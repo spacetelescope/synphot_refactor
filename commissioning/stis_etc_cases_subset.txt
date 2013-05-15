@@ -1,0 +1,87 @@
+calcspecCase1   None   icat(k93models,44500,0.0,5.0)
+calcspecCase21   None   icat(k93models,5770,0.0,4.5)
+calcspecCase22  None   icat(k93models,30000,0.0,4.0)
+calcspecCase27   None   icat(k93models,5860,0.0,4.4)
+calcspecCase29   None   bb(50000)
+calcspecCase30   None   pl(4000.0,0.0,flam)
+calcspecCase31   None   pl(4000.0,-1.0,flam)
+calcspecCase58   None   icat(k93models,5860,0.0,4.4)
+calcspecCase60   None   icat(k93models,11900,0.0,4.0)
+calcphotCase28   stis,fuvmama,25mama   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18.5,vegamag)
+calcphotCase42   stis,fuvmama,f25ndq1   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)
+calcphotCase49   stis,fuvmama,f25lya   spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))
+calcphotCase53   stis,fuvmama,f25srf2   rn(icat(k93models,30000,0.0,4.0),band(johnson,v),26,vegamag)
+calcphotCase23   stis,nuvmama,f25qtz   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),20,vegamag)
+calcphotCase48   stis,nuvmama,f25ndq4   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)
+calcphotCase56   stis,nuvmama,25mama   spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))
+calcphotCase59   stis,nuvmama,f25srf2   rn(icat(k93models,30000,0.0,4.0),band(johnson,v),26,vegamag)
+calcphotCase2    stis,ccd,50ccd   rn(unit(1.0,flam),band(johnson,v),15,vegamag)
+calcphotCase51   stis,ccd,50ccd   rn(icat(k93models,5770,0.0,4.5),band(johnson,v),28,vegamag)
+calcphotCase8    stis,ccd,50ccd   spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)
+calcphotCase15   stis,ccd,50ccd   rn(spec(/grp/hst/cdbs//calspec/agk_81d266_stis_001.fits),band(johnson,v),10,vegamag)
+calcphotCase11   stis,ccd,s03x005nd   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),4,vegamag)
+calcphotCase19   stis,ccd,f28x50oii   spec(/grp/hst/cdbs//calspec/agk_81d266_stis_001.fits)
+calcphotCase61   stis,ccd,f28x50lp  rn(icat(k93models,5860,0.0,4.4),band(johnson,v),5,vegamag)
+countrateCase7   stis,ccd,50ccd   spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)
+countrateCase50  stis,ccd,50ccd   rn(icat(k93models,5770,0.0,4.5),band(johnson,v),28,vegamag)
+countrateCase59  stis,ccd,f28x50lp   spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))
+countrateCase10  stis,ccd,s03x005nd   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),4,vegamag
+countrateCase12  stis,ccd,f25nd5   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),4,vegamag)
+countrateCase22  stis,nuvmama,f25qtz   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),20,vegamag)
+countrateCase29  stis,nuvmama,f25mgii   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)
+countrateCase39  stis,nuvmama,f25nd5   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)
+countrateCase62  stis,nuvmama,25mama   rn(icat(k93models,5860,0.0,4.4),band(johnson,v),5,vegamag)
+countrateCase25  stis,fuvmama,25mama   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),20,vegamag)
+countrateCase41  stis,fuvmama,f25ndq1   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)
+countrateCase49  stis,fuvmama,f25lya   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)
+countrateCase54  stis,fuvmama,f25qtz   rn(icat(k93models,30000,0.0,4.0),band(johnson,v),26,vegamag)
+SpecSourcerateSpecCase62   stis,fuvmama,g140l,s52x2   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),27.5,vegamag)
+SpecSourcerateSpecCase52   stis,fuvmama,e140m,c1425,s02x02   rn(icat(k93models,11900,0.0,4.0),band(johnson,v),7,vegamag)
+SpecSourcerateSpecCase74   stis,fuvmama,e140m,c1425   spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))*2.0
+SpecSourcerateSpecCase14   stis,fuvmama,e140h,c1416,s02x02   spec(/grp/hst/cdbs//calspec/bd_28d4211_stis_001.fits)
+SpecSourcerateSpecCase47   stis,nuvmama,g230l,s52x2   rn(icat(k93models,44500,0.0,5.0)*ebmvx(0.5,gal1),band(johnson,v),15,vegamag)
+SpecSourcerateSpecCase44   stis,nuvmama,e230h,c2263,s02x02   rn(pl(4000.0,-1.0,flam),band(johnson,v),10.516,vegamag)
+SpecSourcerateSpecCase45   stis,nuvmama,e230h,c2263,s02x02   rn(spec(/grp/hst/cdbs//calspec/bd_28d4211_stis_001.fits),box(2000.0,1.0),1.0e-12,flam)
+SpecSourcerateSpecCase20   stis,nuvmama,prism,s52x01   spec(HS20270651.dat)
+SpecSourcerateSpecCase6    stis,nuvmama,g230m,c2818,s52x2   spec(/grp/hst/cdbs//calspec/agk_81d266_stis_001.fits)
+SpecSourcerateSpecCase69   stis,ccd,g750l,c7751,s52x2   rn(icat(k93models,44500,0.0,5.0),band(johnson,v),23,vegamag)
+SpecSourcerateSpecCase36   stis,ccd,g750l,c7751,s52x02   rn(z(spec(qso_template.fits),0.03),band(johnson,v),18,vegamag)
+SpecSourcerateSpecCase32   stis,ccd,g230mb,c1995,s52x2   spec(/grp/hst/cdbs//calspec/agk_81d266_stis_001.fits)
+SpecSourcerateSpecCase77   stis,ccd,g430l   rn(icat(k93models,5860,0.0,4.4),band(johnson,v),5,vegamag)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

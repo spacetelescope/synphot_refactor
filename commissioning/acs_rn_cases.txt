@@ -1,0 +1,158 @@
+
+#
+rn(bb(2000),band(ACS,WFC1,F606W),29.0, vegamag)
+rn(bb(2000),band(ACS,WFC1,F775W),29.0, vegamag)
+rn(bb(2000),band(ACS,WFC1,F814W),29.0, vegamag)
+rn(bb(2000),band(ACS,WFC1,F850LP),29.0, vegamag)
+#
+rn(bb(3000),band(ACS,WFC1,F606W),29.0, vegamag)
+rn(bb(3000),band(ACS,WFC1,F775W),29.0, vegamag)
+rn(bb(3000),band(ACS,WFC1,F814W),29.0, vegamag)
+rn(bb(3000),band(ACS,WFC1,F850LP),29.0, vegamag)
+#
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F435W),29.0, vegamag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F475W),29.0, vegamag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F555W),29.0, vegamag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F606W),29.0, vegamag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F775W),29.0, vegamag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F814W),29.0, vegamag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F850LP),29.0, vegamag)
+#
+#
+rn(bb(2000),band(ACS,WFC1,F606W),29.0, obmag)
+rn(bb(2000),band(ACS,WFC1,F775W),29.0, obmag)
+rn(bb(2000),band(ACS,WFC1,F814W),29.0, obmag)
+rn(bb(2000),band(ACS,WFC1,F850LP),29.0, obmag)
+#
+rn(bb(3000),band(ACS,WFC1,F606W),29.0, obmag)
+rn(bb(3000),band(ACS,WFC1,F775W),29.0, obmag)
+rn(bb(3000),band(ACS,WFC1,F814W),29.0, obmag)
+rn(bb(3000),band(ACS,WFC1,F850LP),29.0, obmag)
+#
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F435W),29.0, obmag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F475W),29.0, obmag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F555W),29.0, obmag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F606W),29.0, obmag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F775W),29.0, obmag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F814W),29.0, obmag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F850LP),29.0, obmag)
+#
+#
+rn(bb(2000),band(ACS,WFC1,F606W),29.0, flam)
+rn(bb(2000),band(ACS,WFC1,F775W),29.0, flam)
+rn(bb(2000),band(ACS,WFC1,F814W),29.0, flam)
+rn(bb(2000),band(ACS,WFC1,F850LP),29.0, flam)
+#
+rn(bb(3000),band(ACS,WFC1,F606W),29.0, flam)
+rn(bb(3000),band(ACS,WFC1,F775W),29.0, flam)
+rn(bb(3000),band(ACS,WFC1,F814W),29.0, flam)
+rn(bb(3000),band(ACS,WFC1,F850LP),29.0, flam)
+#
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F435W),29.0, flam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F475W),29.0, flam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F555W),29.0, flam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F606W),29.0, flam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F775W),29.0, flam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F814W),29.0, flam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F850LP),29.0, flam)
+#
+#
+rn(bb(2000),band(ACS,WFC1,F606W),29.0, photlam)
+rn(bb(2000),band(ACS,WFC1,F775W),29.0, photlam)
+rn(bb(2000),band(ACS,WFC1,F814W),29.0, photlam)
+rn(bb(2000),band(ACS,WFC1,F850LP),29.0, photlam)
+#
+rn(bb(3000),band(ACS,WFC1,F606W),29.0, photlam)
+rn(bb(3000),band(ACS,WFC1,F775W),29.0, photlam)
+rn(bb(3000),band(ACS,WFC1,F814W),29.0, photlam)
+rn(bb(3000),band(ACS,WFC1,F850LP),29.0, photlam)
+#
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F435W),29.0, photlam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F475W),29.0, photlam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F555W),29.0, photlam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F606W),29.0, photlam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F775W),29.0, photlam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F814W),29.0, photlam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,WFC1,F850LP),29.0, photlam)
+#
+#
+rn(bb(2000),band(ACS,HRC,F606W),29.0, vegamag)
+rn(bb(2000),band(ACS,HRC,F775W),29.0, vegamag)
+rn(bb(2000),band(ACS,HRC,F814W),29.0, vegamag)
+rn(bb(2000),band(ACS,HRC,F850LP),29.0, vegamag)
+#
+rn(bb(3000),band(ACS,HRC,F606W),29.0, vegamag)
+rn(bb(3000),band(ACS,HRC,F775W),29.0, vegamag)
+rn(bb(3000),band(ACS,HRC,F814W),29.0, vegamag)
+rn(bb(3000),band(ACS,HRC,F850LP),29.0, vegamag)
+#
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F435W),29.0, vegamag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F475W),29.0, vegamag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F555W),29.0, vegamag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F606W),29.0, vegamag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F775W),29.0, vegamag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F814W),29.0, vegamag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F850LP),29.0, vegamag)
+#
+#
+rn(bb(2000),band(ACS,HRC,F606W),29.0, obmag)
+rn(bb(2000),band(ACS,HRC,F775W),29.0, obmag)
+rn(bb(2000),band(ACS,HRC,F814W),29.0, obmag)
+rn(bb(2000),band(ACS,HRC,F850LP),29.0, obmag)
+#
+rn(bb(3000),band(ACS,HRC,F606W),29.0, obmag)
+rn(bb(3000),band(ACS,HRC,F775W),29.0, obmag)
+rn(bb(3000),band(ACS,HRC,F814W),29.0, obmag)
+rn(bb(3000),band(ACS,HRC,F850LP),29.0, obmag)
+#
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F435W),29.0, obmag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F475W),29.0, obmag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F555W),29.0, obmag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F606W),29.0, obmag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F775W),29.0, obmag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F814W),29.0, obmag)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F850LP),29.0, obmag)
+#
+#
+rn(bb(2000),band(ACS,HRC,F606W),29.0, flam)
+rn(bb(2000),band(ACS,HRC,F775W),29.0, flam)
+rn(bb(2000),band(ACS,HRC,F814W),29.0, flam)
+rn(bb(2000),band(ACS,HRC,F850LP),29.0, flam)
+#
+rn(bb(3000),band(ACS,HRC,F606W),29.0, flam)
+rn(bb(3000),band(ACS,HRC,F775W),29.0, flam)
+rn(bb(3000),band(ACS,HRC,F814W),29.0, flam)
+rn(bb(3000),band(ACS,HRC,F850LP),29.0, flam)
+#
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F435W),29.0, flam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F475W),29.0, flam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F555W),29.0, flam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F606W),29.0, flam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F775W),29.0, flam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F814W),29.0, flam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F850LP),29.0, flam)
+#
+#
+rn(bb(2000),band(ACS,HRC,F606W),29.0, photlam)
+rn(bb(2000),band(ACS,HRC,F775W),29.0, photlam)
+rn(bb(2000),band(ACS,HRC,F814W),29.0, photlam)
+rn(bb(2000),band(ACS,HRC,F850LP),29.0, photlam)
+#
+rn(bb(3000),band(ACS,HRC,F606W),29.0, photlam)
+rn(bb(3000),band(ACS,HRC,F775W),29.0, photlam)
+rn(bb(3000),band(ACS,HRC,F814W),29.0, photlam)
+rn(bb(3000),band(ACS,HRC,F850LP),29.0, photlam)
+#
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F435W),29.0, photlam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F475W),29.0, photlam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F555W),29.0, photlam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F606W),29.0, photlam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F775W),29.0, photlam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F814W),29.0, photlam)
+rn(crcalspec$alpha_lyr_stis_003.fits,band(ACS,HRC,F850LP),29.0, photlam)
+#
+#These should produce errors & have been moved to invalid_rn_cases
+#rn(icat(ck04models,41000,4.5,0),band(ACS,HRC,G800L,F220W),4.5,vegamag)
+#rn(icat(ck04models,41000,4.5,0),band(ACS,HRC,G800L,F250W),4.5,vegamag)
+#rn(icat(ck04models,41000,4.5,0),band(ACS,HRC,G800L,F330W),4.5,vegamag)
+

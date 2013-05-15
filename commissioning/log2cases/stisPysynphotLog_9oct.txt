@@ -1,0 +1,318 @@
+##[BatchLogTest.run] starting 'STISACQ1983'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd"&spectrum="rn(unit(1.0,flam),band(johnson,v),15,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(johnson,v),15,vegamag)"&instrument="stis,ccd"'.
+##[BatchLogTest.run] starting 'STISIMAG1253'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd"&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"&instrument="stis,ccd"'.
+##[BatchLogTest.run] starting 'STISSPEC1341'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd,g430l"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV79.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,5860,0.0,4.4),band(johnson,v),5,vegamag)"&instrument="stis,ccd,g430l"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV80.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1342'.
+##[BatchLogTest.run] starting 'STISSPEC1343'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,5860,0.0,4.4),band(johnson,v),5,vegamag)"&instrument="stis,ccd,g430l"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV81.fits'.
+##[BatchLogTest.run] starting 'STISSPEC110506'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,11900,0.0,4.0),band(johnson,v),10,vegamag)"&instrument="stis,fuvmama,e140m,c1425,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV82.fits'.
+##[BatchLogTest.run] starting 'STISSPEC110508'.
+##[BatchLogTest.run] starting 'STISSPEC1344'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)+(spec(el1215a.fits)*0.2+spec(el1302a.fits)*0.01333333333+spec(el1356a.fits)*0.012+spec(el2471a.fits)*0.01)"&instrument="stis,ccd,g430l"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV83.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="em(4300.0,1.0,1.0E-12,flam)"&instrument="stis,ccd,g430l"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV84.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1345'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd,g430m,c4194"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV85.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="em(4300.0,1.0,1.0E-12,flam)"&instrument="stis,ccd,g430m,c4194,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV86.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1346'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama,e140m,c1425"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV87.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="em(1425.0,1.0,1.0E-10,flam)"&instrument="stis,fuvmama,e140m,c1425,s02x006"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV88.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1347'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="em(1425.0,0.043487548828125,1.0E-10,flam)"&instrument="stis,fuvmama,e140m,c1425,s02x006"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV89.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1360'.
+##[BatchLogTest.run] starting 'STISIMAG1255'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd"&spectrum="rn(spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits),band(johnson,v),10,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits),band(johnson,v),10,vegamag)"&instrument="stis,ccd"'.
+##[BatchLogTest.run] starting 'STISSPEC4422'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/grw_70d5824_stis_001.fits),band(johnson,v),10.516,vegamag)"&instrument="stis,fuvmama,g140l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV90.fits'.
+##[BatchLogTest.run] starting 'STISIMAG1257'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,ccd,f28x50lp"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,f28x50lp"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,f28x50lp"&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"&instrument="stis,ccd,f28x50lp"'.
+##[BatchLogTest.run] starting 'STISIMAG1258'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,ccd,f28x50oii"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,f28x50oii"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,f28x50oii"&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"&instrument="stis,ccd,f28x50oii"'.
+##[BatchLogTest.run] starting 'STISIMAG1259'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,ccd,f28x50oiii"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,f28x50oiii"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,f28x50oiii"&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"&instrument="stis,ccd,f28x50oiii"'.
+##[BatchLogTest.run] starting 'STISIMAG1260'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,f25qtz"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25qtz"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25qtz"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),20,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),20,vegamag)"&instrument="stis,nuvmama,f25qtz"'.
+##[BatchLogTest.run] starting 'STISIMAG1263'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25qtz"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"&instrument="stis,nuvmama,f25qtz"'.
+##[BatchLogTest.run] starting 'STISIMAG1265'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),20,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),20,vegamag)"&instrument="stis,fuvmama"'.
+##[BatchLogTest.run] starting 'STISIMAG1267'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18.5,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18.5,vegamag)"&instrument="stis,fuvmama"'.
+##[BatchLogTest.run] starting 'STISIMAG1271'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,f25mgii"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25mgii"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25mgii"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"&instrument="stis,nuvmama,f25mgii"'.
+##[BatchLogTest.run] starting 'STISACQ1983a'.
+##[BatchLogTest.run] starting 'STISIMAG1273'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,f25cn270"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25cn270"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25cn270"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"&instrument="stis,nuvmama,f25cn270"'.
+##[BatchLogTest.run] starting 'STISIMAG1275'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,f25ciii"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25ciii"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25ciii"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"&instrument="stis,nuvmama,f25ciii"'.
+##[BatchLogTest.run] starting 'STISIMAG1277'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,f25cn182"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25cn182"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25cn182"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"&instrument="stis,nuvmama,f25cn182"'.
+##[BatchLogTest.run] starting 'STISIMAG1279'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama,f25nd3"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama,f25nd3"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama,f25nd3"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"&instrument="stis,fuvmama,f25nd3"'.
+##[BatchLogTest.run] starting 'STISIMAG1281'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,f25nd5"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25nd5"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25nd5"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"&instrument="stis,nuvmama,f25nd5"'.
+##[BatchLogTest.run] starting 'STISIMAG1282'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama,f25ndq1"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama,f25ndq1"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama,f25ndq1"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"&instrument="stis,fuvmama,f25ndq1"'.
+##[BatchLogTest.run] starting 'STISIMAG1286'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,f25ndq2"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25ndq2"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25ndq2"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"&instrument="stis,nuvmama,f25ndq2"'.
+##[BatchLogTest.run] starting 'STISIMAG1288'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama,f25ndq3"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama,f25ndq3"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama,f25ndq3"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"&instrument="stis,fuvmama,f25ndq3"'.
+##[BatchLogTest.run] starting 'STISIMAG1290'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,f25ndq4"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25ndq4"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25ndq4"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"&instrument="stis,nuvmama,f25ndq4"'.
+##[BatchLogTest.run] starting 'STISIMAG1291'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama,f25lya"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama,f25lya"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama,f25lya"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18,vegamag)"&instrument="stis,fuvmama,f25lya"'.
+##[BatchLogTest.run] starting 'STISACQ1983b'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd,s03x005nd"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,s03x005nd"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,s03x005nd"&spectrum="rn(unit(1.0,flam),band(johnson,v),15,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(johnson,v),15,vegamag)"&instrument="stis,ccd,s03x005nd"'.
+##[BatchLogTest.run] starting 'STISIMAG1293'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd"&spectrum="rn(icat(k93models,5770,0.0,4.5),band(johnson,v),28,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,5770,0.0,4.5),band(johnson,v),28,vegamag)"&instrument="stis,ccd"'.
+##[BatchLogTest.run] starting 'STISIMAG1295'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama,f25srf2"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama,f25srf2"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama,f25srf2"&spectrum="rn(icat(k93models,30000,0.0,4.0),band(johnson,v),26,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,30000,0.0,4.0),band(johnson,v),26,vegamag)"&instrument="stis,fuvmama,f25srf2"'.
+##[BatchLogTest.run] starting 'STISIMAG1297'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama,f25qtz"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama,f25qtz"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,fuvmama,f25qtz"&spectrum="rn(icat(k93models,30000,0.0,4.0),band(johnson,v),26,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,30000,0.0,4.0),band(johnson,v),26,vegamag)"&instrument="stis,fuvmama,f25qtz"'.
+##[BatchLogTest.run] starting 'STISIMAG1299'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama"&spectrum="rn(icat(k93models,30000,0.0,4.0),band(johnson,v),26,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,30000,0.0,4.0),band(johnson,v),26,vegamag)"&instrument="stis,nuvmama"'.
+##[BatchLogTest.run] starting 'STISIMAG1302'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,f25srf2"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25srf2"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama,f25srf2"&spectrum="rn(icat(k93models,30000,0.0,4.0),band(johnson,v),26,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,30000,0.0,4.0),band(johnson,v),26,vegamag)"&instrument="stis,nuvmama,f25srf2"'.
+##[BatchLogTest.run] starting 'STISIMAG110509'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd,f28x50lp"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,f28x50lp"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,f28x50lp"&spectrum="rn(icat(k93models,5860,0.0,4.4),band(johnson,v),5,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,5860,0.0,4.4),band(johnson,v),5,vegamag)"&instrument="stis,ccd,f28x50lp"'.
+##[BatchLogTest.run] starting 'STISIMAG1306'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,nuvmama"&spectrum="rn(icat(k93models,5860,0.0,4.4),band(johnson,v),5,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,5860,0.0,4.4),band(johnson,v),5,vegamag)"&instrument="stis,nuvmama"'.
+##[BatchLogTest.run] starting 'STISSPEC1264'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama,g140l"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV1.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/grw_70d5824_stis_001.fits)"&instrument="stis,fuvmama,g140l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV2.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1266'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,nuvmama,g230l"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV3.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/grw_70d5824_stis_001.fits)"&instrument="stis,nuvmama,g230l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV4.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1269'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,nuvmama,g230m,c2818"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV5.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"&instrument="stis,nuvmama,g230m,c2818,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV6.fits'.
+##[BatchLogTest.run] starting 'STISACQ1983c'.
+##[BatchLogTest.run] starting 'STISSPEC1370'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama,g140m,c1567"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV7.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"&instrument="stis,fuvmama,g140m,c1567,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV8.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1272'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,prism"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV9.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/APT/userFiles/HS20270651.dat)"&instrument="stis,nuvmama,prism,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV10.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1274'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama,e140m,c1425"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV11.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/bd_28d4211_stis_001.fits)"&instrument="stis,fuvmama,e140m,c1425,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV12.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1278'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama,e140h,c1416"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV13.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/bd_28d4211_stis_001.fits)"&instrument="stis,fuvmama,e140h,c1416,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV14.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1280'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,e230m,c1978"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV15.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/bd_28d4211_stis_001.fits)"&instrument="stis,nuvmama,e230m,c1978,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV16.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1372'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,e230h,c2263"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV17.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/bd_28d4211_stis_001.fits)"&instrument="stis,nuvmama,e230h,c2263,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV18.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1396'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,prism"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV19.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/APT/userFiles/HS20270651.dat)"&instrument="stis,nuvmama,prism,s52x01"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV20.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1305'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,ccd,g230lb"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV21.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"&instrument="stis,ccd,g230lb,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV22.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1307'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,ccd,g430l"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV23.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"&instrument="stis,ccd,g430l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV24.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1308'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,ccd,g750l,c7751"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV25.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"&instrument="stis,ccd,g750l,c7751,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV26.fits'.
+##[BatchLogTest.run] starting 'STISACQ1906'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),10,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),10,vegamag)"&instrument="stis,ccd"'.
+##[BatchLogTest.run] starting 'STISSPEC1310'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,ccd,g430m,c4194"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV27.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"&instrument="stis,ccd,g430m,c4194,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV28.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1311'.
+##[BatchLogTest.run] starting 'STISSPEC1374'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd,g750m,c7283"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV29.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"&instrument="stis,ccd,g750m,c7283,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV30.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1400'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd,g230mb,c1995"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV31.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits)"&instrument="stis,ccd,g230mb,c1995,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV32.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1314'.
+##[BatchLogTest.run] starting 'STISSPEC1315'.
+##[BatchLogTest.run] starting 'STISSPEC1316'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,fuvmama,g140l"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV33.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits),band(johnson,v),12.77,vegamag)"&instrument="stis,fuvmama,g140l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV34.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1319'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,ccd,g750l,c7751"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV35.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(z(spec(qso_template.fits),0.03),band(johnson,v),18,vegamag)"&instrument="stis,ccd,g750l,c7751,s52x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV36.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1320'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(z(spec(qso_template.fits),1.0),band(johnson,v),18,vegamag)"&instrument="stis,ccd,g750l,c7751,s52x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV37.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1321'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(z(spec(qso_template.fits),3.0),band(johnson,v),18,vegamag)"&instrument="stis,ccd,g750l,c7751,s52x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV38.fits'.
+##[BatchLogTest.run] starting 'STISACQ1907'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,ccd"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),20,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),20,vegamag)"&instrument="stis,ccd"'.
+##[BatchLogTest.run] starting 'STISSPEC1375'.
+##[BatchLogTest.run] starting 'STISSPEC1376'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/bd_28d4211_stis_001.fits),band(johnson,v),10.516,vegamag)"&instrument="stis,nuvmama,e230h,c2263,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV39.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1377'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),10.516,vegamag)"&instrument="stis,nuvmama,e230h,c2263,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV40.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1378'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="bb(50000)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV41.fits"'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(bb(50000),band(johnson,v),10.516,vegamag)"&instrument="stis,nuvmama,e230h,c2263,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV42.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1379'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(unit(1.0,flam),band(johnson,v),10.516,vegamag)"&instrument="stis,nuvmama,e230h,c2263,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV43.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1380'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="pl(4000.0,0.0,flam)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV44.fits"'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(pl(4000.0,0.0,flam),band(johnson,v),10.516,vegamag)"&instrument="stis,nuvmama,e230h,c2263,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV45.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1381'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="pl(4000.0,-1.0,flam)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV46.fits"'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(pl(4000.0,-1.0,flam),band(johnson,v),10.516,vegamag)"&instrument="stis,nuvmama,e230h,c2263,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV47.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1382'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/bd_28d4211_stis_001.fits),box(2000.0,1.0),1.0e-12,flam)"&instrument="stis,nuvmama,e230h,c2263,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV48.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1322'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,nuvmama,g230l"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV49.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0)*ebmvx(0.5,gal1),band(johnson,v),15,vegamag)"&instrument="stis,nuvmama,g230l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV50.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1323'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0)*ebmvx(0.5,smc),band(johnson,v),15,vegamag)"&instrument="stis,nuvmama,g230l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV51.fits'.
+##[BatchLogTest.run] starting 'STISACQ1908'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="stis,ccd,s03x005nd"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,s03x005nd"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,s03x005nd"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),4,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),4,vegamag)"&instrument="stis,ccd,s03x005nd"'.
+##[BatchLogTest.run] starting 'STISSPEC1324'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0)*ebmvx(0.5,lmc),band(johnson,v),15,vegamag)"&instrument="stis,nuvmama,g230l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV52.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1325'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0)*ebmvx(0.5,xgal),band(johnson,v),15,vegamag)"&instrument="stis,nuvmama,g230l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV53.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1099'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,11900,0.0,4.0),band(johnson,v),6,vegamag)"&instrument="stis,fuvmama,e140m,c1425,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV54.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1101'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,11900,0.0,4.0),band(johnson,v),7,vegamag)"&instrument="stis,fuvmama,e140m,c1425,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV55.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1239'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),13,vegamag)"&instrument="stis,fuvmama,g140l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV56.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1240'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),14,vegamag)"&instrument="stis,fuvmama,g140l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV57.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1241'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),14.1,vegamag)"&instrument="stis,fuvmama,g140l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV58.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1242'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,fuvmama,g140l"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV59.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(ngc1068_template.fits),band(johnson,v),9,vegamag)"&instrument="stis,fuvmama,g140l,s52x01"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV60.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1243'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd,g430l"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV61.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/agk_81d266_stis_001.fits),band(johnson,v),10,vegamag)"&instrument="stis,ccd,g430l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV62.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1244'.
+##[BatchLogTest.run] starting 'STISACQ1943'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd,f25nd5"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,f25nd5"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="stis,ccd,f25nd5"&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),4,vegamag)"'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),4,vegamag)"&instrument="stis,ccd,f25nd5"'.
+##[BatchLogTest.run] starting 'STISSPEC1245'.
+##[BatchLogTest.run] starting 'STISSPEC1250'.
+##[BatchLogTest.run] starting 'STISSPEC1251'.
+##[BatchLogTest.run] starting 'STISSPEC1252'.
+##[BatchLogTest.run] starting 'STISSPEC1254'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),22,vegamag)"&instrument="stis,fuvmama,e140m,c1425,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV63.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1256'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),18.5,vegamag)"&instrument="stis,nuvmama,e230m,c1978,s02x02"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV64.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1292'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),27.5,vegamag)"&instrument="stis,fuvmama,g140l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV65.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1294'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),24,vegamag)"&instrument="stis,nuvmama,g230l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV66.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1296'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd,g230lb"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV67.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),22,vegamag)"&instrument="stis,ccd,g230lb,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV68.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1298'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),23.5,vegamag)"&instrument="stis,ccd,g430l,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV69.fits'.
+##[BatchLogTest.run] starting 'STISACQ1944'.
+##[BatchLogTest.run] starting 'STISSPEC1300'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd,g750l,c7751"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV70.fits'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),24.5,vegamag)"&instrument="stis,ccd,g750l,c7751,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV71.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1329'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,44500,0.0,5.0),band(johnson,v),23,vegamag)"&instrument="stis,ccd,g750l,c7751,s52x2"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV72.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1330'.
+##[BatchLogTest.run] starting 'STISSPEC1331'.
+##[BatchLogTest.run] starting 'STISSPEC1332'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd,g750l,c7751"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV73.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1333'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="stis,ccd,g750l,c7751"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV74.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1336'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))*2.0"&instrument="stis,ccd,g750l,c7751"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV75.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1337'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)*0.2+spec(el1302a.fits)*0.01333333333+spec(el1356a.fits)*0.012+spec(el2471a.fits)*0.01)"&instrument="stis,ccd,g750l,c7751"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV76.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1338'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))*2.0"&instrument="stis,fuvmama,e140m,c1425"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV77.fits'.
+##[BatchLogTest.run] starting 'STISSPEC1339'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)+(spec(el1215a.fits)*0.2+spec(el1302a.fits)*0.01333333333+spec(el1356a.fits)*0.012+spec(el2471a.fits)*0.01)"&instrument="stis,fuvmama,e140m,c1425"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV78.fits'.

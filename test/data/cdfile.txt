@@ -1,0 +1,5 @@
+KEYWORD          20A              A12              ""               ""               ""               ""               ""              
+INNODE           J                I10              ""               ""               -2147483647      ""               ""              
+OUTNODE          J                I10              ""               ""               -2147483647      ""               ""              
+COMPNAME         20A              A18              ""               ""               ""               ""               ""              
+THCOMPNAME       20A              ""               ""               ""               ""               ""               ""              

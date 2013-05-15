@@ -1,0 +1,44 @@
+>>> from hotshot import stats
+>>> spec=stats.load('wfc3_ir_spec.stats')
+>>> spec.sort_stats("time")
+<pstats.Stats instance at 0x2a98ef4908>
+
+>>> spec.print_stats(30)
+         59707396 function calls (59519186 primitive calls) in 312.799 CPU seconds
+
+   Ordered by: internal time
+   List reduced from 1027 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    16614   66.648    0.004   66.648    0.004 /usr/stsci/pyssgdev/2.5.1/pyraf/subproc.py:688(read)
+      362   42.443    0.117   72.619    0.201 /user/laidler/pyinstall/pysynphot/catalog.py:61(_getArgs)
+ 16056176   30.725    0.000   30.778    0.000 /usr/stsci/pyssgdev/2.5.1/numpy/core/defchararray.py:45(__getitem__)
+ 13773738   11.353    0.000   11.353    0.000 /user/laidler/pyinstall/pysynphot/catalog.py:65(<lambda>)
+    10001   10.955    0.001   16.474    0.002 /user/laidler/pyinstall/pysynphot/spectrum.py:879(resample)
+       51   10.333    0.203   10.333    0.203 /usr/stsci/pyssgdev/2.5.1/pyraf/subproc.py:395(wait)
+    64952    9.532    0.000   10.844    0.000 /usr/stsci/pyssgdev/2.5.1/pyfits/NP_pyfits.py:2705(__init__)
+    15884    9.524    0.001    9.524    0.001 /usr/stsci/pyssgdev/2.5.1/numpy/core/fromnumeric.py:523(searchsorted)
+     2534    8.047    0.003   13.085    0.005 /user/laidler/pyinstall/pysynphot/catalog.py:72(_breakList)
+    24880    5.827    0.000   20.453    0.001 /usr/stsci/pyssgdev/2.5.1/pyfits/NP_pyfits.py:1676(setupHDU)
+    13074    5.420    0.000   21.767    0.002 /usr/stsci/pyssgdev/2.5.1/pyfits/NP_pyfits.py:2859(__init__)
+    13074    5.342    0.000    5.755    0.000 /usr/stsci/pyssgdev/2.5.1/pyfits/NP_pyfits.py:4283(__init__)
+     5590    4.896    0.001   11.697    0.002 /user/laidler/pyinstall/pysynphot/spectrum.py:517(resample)
+      823    4.474    0.005   15.527    0.019 /user/laidler/pyinstall/pysynphot/observationmode.py:51(__init__)
+      823    3.824    0.005   16.338    0.020 /user/laidler/pyinstall/pysynphot/observationmode.py:75(__init__)
+   366809    3.732    0.000    8.155    0.000 /usr/stsci/pyssgdev/2.5.1/pyfits/NP_pyfits.py:559(_extractValueComment)
+  9516980    3.337    0.000    3.337    0.000 /usr/stsci/pyssgdev/2.5.1/numpy/ma/core.py:1566(_get_mask)
+   786576    3.206    0.000    3.609    0.000 /usr/stsci/pyssgdev/2.5.1/pyfits/NP_pyfits.py:754(fromstring)
+    66960    3.167    0.000    3.167    0.000 /usr/stsci/pyssgdev/2.5.1/numpy/core/defchararray.py:55(__eq__)
+  1163717    2.275    0.000    2.275    0.000 /usr/stsci/pyssgdev/2.5.1/pyfits/NP_pyfits.py:653(_locateEq)
+      198    2.142    0.011    2.195    0.011 /usr/stsci/pyssgdev/2.5.1/pyraf/irafpar.py:2232(saveParList)
+   377141    2.140    0.000    3.563    0.000 /usr/stsci/pyssgdev/2.5.1/pyfits/NP_pyfits.py:700(_check)
+  1293297    1.887    0.000   14.299    0.000 /usr/stsci/pyssgdev/2.5.1/pyfits/NP_pyfits.py:351(__getattr__)
+    12440    1.876    0.000    2.402    0.000 /usr/stsci/pyssgdev/2.5.1/pyfits/rec.py:446(fromfile)
+   478231    1.796    0.000    1.796    0.000 /usr/stsci/pyssgdev/2.5.1/pyfits/NP_pyfits.py:1365(index_of)
+    51812    1.715    0.000    1.911    0.000 /user/laidler/pyinstall/pysynphot/spark.py:209(buildState)
+  2105033    1.693    0.000    1.693    0.000 /usr/stsci/pyssgdev/2.5.1/pyfits/rec.py:198(__getattribute__)
+       78    1.635    0.021    1.883    0.024 /user/laidler/pyinstall/pysynphot/spectrum.py:740(__call__)
+     2306    1.528    0.001  147.939    0.064 /user/laidler/pyinstall/pysynphot/spparser.py:187(p_functioncall)
+   132440    1.450    0.000    1.487    0.000 /usr/stsci/pyssgdev/2.5.1/pyfits/NP_pyfits.py:2469(_parse_tformat)
+
+

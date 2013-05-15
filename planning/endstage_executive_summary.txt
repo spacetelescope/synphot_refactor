@@ -1,0 +1,94 @@
+Plan for concluding the syn_pysyn commissioning process:
+
+Goal: apply the information gathered from the syn_pysyn testing to the
+ETC regression testing process.
+
+About the syn_pysyn test set:
+============================
+
+Test cases were generated from the existing ETC regression test suites
+for (ACS,NICMOS,STIS,WFC3). Each distinct (synphot command, obsmode,
+spectrum) tuple generated a separate case. Some additional cases were
+generated to test renormalization and non-HST bands.
+
+For each test case, the command was issued in synphot, and the
+analogous calculation was performed in pysynphot. A small number (3-7)
+of scalar and array values were compared, including both final and
+intermediate products. This resulted in a total of 15700 distinct
+tests.
+
+To avoid drowning in a sea of data, several subsets were defined for
+careful attention:
+  - a "representative subset" of test cases defined by each team rep
+  - all countrate comparisons
+  - all throughput comparisons
+  - all "extreme" failures (>20% discrepancy between synphot and
+  pysynphot)
+
+Further details of the commissioning process, the test sets, the
+comparisons, the known differences between synphot and pysynphot will
+be included in the commissioning report (in prep).
+
+PENULTIMATE STAGE: 
+=================
+
+1. Pysynphot Code Changes: DONE
+
+Commit code changes for remaining set of high-priority tickets.
+
+2. Changes to test definitions and CDBS files: DONE
+
+Some changes were ncessary due to duplication, changes in extinction
+laws, poor choices of spectral models, and to handle cases of partial
+overlap between spectrum and bandpass. Changes in CDBS throughput
+files were necessary to ensure that all obsmodes were properly pinned
+to zero.
+
+3. Define and mark representative subsets: DONE
+
+
+4. Run the final test set: DONE
+
+
+5. Evaluate results of final test set: IN PROGRESS
+
+
+The end result of the penultimate stage will be a
+set of tests that either pass, or are accepted failures -- ie,
+discrepancies between synphot and pysynphot that result from
+acceptable differences between the synphot and pysynphot software packages.
+
+
+
+
+
+FINAL STAGE:
+===========
+
+1. Preparation: In Progress
+
+Write scripts and utilities to facilitate the bookkeeping.
+
+2. Mapping to the ETC cases: DONE
+
+Include ETC test names as part of the syn_pysyn test cases.
+
+3. Run the ETC Regression test set
+
+Set up a test environment, run the regression tests
+against the last released ETC version (17.3) using pysynphot instead
+of synphot.
+
+Generate a report of failed tests by name; divide them into "new" and 
+"expected" failures.
+  "new" failure      = syn_pysyn passed, ETC failed
+  "expected" failure = syn_pysyn acceptable failure, ETC failed
+
+4. Examine any "new" failures
+
+5. Doublecheck the "expected" failures
+
+When the final round is complete:
+
+- the tested version of pysynphot will be named v0.6 and released
+- ETC 17.4 development will switch over from synphot to pysynphot v0.6

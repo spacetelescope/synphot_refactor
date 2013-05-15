@@ -1,0 +1,41 @@
+Pysynphot Commissioning Effort
+Status Report 16 June 2008
+
+- A test procedure has been defined.
+
+   SSB and INS have agreed that synphot will be used as a "brass
+   standard", and initial commissioning tests will be run to compare
+   synphot and pysynphot results for the same cases. Significant
+   discrepancies will be investigated to determine which software
+   package gives the more correct answer.
+
+   Additionally, tests will be defined for cases in which synphot is
+   known to give incorrect or questionable results, which will be
+   scrutinized more carefully.
+
+- A set of ETC-related cases has been defined and run for all
+  instruments that use the ETC.
+     - these are still missing the thermback cases.
+     - there are over 23000 tests in this set
+     - several new pysynphot errors have been identified
+     - an ETC obsmode specification error has been identified
+     - a sporadic IRAF problem occurs during large test runs but not
+  when tests are run individually; investigatino ongoing.
+     - synphot.calcspec sometimes generates errors pertaining to the
+  renormalization wavetab when countrate does not
+     - for more detail see errors.txt in this repository
+
+- A set of science-related cases has been started.
+     - these include the narrow emission lines used in the ETC
+     background, which demonstrate some interesting differences
+
+- Scripts have been written to automatically run the above test sets,
+  perform statistics, and generate plots.
+
+- A multi-platform set has been run.
+     Two test cases were reported to me that demonstrated discrepant
+     results on Solaris, Mac, and Linux platforms. I have run these
+     cases on various platforms and determined that pysynphot
+     performs identically platforms on which synphot differs.
+     results and list of platforms tested are
+     located in /eng/ssb/syn_pysyn/platform. )

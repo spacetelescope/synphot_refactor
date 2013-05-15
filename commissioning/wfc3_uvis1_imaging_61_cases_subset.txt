@@ -1,0 +1,85 @@
+#All of the cases involving Zodi and emission-line spectra always fail the spectrum
+#based tests because of the narrow features. So keep just one or two.
+
+calcphotCase1    wfc3,uvis1,f200lp spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))
+
+#All of the cases involving k93models always fail the spectrum-based
+#tests because of high-frequency features in the spectra. So keep just
+#one or two.
+
+calcphotCase189  wfc3,uvis1,f606w  rn(icat(k93models,30000,0.0,4.0)*ebmvx(0.04,gal1),band(johnson,b),28.0,vegamag)
+
+#All of the cases involving cdbs spectra always fail the spectrum-based
+#tests because of high-frequency features in the spectra. Only keep one
+#or two.
+
+calcphotCase308  wfc3,uvis1,f555w  rn(z(spec(spiral.fits),0.3),band(johnson,b),28.0,vegamag)
+
+#All of the cases involving BZ catalog spectra always fail the spectrum
+#based tests because of sharp features in the spectra. This should be
+#better when using the Pickles catalog, so keep a few to test range of
+#parameters.
+
+calcphotCase213  wfc3,uvis1,f814w  rn(spec(/grp/hst/cdbs//grid/bz77/bz_1.fits),band(cousins,i),28.0,vegamag)*ebmvx(0.04,gal1)
+calcphotCase260  wfc3,uvis1,f814w  rn(spec(/grp/hst/cdbs//grid/bz77/bz_50.fits),band(cousins,i),28.0,vegamag)*ebmvx(0.24,xgal)
+calcphotCase271  wfc3,uvis1,f814w  rn(spec(/grp/hst/cdbs//grid/bz77/bz_61.fits),band(cousins,i),28.0,vegamag)*ebmvx(0.2,lmc)
+
+#All of these cases pass because of their smooth spectra, except for the one
+#case involving an emission line. So keep all but the emission line case.
+
+calcphotCase313  wfc3,uvis1,f300x  rn(bb(10000),band(johnson,u),28.0,vegamag)
+calcphotCase317  wfc3,uvis1,f300x  rn(bb(10000),band(johnson,i),28.0,vegamag)
+calcphotCase321  wfc3,uvis1,f300x  rn(bb(10000),band(johnson,k),28.0,vegamag)
+calcphotCase325  wfc3,uvis1,f850lp rn(pl(4000.0,-2.0,flam),band(bessell,h),28.0,vegamag)
+calcphotCase329  wfc3,uvis1,f850lp rn(pl(4000.0,-2.0,flam),band(bessell,k),28.0,vegamag)
+calcphotCase334  wfc3,uvis1,f225w  rn(unit(1.0,flam),band(sdss,i),28.0,vegamag)
+calcphotCase337  wfc3,uvis1,f225w  rn(unit(1.0,flam),box(5000.0,1.0),1.0e-18,flam)
+
+#All of the cases involving k93models always fail because of
+#high-frequency features in the spectra. So only keep one or two.
+
+calcspecCase2244  None  icat(k93models,6440,0.0,4.3)
+
+#These always pass because of their smooth spectra, so keep both.
+
+calcspecCase2257  None  bb(10000)
+calcspecCase2263  None  pl(4000.0,-2.0,flam)
+
+#All cases using Zodi and emission lines fail due to narrow spectral features.
+#Keep one or two.
+
+countrateCase32  wfc3,uvis1,f350lp  spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))
+
+#All cases using k93models fail spectrum-based tests because of high-frequency
+#spectral features. Keep one or two.
+
+countrateCase4  wfc3,uvis1,f200lp  rn(icat(k93models,9230,0.0,4.1),band(johnson,v),22.0,vegamag)
+
+#All of the cases using BZ spectra fail because of their spectral features.
+#Keep a few of them, in case we get better results once we switch to Pickles
+#spectra.
+
+countrateCase220  wfc3,uvis1,f814w  rn(spec(/grp/hst/cdbs//grid/bz77/bz_9.fits),band(cousins,i),28.0,vegamag)*ebmvx(0.12,gal3)
+countrateCase249  wfc3,uvis1,f814w  rn(spec(/grp/hst/cdbs//grid/bz77/bz_39.fits),band(cousins,i),28.0,vegamag)*ebmvx(0.08,gal1)
+countrateCase269  wfc3,uvis1,f814w  rn(spec(/grp/hst/cdbs//grid/bz77/bz_60.fits),band(cousins,i),28.0,vegamag)*ebmvx(0.16,smc)
+
+#All cases using cdbs spectra fail because of high-frequency spectral features.
+#Keep one or two.
+
+countrateCase307  wfc3,uvis1,f555w  rn(z(spec(spiral.fits),0.3),band(johnson,b),28.0,vegamag)
+
+#All of the bb and pl cases pass because of their smooth spectra. 
+#Keep them all, since they're the only ones that work.
+
+countrateCase312  wfc3,uvis1,f300x  rn(bb(10000),band(johnson,u),28.0,vegamag)
+countrateCase316  wfc3,uvis1,f300x  rn(bb(10000),band(johnson,i),28.0,vegamag)
+countrateCase320  wfc3,uvis1,f300x  rn(bb(10000),band(johnson,k),28.0,vegamag)
+countrateCase324  wfc3,uvis1,f850lp  rn(pl(4000.0,-2.0,flam),band(bessell,h),28.0,vegamag)
+countrateCase328  wfc3,uvis1,f850lp  rn(pl(4000.0,-2.0,flam),band(bessell,k),28.0,vegamag)
+
+#All of the unit cases pass, except for the one with an emission-line
+#superimposed. So keep all but that one.
+
+countrateCase330  wfc3,uvis1,f225w  rn(unit(1.0,flam),band(sdss,g),28.0,vegamag)
+countrateCase335  wfc3,uvis1,f225w  rn(unit(1.0,fnu),band(sdss,z),28.0,vegamag)
+

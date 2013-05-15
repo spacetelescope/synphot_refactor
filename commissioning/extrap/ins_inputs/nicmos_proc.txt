@@ -1,0 +1,6 @@
+Elizabeth provided me with a file containing "pin" or "do not pin".
+I saved this file as nicmos_pinlist.txt.
+
+awk -F: '/do not pin/ {print $1}' nicmos_pinlist.txt > nicmos_unpinned.txt
+
+python remove_unpinned.py nicmos_unpinned.txt comp/nicmos/

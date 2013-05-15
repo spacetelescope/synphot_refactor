@@ -1,0 +1,25 @@
+XTENSION= 'BINTABLE'           / binary table extension                         
+BITPIX  =                    8 / array data type                                
+NAXIS   =                    2 / number of array dimensions                     
+NAXIS1  =                  136 / length of dimension 1                          
+NAXIS2  =                 3299 / length of dimension 2                          
+PCOUNT  =                    0 / number of group parameters                     
+GCOUNT  =                    1 / number of groups                               
+TFIELDS =                    6 / number of table fields                         
+TTYPE1  = 'COMPNAME'                                                            
+TFORM1  = '20A     '                                                            
+TDISP1  = 'A18     '                                                            
+TTYPE2  = 'KEYWORD '                                                            
+TFORM2  = '20A     '                                                            
+TDISP2  = 'A12     '                                                            
+TTYPE3  = 'INNODE  '                                                            
+TFORM3  = 'J       '                                                            
+TNULL3  =          -2147483647                                                  
+TDISP3  = 'I10     '                                                            
+TTYPE4  = 'OUTNODE '                                                            
+TFORM4  = 'J       '                                                            
+TNULL4  =          -2147483647                                                  
+TDISP4  = 'I10     '                                                            
+TTYPE5  = 'THCOMPNAME'                                                          
+TFORM5  = '20A     '                                                            
+

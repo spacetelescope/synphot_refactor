@@ -1,0 +1,1905 @@
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.001'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 2552
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 5471
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 4743
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 5896
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 7082
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.010'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f160w"&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3306
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"&instrument="nicmos,2,f160w"'.
+##[PysynphotRunner.doRun] request took 3445
+##[BatchLogTest.run] starting 'ImagingA:00078'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.9514,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3203
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.9514,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3193
+##[BatchLogTest.run] starting 'ImagingA:00079'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.0086,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3353
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.0086,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3174
+##[BatchLogTest.run] starting 'ImagingA:00080'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.1514,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3373
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.1514,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3326
+##[BatchLogTest.run] starting 'ImagingA:00081'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.40573333333333,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3336
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.40573333333333,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3242
+##[BatchLogTest.run] starting 'ImagingA:00082'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.067600000000002,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3524
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.067600000000002,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3664
+##[BatchLogTest.run] starting 'ImagingA:00083'.
+##[BatchLogTest.run] starting 'ImagingA:00085'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.964448767123287,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3214
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.964448767123287,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3193
+##[BatchLogTest.run] starting 'ImagingA:00086'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.26738684931507,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3329
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.26738684931507,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3348
+##[BatchLogTest.run] starting 'ImagingA:00087'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.808112328767123,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3432
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.808112328767123,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3344
+##[BatchLogTest.run] starting 'ImagingA:00088'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),21.628378447488586,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3430
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),21.628378447488586,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3086
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.011'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f160w"'.
+##[PysynphotRunner.doRun] request took 1881
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f160w"'.
+##[PysynphotRunner.doRun] request took 3273
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f160w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3229
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f160w"&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3511
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f160w"'.
+##[PysynphotRunner.doRun] request took 3646
+##[BatchLogTest.run] starting 'ImagingA:00089'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),30.0,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3300
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),30.0,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3137
+##[BatchLogTest.run] starting 'ImagingA:00090'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),28.0,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3102
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),28.0,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3393
+##[BatchLogTest.run] starting 'ImagingA:00091'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+spec(Zodi.fits)*1.0"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3118
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+spec(Zodi.fits)*1.0"'.
+##[PysynphotRunner.doRun] request took 2888
+##[BatchLogTest.run] starting 'ImagingA:00092'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+spec(Zodi.fits)*1.5"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 2917
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+spec(Zodi.fits)*1.5"'.
+##[PysynphotRunner.doRun] request took 3119
+##[BatchLogTest.run] starting 'ImagingA:00093'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3006
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3320
+##[BatchLogTest.run] starting 'ImagingA:00094'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3324
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3026
+##[BatchLogTest.run] starting 'ImagingA:00095'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3531
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3387
+##[BatchLogTest.run] starting 'ImagingA:00096'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(earthshine.fits),band(johnson,v),30.0,vegamag)+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3577
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(earthshine.fits),band(johnson,v),30.0,vegamag)+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3645
+##[BatchLogTest.run] starting 'ImagingA:00097'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(earthshine.fits),band(johnson,v),28.0,vegamag)+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3630
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(earthshine.fits),band(johnson,v),28.0,vegamag)+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3596
+##[BatchLogTest.run] starting 'ImagingA:00098'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*1.0+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3168
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*1.0+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3402
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.012'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f090m"'.
+##[PysynphotRunner.doRun] request took 1948
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f090m"'.
+##[PysynphotRunner.doRun] request took 3699
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f090m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3293
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f090m"&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3312
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"&instrument="nicmos,1,f090m"'.
+##[PysynphotRunner.doRun] request took 3681
+##[BatchLogTest.run] starting 'ImagingA:00099'.
+##[BatchLogTest.run] starting 'ImagingA:00100'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits)"'.
+##[PysynphotRunner.doRun] request took 4108
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 4804
+##[BatchLogTest.run] starting 'ImagingA:00101'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f160w"&spectrum="spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits)"'.
+##[PysynphotRunner.doRun] request took 4284
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits)"&instrument="nicmos,1,f160w"'.
+##[PysynphotRunner.doRun] request took 4810
+##[BatchLogTest.run] starting 'ImagingA:00102'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits)"'.
+##[PysynphotRunner.doRun] request took 3988
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 4330
+##[BatchLogTest.run] starting 'ImagingA:00103'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f160w"&spectrum="spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits)"'.
+##[PysynphotRunner.doRun] request took 4403
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits)"&instrument="nicmos,1,f160w"'.
+##[PysynphotRunner.doRun] request took 4595
+##[BatchLogTest.run] starting 'ImagingA:00104'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits)"'.
+##[PysynphotRunner.doRun] request took 4448
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 4770
+##[BatchLogTest.run] starting 'ImagingA:00105'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f160w"&spectrum="spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits)"'.
+##[PysynphotRunner.doRun] request took 3892
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits)"&instrument="nicmos,1,f160w"'.
+##[PysynphotRunner.doRun] request took 4660
+##[BatchLogTest.run] starting 'ImagingA:00106'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f110w"&spectrum="spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits)"'.
+##[PysynphotRunner.doRun] request took 4275
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits)"&instrument="nicmos,2,f110w"'.
+##[PysynphotRunner.doRun] request took 4690
+##[BatchLogTest.run] starting 'ImagingA:00107'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f160w"&spectrum="spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits)"'.
+##[PysynphotRunner.doRun] request took 4013
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits)"&instrument="nicmos,2,f160w"'.
+##[PysynphotRunner.doRun] request took 4263
+##[BatchLogTest.run] starting 'ImagingA:00108'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f110w"&spectrum="spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits)"'.
+##[PysynphotRunner.doRun] request took 3840
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits)"&instrument="nicmos,2,f110w"'.
+##[PysynphotRunner.doRun] request took 4525
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.013'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f222m"'.
+##[PysynphotRunner.doRun] request took 1735
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f222m"'.
+##[PysynphotRunner.doRun] request took 3316
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f222m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3133
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f222m"&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3475
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"&instrument="nicmos,2,f222m"'.
+##[PysynphotRunner.doRun] request took 3585
+##[BatchLogTest.run] starting 'ImagingA:00109'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f160w"&spectrum="spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits)"'.
+##[PysynphotRunner.doRun] request took 4108
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits)"&instrument="nicmos,2,f160w"'.
+##[PysynphotRunner.doRun] request took 4746
+##[BatchLogTest.run] starting 'ImagingA:00110'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f110w"&spectrum="spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits)"'.
+##[PysynphotRunner.doRun] request took 3858
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits)"&instrument="nicmos,2,f110w"'.
+##[PysynphotRunner.doRun] request took 4730
+##[BatchLogTest.run] starting 'ImagingA:00111'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f160w"&spectrum="spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits)"'.
+##[PysynphotRunner.doRun] request took 3963
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits)"&instrument="nicmos,2,f160w"'.
+##[PysynphotRunner.doRun] request took 4465
+##[BatchLogTest.run] starting 'ImagingA:00112'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits)"'.
+##[PysynphotRunner.doRun] request took 3904
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 4778
+##[BatchLogTest.run] starting 'ImagingA:00113'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f160w"&spectrum="spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits)"'.
+##[PysynphotRunner.doRun] request took 3936
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits)"&instrument="nicmos,3,f160w"'.
+##[PysynphotRunner.doRun] request took 4647
+##[BatchLogTest.run] starting 'ImagingA:00115'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f160w"&spectrum="spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits)"'.
+##[PysynphotRunner.doRun] request took 3864
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits)"&instrument="nicmos,3,f160w"'.
+##[PysynphotRunner.doRun] request took 4631
+##[BatchLogTest.run] starting 'ImagingA:00117'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f160w"&spectrum="spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits)"'.
+##[PysynphotRunner.doRun] request took 3853
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits)"&instrument="nicmos,3,f160w"'.
+##[PysynphotRunner.doRun] request took 4781
+##[BatchLogTest.run] starting 'ImagingA:00118'.
+##[BatchLogTest.run] starting 'ImagingA:00119'.
+##[BatchLogTest.run] starting 'ImagingA:00120'.
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.014'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f222m"'.
+##[PysynphotRunner.doRun] request took 1952
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f222m"'.
+##[PysynphotRunner.doRun] request took 3426
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f222m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2976
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f222m"&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3420
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f222m"'.
+##[PysynphotRunner.doRun] request took 3512
+##[BatchLogTest.run] starting 'ImagingA:00121'.
+##[BatchLogTest.run] starting 'ImagingA:00122'.
+##[BatchLogTest.run] starting 'ImagingA:00123'.
+##[BatchLogTest.run] starting 'ImagingA:00124'.
+##[BatchLogTest.run] starting 'ImagingA:00125'.
+##[BatchLogTest.run] starting 'ImagingA:00126'.
+##[BatchLogTest.run] starting 'ImagingA:00127'.
+##[BatchLogTest.run] starting 'ImagingB:1'.
+##[BatchLogTest.run] starting 'ImagingB:10'.
+##[BatchLogTest.run] starting 'ImagingB:100'.
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.015'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f165m"'.
+##[PysynphotRunner.doRun] request took 1698
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f165m"'.
+##[PysynphotRunner.doRun] request took 3162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f165m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3301
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f165m"&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3240
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"&instrument="nicmos,1,f165m"'.
+##[PysynphotRunner.doRun] request took 3894
+##[BatchLogTest.run] starting 'ImagingB:101'.
+##[BatchLogTest.run] starting 'ImagingB:102'.
+##[BatchLogTest.run] starting 'ImagingB:103'.
+##[BatchLogTest.run] starting 'ImagingB:104'.
+##[BatchLogTest.run] starting 'ImagingB:105'.
+##[BatchLogTest.run] starting 'ImagingB:106'.
+##[BatchLogTest.run] starting 'ImagingB:107'.
+##[BatchLogTest.run] starting 'ImagingB:108'.
+##[BatchLogTest.run] starting 'ImagingB:109'.
+##[BatchLogTest.run] starting 'ImagingB:11'.
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.016'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f165m"'.
+##[PysynphotRunner.doRun] request took 1537
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f165m"'.
+##[PysynphotRunner.doRun] request took 3744
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f165m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3463
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f165m"&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3348
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"&instrument="nicmos,2,f165m"'.
+##[PysynphotRunner.doRun] request took 3706
+##[BatchLogTest.run] starting 'ImagingB:110'.
+##[BatchLogTest.run] starting 'ImagingB:111'.
+##[BatchLogTest.run] starting 'ImagingB:112'.
+##[BatchLogTest.run] starting 'ImagingB:113'.
+##[BatchLogTest.run] starting 'ImagingB:114'.
+##[BatchLogTest.run] starting 'ImagingB:115'.
+##[BatchLogTest.run] starting 'ImagingB:116'.
+##[BatchLogTest.run] starting 'ImagingB:117'.
+##[BatchLogTest.run] starting 'ImagingB:118'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(egal.dat)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV7.fits"'.
+##[PysynphotRunner.doRun] request took 92
+##[BatchLogTest.run] starting 'ImagingB:119'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(spiral.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV8.fits"'.
+##[PysynphotRunner.doRun] request took 40
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.017'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f175w"'.
+##[PysynphotRunner.doRun] request took 1920
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f175w"'.
+##[PysynphotRunner.doRun] request took 3491
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f175w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3106
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f175w"&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3555
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f175w"'.
+##[PysynphotRunner.doRun] request took 3780
+##[BatchLogTest.run] starting 'ImagingB:12'.
+##[BatchLogTest.run] starting 'ImagingB:120'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(qso_template.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV9.fits"'.
+##[PysynphotRunner.doRun] request took 52
+##[BatchLogTest.run] starting 'ImagingB:121'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(z(spec(qso_fos_001.dat),2.0),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3272
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(z(spec(qso_fos_001.dat),2.0),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3256
+##[BatchLogTest.run] starting 'ImagingB:122'.
+##[BatchLogTest.run] starting 'ImagingB:123'.
+##[BatchLogTest.run] starting 'ImagingB:124'.
+##[BatchLogTest.run] starting 'ImagingB:125'.
+##[BatchLogTest.run] starting 'ImagingB:126'.
+##[BatchLogTest.run] starting 'ImagingB:127'.
+##[BatchLogTest.run] starting 'ImagingB:128'.
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.018'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f160w"&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3214
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f160w"'.
+##[PysynphotRunner.doRun] request took 3615
+##[BatchLogTest.run] starting 'ImagingB:129'.
+##[BatchLogTest.run] starting 'ImagingB:13'.
+##[BatchLogTest.run] starting 'ImagingB:130'.
+##[BatchLogTest.run] starting 'ImagingB:131'.
+##[BatchLogTest.run] starting 'ImagingB:132'.
+##[BatchLogTest.run] starting 'ImagingB:133'.
+##[BatchLogTest.run] starting 'ImagingB:134'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam)*ebmvx(3.0,gal2),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 33
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam)*ebmvx(3.0,gal2),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 30
+##[BatchLogTest.run] starting 'ImagingB:135'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)*ebmvx(3.0,gal2)"'.
+##[PysynphotRunner.doRun] request took 86
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)*ebmvx(3.0,gal2)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 85
+##[BatchLogTest.run] starting 'ImagingB:136'.
+##[BatchLogTest.run] starting 'ImagingB:137'.
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.019'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f090m"&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3439
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"&instrument="nicmos,1,f090m"'.
+##[PysynphotRunner.doRun] request took 3436
+##[BatchLogTest.run] starting 'ImagingB:138'.
+##[BatchLogTest.run] starting 'ImagingB:139'.
+##[BatchLogTest.run] starting 'ImagingB:14'.
+##[BatchLogTest.run] starting 'ImagingB:140'.
+##[BatchLogTest.run] starting 'ImagingB:141'.
+##[BatchLogTest.run] starting 'ImagingB:142'.
+##[BatchLogTest.run] starting 'ImagingB:143'.
+##[BatchLogTest.run] starting 'ImagingB:144'.
+##[BatchLogTest.run] starting 'ImagingB:145'.
+##[BatchLogTest.run] starting 'ImagingB:146'.
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.002'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f110w"'.
+##[PysynphotRunner.doRun] request took 2358
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f110w"'.
+##[PysynphotRunner.doRun] request took 5036
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 4772
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f110w"&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 5031
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"&instrument="nicmos,2,f110w"'.
+##[PysynphotRunner.doRun] request took 5229
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.020'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f222m"&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3465
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"&instrument="nicmos,2,f222m"'.
+##[PysynphotRunner.doRun] request took 3463
+##[BatchLogTest.run] starting 'ImagingB:147'.
+##[BatchLogTest.run] starting 'ImagingB:148'.
+##[BatchLogTest.run] starting 'ImagingB:149'.
+##[BatchLogTest.run] starting 'ImagingB:15'.
+##[BatchLogTest.run] starting 'ImagingB:150'.
+##[BatchLogTest.run] starting 'ImagingB:151'.
+##[BatchLogTest.run] starting 'ImagingB:152'.
+##[BatchLogTest.run] starting 'ImagingB:153'.
+##[BatchLogTest.run] starting 'ImagingB:154'.
+##[BatchLogTest.run] starting 'ImagingB:155'.
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.021'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f222m"&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3516
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f222m"'.
+##[PysynphotRunner.doRun] request took 3536
+##[BatchLogTest.run] starting 'ImagingB:156'.
+##[BatchLogTest.run] starting 'ImagingB:157'.
+##[BatchLogTest.run] starting 'ImagingB:158'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(/usr/stsci/stdata/calspec/1740346_nic_001.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV10.fits"'.
+##[PysynphotRunner.doRun] request took 86
+##[BatchLogTest.run] starting 'ImagingB:159'.
+##[BatchLogTest.run] starting 'ImagingB:16'.
+##[BatchLogTest.run] starting 'ImagingB:160'.
+##[BatchLogTest.run] starting 'ImagingB:161'.
+##[BatchLogTest.run] starting 'ImagingB:162'.
+##[BatchLogTest.run] starting 'ImagingB:163'.
+##[BatchLogTest.run] starting 'ImagingB:164'.
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.022'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f165m"&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3738
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"&instrument="nicmos,1,f165m"'.
+##[PysynphotRunner.doRun] request took 3547
+##[BatchLogTest.run] starting 'ImagingB:165'.
+##[BatchLogTest.run] starting 'ImagingB:166'.
+##[BatchLogTest.run] starting 'ImagingB:167'.
+##[BatchLogTest.run] starting 'ImagingB:168'.
+##[BatchLogTest.run] starting 'ImagingB:169'.
+##[BatchLogTest.run] starting 'ImagingB:17'.
+##[BatchLogTest.run] starting 'ImagingB:170'.
+##[BatchLogTest.run] starting 'ImagingB:171'.
+##[BatchLogTest.run] starting 'ImagingB:172'.
+##[BatchLogTest.run] starting 'ImagingB:173'.
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.023'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f165m"&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3311
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"&instrument="nicmos,2,f165m"'.
+##[PysynphotRunner.doRun] request took 3329
+##[BatchLogTest.run] starting 'ImagingB:174'.
+##[BatchLogTest.run] starting 'ImagingB:175'.
+##[BatchLogTest.run] starting 'ImagingB:176'.
+##[BatchLogTest.run] starting 'ImagingB:177'.
+##[BatchLogTest.run] starting 'ImagingB:178'.
+##[BatchLogTest.run] starting 'ImagingB:179'.
+##[BatchLogTest.run] starting 'ImagingB:18'.
+##[BatchLogTest.run] starting 'ImagingB:180'.
+##[BatchLogTest.run] starting 'ImagingB:181'.
+##[BatchLogTest.run] starting 'ImagingB:182'.
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.024'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f175w"&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3434
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f175w"'.
+##[PysynphotRunner.doRun] request took 3595
+##[BatchLogTest.run] starting 'ImagingB:183'.
+##[BatchLogTest.run] starting 'ImagingB:184'.
+##[BatchLogTest.run] starting 'ImagingB:185'.
+##[BatchLogTest.run] starting 'ImagingB:186'.
+##[BatchLogTest.run] starting 'ImagingB:187'.
+##[BatchLogTest.run] starting 'ImagingB:188'.
+##[BatchLogTest.run] starting 'ImagingB:189'.
+##[BatchLogTest.run] starting 'ImagingB:19'.
+##[BatchLogTest.run] starting 'ImagingB:190'.
+##[BatchLogTest.run] starting 'ImagingB:191'.
+##[BatchLogTest.run] starting 'ImagingA:ImagingA:00001'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3125
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3294
+##[BatchLogTest.run] starting 'ImagingB:192'.
+##[BatchLogTest.run] starting 'ImagingB:193'.
+##[BatchLogTest.run] starting 'ImagingB:194'.
+##[BatchLogTest.run] starting 'ImagingB:195'.
+##[BatchLogTest.run] starting 'ImagingB:196'.
+##[BatchLogTest.run] starting 'ImagingB:197'.
+##[BatchLogTest.run] starting 'ImagingB:198'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits)"'.
+##[PysynphotRunner.doRun] request took 3754
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 4607
+##[BatchLogTest.run] starting 'ImagingB:199'.
+##[BatchLogTest.run] starting 'ImagingA:00002'.
+##[BatchLogTest.run] starting 'ImagingA:00003'.
+##[BatchLogTest.run] starting 'ImagingA:00004'.
+##[BatchLogTest.run] starting 'ImagingA:00005'.
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.003'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 1871
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 3404
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3142
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3843
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 3552
+##[BatchLogTest.run] starting 'ImagingA:00006'.
+##[BatchLogTest.run] starting 'ImagingA:00007'.
+##[BatchLogTest.run] starting 'ImagingA:00008'.
+##[BatchLogTest.run] starting 'ImagingA:00009'.
+##[BatchLogTest.run] starting 'ImagingA:00010'.
+##[BatchLogTest.run] starting 'ImagingA:00011'.
+##[BatchLogTest.run] starting 'ImagingA:00012'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_20.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV1.fits"'.
+##[PysynphotRunner.doRun] request took 75
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_20.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 2927
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_20.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 2780
+##[BatchLogTest.run] starting 'ImagingA:00013'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(/usr/stsci/stdata/grid/bpgs/bpgs_35.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV2.fits"'.
+##[PysynphotRunner.doRun] request took 96
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/bpgs/bpgs_35.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 2995
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/bpgs/bpgs_35.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 2812
+##[BatchLogTest.run] starting 'ImagingA:00014'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_63.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV3.fits"'.
+##[PysynphotRunner.doRun] request took 80
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_63.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3208
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_63.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 2846
+##[BatchLogTest.run] starting 'ImagingA:00015'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_121.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV4.fits"'.
+##[PysynphotRunner.doRun] request took 68
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_121.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3047
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_121.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3027
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.004'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3406
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3651
+##[BatchLogTest.run] starting 'ImagingA:00016'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_127.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV5.fits"'.
+##[PysynphotRunner.doRun] request took 72
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_127.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 2912
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_127.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3060
+##[BatchLogTest.run] starting 'ImagingA:00017'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(icat(ck04models,6250,0.0,4.5),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3422
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(ck04models,6250,0.0,4.5),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3702
+##[BatchLogTest.run] starting 'ImagingA:00018'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(icat(ck04models,15000,0.0,3.5),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 4287
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(ck04models,15000,0.0,3.5),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3752
+##[BatchLogTest.run] starting 'ImagingA:00019'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(icat(ck04models,7750,0.0,2.0),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3486
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(ck04models,7750,0.0,2.0),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3629
+##[BatchLogTest.run] starting 'ImagingA:00020'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(icat(ck04models,4750,0.0,1.0),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3579
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(ck04models,4750,0.0,1.0),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3431
+##[BatchLogTest.run] starting 'ImagingA:00021'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_20.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 2961
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_20.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 2801
+##[BatchLogTest.run] starting 'ImagingA:00022'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_63.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3139
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_63.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 2913
+##[BatchLogTest.run] starting 'ImagingA:00023'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_121.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 2750
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_121.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3011
+##[BatchLogTest.run] starting 'ImagingA:00024'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_126.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 2795
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_126.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3067
+##[BatchLogTest.run] starting 'ImagingA:00025'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(icat(k93models,6200,0.0,4.4),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3722
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,6200,0.0,4.4),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3795
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.005'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f160w"'.
+##[PysynphotRunner.doRun] request took 1559
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f160w"'.
+##[PysynphotRunner.doRun] request took 3312
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f160w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3220
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f160w"&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3357
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"&instrument="nicmos,1,f160w"'.
+##[PysynphotRunner.doRun] request took 3650
+##[BatchLogTest.run] starting 'ImagingA:00026'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(icat(k93models,7700,0.0,1.7),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 4021
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,7700,0.0,1.7),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3889
+##[BatchLogTest.run] starting 'ImagingA:00027'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(icat(k93models,4850,0.0,1.1),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3832
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,4850,0.0,1.1),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3786
+##[BatchLogTest.run] starting 'ImagingA:00028'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_20.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 2837
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_20.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 2729
+##[BatchLogTest.run] starting 'ImagingA:00029'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_63.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 9256
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_63.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 5679
+##[BatchLogTest.run] starting 'ImagingA:00030'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_121.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 5994
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_121.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 7839
+##[BatchLogTest.run] starting 'ImagingA:00031'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_127.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 7802
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_127.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 7916
+##[BatchLogTest.run] starting 'ImagingA:00032'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 11652
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 13575
+##[BatchLogTest.run] starting 'ImagingA:00033'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 11598
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 12050
+##[BatchLogTest.run] starting 'ImagingA:00034'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 8356
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 9265
+##[BatchLogTest.run] starting 'ImagingA:00035'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(egal.dat),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 5616
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(egal.dat),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 6995
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.006'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f110w"&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3227
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"&instrument="nicmos,2,f110w"'.
+##[PysynphotRunner.doRun] request took 3552
+##[BatchLogTest.run] starting 'ImagingA:00036'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(spec(spiral.fits),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 4861
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(spiral.fits),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 5336
+##[BatchLogTest.run] starting 'ImagingA:00037'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(z(spec(qso_template.fits),2.0),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 5143
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(z(spec(qso_template.fits),2.0),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 6273
+##[BatchLogTest.run] starting 'ImagingA:00038'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(bb(10000),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 7697
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(10000),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 6266
+##[BatchLogTest.run] starting 'ImagingA:00039'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(bb(7700),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 5694
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(7700),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 5915
+##[BatchLogTest.run] starting 'ImagingA:00040'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(bb(6200),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 6654
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(6200),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 8499
+##[BatchLogTest.run] starting 'ImagingA:00041'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(bb(5000),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 5706
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 7934
+##[BatchLogTest.run] starting 'ImagingA:00042'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(pl(4000.0,-0.5,flam),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 10243
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(pl(4000.0,-0.5,flam),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 7961
+##[BatchLogTest.run] starting 'ImagingA:00043'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(pl(4000.0,-1.0,flam),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 9050
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(pl(4000.0,-1.0,flam),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 11205
+##[BatchLogTest.run] starting 'ImagingA:00044'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(pl(4000.0,-1.5,flam),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 7243
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(pl(4000.0,-1.5,flam),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3955
+##[BatchLogTest.run] starting 'ImagingA:00045'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,fnu),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3139
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,fnu),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3209
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.007'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3451
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 3532
+##[BatchLogTest.run] starting 'ImagingA:00046'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)+em(10000.0,10.0,1.0E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3237
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)+em(10000.0,10.0,1.0E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3453
+##[BatchLogTest.run] starting 'ImagingA:00047'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="em(10000.0,10.0,1.0E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 2913
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="em(10000.0,10.0,1.0E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 2698
+##[BatchLogTest.run] starting 'ImagingA:00048'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam)*ebmvx(3.0,gal1),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3065
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam)*ebmvx(3.0,gal1),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3478
+##[BatchLogTest.run] starting 'ImagingA:00049'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)*ebmvx(3.0,gal1)"'.
+##[PysynphotRunner.doRun] request took 2899
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)*ebmvx(3.0,gal1)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3390
+##[BatchLogTest.run] starting 'ImagingA:00052'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam)*ebmvx(3.0,lmc),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 2899
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam)*ebmvx(3.0,lmc),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3468
+##[BatchLogTest.run] starting 'ImagingA:00053'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)*ebmvx(3.0,lmc)"'.
+##[PysynphotRunner.doRun] request took 3133
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)*ebmvx(3.0,lmc)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3164
+##[BatchLogTest.run] starting 'ImagingA:00054'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam)*ebmvx(3.0,xgal),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3132
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam)*ebmvx(3.0,xgal),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3272
+##[BatchLogTest.run] starting 'ImagingA:00055'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)*ebmvx(3.0,xgal)"'.
+##[PysynphotRunner.doRun] request took 3117
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)*ebmvx(3.0,xgal)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3362
+##[BatchLogTest.run] starting 'ImagingA:00056'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(z(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),0.5),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 4203
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(z(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),0.5),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 5105
+##[BatchLogTest.run] starting 'ImagingA:00057'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(z(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),1.0),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 4266
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(z(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),1.0),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 5001
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.008'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f160w"'.
+##[PysynphotRunner.doRun] request took 1506
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f160w"'.
+##[PysynphotRunner.doRun] request took 3185
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f160w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3236
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f160w"&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3393
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5000),band(bessell,h),20,vegamag)"&instrument="nicmos,2,f160w"'.
+##[PysynphotRunner.doRun] request took 4676
+##[BatchLogTest.run] starting 'ImagingA:00058'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(z(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),2.0),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 4445
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(z(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),2.0),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 5020
+##[BatchLogTest.run] starting 'ImagingA:00059'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),band(johnson,v),15,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3123
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(johnson,v),15,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3360
+##[BatchLogTest.run] starting 'ImagingA:00060'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),band(johnson,v),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3189
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(johnson,v),20,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3827
+##[BatchLogTest.run] starting 'ImagingA:00061'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),band(johnson,k),15,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3302
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(johnson,k),15,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3549
+##[BatchLogTest.run] starting 'ImagingA:00062'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),band(johnson,k),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2929
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(johnson,k),20,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3456
+##[BatchLogTest.run] starting 'ImagingA:00063'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),band(bessell,k),15,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3263
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(bessell,k),15,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3444
+##[BatchLogTest.run] starting 'ImagingA:00064'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),band(bessell,k),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3171
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(bessell,k),20,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3560
+##[BatchLogTest.run] starting 'ImagingA:00065'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),band(cousins,i),15,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3023
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(cousins,i),15,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3436
+##[BatchLogTest.run] starting 'ImagingA:00066'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),band(sdss,i),15,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3236
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(sdss,i),15,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3783
+##[BatchLogTest.run] starting 'ImagingA:00067'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),band(nicmos,2,f110w),15,vegamag)"'.
+##[PysynphotRunner.doRun] request took 4141
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(nicmos,2,f110w),15,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 4173
+##[BatchLogTest.run] starting 'NIC.EXT.IMAG.009'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f160w"&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3850
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),20,vegamag)"&instrument="nicmos,1,f160w"'.
+##[PysynphotRunner.doRun] request took 4180
+##[BatchLogTest.run] starting 'ImagingA:00068'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),band(nicmos,2,f160w),15,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3774
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(nicmos,2,f160w),15,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3875
+##[BatchLogTest.run] starting 'ImagingA:00069'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),box(15999.999999999998,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 2746
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(15999.999999999998,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3152
+##[BatchLogTest.run] starting 'ImagingA:00070'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),box(22000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3108
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(22000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3098
+##[BatchLogTest.run] starting 'ImagingA:00071'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-06,jy)"'.
+##[PysynphotRunner.doRun] request took 3062
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-06,jy)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3348
+##[BatchLogTest.run] starting 'ImagingA:00072'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),box(15999.999999999998,1.0),1.00E-06,jy)"'.
+##[PysynphotRunner.doRun] request took 3180
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(15999.999999999998,1.0),1.00E-06,jy)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3126
+##[BatchLogTest.run] starting 'ImagingA:00073'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),box(22000.0,1.0),1.00E-06,jy)"'.
+##[PysynphotRunner.doRun] request took 3028
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(22000.0,1.0),1.00E-06,jy)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3030
+##[BatchLogTest.run] starting 'ImagingA:00074'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(/usr/stsci/stdata/calspec/1740346_nic_001.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV6.fits"'.
+##[PysynphotRunner.doRun] request took 120
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(/usr/stsci/stdata/calspec/1740346_nic_001.fits)"'.
+##[PysynphotRunner.doRun] request took 2943
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/1740346_nic_001.fits)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 2633
+##[BatchLogTest.run] starting 'ImagingA:00075'.
+##[BatchLogTest.run] starting 'ImagingA:00076'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3203
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3264
+##[BatchLogTest.run] starting 'ImagingA:00077'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3235
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3166
+##[BatchLogTest.run] starting 'ImagingB:2'.
+##[BatchLogTest.run] starting 'ImagingB:20'.
+##[BatchLogTest.run] starting 'ImagingB:200'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits)"'.
+##[PysynphotRunner.doRun] request took 3705
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 4609
+##[BatchLogTest.run] starting 'ImagingB:201'.
+##[BatchLogTest.run] starting 'ImagingB:202'.
+##[BatchLogTest.run] starting 'ImagingB:203'.
+##[BatchLogTest.run] starting 'ImagingB:204'.
+##[BatchLogTest.run] starting 'ImagingB:205'.
+##[BatchLogTest.run] starting 'ImagingB:206'.
+##[BatchLogTest.run] starting 'ImagingB:207'.
+##[BatchLogTest.run] starting 'ImagingB:208'.
+##[BatchLogTest.run] starting 'ImagingB:209'.
+##[BatchLogTest.run] starting 'ImagingB:21'.
+##[BatchLogTest.run] starting 'ImagingB:210'.
+##[BatchLogTest.run] starting 'ImagingB:211'.
+##[BatchLogTest.run] starting 'ImagingB:22'.
+##[BatchLogTest.run] starting 'ImagingB:23'.
+##[BatchLogTest.run] starting 'ImagingB:24'.
+##[BatchLogTest.run] starting 'ImagingB:25'.
+##[BatchLogTest.run] starting 'ImagingB:26'.
+##[BatchLogTest.run] starting 'ImagingB:27'.
+##[BatchLogTest.run] starting 'ImagingB:28'.
+##[BatchLogTest.run] starting 'ImagingB:29'.
+##[BatchLogTest.run] starting 'ImagingB:3'.
+##[BatchLogTest.run] starting 'ImagingB:30'.
+##[BatchLogTest.run] starting 'ImagingB:31'.
+##[BatchLogTest.run] starting 'ImagingB:32'.
+##[BatchLogTest.run] starting 'ImagingB:33'.
+##[BatchLogTest.run] starting 'ImagingB:34'.
+##[BatchLogTest.run] starting 'ImagingB:35'.
+##[BatchLogTest.run] starting 'ImagingB:36'.
+##[BatchLogTest.run] starting 'ImagingB:37'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f190n"'.
+##[PysynphotRunner.doRun] request took 1582
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f190n"'.
+##[PysynphotRunner.doRun] request took 3305
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f190n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3279
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f190n"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3173
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,1,f190n"'.
+##[PysynphotRunner.doRun] request took 3065
+##[BatchLogTest.run] starting 'ImagingB:38'.
+##[BatchLogTest.run] starting 'ImagingB:39'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f110w"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3115
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,2,f110w"'.
+##[PysynphotRunner.doRun] request took 3076
+##[BatchLogTest.run] starting 'ImagingB:4'.
+##[BatchLogTest.run] starting 'ImagingB:40'.
+##[BatchLogTest.run] starting 'ImagingB:41'.
+##[BatchLogTest.run] starting 'ImagingB:42'.
+##[BatchLogTest.run] starting 'ImagingB:43'.
+##[BatchLogTest.run] starting 'ImagingB:44'.
+##[BatchLogTest.run] starting 'ImagingB:45'.
+##[BatchLogTest.run] starting 'ImagingB:46'.
+##[BatchLogTest.run] starting 'ImagingB:47'.
+##[BatchLogTest.run] starting 'ImagingB:48'.
+##[BatchLogTest.run] starting 'ImagingB:49'.
+##[BatchLogTest.run] starting 'ImagingB:5'.
+##[BatchLogTest.run] starting 'ImagingB:50'.
+##[BatchLogTest.run] starting 'ImagingB:51'.
+##[BatchLogTest.run] starting 'ImagingB:52'.
+##[BatchLogTest.run] starting 'ImagingB:53'.
+##[BatchLogTest.run] starting 'ImagingB:54'.
+##[BatchLogTest.run] starting 'ImagingB:55'.
+##[BatchLogTest.run] starting 'ImagingB:56'.
+##[BatchLogTest.run] starting 'ImagingB:57'.
+##[BatchLogTest.run] starting 'ImagingB:58'.
+##[BatchLogTest.run] starting 'ImagingB:59'.
+##[BatchLogTest.run] starting 'ImagingB:6'.
+##[BatchLogTest.run] starting 'ImagingB:60'.
+##[BatchLogTest.run] starting 'ImagingB:61'.
+##[BatchLogTest.run] starting 'ImagingB:62'.
+##[BatchLogTest.run] starting 'ImagingB:63'.
+##[BatchLogTest.run] starting 'ImagingB:64'.
+##[BatchLogTest.run] starting 'ImagingB:65'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f222m"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 2896
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,2,f222m"'.
+##[PysynphotRunner.doRun] request took 3330
+##[BatchLogTest.run] starting 'ImagingB:66'.
+##[BatchLogTest.run] starting 'ImagingB:67'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 3126
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 3205
+##[BatchLogTest.run] starting 'ImagingB:68'.
+##[BatchLogTest.run] starting 'ImagingB:69'.
+##[BatchLogTest.run] starting 'ImagingB:7'.
+##[BatchLogTest.run] starting 'ImagingB:70'.
+##[BatchLogTest.run] starting 'ImagingB:71'.
+##[BatchLogTest.run] starting 'ImagingB:72'.
+##[BatchLogTest.run] starting 'ImagingB:73'.
+##[BatchLogTest.run] starting 'ImagingB:74'.
+##[BatchLogTest.run] starting 'ImagingB:75'.
+##[BatchLogTest.run] starting 'ImagingB:76'.
+##[BatchLogTest.run] starting 'ImagingB:77'.
+##[BatchLogTest.run] starting 'ImagingB:78'.
+##[BatchLogTest.run] starting 'ImagingB:79'.
+##[BatchLogTest.run] starting 'ImagingB:8'.
+##[BatchLogTest.run] starting 'ImagingB:80'.
+##[BatchLogTest.run] starting 'ImagingB:81'.
+##[BatchLogTest.run] starting 'ImagingB:82'.
+##[BatchLogTest.run] starting 'ImagingB:83'.
+##[BatchLogTest.run] starting 'ImagingB:84'.
+##[BatchLogTest.run] starting 'ImagingB:85'.
+##[BatchLogTest.run] starting 'ImagingB:86'.
+##[BatchLogTest.run] starting 'ImagingB:87'.
+##[BatchLogTest.run] starting 'ImagingB:88'.
+##[BatchLogTest.run] starting 'ImagingB:89'.
+##[BatchLogTest.run] starting 'ImagingB:9'.
+##[BatchLogTest.run] starting 'ImagingB:90'.
+##[BatchLogTest.run] starting 'ImagingB:91'.
+##[BatchLogTest.run] starting 'ImagingB:92'.
+##[BatchLogTest.run] starting 'ImagingB:93'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f222m"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)"'.
+##[PysynphotRunner.doRun] request took 2788
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.00E-13,flam)"&instrument="nicmos,3,f222m"'.
+##[PysynphotRunner.doRun] request took 3260
+##[BatchLogTest.run] starting 'ImagingB:94'.
+##[BatchLogTest.run] starting 'ImagingB:95'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_20.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV11.fits"'.
+##[PysynphotRunner.doRun] request took 56
+##[BatchLogTest.run] starting 'ImagingB:96'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(/usr/stsci/stdata/grid/bpgs/bpgs_35.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV12.fits"'.
+##[PysynphotRunner.doRun] request took 98
+##[BatchLogTest.run] starting 'ImagingB:97'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_63.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV13.fits"'.
+##[PysynphotRunner.doRun] request took 88
+##[BatchLogTest.run] starting 'ImagingB:98'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_121.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV14.fits"'.
+##[PysynphotRunner.doRun] request took 58
+##[BatchLogTest.run] starting 'ImagingB:99'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_127.fits)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV15.fits"'.
+##[PysynphotRunner.doRun] request took 56
+##[BatchLogTest.run] starting 'SpecA:S001'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,g096"'.
+##[PysynphotRunner.doRun] request took 1427
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g096"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 984
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,g096"'.
+##[PysynphotRunner.doRun] request took 1068
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(nicmos,2,f110w),12.554,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV16.fits'.
+##[PysynphotRunner.doRun] request took 3694
+##[BatchLogTest.run] starting 'SpecA:S002'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,g141"'.
+##[PysynphotRunner.doRun] request took 1477
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g141"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 856
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,g141"'.
+##[PysynphotRunner.doRun] request took 1267
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(nicmos,2,f110w),12.554,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV17.fits'.
+##[PysynphotRunner.doRun] request took 3526
+##[BatchLogTest.run] starting 'SpecA:S003'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,g206"'.
+##[PysynphotRunner.doRun] request took 1708
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g206"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 873
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,g206"'.
+##[PysynphotRunner.doRun] request took 903
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(nicmos,2,f110w),12.554,vegamag)"&instrument="nicmos,3,g206"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV18.fits'.
+##[PysynphotRunner.doRun] request took 3695
+##[BatchLogTest.run] starting 'SpecA:S004'.
+##[BatchLogTest.run] starting 'SpecA:S005'.
+##[BatchLogTest.run] starting 'SpecA:S006'.
+##[BatchLogTest.run] starting 'SpecA:S007'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g096"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"'.
+##[PysynphotRunner.doRun] request took 999
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"&instrument="nicmos,3,g096"'.
+##[PysynphotRunner.doRun] request took 994
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(nicmos,2,f110w),20,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV19.fits'.
+##[PysynphotRunner.doRun] request took 3742
+##[BatchLogTest.run] starting 'SpecA:S008'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g141"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"'.
+##[PysynphotRunner.doRun] request took 984
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"&instrument="nicmos,3,g141"'.
+##[PysynphotRunner.doRun] request took 1110
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(nicmos,2,f110w),20,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV20.fits'.
+##[PysynphotRunner.doRun] request took 4350
+##[BatchLogTest.run] starting 'SpecA:S009'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g206"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"'.
+##[PysynphotRunner.doRun] request took 1204
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"&instrument="nicmos,3,g206"'.
+##[PysynphotRunner.doRun] request took 1475
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(nicmos,2,f110w),20,vegamag)"&instrument="nicmos,3,g206"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV21.fits'.
+##[PysynphotRunner.doRun] request took 3798
+##[BatchLogTest.run] starting 'SpecA:S010'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g096"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 1043
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,g096"'.
+##[PysynphotRunner.doRun] request took 1305
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(nicmos,2,f110w),15,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV22.fits'.
+##[PysynphotRunner.doRun] request took 3686
+##[BatchLogTest.run] starting 'SpecA:S011'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g141"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 1010
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,g141"'.
+##[PysynphotRunner.doRun] request took 1301
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(nicmos,2,f110w),15,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV23.fits'.
+##[PysynphotRunner.doRun] request took 3428
+##[BatchLogTest.run] starting 'SpecA:S012'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g206"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 946
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,g206"'.
+##[PysynphotRunner.doRun] request took 1022
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(nicmos,2,f110w),15,vegamag)"&instrument="nicmos,3,g206"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV24.fits'.
+##[PysynphotRunner.doRun] request took 3728
+##[BatchLogTest.run] starting 'SpecA:S013'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g096"&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 1167
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,g096"'.
+##[PysynphotRunner.doRun] request took 938
+##[BatchLogTest.run] starting 'SpecA:S014'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g141"&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 917
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,g141"'.
+##[PysynphotRunner.doRun] request took 973
+##[BatchLogTest.run] starting 'SpecA:S015'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g206"&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 1085
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,g206"'.
+##[PysynphotRunner.doRun] request took 967
+##[BatchLogTest.run] starting 'SpecA:S016'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g096"&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 1431
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,g096"'.
+##[PysynphotRunner.doRun] request took 1494
+##[BatchLogTest.run] starting 'SpecA:S017'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g141"&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 918
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,g141"'.
+##[PysynphotRunner.doRun] request took 1456
+##[BatchLogTest.run] starting 'SpecA:S018'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g206"&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 1095
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,g206"'.
+##[PysynphotRunner.doRun] request took 1615
+##[BatchLogTest.run] starting 'SpecA:S019'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g096"&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 778
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,g096"'.
+##[PysynphotRunner.doRun] request took 977
+##[BatchLogTest.run] starting 'SpecA:S020'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g141"&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 732
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,g141"'.
+##[PysynphotRunner.doRun] request took 1125
+##[BatchLogTest.run] starting 'SpecA:S021'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g206"&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 779
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,g206"'.
+##[PysynphotRunner.doRun] request took 1172
+##[BatchLogTest.run] starting 'SpecA:S022'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g096"&spectrum="rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"'.
+##[PysynphotRunner.doRun] request took 861
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"&instrument="nicmos,3,g096"'.
+##[PysynphotRunner.doRun] request took 907
+##[BatchLogTest.run] starting 'SpecA:S023'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g141"&spectrum="rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"'.
+##[PysynphotRunner.doRun] request took 755
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"&instrument="nicmos,3,g141"'.
+##[PysynphotRunner.doRun] request took 992
+##[BatchLogTest.run] starting 'SpecA:S024'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g206"&spectrum="rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"'.
+##[PysynphotRunner.doRun] request took 816
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"&instrument="nicmos,3,g206"'.
+##[PysynphotRunner.doRun] request took 957
+##[BatchLogTest.run] starting 'SpecA:S025'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(nicmos,2,f110w),12.658,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV25.fits'.
+##[PysynphotRunner.doRun] request took 3520
+##[BatchLogTest.run] starting 'SpecA:S026'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(nicmos,2,f110w),12.658,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV26.fits'.
+##[PysynphotRunner.doRun] request took 3658
+##[BatchLogTest.run] starting 'SpecA:S027'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(nicmos,2,f110w),12.658,vegamag)"&instrument="nicmos,3,g206"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV27.fits'.
+##[PysynphotRunner.doRun] request took 3688
+##[BatchLogTest.run] starting 'SpecA:S028'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits),band(nicmos,2,f110w),14.047,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV28.fits'.
+##[PysynphotRunner.doRun] request took 3431
+##[BatchLogTest.run] starting 'SpecA:S029'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits),band(nicmos,2,f110w),14.047,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV29.fits'.
+##[PysynphotRunner.doRun] request took 3728
+##[BatchLogTest.run] starting 'SpecA:S030'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits),band(nicmos,2,f110w),14.047,vegamag)"&instrument="nicmos,3,g206"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV30.fits'.
+##[PysynphotRunner.doRun] request took 3611
+##[BatchLogTest.run] starting 'SpecA:S031'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits),band(nicmos,2,f110w),14.185,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV31.fits'.
+##[PysynphotRunner.doRun] request took 3944
+##[BatchLogTest.run] starting 'SpecA:S032'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits),band(nicmos,2,f110w),14.185,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV32.fits'.
+##[PysynphotRunner.doRun] request took 3621
+##[BatchLogTest.run] starting 'SpecA:S033'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits),band(nicmos,2,f110w),14.185,vegamag)"&instrument="nicmos,3,g206"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV33.fits'.
+##[PysynphotRunner.doRun] request took 3726
+##[BatchLogTest.run] starting 'SpecA:S034'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits),band(nicmos,2,f110w),13.742,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV34.fits'.
+##[PysynphotRunner.doRun] request took 3782
+##[BatchLogTest.run] starting 'SpecA:S035'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits),band(nicmos,2,f110w),13.742,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV35.fits'.
+##[PysynphotRunner.doRun] request took 3706
+##[BatchLogTest.run] starting 'SpecA:S036'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits),band(nicmos,2,f110w),13.742,vegamag)"&instrument="nicmos,3,g206"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV36.fits'.
+##[PysynphotRunner.doRun] request took 3764
+##[BatchLogTest.run] starting 'SpecA:S037'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits),band(nicmos,2,f110w),13.735,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV37.fits'.
+##[PysynphotRunner.doRun] request took 3456
+##[BatchLogTest.run] starting 'SpecA:S038'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits),band(nicmos,2,f110w),13.735,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV38.fits'.
+##[PysynphotRunner.doRun] request took 3493
+##[BatchLogTest.run] starting 'SpecA:S039'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits),band(nicmos,2,f110w),13.735,vegamag)"&instrument="nicmos,3,g206"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV39.fits'.
+##[PysynphotRunner.doRun] request took 3656
+##[BatchLogTest.run] starting 'SpecA:S040'.
+##[BatchLogTest.run] starting 'SpecA:S041'.
+##[BatchLogTest.run] starting 'SpecA:S042'.
+##[BatchLogTest.run] starting 'SpecA:S043'.
+##[BatchLogTest.run] starting 'SpecA:S044'.
+##[BatchLogTest.run] starting 'SpecA:S045'.
+##[BatchLogTest.run] starting 'SpecA:S046'.
+##[BatchLogTest.run] starting 'SpecA:S047'.
+##[BatchLogTest.run] starting 'SpecA:S048'.
+##[BatchLogTest.run] starting 'SpecA:S049'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(egal.dat),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV40.fits'.
+##[PysynphotRunner.doRun] request took 1422
+##[BatchLogTest.run] starting 'SpecA:S050'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(egal.dat)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV41.fits"'.
+##[PysynphotRunner.doRun] request took 80
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(egal.dat),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV42.fits'.
+##[PysynphotRunner.doRun] request took 1379
+##[BatchLogTest.run] starting 'SpecA:S051'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(egal.dat)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV43.fits"'.
+##[PysynphotRunner.doRun] request took 126
+##[BatchLogTest.run] starting 'SpecA:S052'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(egal.dat),band(nicmos,2,f110w),17,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV44.fits'.
+##[PysynphotRunner.doRun] request took 1470
+##[BatchLogTest.run] starting 'SpecA:S053'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(egal.dat)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV45.fits"'.
+##[PysynphotRunner.doRun] request took 80
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(egal.dat),band(nicmos,2,f110w),17,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV46.fits'.
+##[PysynphotRunner.doRun] request took 1227
+##[BatchLogTest.run] starting 'SpecA:S054'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(egal.dat)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV47.fits"'.
+##[PysynphotRunner.doRun] request took 61
+##[BatchLogTest.run] starting 'SpecA:S055'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(egal.dat)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV48.fits"'.
+##[PysynphotRunner.doRun] request took 78
+##[BatchLogTest.run] starting 'SpecA:S056'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(egal.dat)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV49.fits"'.
+##[PysynphotRunner.doRun] request took 57
+##[BatchLogTest.run] starting 'SpecA:S057'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(egal.dat)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV50.fits"'.
+##[PysynphotRunner.doRun] request took 57
+##[BatchLogTest.run] starting 'SpecA:S058'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(egal.dat)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV51.fits"'.
+##[PysynphotRunner.doRun] request took 116
+##[BatchLogTest.run] starting 'SpecA:S059'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(egal.dat)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV52.fits"'.
+##[PysynphotRunner.doRun] request took 64
+##[BatchLogTest.run] starting 'SpecA:S060'.
+##[PysynphotRunner.doRun] command is 'calcspec&spectrum="spec(egal.dat)"&output="/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV53.fits"'.
+##[PysynphotRunner.doRun] request took 81
+##[BatchLogTest.run] starting 'SpecA:S061'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(ck04models,45000,0.0,4.5),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV54.fits'.
+##[PysynphotRunner.doRun] request took 1990
+##[BatchLogTest.run] starting 'SpecA:S062'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(ck04models,45000,0.0,4.5),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV55.fits'.
+##[PysynphotRunner.doRun] request took 1946
+##[BatchLogTest.run] starting 'SpecA:S063'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(ck04models,45000,0.0,4.5),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g206"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV56.fits'.
+##[PysynphotRunner.doRun] request took 2281
+##[BatchLogTest.run] starting 'SpecA:S064'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_38.fits),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV57.fits'.
+##[PysynphotRunner.doRun] request took 1448
+##[BatchLogTest.run] starting 'SpecA:S065'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,7200,0.0,4.3),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV58.fits'.
+##[PysynphotRunner.doRun] request took 2392
+##[BatchLogTest.run] starting 'SpecA:S066'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_9.fits),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV59.fits'.
+##[PysynphotRunner.doRun] request took 1132
+##[BatchLogTest.run] starting 'SpecA:S067'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(bb(5000.0),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV60.fits'.
+##[PysynphotRunner.doRun] request took 1638
+##[BatchLogTest.run] starting 'SpecA:S068'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(pl(4000.0,-1.0,flam),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV61.fits'.
+##[PysynphotRunner.doRun] request took 1934
+##[BatchLogTest.run] starting 'SpecA:S069'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(unit(1.0,flam),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV62.fits'.
+##[PysynphotRunner.doRun] request took 1712
+##[BatchLogTest.run] starting 'SpecA:S070'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,7200,0.0,4.3)*ebmvx(1.0,gal1),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV63.fits'.
+##[PysynphotRunner.doRun] request took 2401
+##[BatchLogTest.run] starting 'SpecA:S071'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,7200,0.0,4.3)*ebmvx(1.0,gal1),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV64.fits'.
+##[PysynphotRunner.doRun] request took 2293
+##[BatchLogTest.run] starting 'SpecA:S072'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,7200,0.0,4.3)*ebmvx(1.0,gal1),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g206"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV65.fits'.
+##[PysynphotRunner.doRun] request took 2597
+##[BatchLogTest.run] starting 'SpecA:S073'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,7200,0.0,4.3)*ebmvx(5.0,gal1),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV66.fits'.
+##[PysynphotRunner.doRun] request took 2503
+##[BatchLogTest.run] starting 'SpecA:S074'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,7200,0.0,4.3)*ebmvx(5.0,gal1),band(nicmos,2,f110w),13,vegamag)"&instrument="nicmos,3,g206"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV67.fits'.
+##[PysynphotRunner.doRun] request took 2408
+##[BatchLogTest.run] starting 'SpecA:S075'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_23.fits)*ebmvx(1.0,gal1),box(10000.0,1.0),1.50E-13,flam)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV68.fits'.
+##[PysynphotRunner.doRun] request took 782
+##[BatchLogTest.run] starting 'SpecA:S076'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_23.fits)*ebmvx(1.0,gal1),box(10000.0,1.0),1.50E-12,flam)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV69.fits'.
+##[PysynphotRunner.doRun] request took 769
+##[BatchLogTest.run] starting 'SpecA:S077'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_23.fits)*ebmvx(1.0,gal1),box(10000.0,1.0),1.00E-06,jy)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV70.fits'.
+##[PysynphotRunner.doRun] request took 777
+##[BatchLogTest.run] starting 'SpecA:S078'.
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/usr/stsci/stdata/grid/pickles/dat_uvk/pickles_uk_23.fits)*ebmvx(1.0,gal1),box(10000.0,1.0),1.00E-05,jy)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV71.fits'.
+##[PysynphotRunner.doRun] request took 578
+##[BatchLogTest.run] starting 'NICIMAG920'.
+##[BatchLogTest.run] starting 'NICIMAG921'.
+##[BatchLogTest.run] starting 'NICIMAG922'.
+##[BatchLogTest.run] starting 'NICIMAG1445'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.47200E-6,jy)"'.
+##[PysynphotRunner.doRun] request took 3308
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),box(10000.0,1.0),1.47200E-6,jy)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 3374
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.001'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f090m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3261
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f090m"'.
+##[PysynphotRunner.doRun] request took 3532
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.002'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f095n"'.
+##[PysynphotRunner.doRun] request took 1555
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f095n"'.
+##[PysynphotRunner.doRun] request took 3179
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f095n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3102
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f095n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3479
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f095n"'.
+##[PysynphotRunner.doRun] request took 3656
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.003'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f097n"'.
+##[PysynphotRunner.doRun] request took 1396
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f097n"'.
+##[PysynphotRunner.doRun] request took 3424
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f097n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3127
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f097n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3282
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f097n"'.
+##[PysynphotRunner.doRun] request took 3541
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.004'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f108n"'.
+##[PysynphotRunner.doRun] request took 1601
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f108n"'.
+##[PysynphotRunner.doRun] request took 3336
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f108n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3314
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f108n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3626
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f108n"'.
+##[PysynphotRunner.doRun] request took 3789
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.005'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f110m"'.
+##[PysynphotRunner.doRun] request took 1430
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f110m"'.
+##[PysynphotRunner.doRun] request took 3311
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3062
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3302
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f110m"'.
+##[PysynphotRunner.doRun] request took 3449
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.006'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f110w"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3295
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f110w"'.
+##[PysynphotRunner.doRun] request took 4199
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.007'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f113n"'.
+##[PysynphotRunner.doRun] request took 1591
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f113n"'.
+##[PysynphotRunner.doRun] request took 3456
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f113n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3150
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f113n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3244
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f113n"'.
+##[PysynphotRunner.doRun] request took 3582
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.008'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f140w"'.
+##[PysynphotRunner.doRun] request took 1936
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f140w"'.
+##[PysynphotRunner.doRun] request took 3344
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f140w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3240
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f140w"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3273
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f140w"'.
+##[PysynphotRunner.doRun] request took 3778
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.009'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f145m"'.
+##[PysynphotRunner.doRun] request took 1603
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f145m"'.
+##[PysynphotRunner.doRun] request took 3247
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f145m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3333
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f145m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3097
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f145m"'.
+##[PysynphotRunner.doRun] request took 3739
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.010'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f160w"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3510
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f160w"'.
+##[PysynphotRunner.doRun] request took 3671
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.012'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f164n"'.
+##[PysynphotRunner.doRun] request took 1782
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f164n"'.
+##[PysynphotRunner.doRun] request took 3180
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f164n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3215
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f164n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3364
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f164n"'.
+##[PysynphotRunner.doRun] request took 3301
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.012'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f165m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3385
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f165m"'.
+##[PysynphotRunner.doRun] request took 3537
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.013'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f166n"'.
+##[PysynphotRunner.doRun] request took 1493
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f166n"'.
+##[PysynphotRunner.doRun] request took 3967
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f166n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3085
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f166n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3377
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f166n"'.
+##[PysynphotRunner.doRun] request took 3578
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.014'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f170m"'.
+##[PysynphotRunner.doRun] request took 1423
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f170m"'.
+##[PysynphotRunner.doRun] request took 3387
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f170m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3046
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f170m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3641
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f170m"'.
+##[PysynphotRunner.doRun] request took 3589
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.015'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,f187n"'.
+##[PysynphotRunner.doRun] request took 1451
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,f187n"'.
+##[PysynphotRunner.doRun] request took 3297
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f187n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3454
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f187n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3331
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f187n"'.
+##[PysynphotRunner.doRun] request took 3563
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.016'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,f190n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3380
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,f190n"'.
+##[PysynphotRunner.doRun] request took 3324
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.017'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,1,pol0s"'.
+##[PysynphotRunner.doRun] request took 1656
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,1,pol0s"'.
+##[PysynphotRunner.doRun] request took 3227
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,pol0s"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3137
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,1,pol0s"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3289
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,1,pol0s"'.
+##[PysynphotRunner.doRun] request took 3675
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.018'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f110w"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3470
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f110w"'.
+##[PysynphotRunner.doRun] request took 3621
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.019'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f160w"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3433
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f160w"'.
+##[PysynphotRunner.doRun] request took 3849
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.020'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f165m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3187
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f165m"'.
+##[PysynphotRunner.doRun] request took 3750
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.021'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f171m"'.
+##[PysynphotRunner.doRun] request took 1663
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f171m"'.
+##[PysynphotRunner.doRun] request took 3202
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f171m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3225
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f171m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3317
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f171m"'.
+##[PysynphotRunner.doRun] request took 3594
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.022'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f180m"'.
+##[PysynphotRunner.doRun] request took 1515
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f180m"'.
+##[PysynphotRunner.doRun] request took 3850
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f180m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3527
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f180m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3451
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f180m"'.
+##[PysynphotRunner.doRun] request took 3222
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.023'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f187n"'.
+##[PysynphotRunner.doRun] request took 1489
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f187n"'.
+##[PysynphotRunner.doRun] request took 3246
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f187n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3227
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f187n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 4885
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f187n"'.
+##[PysynphotRunner.doRun] request took 3572
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.024'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f187w"'.
+##[PysynphotRunner.doRun] request took 1410
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f187w"'.
+##[PysynphotRunner.doRun] request took 3009
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f187w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3617
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f187w"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2811
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f187w"'.
+##[PysynphotRunner.doRun] request took 3567
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.025'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f190n"'.
+##[PysynphotRunner.doRun] request took 1397
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f190n"'.
+##[PysynphotRunner.doRun] request took 3143
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f190n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2979
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f190n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3188
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f190n"'.
+##[PysynphotRunner.doRun] request took 3239
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.026'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f204m"'.
+##[PysynphotRunner.doRun] request took 1419
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f204m"'.
+##[PysynphotRunner.doRun] request took 3139
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f204m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3071
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f204m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3330
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f204m"'.
+##[PysynphotRunner.doRun] request took 3250
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.027'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f205w"'.
+##[PysynphotRunner.doRun] request took 1481
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f205w"'.
+##[PysynphotRunner.doRun] request took 3400
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f205w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3044
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f205w"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3445
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f205w"'.
+##[PysynphotRunner.doRun] request took 3359
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.028'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f207m"'.
+##[PysynphotRunner.doRun] request took 1657
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f207m"'.
+##[PysynphotRunner.doRun] request took 3148
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f207m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2983
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f207m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3157
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f207m"'.
+##[PysynphotRunner.doRun] request took 3381
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.030'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f212n"'.
+##[PysynphotRunner.doRun] request took 1525
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f212n"'.
+##[PysynphotRunner.doRun] request took 3074
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f212n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3047
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f212n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3133
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f212n"'.
+##[PysynphotRunner.doRun] request took 3219
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.030'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f215n"'.
+##[PysynphotRunner.doRun] request took 1328
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f215n"'.
+##[PysynphotRunner.doRun] request took 3636
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f215n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3058
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f215n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3019
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f215n"'.
+##[PysynphotRunner.doRun] request took 3225
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.031'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f216n"'.
+##[PysynphotRunner.doRun] request took 1630
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f216n"'.
+##[PysynphotRunner.doRun] request took 3060
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f216n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2851
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f216n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3233
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f216n"'.
+##[PysynphotRunner.doRun] request took 3264
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.032'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f222m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3176
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f222m"'.
+##[PysynphotRunner.doRun] request took 3297
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.033'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,f237m"'.
+##[PysynphotRunner.doRun] request took 1649
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,f237m"'.
+##[PysynphotRunner.doRun] request took 3180
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f237m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3075
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,f237m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3149
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,f237m"'.
+##[PysynphotRunner.doRun] request took 3385
+##[BatchLogTest.run] starting 'NIC.PT.IMAG.034'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,2,pol0l"'.
+##[PysynphotRunner.doRun] request took 1608
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,2,pol0l"'.
+##[PysynphotRunner.doRun] request took 3053
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,pol0l"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3053
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,2,pol0l"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3072
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,2,pol0l"'.
+##[PysynphotRunner.doRun] request took 3217
+##[BatchLogTest.run] starting 'NICIMAG1001'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f108n"'.
+##[PysynphotRunner.doRun] request took 1514
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f108n"'.
+##[PysynphotRunner.doRun] request took 3081
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f108n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2838
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f108n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3285
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f108n"'.
+##[PysynphotRunner.doRun] request took 3292
+##[BatchLogTest.run] starting 'NICIMAG1003'.
+##[BatchLogTest.run] starting 'NICIMAG1004'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3225
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 3212
+##[BatchLogTest.run] starting 'NICIMAG1005'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f113n"'.
+##[PysynphotRunner.doRun] request took 1603
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f113n"'.
+##[PysynphotRunner.doRun] request took 3073
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f113n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2909
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f113n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3207
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f113n"'.
+##[PysynphotRunner.doRun] request took 3540
+##[BatchLogTest.run] starting 'NICIMAG1006'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 1698
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 3230
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3116
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3323
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 3382
+##[BatchLogTest.run] starting 'NICIMAG1007'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f160w"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3068
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f160w"'.
+##[PysynphotRunner.doRun] request took 3333
+##[BatchLogTest.run] starting 'NICIMAG1008'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f164n"'.
+##[PysynphotRunner.doRun] request took 1574
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f164n"'.
+##[PysynphotRunner.doRun] request took 3015
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f164n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3082
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f164n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3027
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f164n"'.
+##[PysynphotRunner.doRun] request took 3200
+##[BatchLogTest.run] starting 'NICIMAG1009'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f166n"'.
+##[PysynphotRunner.doRun] request took 1560
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f166n"'.
+##[PysynphotRunner.doRun] request took 3108
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f166n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3030
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f166n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3068
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f166n"'.
+##[PysynphotRunner.doRun] request took 3181
+##[BatchLogTest.run] starting 'NICIMAG1010'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f175w"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3119
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f175w"'.
+##[PysynphotRunner.doRun] request took 3384
+##[BatchLogTest.run] starting 'NICIMAG1011'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f187n"'.
+##[PysynphotRunner.doRun] request took 1526
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f187n"'.
+##[PysynphotRunner.doRun] request took 3143
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f187n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3046
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f187n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3045
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f187n"'.
+##[PysynphotRunner.doRun] request took 3386
+##[BatchLogTest.run] starting 'NICIMAG1012'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f190n"'.
+##[PysynphotRunner.doRun] request took 1418
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f190n"'.
+##[PysynphotRunner.doRun] request took 3127
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f190n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2936
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f190n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3082
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f190n"'.
+##[PysynphotRunner.doRun] request took 3361
+##[BatchLogTest.run] starting 'NICIMAG1013'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f196n"'.
+##[PysynphotRunner.doRun] request took 1408
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f196n"'.
+##[PysynphotRunner.doRun] request took 2953
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f196n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3060
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f196n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3125
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f196n"'.
+##[PysynphotRunner.doRun] request took 3254
+##[BatchLogTest.run] starting 'NICIMAG1014'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f200n"'.
+##[PysynphotRunner.doRun] request took 1569
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f200n"'.
+##[PysynphotRunner.doRun] request took 3100
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f200n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2851
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f200n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3109
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f200n"'.
+##[PysynphotRunner.doRun] request took 3248
+##[BatchLogTest.run] starting 'NICIMAG1015'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f212n"'.
+##[PysynphotRunner.doRun] request took 1391
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f212n"'.
+##[PysynphotRunner.doRun] request took 3091
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f212n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2848
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f212n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3158
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f212n"'.
+##[PysynphotRunner.doRun] request took 3920
+##[BatchLogTest.run] starting 'NICIMAG1016'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f215n"'.
+##[PysynphotRunner.doRun] request took 1480
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f215n"'.
+##[PysynphotRunner.doRun] request took 3143
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f215n"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2924
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f215n"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3240
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f215n"'.
+##[PysynphotRunner.doRun] request took 3345
+##[BatchLogTest.run] starting 'NICIMAG1017'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f222m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3107
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f222m"'.
+##[PysynphotRunner.doRun] request took 3408
+##[BatchLogTest.run] starting 'NICIMAG1018'.
+##[PysynphotRunner.doRun] command is 'thermback&obsmode="nicmos,3,f240m"'.
+##[PysynphotRunner.doRun] request took 1409
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f240m"'.
+##[PysynphotRunner.doRun] request took 3097
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f240m"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3120
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f240m"&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3229
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),22,vegamag)"&instrument="nicmos,3,f240m"'.
+##[PysynphotRunner.doRun] request took 3174
+##[BatchLogTest.run] starting 'NICIMAG1019'.
+##[BatchLogTest.run] starting 'NICIMAG1020'.
+##[BatchLogTest.run] starting 'NICIMAG1021'.
+##[BatchLogTest.run] starting 'NICIMAG1022'.
+##[BatchLogTest.run] starting 'NICIMAG1023'.
+##[BatchLogTest.run] starting 'NICIMAG1024'.
+##[BatchLogTest.run] starting 'NICIMAG1025'.
+##[BatchLogTest.run] starting 'NICIMAG1026'.
+##[BatchLogTest.run] starting 'NICIMAG1027'.
+##[BatchLogTest.run] starting 'NICIMAG1028'.
+##[BatchLogTest.run] starting 'NICIMAG1029'.
+##[BatchLogTest.run] starting 'NICIMAG1030'.
+##[BatchLogTest.run] starting 'NICIMAG1031'.
+##[BatchLogTest.run] starting 'NICIMAG1032'.
+##[BatchLogTest.run] starting 'NICIMAG1033'.
+##[BatchLogTest.run] starting 'NICIMAG1034'.
+##[BatchLogTest.run] starting 'NICIMAG1035'.
+##[BatchLogTest.run] starting 'NICIMAG1036'.
+##[BatchLogTest.run] starting 'NICIMAG1458'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 3103
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2922
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="rn(bb(5500),band(bessell,h),23.5,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3180
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500),band(bessell,h),23.5,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 3322
+##[BatchLogTest.run] starting 'NICIMAG1459'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 3108
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2746
+##[BatchLogTest.run] starting 'NICIMAG1460'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 2874
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2846
+##[BatchLogTest.run] starting 'NICIMAG1461'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 3049
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2989
+##[BatchLogTest.run] starting 'NICIMAG1462'.
+##[BatchLogTest.run] starting 'NICIMAG1463'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 3125
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3040
+##[BatchLogTest.run] starting 'NICIMAG1464'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 3146
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3096
+##[BatchLogTest.run] starting 'NICIMAG1465'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 3133
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3063
+##[BatchLogTest.run] starting 'NICIMAG1466'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 2919
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3066
+##[BatchLogTest.run] starting 'NICIMAG1467'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 2957
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3132
+##[BatchLogTest.run] starting 'NICIMAG1468'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 3056
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2980
+##[BatchLogTest.run] starting 'NICIMAG1470'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"&instrument="nicmos,3,f150w"'.
+##[PysynphotRunner.doRun] request took 3125
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f150w"&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3060
+##[BatchLogTest.run] starting 'NICIMAG1471'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(icat(k93models,9230,0.0,4.1),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3814
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(icat(k93models,9230,0.0,4.1),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 3768
+##[BatchLogTest.run] starting 'NICIMAG1472'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 4038
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd71_mod_005.fits),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 4584
+##[BatchLogTest.run] starting 'NICIMAG1473'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 4203
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/calspec/gd153_mod_004.fits),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 4733
+##[BatchLogTest.run] starting 'NICIMAG1474'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 4145
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(/usr/stsci/stdata/calspec/g191b2b_mod_004.fits),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 4839
+##[BatchLogTest.run] starting 'NICIMAG1479'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(spec(egal.dat),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 2927
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(egal.dat),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 2860
+##[BatchLogTest.run] starting 'NICIMAG1480'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(bb(10000),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3140
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(10000),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 3284
+##[BatchLogTest.run] starting 'NICIMAG1481'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(pl(4000.0,-1.0,flam),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3731
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(pl(4000.0,-1.0,flam),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 3790
+##[BatchLogTest.run] starting 'NICIMAG1482'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(unit(1.0,flam),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3040
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(unit(1.0,flam),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 3233
+##[BatchLogTest.run] starting 'NICIMAG1483'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,f110w"&spectrum="rn(bb(5500)*ebmvx(0.5,lmc),band(bessell,h),20,vegamag)"'.
+##[PysynphotRunner.doRun] request took 3182
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(bb(5500)*ebmvx(0.5,lmc),band(bessell,h),20,vegamag)"&instrument="nicmos,3,f110w"'.
+##[PysynphotRunner.doRun] request took 3343
+##[BatchLogTest.run] starting 'NIC.SPEC.CTS.01'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g096"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.922913199593925,vegamag)"'.
+##[PysynphotRunner.doRun] request took 812
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.922913199593925,vegamag)"&instrument="nicmos,3,g096"'.
+##[PysynphotRunner.doRun] request took 1008
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(unit(1.0,flam),band(johnson,v),15,vegamag)"&instrument="nicmos,3,g096"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV72.fits'.
+##[PysynphotRunner.doRun] request took 1106
+##[BatchLogTest.run] starting 'NIC.SPEC.CTS.02'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g141"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.922913199593925,vegamag)"'.
+##[PysynphotRunner.doRun] request took 949
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.922913199593925,vegamag)"&instrument="nicmos,3,g141"'.
+##[PysynphotRunner.doRun] request took 1040
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(unit(1.0,flam),band(johnson,v),15,vegamag)"&instrument="nicmos,3,g141"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV73.fits'.
+##[PysynphotRunner.doRun] request took 1043
+##[BatchLogTest.run] starting 'NIC.SPEC.CTS.03'.
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="nicmos,3,g206"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.922913199593925,vegamag)"'.
+##[PysynphotRunner.doRun] request took 1020
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.922913199593925,vegamag)"&instrument="nicmos,3,g206"'.
+##[PysynphotRunner.doRun] request took 1000
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(unit(1.0,flam),band(johnson,v),15,vegamag)"&instrument="nicmos,3,g206"&output=/Users/dmclean/IdeaProjects/etcDev/JUNIT/testFiles/specResults/2008/001/specAV74.fits'.
+##[PysynphotRunner.doRun] request took 1210
+##[BatchLogTest.run] starting 'NIC.SPEC.SNR.01'.
+##[BatchLogTest.run] starting 'NIC.SPEC.SNR.02'.
+##[BatchLogTest.run] starting 'NIC.SPEC.SNR.03'.

@@ -1,0 +1,42 @@
+# "endpoints" = single endpoints are problem OR the noisy region towards endpoints
+# "filter/spectrum endpoints" = likely interp at the pinning point of filter
+# "hot kurucz" = hotter Kurucz models have spikey lines
+# "steep gradient + endpoint" = too steep to reproduce + one endpoint off
+
+
+#% more 11feb_r812_subset_fail_nicmos.txt 
+nicmos_etc_cases/testcrphotlam/countrateCase245	endpoints
+nicmos_etc_cases/testcrcounts/countrateCase44	filter/spectrum endpoints
+nicmos_etc_cases/testcrphotlam/countrateCase228	endpoints
+nicmos_etc_cases/testcrspec/countrateCase59	endpoints
+nicmos_etc_cases/testcrcounts/countrateCase59	filter/spectrum endpoints
+nicmos_etc_cases/testcrphotlam/countrateCase254	endpoints
+nicmos_etc_cases/testcrphotlam/countrateCase60	endpoints
+nicmos_etc_cases/testcrcounts/countrateCase40	endpoints - lots of outliers
+nicmos_etc_cases/testcrphotlam/countrateCase44	endpoints
+nicmos_etc_cases/testcrspec/countrateCase257	endpoints
+nicmos_etc_cases/testcrphotlam/countrateCase59	endpoints
+nicmos_etc_cases/testcrspec/SpecSourcerateSpecCase36 endpoints
+nicmos_etc_cases/testcrspec/countrateCase258	endpoints
+nicmos_etc_cases/testcrspec/SpecSourcerateSpecCase29 endpoints
+nicmos_etc_cases/testcrphotlam/countrateCase40	endpoints
+nicmos_etc_cases/testcrspec/countrateCase135	endpoints
+nicmos_etc_cases/testcrspec/countrateCase60	endpoints	
+nicmos_etc_cases/testcrspec/countrateCase132	endpoints
+nicmos_etc_cases/testcrspec/SpecSourcerateSpecCase73	hot kurucz
+nicmos_etc_cases/testcrcounts/countrateCase245	endpoints
+nicmos_etc_cases/testcrcounts/countrateCase228	endpoints
+nicmos_etc_cases/testcrcounts/countrateCase254	endpoints
+nicmos_etc_cases/testcrcounts/countrateCase60	endpoints
+
+#% more 11feb_r812_extreme_fail_nicmos.txt 
+nicmos_etc_cases/testcrspec/countrateCase77	steep gradient + endpoint
+nicmos_etc_cases/testcrspec/SpecSourcerateSpecCase70	hot kurucz
+nicmos_etc_cases/testcrspec/SpecSourcerateSpecCase71	hot kurucz
+nicmos_etc_cases/testcrspec/SpecSourcerateSpecCase72	hot kurucz
+nicmos_etc_cases/testcrspec/SpecSourcerateSpecCase74	hot kurucz
+nicmos_etc_cases/testcrspec/SpecSourcerateSpecCase73	hot kurucz
+nicmos_etc_cases/testcrspec/calcphotCase77	steep gradient + endpoint
+
+#% more 11feb_r812_tcr_fail_nicmos.txt
+nicmos_etc_cases/testcountrate/countrateCase239		auto-accept

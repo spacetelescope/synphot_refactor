@@ -1,0 +1,392 @@
+#
+# test cases for renormalization in the UV range (lambda<3500 A)
+#
+# A common task will be to renormalize a model or template spectrum
+# to an observed Galex flux or to a known mean UV flux.
+# Some of the lowest temperature
+# Kurucz models should produce warnings when normalizing in the FUV.
+#
+#
+#  ABMAG units
+#
+# STIS cases
+#
+# Kurucz models normalized to Galex NUV/FUV 
+rn(icat(k93models,37000,0.0,4.0),band(galex,nuv),16.0,abmag)
+rn(icat(k93models,35000,0.0,4.0),band(galex,nuv),16.0,abmag)
+rn(icat(k93models,30000,0.0,4.0),band(galex,nuv),16.0,abmag)
+rn(icat(k93models,25000,0.0,4.0),band(galex,nuv),16.0,abmag)
+rn(icat(k93models,20000,0.0,4.0),band(galex,nuv),16.0,abmag)
+rn(icat(k93models,10000,0.0,4.0),band(galex,nuv),16.0,abmag)
+rn(icat(k93models, 5000,0.0,4.0),band(galex,nuv),16.0,abmag)
+rn(icat(k93models,37000,0.0,4.0),band(galex,fuv),16.0,abmag)
+rn(icat(k93models,35000,0.0,4.0),band(galex,fuv),16.0,abmag)
+rn(icat(k93models,30000,0.0,4.0),band(galex,fuv),16.0,abmag)
+rn(icat(k93models,25000,0.0,4.0),band(galex,fuv),16.0,abmag)
+rn(icat(k93models,20000,0.0,4.0),band(galex,fuv),16.0,abmag)
+rn(icat(k93models,10000,0.0,4.0),band(galex,fuv),16.0,abmag)
+rn(icat(k93models, 5000,0.0,4.0),band(galex,fuv),16.0,abmag)
+# Some template galaxies normalized in STIS UV range 
+rn(crgridkc96$starb1_template.fits,band(stis,e140h),16.0,abmag)
+rn(crgridkc96$starb2_template.fits,band(stis,e140m),16.0,abmag)
+rn(crgridkc96$starb3_template.fits,band(stis,e230h),16.0,abmag)
+rn(crgridkc96$starb4_template.fits,band(stis,e230m),16.0,abmag)
+rn(crgridkc96$starb5_template.fits,band(stis,g140m),16.0,abmag)
+rn(crgridkc96$starb6_template.fits,band(stis,g230m),16.0,abmag)
+rn(crgridkc96$starb1_template.fits,band(stis,e140h),16.0,abmag)
+rn(crgridkc96$starb2_template.fits,band(stis,e140m),16.0,abmag)
+rn(crgridkc96$starb3_template.fits,band(stis,e230h),16.0,abmag)
+rn(crgridkc96$starb4_template.fits,band(stis,e230m),16.0,abmag)
+rn(crgridkc96$starb5_template.fits,band(stis,g140m),16.0,abmag)
+rn(crgridkc96$starb6_template.fits,band(stis,g230m),16.0,abmag)
+#
+#  COS counterparts
+#
+# Kurucz models normalized to Galex NUV/FUV  
+rn(icat(k93models,37000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,abmag)
+rn(icat(k93models,35000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,abmag)
+rn(icat(k93models,30000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,abmag)
+rn(icat(k93models,25000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,abmag)
+rn(icat(k93models,20000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,abmag)
+rn(icat(k93models,10000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,abmag)
+rn(icat(k93models, 5000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,abmag)
+rn(icat(k93models,37000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,abmag)
+rn(icat(k93models,35000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,abmag)
+rn(icat(k93models,30000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,abmag)
+rn(icat(k93models,25000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,abmag)
+rn(icat(k93models,20000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,abmag)
+rn(icat(k93models,10000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,abmag)
+rn(icat(k93models, 5000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,abmag)
+# Some template galaxies normalized in COS UV range
+rn(crgridkc96$starb1_template.fits,band(cos,fuv,g130m,c1300),16.0,abmag)
+rn(crgridkc96$starb2_template.fits,band(cos,fuv,g130m,c1300),16.0,abmag)
+rn(crgridkc96$starb3_template.fits,band(cos,fuv,g130m,c1300),16.0,abmag)
+rn(crgridkc96$starb4_template.fits,band(cos,fuv,g130m,c1300),16.0,abmag)
+rn(crgridkc96$starb5_template.fits,band(cos,fuv,g130m,c1300),16.0,abmag)
+rn(crgridkc96$starb6_template.fits,band(cos,fuv,g130m,c1300),16.0,abmag)
+rn(crgridkc96$starb1_template.fits,band(cos,nuv,g185m,c1835),16.0,abmag)
+rn(crgridkc96$starb2_template.fits,band(cos,nuv,g185m,c1835),16.0,abmag)
+rn(crgridkc96$starb3_template.fits,band(cos,nuv,g185m,c1835),16.0,abmag)
+rn(crgridkc96$starb4_template.fits,band(cos,nuv,g185m,c1835),16.0,abmag)
+rn(crgridkc96$starb5_template.fits,band(cos,nuv,g185m,c1835),16.0,abmag)
+rn(crgridkc96$starb6_template.fits,band(cos,nuv,g185m,c1835),16.0,abmag)
+#
+#  STMAG units
+#
+# STIS cases
+#
+# Kurucz models normalized to Galex NUV/FUV 
+rn(icat(k93models,37000,0.0,4.0),band(galex,nuv),16.0,stmag)
+rn(icat(k93models,35000,0.0,4.0),band(galex,nuv),16.0,stmag)
+rn(icat(k93models,30000,0.0,4.0),band(galex,nuv),16.0,stmag)
+rn(icat(k93models,25000,0.0,4.0),band(galex,nuv),16.0,stmag)
+rn(icat(k93models,20000,0.0,4.0),band(galex,nuv),16.0,stmag)
+rn(icat(k93models,10000,0.0,4.0),band(galex,nuv),16.0,stmag)
+rn(icat(k93models, 5000,0.0,4.0),band(galex,nuv),16.0,stmag)
+rn(icat(k93models,37000,0.0,4.0),band(galex,fuv),16.0,stmag)
+rn(icat(k93models,35000,0.0,4.0),band(galex,fuv),16.0,stmag)
+rn(icat(k93models,30000,0.0,4.0),band(galex,fuv),16.0,stmag)
+rn(icat(k93models,25000,0.0,4.0),band(galex,fuv),16.0,stmag)
+rn(icat(k93models,20000,0.0,4.0),band(galex,fuv),16.0,stmag)
+rn(icat(k93models,10000,0.0,4.0),band(galex,fuv),16.0,stmag)
+rn(icat(k93models, 5000,0.0,4.0),band(galex,fuv),16.0,stmag)
+# Some template galaxies normalized in STIS UV range 
+rn(crgridkc96$starb1_template.fits,band(stis,e140h),16.0,stmag)
+rn(crgridkc96$starb2_template.fits,band(stis,e140m),16.0,stmag)
+rn(crgridkc96$starb3_template.fits,band(stis,e230h),16.0,stmag)
+rn(crgridkc96$starb4_template.fits,band(stis,e230m),16.0,stmag)
+rn(crgridkc96$starb5_template.fits,band(stis,g140m),16.0,stmag)
+rn(crgridkc96$starb6_template.fits,band(stis,g230m),16.0,stmag)
+rn(crgridkc96$starb1_template.fits,band(stis,e140h),16.0,stmag)
+rn(crgridkc96$starb2_template.fits,band(stis,e140m),16.0,stmag)
+rn(crgridkc96$starb3_template.fits,band(stis,e230h),16.0,stmag)
+rn(crgridkc96$starb4_template.fits,band(stis,e230m),16.0,stmag)
+rn(crgridkc96$starb5_template.fits,band(stis,g140m),16.0,stmag)
+rn(crgridkc96$starb6_template.fits,band(stis,g230m),16.0,stmag)
+#
+#  COS counterparts
+#
+# Kurucz models normalized to Galex NUV/FUV  
+rn(icat(k93models,37000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,stmag)
+rn(icat(k93models,35000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,stmag)
+rn(icat(k93models,30000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,stmag)
+rn(icat(k93models,25000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,stmag)
+rn(icat(k93models,20000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,stmag)
+rn(icat(k93models,10000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,stmag)
+rn(icat(k93models, 5000,0.0,4.0),band(cos,nuv,g185m,c1835),16.0,stmag)
+rn(icat(k93models,37000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,stmag)
+rn(icat(k93models,35000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,stmag)
+rn(icat(k93models,30000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,stmag)
+rn(icat(k93models,25000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,stmag)
+rn(icat(k93models,20000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,stmag)
+rn(icat(k93models,10000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,stmag)
+rn(icat(k93models, 5000,0.0,4.0),band(cos,fuv,g130m,c1300),16.0,stmag)
+# Some template galaxies normalized in COS UV range
+rn(crgridkc96$starb1_template.fits,band(cos,fuv,g130m,c1300),16.0,stmag)
+rn(crgridkc96$starb2_template.fits,band(cos,fuv,g130m,c1300),16.0,stmag)
+rn(crgridkc96$starb3_template.fits,band(cos,fuv,g130m,c1300),16.0,stmag)
+rn(crgridkc96$starb4_template.fits,band(cos,fuv,g130m,c1300),16.0,stmag)
+rn(crgridkc96$starb5_template.fits,band(cos,fuv,g130m,c1300),16.0,stmag)
+rn(crgridkc96$starb6_template.fits,band(cos,fuv,g130m,c1300),16.0,stmag)
+rn(crgridkc96$starb1_template.fits,band(cos,nuv,g185m,c1835),16.0,stmag)
+rn(crgridkc96$starb2_template.fits,band(cos,nuv,g185m,c1835),16.0,stmag)
+rn(crgridkc96$starb3_template.fits,band(cos,nuv,g185m,c1835),16.0,stmag)
+rn(crgridkc96$starb4_template.fits,band(cos,nuv,g185m,c1835),16.0,stmag)
+rn(crgridkc96$starb5_template.fits,band(cos,nuv,g185m,c1835),16.0,stmag)
+rn(crgridkc96$starb6_template.fits,band(cos,nuv,g185m,c1835),16.0,stmag)
+#
+#  FNU units
+#
+# STIS cases
+#
+# Kurucz models normalized to Galex NUV/FUV 
+rn(icat(k93models,37000,0.0,4.0),band(galex,nuv),1.e-26,fnu)
+rn(icat(k93models,35000,0.0,4.0),band(galex,nuv),1.e-26,fnu)
+rn(icat(k93models,30000,0.0,4.0),band(galex,nuv),1.e-26,fnu)
+rn(icat(k93models,25000,0.0,4.0),band(galex,nuv),1.e-26,fnu)
+rn(icat(k93models,20000,0.0,4.0),band(galex,nuv),1.e-26,fnu)
+rn(icat(k93models,10000,0.0,4.0),band(galex,nuv),1.e-26,fnu)
+rn(icat(k93models, 5000,0.0,4.0),band(galex,nuv),1.e-26,fnu)
+rn(icat(k93models,37000,0.0,4.0),band(galex,fuv),1.e-26,fnu)
+rn(icat(k93models,35000,0.0,4.0),band(galex,fuv),1.e-26,fnu)
+rn(icat(k93models,30000,0.0,4.0),band(galex,fuv),1.e-26,fnu)
+rn(icat(k93models,25000,0.0,4.0),band(galex,fuv),1.e-26,fnu)
+rn(icat(k93models,20000,0.0,4.0),band(galex,fuv),1.e-26,fnu)
+rn(icat(k93models,10000,0.0,4.0),band(galex,fuv),1.e-26,fnu)
+rn(icat(k93models, 5000,0.0,4.0),band(galex,fuv),1.e-26,fnu)
+# Some template galaxies normalized in STIS UV range 
+rn(crgridkc96$starb1_template.fits,band(stis,e140h),1.e-26,fnu)
+rn(crgridkc96$starb2_template.fits,band(stis,e140m),1.e-26,fnu)
+rn(crgridkc96$starb3_template.fits,band(stis,e230h),1.e-26,fnu)
+rn(crgridkc96$starb4_template.fits,band(stis,e230m),1.e-26,fnu)
+rn(crgridkc96$starb5_template.fits,band(stis,g140m),1.e-26,fnu)
+rn(crgridkc96$starb6_template.fits,band(stis,g230m),1.e-26,fnu)
+rn(crgridkc96$starb1_template.fits,band(stis,e140h),1.e-26,fnu)
+rn(crgridkc96$starb2_template.fits,band(stis,e140m),1.e-26,fnu)
+rn(crgridkc96$starb3_template.fits,band(stis,e230h),1.e-26,fnu)
+rn(crgridkc96$starb4_template.fits,band(stis,e230m),1.e-26,fnu)
+rn(crgridkc96$starb5_template.fits,band(stis,g140m),1.e-26,fnu)
+rn(crgridkc96$starb6_template.fits,band(stis,g230m),1.e-26,fnu)
+#
+#  COS counterparts
+#
+# Kurucz models normalized to Galex NUV/FUV  
+rn(icat(k93models,37000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-26,fnu)
+rn(icat(k93models,35000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-26,fnu)
+rn(icat(k93models,30000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-26,fnu)
+rn(icat(k93models,25000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-26,fnu)
+rn(icat(k93models,20000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-26,fnu)
+rn(icat(k93models,10000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-26,fnu)
+rn(icat(k93models, 5000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-26,fnu)
+rn(icat(k93models,37000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-26,fnu)
+rn(icat(k93models,35000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-26,fnu)
+rn(icat(k93models,30000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-26,fnu)
+rn(icat(k93models,25000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-26,fnu)
+rn(icat(k93models,20000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-26,fnu)
+rn(icat(k93models,10000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-26,fnu)
+rn(icat(k93models, 5000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-26,fnu)
+# Some template galaxies normalized in COS UV range
+rn(crgridkc96$starb1_template.fits,band(cos,fuv,g130m,c1300),1.e-26,fnu)
+rn(crgridkc96$starb2_template.fits,band(cos,fuv,g130m,c1300),1.e-26,fnu)
+rn(crgridkc96$starb3_template.fits,band(cos,fuv,g130m,c1300),1.e-26,fnu)
+rn(crgridkc96$starb4_template.fits,band(cos,fuv,g130m,c1300),1.e-26,fnu)
+rn(crgridkc96$starb5_template.fits,band(cos,fuv,g130m,c1300),1.e-26,fnu)
+rn(crgridkc96$starb6_template.fits,band(cos,fuv,g130m,c1300),1.e-26,fnu)
+rn(crgridkc96$starb1_template.fits,band(cos,nuv,g185m,c1835),1.e-26,fnu)
+rn(crgridkc96$starb2_template.fits,band(cos,nuv,g185m,c1835),1.e-26,fnu)
+rn(crgridkc96$starb3_template.fits,band(cos,nuv,g185m,c1835),1.e-26,fnu)
+rn(crgridkc96$starb4_template.fits,band(cos,nuv,g185m,c1835),1.e-26,fnu)
+rn(crgridkc96$starb5_template.fits,band(cos,nuv,g185m,c1835),1.e-26,fnu)
+rn(crgridkc96$starb6_template.fits,band(cos,nuv,g185m,c1835),1.e-26,fnu)
+#
+#  JY units
+#
+# STIS cases
+#
+# Kurucz models normalized to Galex NUV/FUV 
+rn(icat(k93models,37000,0.0,4.0),band(galex,nuv),1.e-3,jy)
+rn(icat(k93models,35000,0.0,4.0),band(galex,nuv),1.e-3,jy)
+rn(icat(k93models,30000,0.0,4.0),band(galex,nuv),1.e-3,jy)
+rn(icat(k93models,25000,0.0,4.0),band(galex,nuv),1.e-3,jy)
+rn(icat(k93models,20000,0.0,4.0),band(galex,nuv),1.e-3,jy)
+rn(icat(k93models,10000,0.0,4.0),band(galex,nuv),1.e-3,jy)
+rn(icat(k93models, 5000,0.0,4.0),band(galex,nuv),1.e-3,jy)
+rn(icat(k93models,37000,0.0,4.0),band(galex,fuv),1.e-3,jy)
+rn(icat(k93models,35000,0.0,4.0),band(galex,fuv),1.e-3,jy)
+rn(icat(k93models,30000,0.0,4.0),band(galex,fuv),1.e-3,jy)
+rn(icat(k93models,25000,0.0,4.0),band(galex,fuv),1.e-3,jy)
+rn(icat(k93models,20000,0.0,4.0),band(galex,fuv),1.e-3,jy)
+rn(icat(k93models,10000,0.0,4.0),band(galex,fuv),1.e-3,jy)
+rn(icat(k93models, 5000,0.0,4.0),band(galex,fuv),1.e-3,jy)
+# Some template galaxies normalized in STIS UV range 
+rn(crgridkc96$starb1_template.fits,band(stis,e140h),1.e-3,jy)
+rn(crgridkc96$starb2_template.fits,band(stis,e140m),1.e-3,jy)
+rn(crgridkc96$starb3_template.fits,band(stis,e230h),1.e-3,jy)
+rn(crgridkc96$starb4_template.fits,band(stis,e230m),1.e-3,jy)
+rn(crgridkc96$starb5_template.fits,band(stis,g140m),1.e-3,jy)
+rn(crgridkc96$starb6_template.fits,band(stis,g230m),1.e-3,jy)
+rn(crgridkc96$starb1_template.fits,band(stis,e140h),1.e-3,jy)
+rn(crgridkc96$starb2_template.fits,band(stis,e140m),1.e-3,jy)
+rn(crgridkc96$starb3_template.fits,band(stis,e230h),1.e-3,jy)
+rn(crgridkc96$starb4_template.fits,band(stis,e230m),1.e-3,jy)
+rn(crgridkc96$starb5_template.fits,band(stis,g140m),1.e-3,jy)
+rn(crgridkc96$starb6_template.fits,band(stis,g230m),1.e-3,jy)
+#
+#  COS counterparts
+#
+# Kurucz models normalized to Galex NUV/FUV  
+rn(icat(k93models,37000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-3,jy)
+rn(icat(k93models,35000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-3,jy)
+rn(icat(k93models,30000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-3,jy)
+rn(icat(k93models,25000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-3,jy)
+rn(icat(k93models,20000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-3,jy)
+rn(icat(k93models,10000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-3,jy)
+rn(icat(k93models, 5000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-3,jy)
+rn(icat(k93models,37000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-3,jy)
+rn(icat(k93models,35000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-3,jy)
+rn(icat(k93models,30000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-3,jy)
+rn(icat(k93models,25000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-3,jy)
+rn(icat(k93models,20000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-3,jy)
+rn(icat(k93models,10000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-3,jy)
+rn(icat(k93models, 5000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-3,jy)
+# Some template galaxies normalized in COS UV range
+rn(crgridkc96$starb1_template.fits,band(cos,fuv,g130m,c1300),1.e-3,jy)
+rn(crgridkc96$starb2_template.fits,band(cos,fuv,g130m,c1300),1.e-3,jy)
+rn(crgridkc96$starb3_template.fits,band(cos,fuv,g130m,c1300),1.e-3,jy)
+rn(crgridkc96$starb4_template.fits,band(cos,fuv,g130m,c1300),1.e-3,jy)
+rn(crgridkc96$starb5_template.fits,band(cos,fuv,g130m,c1300),1.e-3,jy)
+rn(crgridkc96$starb6_template.fits,band(cos,fuv,g130m,c1300),1.e-3,jy)
+rn(crgridkc96$starb1_template.fits,band(cos,nuv,g185m,c1835),1.e-3,jy)
+rn(crgridkc96$starb2_template.fits,band(cos,nuv,g185m,c1835),1.e-3,jy)
+rn(crgridkc96$starb3_template.fits,band(cos,nuv,g185m,c1835),1.e-3,jy)
+rn(crgridkc96$starb4_template.fits,band(cos,nuv,g185m,c1835),1.e-3,jy)
+rn(crgridkc96$starb5_template.fits,band(cos,nuv,g185m,c1835),1.e-3,jy)
+rn(crgridkc96$starb6_template.fits,band(cos,nuv,g185m,c1835),1.e-3,jy)
+#
+#  mJY units
+#
+# STIS cases
+#
+# Kurucz models normalized to Galex NUV/FUV 
+rn(icat(k93models,37000,0.0,4.0),band(galex,nuv),1.,mjy)
+rn(icat(k93models,35000,0.0,4.0),band(galex,nuv),1.,mjy)
+rn(icat(k93models,30000,0.0,4.0),band(galex,nuv),1.,mjy)
+rn(icat(k93models,25000,0.0,4.0),band(galex,nuv),1.,mjy)
+rn(icat(k93models,20000,0.0,4.0),band(galex,nuv),1.,mjy)
+rn(icat(k93models,10000,0.0,4.0),band(galex,nuv),1.,mjy)
+rn(icat(k93models, 5000,0.0,4.0),band(galex,nuv),1.,mjy)
+rn(icat(k93models,37000,0.0,4.0),band(galex,fuv),1.,mjy)
+rn(icat(k93models,35000,0.0,4.0),band(galex,fuv),1.,mjy)
+rn(icat(k93models,30000,0.0,4.0),band(galex,fuv),1.,mjy)
+rn(icat(k93models,25000,0.0,4.0),band(galex,fuv),1.,mjy)
+rn(icat(k93models,20000,0.0,4.0),band(galex,fuv),1.,mjy)
+rn(icat(k93models,10000,0.0,4.0),band(galex,fuv),1.,mjy)
+rn(icat(k93models, 5000,0.0,4.0),band(galex,fuv),1.,mjy)
+# Some template galaxies normalized in STIS UV range 
+rn(crgridkc96$starb1_template.fits,band(stis,e140h),1.,mjy)
+rn(crgridkc96$starb2_template.fits,band(stis,e140m),1.,mjy)
+rn(crgridkc96$starb3_template.fits,band(stis,e230h),1.,mjy)
+rn(crgridkc96$starb4_template.fits,band(stis,e230m),1.,mjy)
+rn(crgridkc96$starb5_template.fits,band(stis,g140m),1.,mjy)
+rn(crgridkc96$starb6_template.fits,band(stis,g230m),1.,mjy)
+rn(crgridkc96$starb1_template.fits,band(stis,e140h),1.,mjy)
+rn(crgridkc96$starb2_template.fits,band(stis,e140m),1.,mjy)
+rn(crgridkc96$starb3_template.fits,band(stis,e230h),1.,mjy)
+rn(crgridkc96$starb4_template.fits,band(stis,e230m),1.,mjy)
+rn(crgridkc96$starb5_template.fits,band(stis,g140m),1.,mjy)
+rn(crgridkc96$starb6_template.fits,band(stis,g230m),1.,mjy)
+#
+#  COS counterparts
+#
+# Kurucz models normalized to Galex NUV/FUV  
+rn(icat(k93models,37000,0.0,4.0),band(cos,nuv,g185m,c1835),1.,mjy)
+rn(icat(k93models,35000,0.0,4.0),band(cos,nuv,g185m,c1835),1.,mjy)
+rn(icat(k93models,30000,0.0,4.0),band(cos,nuv,g185m,c1835),1.,mjy)
+rn(icat(k93models,25000,0.0,4.0),band(cos,nuv,g185m,c1835),1.,mjy)
+rn(icat(k93models,20000,0.0,4.0),band(cos,nuv,g185m,c1835),1.,mjy)
+rn(icat(k93models,10000,0.0,4.0),band(cos,nuv,g185m,c1835),1.,mjy)
+rn(icat(k93models, 5000,0.0,4.0),band(cos,nuv,g185m,c1835),1.,mjy)
+rn(icat(k93models,37000,0.0,4.0),band(cos,fuv,g130m,c1300),1.,mjy)
+rn(icat(k93models,35000,0.0,4.0),band(cos,fuv,g130m,c1300),1.,mjy)
+rn(icat(k93models,30000,0.0,4.0),band(cos,fuv,g130m,c1300),1.,mjy)
+rn(icat(k93models,25000,0.0,4.0),band(cos,fuv,g130m,c1300),1.,mjy)
+rn(icat(k93models,20000,0.0,4.0),band(cos,fuv,g130m,c1300),1.,mjy)
+rn(icat(k93models,10000,0.0,4.0),band(cos,fuv,g130m,c1300),1.,mjy)
+rn(icat(k93models, 5000,0.0,4.0),band(cos,fuv,g130m,c1300),1.,mjy)
+# Some template galaxies normalized in COS UV range
+rn(crgridkc96$starb1_template.fits,band(cos,fuv,g130m,c1300),1.,mjy)
+rn(crgridkc96$starb2_template.fits,band(cos,fuv,g130m,c1300),1.,mjy)
+rn(crgridkc96$starb3_template.fits,band(cos,fuv,g130m,c1300),1.,mjy)
+rn(crgridkc96$starb4_template.fits,band(cos,fuv,g130m,c1300),1.,mjy)
+rn(crgridkc96$starb5_template.fits,band(cos,fuv,g130m,c1300),1.,mjy)
+rn(crgridkc96$starb6_template.fits,band(cos,fuv,g130m,c1300),1.,mjy)
+rn(crgridkc96$starb1_template.fits,band(cos,nuv,g185m,c1835),1.,mjy)
+rn(crgridkc96$starb2_template.fits,band(cos,nuv,g185m,c1835),1.,mjy)
+rn(crgridkc96$starb3_template.fits,band(cos,nuv,g185m,c1835),1.,mjy)
+rn(crgridkc96$starb4_template.fits,band(cos,nuv,g185m,c1835),1.,mjy)
+rn(crgridkc96$starb5_template.fits,band(cos,nuv,g185m,c1835),1.,mjy)
+rn(crgridkc96$starb6_template.fits,band(cos,nuv,g185m,c1835),1.,mjy)
+#
+#  PHOTNU units
+#
+# STIS cases
+#
+# Kurucz models normalized to Galex NUV/FUV 
+rn(icat(k93models,37000,0.0,4.0),band(galex,nuv),1.e-15,photnu)
+rn(icat(k93models,35000,0.0,4.0),band(galex,nuv),1.e-15,photnu)
+rn(icat(k93models,30000,0.0,4.0),band(galex,nuv),1.e-15,photnu)
+rn(icat(k93models,25000,0.0,4.0),band(galex,nuv),1.e-15,photnu)
+rn(icat(k93models,20000,0.0,4.0),band(galex,nuv),1.e-15,photnu)
+rn(icat(k93models,10000,0.0,4.0),band(galex,nuv),1.e-15,photnu)
+rn(icat(k93models, 5000,0.0,4.0),band(galex,nuv),1.e-15,photnu)
+rn(icat(k93models,37000,0.0,4.0),band(galex,fuv),1.e-15,photnu)
+rn(icat(k93models,35000,0.0,4.0),band(galex,fuv),1.e-15,photnu)
+rn(icat(k93models,30000,0.0,4.0),band(galex,fuv),1.e-15,photnu)
+rn(icat(k93models,25000,0.0,4.0),band(galex,fuv),1.e-15,photnu)
+rn(icat(k93models,20000,0.0,4.0),band(galex,fuv),1.e-15,photnu)
+rn(icat(k93models,10000,0.0,4.0),band(galex,fuv),1.e-15,photnu)
+rn(icat(k93models, 5000,0.0,4.0),band(galex,fuv),1.e-15,photnu)
+# Some template galaxies normalized in STIS UV range 
+rn(crgridkc96$starb1_template.fits,band(stis,e140h),1.e-15,photnu)
+rn(crgridkc96$starb2_template.fits,band(stis,e140m),1.e-15,photnu)
+rn(crgridkc96$starb3_template.fits,band(stis,e230h),1.e-15,photnu)
+rn(crgridkc96$starb4_template.fits,band(stis,e230m),1.e-15,photnu)
+rn(crgridkc96$starb5_template.fits,band(stis,g140m),1.e-15,photnu)
+rn(crgridkc96$starb6_template.fits,band(stis,g230m),1.e-15,photnu)
+rn(crgridkc96$starb1_template.fits,band(stis,e140h),1.e-15,photnu)
+rn(crgridkc96$starb2_template.fits,band(stis,e140m),1.e-15,photnu)
+rn(crgridkc96$starb3_template.fits,band(stis,e230h),1.e-15,photnu)
+rn(crgridkc96$starb4_template.fits,band(stis,e230m),1.e-15,photnu)
+rn(crgridkc96$starb5_template.fits,band(stis,g140m),1.e-15,photnu)
+rn(crgridkc96$starb6_template.fits,band(stis,g230m),1.e-15,photnu)
+#
+#  COS counterparts
+#
+# Kurucz models normalized to Galex NUV/FUV  
+rn(icat(k93models,37000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-15,photnu)
+rn(icat(k93models,35000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-15,photnu)
+rn(icat(k93models,30000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-15,photnu)
+rn(icat(k93models,25000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-15,photnu)
+rn(icat(k93models,20000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-15,photnu)
+rn(icat(k93models,10000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-15,photnu)
+rn(icat(k93models, 5000,0.0,4.0),band(cos,nuv,g185m,c1835),1.e-15,photnu)
+rn(icat(k93models,37000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-15,photnu)
+rn(icat(k93models,35000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-15,photnu)
+rn(icat(k93models,30000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-15,photnu)
+rn(icat(k93models,25000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-15,photnu)
+rn(icat(k93models,20000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-15,photnu)
+rn(icat(k93models,10000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-15,photnu)
+rn(icat(k93models, 5000,0.0,4.0),band(cos,fuv,g130m,c1300),1.e-15,photnu)
+# Some template galaxies normalized in COS UV range
+rn(crgridkc96$starb1_template.fits,band(cos,fuv,g130m,c1300),1.e-15,photnu)
+rn(crgridkc96$starb2_template.fits,band(cos,fuv,g130m,c1300),1.e-15,photnu)
+rn(crgridkc96$starb3_template.fits,band(cos,fuv,g130m,c1300),1.e-15,photnu)
+rn(crgridkc96$starb4_template.fits,band(cos,fuv,g130m,c1300),1.e-15,photnu)
+rn(crgridkc96$starb5_template.fits,band(cos,fuv,g130m,c1300),1.e-15,photnu)
+rn(crgridkc96$starb6_template.fits,band(cos,fuv,g130m,c1300),1.e-15,photnu)
+rn(crgridkc96$starb1_template.fits,band(cos,nuv,g185m,c1835),1.e-15,photnu)
+rn(crgridkc96$starb2_template.fits,band(cos,nuv,g185m,c1835),1.e-15,photnu)
+rn(crgridkc96$starb3_template.fits,band(cos,nuv,g185m,c1835),1.e-15,photnu)
+rn(crgridkc96$starb4_template.fits,band(cos,nuv,g185m,c1835),1.e-15,photnu)
+rn(crgridkc96$starb5_template.fits,band(cos,nuv,g185m,c1835),1.e-15,photnu)
+rn(crgridkc96$starb6_template.fits,band(cos,nuv,g185m,c1835),1.e-15,photnu)

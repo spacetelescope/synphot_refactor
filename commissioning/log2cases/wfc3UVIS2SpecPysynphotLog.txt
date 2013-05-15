@@ -1,0 +1,1106 @@
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0000'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 165
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET1.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 307
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0001'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),18.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET2.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 315
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0002'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET3.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0003'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 167
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 149
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET4.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 326
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0004'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET5.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0005'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET6.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0006'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),18.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET7.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 315
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0007'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 154
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET8.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 322
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0008'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET9.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0009'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET10.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0010'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 158
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 148
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET11.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 309
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0011'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),18.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET12.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 330
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0012'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET13.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0013'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET14.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0014'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET15.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0015'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET16.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 309
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0016'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 166
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),18.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET17.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 421
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0017'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET18.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 309
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0018'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET19.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0019'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET20.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0020'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET21.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 328
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0021'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),18.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET22.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0022'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET23.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0023'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET24.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0024'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET25.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 331
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0025'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET26.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0026'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 154
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),18.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET27.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 317
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0027'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET28.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 316
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0028'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 165
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 156
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET29.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 316
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0029'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 180
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET30.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0030'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 154
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET31.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 309
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0031'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 149
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET32.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0032'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET33.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0033'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET34.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 329
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0034'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 165
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET35.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 310
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0035'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET36.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0036'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET37.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0037'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 177
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET38.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 328
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0038'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET39.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0039'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET40.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0040'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET41.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0041'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET42.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 328
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0042'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET43.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0043'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET44.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0044'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 149
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET45.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0045'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 179
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET46.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 309
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0046'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 167
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET47.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 309
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0047'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET48.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0048'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET49.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0049'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET50.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 317
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0050'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET51.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 332
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0051'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET52.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 317
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0052'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET53.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 315
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0053'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 154
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET54.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0054'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET55.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 333
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0055'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET56.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0056'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET57.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0057'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET58.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 309
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0058'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 173
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET59.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0059'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 174
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET60.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0060'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET61.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0061'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET62.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 310
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0062'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 154
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET63.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0063'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 170
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET64.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 332
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0064'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 165
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET65.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0065'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET66.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 315
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0066'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET67.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 315
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0067'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET68.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 333
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0068'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET69.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0069'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 156
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET70.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0070'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET71.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0071'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET72.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 327
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0072'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET73.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 310
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0073'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET74.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 309
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0074'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 158
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 149
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET75.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0075'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET76.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0076'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET77.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 329
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0077'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 176
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET78.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 332
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0078'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET79.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0079'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET80.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 316
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0080'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET81.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 330
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0081'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 148
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET82.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0082'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 158
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET83.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 309
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0083'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 149
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET84.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 310
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0084'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET85.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 358
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0085'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET86.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0086'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET87.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 316
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0087'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET88.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 315
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0088'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 148
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET89.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 310
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0089'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 169
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET90.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 308
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0090'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET91.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0091'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET92.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 310
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0092'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET93.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 309
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0093'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 149
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET94.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 324
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0094'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 166
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET95.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0095'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET96.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0096'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET97.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0097'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 149
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET98.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 327
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0098'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 158
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET99.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 315
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0099'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET100.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 316
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0100'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET101.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 315
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0101'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET102.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0102'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 176
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET103.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0103'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 154
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET104.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0104'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET105.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0105'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET106.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 309
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0106'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET107.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 332
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0107'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET108.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0108'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 261
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET109.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0109'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 149
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET110.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 311
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0110'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 158
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET111.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 326
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0111'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 149
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET112.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 312
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0112'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET113.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 320
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0113'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET114.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0114'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET115.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 327
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0115'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET116.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 315
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0116'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET117.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0117'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 149
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET118.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 315
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0118'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET119.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 316
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0119'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 165
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 168
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET120.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 313
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0120'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET121.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 316
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0121'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET122.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 314
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0122'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET123.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 315
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0123'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET124.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 330
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0124'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET125.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 310
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0125'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1),band(johnson,v),17.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET126.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 317
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0126'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,30000,0.0,4.0)*ebmvx(0.04,gal1),band(johnson,b),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET127.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 318
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0127'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,25400,0.0,3.9)*ebmvx(0.08,gal2),band(johnson,b),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET128.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 209
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0128'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,18700,0.0,3.9)*ebmvx(0.12,gal3),band(johnson,b),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET129.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 319
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0129'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,15400,0.0,3.9)*ebmvx(0.16,smc),band(johnson,b),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET130.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 320
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0130'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,11900,0.0,4.0)*ebmvx(0.2,lmc),band(johnson,b),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET131.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 317
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0131'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(icat(k93models,9230,0.0,4.1)*ebmvx(0.24,xgal),band(johnson,b),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET132.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 332
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0132'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 169
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_1.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.04,gal1)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET133.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 145
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0133'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_1.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.08,gal2)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET134.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 48
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0134'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_2.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.12,gal3)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET135.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 144
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0135'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_2.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.16,smc)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET136.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 148
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0136'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_3.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.2,lmc)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET137.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 144
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0137'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_4.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.24,xgal)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET138.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 146
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0138'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 165
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_5.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.04,gal1)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET139.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 144
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0139'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 166
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_5.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.08,gal2)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET140.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 47
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0140'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_6.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.12,gal3)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET141.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 142
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0141'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 156
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_6.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.16,smc)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET142.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 146
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0142'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_7.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.2,lmc)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET143.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 148
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0143'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 480
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 149
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_7.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.24,xgal)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET144.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0144'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_9.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.04,gal1)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET145.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 148
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0145'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 182
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(spec(/cdbs/grid/pickles/dat_uvk/pickles_uk_10.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.08,gal2)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET146.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 47
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0146'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 156
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(z(spec(/cdbs/calspec/g191b2b_mod_004.fits),0.05),band(johnson,b),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET147.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 503
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0147'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 168
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 156
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(z(spec(/cdbs/calspec/gd153_mod_004.fits),0.1),band(johnson,b),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET148.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 501
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0148'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 159
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(z(spec(/cdbs/calspec/gd71_mod_005.fits),0.15),band(johnson,b),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET149.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 502
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0149'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(bb(10000),band(johnson,u),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET150.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 165
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0150'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 153
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(bb(10000),band(johnson,r),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET151.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 168
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0151'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),23.3,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 150
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(bb(10000),band(johnson,i),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET152.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 165
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0152'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),21.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),21.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 152
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(bb(10000),band(johnson,j),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET153.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 163
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0153'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.424602593467696,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 164
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.424602593467696,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(bb(10000),band(johnson,k),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET154.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 162
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0154'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*0.5+spec(Zodi.fits)*0.5+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 133
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*0.5+spec(Zodi.fits)*0.5+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 112
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(bb(10000),band(cousins,r),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET155.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 168
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0155'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 161
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)*2.0+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 156
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(pl(4000.0,-2.0,flam),band(bessell,h),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET156.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 243
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0156'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 160
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="spec(earthshine.fits)+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 151
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(pl(4000.0,-2.0,flam),band(Bessell,j),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET157.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 248
+##[BatchFileSuite$BatchFileTest.run] running 'uvsp2006.tab:0157'.
+##[PysynphotRunner.doRun] command is 'countrate&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&instrument="wfc3,uvis2,g280,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 155
+##[PysynphotRunner.doRun] command is 'calcphot&obsmode="wfc3,uvis2,g280,bkg"&spectrum="rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 214
+##[PysynphotRunner.doRun] command is 'SpecSourcerateSpec&spectrum="rn(pl(4000.0,-2.0,flam),band(bessell,k),23.0,vegamag)"&instrument="wfc3,uvis2,g280"&output=/usr/stsci/data1/etcRequestLogs.dev/specResults/2008/001/specET158.fits&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+##[PysynphotRunner.doRun] request took 241

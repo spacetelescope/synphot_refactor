@@ -1,0 +1,11 @@
+calcphotCase3  wfc3,uvis2,g280,bkg  spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))
+
+calcspecCase139  None  pl(4000.0,-2.0,flam)
+
+countrateCase3  wfc3,uvis2,g280,bkg  spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.1,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))
+
+SpecSourcerateSpecCase2  wfc3,uvis2,g280  rn(icat(k93models,9230,0.0,4.1),band(johnson,v),18.0,vegamag)
+
+SpecSourcerateSpecCase29  wfc3,uvis2,g280  rn(bb(10000),band(johnson,r),23.0,vegamag)
+SpecSourcerateSpecCase34  wfc3,uvis2,g280  rn(pl(4000.0,-2.0,flam),band(bessell,h),23.0,vegamag)
+

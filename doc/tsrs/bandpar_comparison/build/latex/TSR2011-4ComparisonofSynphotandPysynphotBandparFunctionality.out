@@ -1,0 +1,51 @@
+\BOOKMARK [0][-]{chapter.1}{Comparison of Synphot and Pysynphot Bandpar Functionality}{}
+\BOOKMARK [0][-]{chapter.2}{RMS Width - BANDW - PHOTBW}{}
+\BOOKMARK [1][-]{section.2.1}{Summary}{chapter.2}
+\BOOKMARK [1][-]{section.2.2}{Synphot Equations}{chapter.2}
+\BOOKMARK [1][-]{section.2.3}{Pysynphot Equations}{chapter.2}
+\BOOKMARK [0][-]{chapter.3}{Full Width Half-Max - FWHM}{}
+\BOOKMARK [1][-]{section.3.1}{Summary}{chapter.3}
+\BOOKMARK [1][-]{section.3.2}{Synphot Equations}{chapter.3}
+\BOOKMARK [1][-]{section.3.3}{Pysynphot Equations}{chapter.3}
+\BOOKMARK [0][-]{chapter.4}{Equivalent Width - EQUVW}{}
+\BOOKMARK [1][-]{section.4.1}{Summary}{chapter.4}
+\BOOKMARK [1][-]{section.4.2}{Synphot Equations}{chapter.4}
+\BOOKMARK [1][-]{section.4.3}{Pysynphot Equations}{chapter.4}
+\BOOKMARK [0][-]{chapter.5}{Rectangular Width - RECTW}{}
+\BOOKMARK [1][-]{section.5.1}{Summary}{chapter.5}
+\BOOKMARK [1][-]{section.5.2}{Synphot Equations}{chapter.5}
+\BOOKMARK [1][-]{section.5.3}{Pysynphot Equations}{chapter.5}
+\BOOKMARK [0][-]{chapter.6}{Unit Response - URESP - PHOTFLAM}{}
+\BOOKMARK [1][-]{section.6.1}{Summary}{chapter.6}
+\BOOKMARK [1][-]{section.6.2}{Synphot Equations}{chapter.6}
+\BOOKMARK [1][-]{section.6.3}{Pysynphot Equations}{chapter.6}
+\BOOKMARK [0][-]{chapter.7}{Pivot Wavelength - PIVWV - PHOTPLAM}{}
+\BOOKMARK [1][-]{section.7.1}{Summary}{chapter.7}
+\BOOKMARK [1][-]{section.7.2}{Synphot Equations}{chapter.7}
+\BOOKMARK [1][-]{section.7.3}{Pysynphot Equations}{chapter.7}
+\BOOKMARK [0][-]{chapter.8}{Wavelength at Peak Throughput - WPEAK}{}
+\BOOKMARK [1][-]{section.8.1}{Summary}{chapter.8}
+\BOOKMARK [1][-]{section.8.2}{Synphot Equations}{chapter.8}
+\BOOKMARK [1][-]{section.8.3}{Pysynphot Equations}{chapter.8}
+\BOOKMARK [0][-]{chapter.9}{Peak Throughput - TPEAK}{}
+\BOOKMARK [1][-]{section.9.1}{Summary}{chapter.9}
+\BOOKMARK [1][-]{section.9.2}{Synphot Equations}{chapter.9}
+\BOOKMARK [1][-]{section.9.3}{Pysynphot Equations}{chapter.9}
+\BOOKMARK [0][-]{chapter.10}{Average Wavelength - AVGWV}{}
+\BOOKMARK [1][-]{section.10.1}{Summary}{chapter.10}
+\BOOKMARK [1][-]{section.10.2}{Synphot Equations}{chapter.10}
+\BOOKMARK [1][-]{section.10.3}{Pysynphot Equations}{chapter.10}
+\BOOKMARK [0][-]{chapter.11}{Dimensionless Efficiency - QTLAM}{}
+\BOOKMARK [1][-]{section.11.1}{Summary}{chapter.11}
+\BOOKMARK [1][-]{section.11.2}{Synphot Equations}{chapter.11}
+\BOOKMARK [1][-]{section.11.3}{Pysynphot Equations}{chapter.11}
+\BOOKMARK [0][-]{chapter.12}{Throughput at Reference Wavelength - TLAMBDA}{}
+\BOOKMARK [1][-]{section.12.1}{Summary}{chapter.12}
+\BOOKMARK [1][-]{section.12.2}{Synphot Equations}{chapter.12}
+\BOOKMARK [1][-]{section.12.3}{Pysynphot Equations}{chapter.12}
+\BOOKMARK [0][-]{chapter.13}{Equivalent Monochromatic Flux - EMFLX}{}
+\BOOKMARK [1][-]{section.13.1}{Summary}{chapter.13}
+\BOOKMARK [1][-]{section.13.2}{Synphot Equations}{chapter.13}
+\BOOKMARK [1][-]{section.13.3}{Pysynphot Equations}{chapter.13}
+\BOOKMARK [0][-]{chapter.14}{Reference Wavelength - REFWAVE}{}
+\BOOKMARK [0][-]{chapter.15}{References}{}

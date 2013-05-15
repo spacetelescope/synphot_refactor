@@ -1,0 +1,19 @@
+
+# G = steep gradient
+# NL = narrow line
+# E = endpoint
+# PL = power law
+# ? = kurucz model / failure accepted because of NL handling
+acs_etc_cases/testcrspec/calcphotCase126 E
+acs_etc_cases/testcrspec/calcphotCase149 ?
+acs_etc_cases/testcrspec/calcspecCase15 # not in ps file #
+acs_etc_cases/testcrspec/calcphotCase10 NL
+acs_etc_cases/testcrspec/calcphotCase137 E
+acs_etc_cases/testcrspec/calcphotCase3 E
+acs_etc_cases/testcrphotlam/countrateCase99 NL
+acs_etc_cases/testcrphotlam/SpecSourcerateSpecCase16 PL
+acs_etc_cases/testcrcounts/countrateCase99 E NL
+acs_etc_cases/testcrcounts/SpecSourcerateSpecCase16 PL
+acs_etc_cases/testcrspec/calcphotCase51 NL
+acs_etc_cases/testcrspec/SpecSourcerateSpecCase3 NL
+

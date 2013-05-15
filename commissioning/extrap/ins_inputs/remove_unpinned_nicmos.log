@@ -1,0 +1,55 @@
+remove_unpinned.py nicmos_unpinned.txt /user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/
+Error removing nic1_bend_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic1_bend_005_syn.fits'
+Error removing nic1_cmask_004_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic1_cmask_004_syn.fits'
+Error removing nic1_dewar_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic1_dewar_005_syn.fits'
+Error removing nic1_dn_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic1_dn_005_syn.fits'
+Error removing nic1_dqe_008_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic1_dqe_008_syn.fits'
+Error removing nic1_image_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic1_image_005_syn.fits'
+Error removing nic1_para1_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic1_para1_005_syn.fits'
+Error removing nic1_para2_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic1_para2_005_syn.fits'
+Error removing nic2_bend_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic2_bend_005_syn.fits'
+Error removing nic2_cmask_004_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic2_cmask_004_syn.fits'
+Error removing nic2_dewar_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic2_dewar_005_syn.fits'
+Error removing nic2_dn_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic2_dn_005_syn.fits'
+Error removing nic2_dqe_008_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic2_dqe_008_syn.fits'
+Error removing nic2_image_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic2_image_005_syn.fits'
+Error removing nic2_para1_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic2_para1_005_syn.fits'
+Error removing nic2_para2_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic2_para2_005_syn.fits'
+Error removing nic3_bend_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic3_bend_005_syn.fits'
+Error removing nic3_cmask_004_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic3_cmask_004_syn.fits'
+Error removing nic3_dewar_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic3_dewar_005_syn.fits'
+Error removing nic3_dn_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic3_dn_005_syn.fits'
+Error removing nic3_dqe_009_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic3_dqe_009_syn.fits'
+Error removing nic3_image_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic3_image_005_syn.fits'
+Error removing nic3_para1_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic3_para1_005_syn.fits'
+Error removing nic3_para2_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic3_para2_005_syn.fits'
+Error removing nic_bend1_005_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic_bend1_005_syn.fits'
+Error removing nic_primary_002_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic_primary_002_syn.fits'
+Error removing nic_secondary_002_syn.fits
+...[Errno 2] No such file or directory: '/user/laidler/cdbs_check/apply_extrap_cdbs/comp/nicmos/nic_secondary_002_syn.fits'

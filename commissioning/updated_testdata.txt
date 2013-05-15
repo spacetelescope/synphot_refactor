@@ -1,0 +1,17 @@
+The test datasets we're using for this process are not in the
+repository, but are instead collected in a tar.gz file in 
+/eng/ssb/syn_pysyn. This tar file contains all the datafiles that
+are called out by name in the test cases; notably files that are
+used by the ETC, such as the earthshine, Zodi, and emission line
+files.
+
+On 29 Jan 09, I extended the wavelength range of the earthshine and
+Zodi files from 25000 to 27000, to cover the full wavelength range
+of the HST instruments. This is a brainless linear extrapolation to
+zero at 27000 which is certainly not scientifically correct, but
+suffices for the syn_pysyn comparison. 
+
+Real updates to these files must be obtained before the ETC goes into
+production using pysynphot.
+
+

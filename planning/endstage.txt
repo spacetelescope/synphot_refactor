@@ -1,0 +1,136 @@
+Plan for concluding the syn_pysyn commissioning process:
+
+Goal: apply the information gathered from the syn_pysyn testing to the
+ETC regression testing process.
+
+This document assumes the procedure described in the document
+pysyn_etc_acceptance_testing.txt, and describes further details in the
+"first iteration" of that procedure.
+
+The ordering of subitems in each stage is not necessarily significant;
+some items can be worked simultaneously.
+
+PENULTIMATE STAGE:
+
+1. Pysynphot Code Changes
+=========================
+
+Commit code changes for remaining set of high-priority tickets:
+
+DONE: (altho extinction curves may need tuning)
+  #123: extinction (add new extinction laws, including new
+        implementation of the same gal3 law, without turning off old
+        gal1/smc/lmc/xgal yet)
+  #149: tapering behavior
+  #129: etc.countrate() should return effective wavelength
+  #157: partial overlap should raise an exception
+  #158: etc.py should taper in case of a partial overlap exception
+
+Code changes were also committed pertinent to the redshift (#106) and
+effstim (#140) calculations: while these were not high-priority
+tickets for purposes of the ETC, they involved changes to fundamental
+classes so it was desirable to include them in this round of testing.
+
+2. Changes to test definitions
+================================
+2a. Finish identifying necessary changes to the tests: 
+    - change Bruzual models to Pickles 
+    - change gal2 to gal1 or gal3 
+    - remove duplicate cases 
+2b. Make the changes in the syn_pysyn tests: DONE
+2c. Make the changes in the ETC regression tests: DONE
+    - requires signoff from instrument teams
+    - may require extra work for WFC3
+
+2d. Modify test definitions for partial overlap cases to apply taper DONE
+
+2e. Create a special "pinned" version of CDBS throughput files to be
+used for endstage testing. (Note that this was done in two stages;
+additional STIS detector files were identified as needing to be pinned
+in Feb 09.) DONE
+
+With these tickets, test definitions, and data changes, there should be no
+more test errors.
+
+3. Representative subset
+========================
+3a. Identify the subset of representative test cases 
+......DONE
+3b. Modify the test code to include a flag identifying this subset
+......DONE
+3c. Modify the test assessment tools to generate useful reports of
+    only this subset
+......DONE
+
+
+4. Run the last test set
+=========================
+4a. Run the tests
+4b. Generate Subset report: failed representative tests for scrutiny
+4c. Generate Extreme report:failed  extreme cases for overview
+4d. Generate Countrate report: failed testcountrate for scrutiny
+4e. Generate Throughput report: failed testthru for scrutiny
+4f. Contact Danny Lennon to run his diagnostics
+4g. Record all accepted failures from the above sets. If necessary,
+iterate this step until all failures in the above sets are accepted.
+
+
+FINAL STAGE:
+
+1. Preparation
+==============
+1a. Write script to parse ETC logs, extract tast case names, and
+    include them in the pysynphot command as another keyword-value
+    pair DONE.
+1b. Write scripts to parse the ETC regression test report logs and
+    generate files that contain the name of the failed test, one per
+    line. (Two scripts are necessary, one for old-style tests and one
+    for new-style tests.)
+1c. Write utility to mark syn_pysyn tests as "ETC failed" using the
+    above files as input.
+1d. Complete changes to the ETC test cases to give them meaningful
+    names. DONE.
+1e. Modify the ETC code to produce test case names in the log. DONE
+1f. Create useful report generator that will use the ETC name to
+    generate reports described below
+1g. Create a branch in the ETC repository to hold all necessary
+changes to run this round of testing
+
+2. Mapping to the ETC cases
+=========================== 
+2a. Generate the logs of pysynphot calls produced by the ETC regression
+    tests that include the name of the ETC regression test. DONE.
+2b. Regenerate the test cases with the ETC name as part of
+    the test definition by parsing those logs. DONE.
+
+
+3. Run the ETC Regression test set
+==================================
+3a. Set up test environment
+3b. Install the latest pysynphot
+3c. Disable synphot
+3d. Run the regression tests
+3e. Generate a report of failed test names
+3f. Divide them into "new" and 'expected" failures.
+
+
+4. Examine any "new" failures
+=======================================
+4a. Subset:    ETC case failed, syn_pysyn passed, subset=True
+4b: Extreme:   ETC case failed,syn_pysyn passed, subset=False, Extreme=True
+4c: Countrate: ETC case failed, syn_pysyn passed, subset=False,
+                 testname contains 'testcountrate'
+4d: Throughput:ETC case failed, syn_pysyn passed, subset=False, Extreme=False,
+                 testname contains 'testthru'
+
+
+5. Doublecheck the "expected" failures
+=============================
+5a. Subset:    ETC case failed, syn_pysyn accepted failure, 
+               subset=True
+5b: Extreme:   ETC case failed,syn_pysyn accepted failure, 
+               subset=False, Extreme=True
+5c: Countrate: ETC case failed, syn_pysyn accepted failure, 
+               subset=False, testname contains 'testcountrate'
+5d: Throughput:ETC case failed, syn_pysyn accepted failure, 
+               subset=False, Extreme=False, testname contains 'testthru'

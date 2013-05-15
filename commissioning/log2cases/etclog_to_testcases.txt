@@ -1,0 +1,62 @@
+This document describes the procedure to go from an ETC log file
+containing (py)synphot commands for a single instrument's set of
+regression tests to a .py file containing defined testcases.
+
+ORIGINALLY:
+
+- Log files were received from Donald in Spring 08; thermback cases came in a
+   separate file
+- They were hand-parsed to replace the CDBS specification
+- They were further processed by gencases.py to produce .py files
+
+Command line procedure:
+  python gencases.py acs_etc_cases.txt
+
+produced:
+  acs_etc_cases.py
+
+OVER TIME:
+- gencases.py was made smart enough to omit duplicate cases without
+renaming anything by constructing a dictionary keyed by (task,obsmode,spectrum) - support for the "subset" flag was added
+
+Command line procedure:
+  python gencases.py acs_etc_cases.txt acs_etc_cases_subset.txt
+
+produced:
+  acs_etc_cases.py
+
+
+THEN we tried something that didn't work and was abandoned (r705-710)
+
+CURRENTLY (committed with r716-717):
+
+- New log files were received. These included the ETC IDs prior to the
+  related set of (py)synphot commands for each id. Also, the syntax
+  was different: field separators were different; some CALCSPEC cases
+  were known to have been removed; all THERMBACK cases were mixed in 
+  with the other commands.
+
+- A new script, parselog.py, was written to handle the
+  pre-processing. It produced a dictionary containing the
+  (task,obsmode,spectrum):etcid mapping, which was pickled.
+
+- gencases.py was made to read the pickled dictionary if provided, and
+  write out the etcid as an additional attribute of the test case. A
+  value of "None" is given if no etcid exists for this case; the whole
+  list is written out if there are multiple etcids for this case.
+
+
+
+Separate scripts were written for each of the instruments, along with cleanup
+scripts and a wrapper for the whole thing. This set of scripts, 
+together with the new log files, have been placed in the log2cases 
+subdirectory of the commissioning directory.
+
+The procedure to run these scripts is:
+cd log2cases
+process_all.csh > process_all.log
+#.....does the actual work; statistics reported to the log file
+cleanup_all.csh: removes all files in the log2cases directory
+**except** process_all.log. It does *not* remove the newly generated
+test cases in the parent directory.
+

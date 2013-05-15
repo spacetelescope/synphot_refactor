@@ -1,0 +1,46 @@
+Notes from convo with Perry:
+
+__call__:
+  - tentative decision: it should always return in internal units
+       => wrap it to provide a "sample at these wavelengths and return
+       in the rendering units
+
+  - test to see whether call actually does this for all types of
+    objects
+....1/21..........added tests in spectest.py. Indeed call always returns
+    an ndarray; and sp(sp.wave) == sp.flux
+
+Overall plan: 
+  - come up with a comprehensive test set
+  - use some kind of code coverage tool to assess tests
+
+Conflicting units in Composite objects:
+  - have some kind of hierarchy to choose which units to use
+
+Round&round on analytic spectra:
+  - force use of keyword in constructor?
+  - change order so fluxunits can come first?
+  - raise exception if waveunits is not a waveunit (sheesh)
+
+And hey by the way,
+  - why aren't sp.fluxunits, sp/bp.waveunits actual Unit objects
+  instead of strings? 
+  --- 1/21: they are, according to the tests in spectest
+
+Redshift: the jury is still out on what the "right" answer is. Waiting
+   to hear from Harry.
+
+Need a new method on AnalyticSpectra:
+  - Evaluate on a given waveset but return a spectrum object (not just
+  the flux table)
+  - Harry's rewrite essentially makes __call__ a wrapper to his new
+  compute() method
+
+SpectralElements are not convertible
+  - This seems wrong to me; one could specify a spectral element in nm
+  or Jy or any other wavelength unit
+  - Making this change would imply a wholesale move to internal units
+  - Possible partial change: permit reading nonAngstroms, but
+  immediately convert them to Angstroms
+  - Possible catch in the meantime: check units when read from a FITS
+  file and spit up if they aren't Angstroms

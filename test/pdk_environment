@@ -1,0 +1,4 @@
+[default]
+PYSYN_CDBS=$CDBS
+PDK_TIMEOUT=300
+

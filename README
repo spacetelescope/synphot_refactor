@@ -1,0 +1,34 @@
+This is a prototype module for manipulating spectra.
+It is intended for it to be used for synthetic
+photometry, i.e. constructing source spectra and
+then passing these spectra through an astronomical
+observatory (e.g. HST, JWST...).
+ 
+Install the module the usual way:
+
+python setup.py install
+
+The spectrum manipulation module spectrum.py will work
+standalone, whereas the observationmode.py module
+is designed to work with the HST synphot database, so
+won't be much use unless you also install these files.
+(You don't need to install the synphot software; only its 
+datafiles.) You can get them from
+
+http://www.stsci.edu/resources/software_hardware/stsdas/synphot
+
+You must define the environment variable PYSYN_CDBS to point
+to the top level directory where you have installed these files.
+
+If you have questions about this module, send mail to
+help@stsci.edu and it will get to the appropriate
+person.
+
+.....
+
+The current revision is $Rev: 2176 $.
+
+It has the following dependencies:
+  - numpy v1.0 or higher
+  - PyFITS v1.1 or higher
+  - matplotlib v0.9 or higher

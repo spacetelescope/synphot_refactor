@@ -1,0 +1,16 @@
+'thermback&obsmode="wfc3,ir,f140w"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f140w"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f098m"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f105w"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f110w"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f125w"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f126n"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f127m"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f128n"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f130n"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f132n"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f139m"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f153m"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f160w"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f164n"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
+'thermback&obsmode="wfc3,ir,f167n"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.

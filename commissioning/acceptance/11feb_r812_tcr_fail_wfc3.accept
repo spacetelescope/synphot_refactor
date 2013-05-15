@@ -1,0 +1,9 @@
+# NB = narrow bandpass, choppy interpolation
+wfc3_uvis2_imaging_18_cases/testcountrate/countrateCase139 NB
+wfc3_uvis2_imaging_18_cases/testcountrate/countrateCase144 NB
+wfc3_uvis1_imaging_61_cases/testcountrate/countrateCase139 NB
+wfc3_uvis1_imaging_61_cases/testcountrate/countrateCase145 NB
+wfc3_uvis2_imaging_18_cases/testcountrate/countrateCase145 NB
+wfc3_uvis1_imaging_61_cases/testcountrate/countrateCase144 NB
+wfc3_uvis2_imaging_18_cases/testcountrate/countrateCase138 NB
+wfc3_uvis1_imaging_61_cases/testcountrate/countrateCase138 NB

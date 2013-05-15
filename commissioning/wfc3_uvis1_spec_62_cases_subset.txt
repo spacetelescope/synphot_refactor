@@ -1,0 +1,45 @@
+#All of these cases fail because of narrow spectral features.
+#Keep one or two.
+
+calcphotCase1  wfc3,uvis1,g280,bkg  spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))
+
+#All of these cases fail because of narrow spectral features.
+#Keep one or two.
+
+calcspecCase1    None  icat(k93models,9230,0.0,4.1)
+
+#These cases pass because of their smooth spectra.
+#Keep them both.
+
+calcspecCase133  None  bb(10000)
+
+#All of these cases fail because of narrow spectral features.
+#Keep one or two.
+
+countrateCase1  wfc3,uvis1,g280,bkg  spec(earthshine.fits)*0.5+rn(spec(Zodi.fits),band(johnson,v),22.7,vegamag)+(spec(el1215a.fits)+spec(el1302a.fits)+spec(el1356a.fits)+spec(el2471a.fits))
+
+#All of these cases fail because of high frequency spectral features.
+#Keep one or two.
+
+SpecSourcerateSpecCase1  wfc3,uvis1,g280  rn(icat(k93models,9230,0.0,4.1),band(johnson,v),23.0,vegamag)
+
+#All of these cases fail because of high frequency spectral features.
+#Might improve with switch to Pickles sprectra.
+
+SpecSourcerateSpecCase11  wfc3,uvis1,g280  rn(spec(/grp/hst/cdbs//grid/bz77/bz_1.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.04,gal1)
+SpecSourcerateSpecCase13  wfc3,uvis1,g280  rn(spec(/grp/hst/cdbs//grid/bz77/bz_3.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.12,gal3)
+SpecSourcerateSpecCase15  wfc3,uvis1,g280  rn(spec(/grp/hst/cdbs//grid/bz77/bz_5.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.2,lmc)
+SpecSourcerateSpecCase17  wfc3,uvis1,g280  rn(spec(/grp/hst/cdbs//grid/bz77/bz_7.fits),band(cousins,i),23.0,vegamag)*ebmvx(0.04,gal1)
+
+#All of these cases fail because of high frequency spectral features.
+#Keep one or two.
+
+SpecSourcerateSpecCase25  wfc3,uvis1,g280  rn(z(spec(/grp/hst/cdbs//calspec/g191b2b_mod_004.fits),0.05),band(johnson,b),23.0,vegamag)
+
+#All of these fail because of the different interpolation used on
+#either end of the bandpass (where the bandpass goes to zero),
+#causing just 1 or a few points to not match. Keep a couple of them.
+
+SpecSourcerateSpecCase28  wfc3,uvis1,g280  rn(bb(10000),band(johnson,u),23.0,vegamag)
+SpecSourcerateSpecCase34  wfc3,uvis1,g280  rn(pl(4000.0,-2.0,flam),band(bessell,h),23.0,vegamag)
+

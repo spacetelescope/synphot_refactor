@@ -1,0 +1,133 @@
+Proposal & issues regarding applying the results of the 
+syn_pysyn commissioning process to the ETC
+
+Goals:
+------
+  - avoid repeating work
+  - apply changes to either pysynphot or the ETC, but not both at the same time
+  - provide unambiguous bookkeeping of software and tests
+
+
+Proposed procedure:
+-------------------
+*Preparation stage:*
+  - test modification: 
+       - apply any test modifications from the syn_pysyn
+  commissioning process to the set of ETC regression tests
+       - run this new set of tests with (ETC17.2+synphot) to generate
+       new comparison answers
+       - generate the {etc_test_name: list of syn_pysyn test cases} mapping
+
+   - identify the machine on which these tests will be run
+   - if necessary, install the (ETC17.2) public release there (rev #?)
+   - if necessary, apply the changes necessary to run pysynphot to the
+     permanent datastore
+   - note the DB update revision number
+   - install pysynphot v0.5 on this machine 
+   - temporarily disable SYNPHOT on this machine
+
+*First iteration:*
+   - run the ETC regression tests (with answers derived in the
+     Preparation Stage)
+   - use the name mapping to apply the syn_pysyn "accepted failure"
+     results back to the etc tests. 
+        - if any associated syn_pysyn test was an accepted failure,
+          then the ETC test failure is accepted
+   - spotcheck these "accepted failures" 
+   - scrutinize any remaining failures
+   - modify pysynphot, re-install, & repeat as necessary
+
+   - when complete (ie, all ETC tests either pass or the failures are 
+     deemed acceptable), 
+          - generate a new set of regression test reference answers
+          - merge any changes that were made to pysynphot back to the
+            trunk of the pysynphot repository
+          - convert all ETC develop & test environments to use
+     pysynphot:
+               - apply the changes necessary to run pysynphot to the
+                 permanent datastore
+               - disable SYNPHOT/STSDAS/TABLES (by renaming them)
+               - [What is the list of machines/installations?]
+
+*Subsequent iterations:*
+- Every run of the regression tests for acceptance testing will be run
+with either
+   - a release candidate of pysynphot and the most recent public
+   release of the ETC, *or*
+   - a release candidate of the ETC and the most recent release of pysynphot.
+
+   where "release candidate" means "a new version on which we are
+   running these tests in preparation for releasing the new version.
+
+- Every accepted run of the regression tests produces a new set of
+  reference answers that will be used for the next run.
+
+
+
+Concerns:
+---------
+----- timing. How should/can this procedure interact with:
+        - pysynphot v0.5 release
+	- a possible 17.2 infrastructure release
+        - syn_pysyn commissioning work milestones
+        - ongoing ETC development & release schedule
+        - ongoing pysynphot development & release schedule
+
+  Proposal:
+    HSTMO determines whether an infrastructure release will happen
+    early. If so, it happens prior to the pysynphot conversion.
+
+    The first iteration described above happens after the public
+    release of pysynphot v0.5 (the fall stsci_python release).
+
+    Subsequent iterations will likely be:
+       - 17.2(+infra?) stable:   testing pysynphot v0.6
+       - pysynphot v0.6 stable:  testing 18.1 release
+
+----- test names and revision numbers
+        - all tests are under configuration control
+        - syn_pysyn test names do not contain revision numbers, and do
+	not contain answers. 
+        - ETC test names for ACS,NICMOS,STIS do not contain revision
+	numbers. The tests do not contain answers, and they are rarely
+	modified.
+        - ETC test names for COS and WFC3 do contain revision
+	numbers. The tests do contain answers, and they are modified
+	whenever the answers are observed to change. This increments
+	the revision number. However, this revision number appears to
+	be irrelevant for the purposes of mapping to the syn_pysyn
+	names. [It should therefore be excluded?]
+       
+----- test modifications: 
+        All test modifications in the syn_pysyn test should be applied
+        to the ETC tests up front, in the preparation stage. Test
+        names should remain constant.
+        - calcspec was dropped from the syn_pysyn tests because it has a bug. 
+        - gal2/gal3 were replaced by gal1 because gal2/gal3 are not
+        yet implemented in pysynphot. 
+        - extinction implementation was changed; old laws are being
+        replaced by new laws that will be read from files and have
+        different names. The only law in both the old and the new sets
+        will be gal3=mwavg. 
+        - synphot has a bug that affects use of the Bruzual models in
+        the IR. We plan to modify the relevant tests by replacing
+        these models with others that don't have the characteristic
+        that triggers the bug.
+
+----- test subsets:
+        - the instrument teams have identified representative subsets
+	of the very large ETC-derived test sets, due to resource
+	limitations. How should the corresponding subset of ETC tests
+	interact with the full set?
+        - Proposal: This subset constitutes the set of accepted
+	failures to be spotchecked.
+
+----- acceptance criteria
+        - we have defined acceptance criteria for scalar and array
+	comparisons for the quantities produced by synphot. However,
+	the ETC uses these quantities in various calculations, and its
+	regression tests use the results of those calculations in its
+	comparisons. 
+        - No attempt will be made to predict ETC test discrepancy from
+	syn_pysyn test discrepancy. ETC tests that have particularly
+	large discrepancies can be investigated at that time.

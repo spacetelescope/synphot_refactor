@@ -1,0 +1,145 @@
+Pysynphot interface control document with the ETC:
+
+=ETC-Pysynphot interface:=
+
+The ETC will access pysynphot functionality by communicating with a
+pysynphot TCP server running on the local ETC machine.
+
+The ETC application will start the pysynphot server when the
+application starts up.
+
+The ETC will submit requests to the pysynphot server as character
+strings identical (in most cases) to those used to submit synphot requests.
+(This item may be revisited for cycle 18, when there is no longer a
+need to maintain compatibility with synphot syntax.)
+
+The ETC will receive responses from the pysynphot server as character
+strings, typically consisting of numbers and filenames. The exact
+syntax may vary for each task.
+
+The pysynphot server must catch all exceptions raised by the pysynphot
+code, and return useful error messages to the ETC.
+
+The pysynphot server must be able to report the version of pysynphot
+that it is running.
+
+
+
+=Pysynphot Functionality=
+
+==Requirements for 17.0==
+(reverse-engineered from what was delivered):
+
+Purpose of this release: Support COS ETC 
+Pysynphot builds: 0.3.x
+Acceptance defined as: COS team accepts ETC regression test results.
+
+- Parse a syntactically correct synphot expression to produce a
+  spectrum. The expression may include the following functions:
+    'spec', 'unit', 'box', 'bb', 'pl', 'em', 'icat',
+    'rn', 'z', 'ebmvx', 'band'
+  The spectrum may be specified in the following units:
+    'photlam', 'flam', 'counts', 'vegamag'
+    'fnu', 'photnu', 'abmag', 'stmag', 'obmag', 'jy', 'mjy'
+  and the following wavelength units:
+    Angstroms nm micron mm cm m hz
+  Renormalization may be specified in either
+    'flam'  'vegamag'   (see below)
+  Extinction may be specified with the following reddening laws:
+    'gal1', 'gal2', 'gal3', 'smc', 'lmc', 'xgal'
+
+  Specifically, in the following order:
+    - construct a spectrum by either:
+      - reading it from a text or FITS file,
+      - interpolating it from a supported atlas,
+      - constructing a blackbody, powerlaw, gaussian, or flat spectrum
+      - summing any combination of the above
+    - apply reddening to the spectrum
+    - redshift the spectrum
+    - renormalize the spectrum either:
+         within a Band to a value specified in vegamag, or,
+         within a Box to a value specified in flam 
+    - apply reddening to the spectrum (either before or after but not both)
+
+- Parse a syntactically correct and complete obsmode string (without
+parameterized keywords), supported by the current graph and component
+tables to produce a bandpass.
+
+- Multiply a spectrum and a bandpass together to produce an observation,
+using the binned wavelength set specified in the wavecat.dat file for
+the obsmode.
+
+- Write a spectrum or an observation to a FITS file.
+
+- Compute the countrate and effective wavelength of an observation.
+
+
+
+
+
+
+== Requirements for 17.1==:
+Purpose of this release: Improve support for COS ETC
+Pysynphot builds: 0.4.x
+Acceptance defined as: ETC regression tests pass
+
+- Update the graph, component, and thermal component tables.
+
+- Show the full file specifications being used in the computation of a
+bandpass.
+
+- Report the version of pysynphot being used.
+
+
+
+== Requirements for 17.2==:
+
+Purpose of this release: Bugfixes & improved robustness to
+user-supplied spectra
+Pysynphot builds: 0.4.x
+Acceptance defined as: ETC regression tests pass
+
+
+== Requirements for 18.0==:
+
+Purpose of this release: Support all ETCs
+Pysynphot builds: 0.6.x
+
+                       { current regression tests pass & agree with synphot
+Acceptance defined as: {                    OR
+                       { instrument teams accept synphot & ETC test results
+
+- Support parameterized keywords.
+
+- Compute the thermal background for an obsmode that includes support
+ for thermal calculations in the graph table.
+
+- Support spectral elements in descending wavelength order(* Or:
+  modify the offending files in CDBS so that they are ascending.)
+
+
+
+== Requirements for UI for 18.0==
+Purpose of this release: provide direct access to pysynphot for ETC
+            users to perform analysis related to their ETC requests
+Pysynphot builds: 0.7.x
+Acceptance defined as: ??
+
+- All the above functionality via OO UI
+
+- Documentation
+
+- Tutorial
+
+- Plot a spectrum or spectral element
+
+- Fully support renormalization in the standard set of units
+
+- Make .thermback() a method on an ObsBandpass
+
+- Support calcphot.effstim with an Observation.effstim() method that
+  supports the full set of units
+
+- Provide capability to modify "refdata" functionality
+
+- Provide obsmode capability 

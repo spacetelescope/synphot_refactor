@@ -1,0 +1,60 @@
+gaudete> pwd
+/eng/ssb/syn_pysyn/cdbs_pinned/comp/stis
+gaudete> set codeplace = /data/gaudete1/dg1/laidler/ssb/checkout/pysynphot/test/commissioning/extrap
+gaudete> python $codeplace/extrap.py stis_ccd_004_syn.fits stis_mama1_004_syn.fits stis_mama2_004_syn.fits
+stis_ccd_004_syn.fits -> stis_ccd_005_syn.fits
+stis_mama1_004_syn.fits -> stis_mama1_005_syn.fits
+stis_mama2_004_syn.fits -> stis_mama2_005_syn.fits
+
+
+
+
+
+
+#
+# Maketmc must be run from root
+gaudete> setenv PYTHONPATH {$PYTHONPATH}:{$codeplace}
+gaudete> pwd
+/eng/ssb/syn_pysyn/cdbs_pinned/mtab
+gaudete> cd ..
+/eng/ssb/syn_pysyn/cdbs_pinned
+gaudete> python
+>>> extrap.buildtmc('mtab/zzz_s8i22541m_tmc.fits')
+>>>
+Suspended
+gaudete> fitsdiff mtab/zzz_s8i22541m_tmc.fits mtab/zzz_s8i22541m_tmc_new.fits
+
+ fitsdiff:  1.4 (23 August 2006)
+ file1 = mtab/zzz_s8i22541m_tmc.fits
+ file2 = mtab/zzz_s8i22541m_tmc_new.fits
+ Keyword(s) not to be compared:  ['']
+ Keyword(s) whose comments not to be compared:  ['']
+ Column(s) not to be compared:  ['']
+ Maximum number of different pixels to be reported:  10
+ Data comparison level:  0.0
+
+Primary HDU:
+Input files have naught dimensions
+
+BINTABLE Extension 1 HDU:
+    Data differ at column 3:
+      Row 2020,  file 1: crstiscomp$stis_ccd_004_syn.fits    file 2: crstiscomp$stis_ccd_005_syn.fits
+      Row 2210,  file 1: crstiscomp$stis_mama1_004_syn.fits    file 2: crstiscomp$stis_mama1_005_syn.fits
+      Row 2211,  file 1: crstiscomp$stis_mama2_004_syn.fits    file 2: crstiscomp$stis_mama2_005_syn.fits
+    There are 3 different data points.
+
+
+I also saved the one we've been using thus far
+   270  11:38   mv buildtmc.log 9dec08_buildtmc.log
+gaudete> ls -l mtab/zzz*
+-rw-r--r--  1 laidler ssb 417600 Feb 11 11:44 mtab/zzz_orig_9dec08_s8i22541m_tmc.fits
+-rw-r--r--  1 laidler ssb 417600 Dec  9 11:27 mtab/zzz_s8i22541m_tmc.fits
+-rw-r--r--  1 laidler ssb 417600 Feb 11 11:50 mtab/zzz_s8i22541m_tmc_new.fits
+
+Now rename to the name we've been using, so we don't have to mess
+with any scripts.
+
+
+gaudete> cmp mtab/zzz_s8i22541m_tmc.fits mtab/zzz_orig_9dec08_s8i22541m_tmc.fits
+gaudete> rm mtab/zzz_s8i22541m_tmc.fits
+gaudete> mv mtab/zzz_s8i22541m_tmc_new.fits mtab/zzz_s8i22541m_tmc.fits

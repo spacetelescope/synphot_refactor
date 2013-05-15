@@ -1,0 +1,8 @@
+stis_e230h_015_syn.fits
+stis_e230m_015_syn.fits
+stis_g230m_008_syn.fits
+stis_g750m_010_syn.fits
+stis_e140m_015_syn.fits
+stis_ccd_004_syn.fits
+stis_mama1_004_syn.fits
+stis_mama2_004_syn.fits

@@ -1,0 +1,86 @@
+# (a) does   (b) should  (c) needs    # ACS files in the directory /grp/hst/cdbs/comp/acs
+# End/Begin  be pinned   a "manual"   # 
+# with Zero? to Zero ?   extrpltion ? # ACS WFC                                                                         LamdaMin     valLMin          LamdaMax     valLMax
+                                     # 
+#
+# APERTURES
+#
+  NO        NO         YES           -rw-r--r--  1 srefpipe cdbsoper 12K Apr  3  2003 acs_sbc_aper_002_syn.fits       01150        1                06000        1        # APE#4.0 
+  NO        NO         YES           -rw-r--r--  1 srefpipe cdbsoper 12K Apr  3  2003 acs_hrc_aper_002_syn.fits       01800        1                11000        1        # APE#4.0
+  NO        NO          NO           -rw-r--r--  1 srefpipe cdbsoper 12K Apr  3  2003 acs_cor_aper_002_syn.fits       01800        0.17             11000        0.03     ### for APER#0
+  NO        NO         YES           -rw-r--r--  1 srefpipe cdbsoper 12K Apr  3  2003 acs_wfc_aper_002_syn.fits       03500        1                11000        1        # APE#4.0
+#
+# MIRROR
+#
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper 15K Apr 19  2000 acs_wfc_im123_004_syn.fits      02000        0.0289468        11000        0.961022 # APE#4.0
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper  8K Sep 20  2001 acs_hrc_m12_005_syn.fits        01162        0.566888         11000        0.87      
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K Sep 20  2001 acs_hrc_m3_005_syn.fits        01162        0.26             11000        0.92
+#
+# CCDs, MAMA
+#
+ YES       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 152K Sep 28  2007 acs_hrc_ccd_013_syn.fits       01000        0                11999        0
+ YES       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 152K Sep 28  2007 acs_hrc_ccd_mjd_013_syn.fits   01000        0                11999        0
+ YES       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 195K Sep 28  2007 acs_wfc_ccd1_019_syn.fits      02000        0                12000        0
+ YES       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 195K Sep 28  2007 acs_wfc_ccd1_mjd_019_syn.fits  02000        0                12000        0
+ YES       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 195K Sep 28  2007 acs_wfc_ccd2_019_syn.fits      02000        0                12000        0
+ YES       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 195K Sep 28  2007 acs_wfc_ccd2_mjd_019_syn.fits  02000        0                12000        0
+  NO       NO/YES      YES(blueEnd)  -rw-r--r-x  1 srefpipe cdbsoper  62K Nov 14  2007 acs_sbc_mama_007_syn.fits      01000        0.05025          08000        1.672E-09
+#                       NO(redEnd)
+#
+# WINDOWS
+#
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper  15K Apr 19  2000 acs_wfc_ebe_win12f_005_syn.fits 2500        0.700868         11000        0.862212
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper  15K May  4  2000 acs_hrc_win_005_syn.fits        1500        0.00249          11000        0.938518
+#
+# ACS / SBC
+#                        
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K Apr 19  2000 acs_f115lp_004_syn.fits         01150        0.15104          09999        0.92
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K Apr 19  2000 acs_f122m_004_syn.fits          01144        0.023            02320        0.003
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K Apr 19  2000 acs_f125lp_005_syn.fits         01216        0.006            09999        0.91
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K Apr 19  2000 acs_f140lp_005_syn.fits         01230        0.00099          09999        0.89
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K Apr 19  2000 acs_f150lp_004_syn.fits         01420        0.00932          09999        0.86
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K Apr 19  2000 acs_f165lp_004_syn.fits         01500        0.00249          09999        0.85
+#
+# ACS / WFC+HRC
+#
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper 164K May 17  2007 acs_f220w_005_syn.fits          01850        0                10800        3.18641E-06
+ YES       YES          NO           -rw-r--r--  1 srefpipe cdbsoper 164K May 17  2007 acs_f250w_004_syn.fits          01850        0                10800        0 
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper 164K May 17  2007 acs_f330w_005_syn.fits          01850        0                10800        7.60443E-06
+  NO       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 8.5K Jul 13  2004 acs_f344n_004_syn.fits          02500        1E-05            10500        1.22E-05
+  NO       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 8.5K Jul 13  2004 acs_f435w_004_syn.fits          02500        6E-06            10500        1.44E-05
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper 8.5K Dec  9  2003 acs_f475w_004_syn.fits          03510        3.06584E-05      10500        8.00749E-05
+  NO       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 8.5K Jul 13  2004 acs_f502n_005_syn.fits          03000        1E-05            10500        2.65856E-06
+  NO       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 8.5K Jul 13  2004 acs_f550m_005_syn.fits          02500        1E-05            10500        1.6005E-05
+  NO       YES          NO           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K Apr 19  2000 acs_f555w_003_syn.fits          03480        1.13E-05         10500        8.41E-05  
+  NO       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 8.5K Jul 13  2004 acs_f606w_005_syn.fits          03000        1E-06            10500        6.49422E-06
+  NO       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 8.5K Jul 13  2004 acs_f625w_004_syn.fits          03000        1E-05            10450        9.5E-06
+  NO       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 8.5K Jul 13  2004 acs_f658n_005_syn.fits          02500        5E-06            10450        8.93926E-06
+  NO       YES          NO           -rw-r--r-x  1 srefpipe cdbsoper 8.5K Jul 13  2004 acs_f660n_005_syn.fits          02500        4E-06            10800        2.30841E-05
+  NO       YES          NO           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K Apr 19  2000 acs_f775w_003_syn.fits          04000        4.75E-07         10470        2.24E-05
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper 116K May 17  2007 acs_f814w_004_syn.fits          04000        4.75E-07         11000        0 
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K Mar  9  2005 acs_f850lp_004_syn.fits         04000        4.11E-07         11000        0.973
+  NO        NO         YES           -rw-r--r-x  1 srefpipe cdbsoper 8.5K Jul 13  2004 acs_f892n_005_syn.fits          02500        3E-06            11000        0.0013566
+#
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  37K Dec 18  2001 acs_fr1016n_003_syn.fits        03500        1E-06            11677        1.00004E-06 # FR1016#9719.0 ALL at ~zero. 
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  20K Dec 18  2001 acs_fr388n_003_syn.fits         03339        1.00305E-06      11000        1E-06
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  23K Dec 18  2001 acs_fr423n_003_syn.fits         03500        1E-06            11000        1E-06
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  34K Dec 18  2001 acs_fr459m_003_syn.fits         03429        9.87186E-05      11000        1E-06
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  23K Dec 18  2001 acs_fr462n_003_syn.fits         03500        1E-06            11000        1E-06
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  23K Dec 18  2001 acs_fr505n_003_syn.fits         03500        1E-06            11000        1E-06
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  26K Dec 18  2001 acs_fr551n_003_syn.fits         03500        1E-06            11000        1E-06
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  26K Dec 18  2001 acs_fr601n_003_syn.fits         03500        1E-06            11000        1E-06  
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  43K Dec 18  2001 acs_fr647m_003_syn.fits         03500        1E-06            11000        1E-06         
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  29K Dec 18  2001 acs_fr656n_003_syn.fits         03500        1E-06            11000        1E-06         
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  29K Dec 18  2001 acs_fr716n_003_syn.fits         03500        1E-06            11000        1E-06         
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  31K Dec 18  2001 acs_fr782n_003_syn.fits         03500        1E-06            11000        1E-06
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  34K Dec 18  2001 acs_fr853n_003_syn.fits         03500        1E-06            11000        1E-06
+  NO        NO         YES           -rw-r--r--  1 srefpipe cdbsoper  57K Dec 18  2001 acs_fr914m_003_syn.fits         03500        1E-06            11776        0.00200705 # for FR914M#10709.0
+  NO       YES          NO           -rw-r--r--  1 srefpipe cdbsoper  34K Dec 18  2001 acs_fr931n_003_syn.fits         03500        1E-06            11000        1E-06
+  NO        NO         YES           -rw-r--r--  1 srefpipe cdbsoper 8.5K Aug 27  2003 acs_g800l_005_syn.fits          05000        0                11000        0.673
+  NO        NO         YES           -rw-r--r--  1 srefpipe cdbsoper 8.5K Sep 12  2002 acs_pol_uv_005_syn.fits         01000        0                20000        1 
+  NO        NO         YES           -rw-r--r--  1 srefpipe cdbsoper 8.5K Sep 12  2002 acs_pol_v_004_syn.fits          03500        0.076037         20000        1
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K May 23  2000 acs_pr110l_006_syn.fits         01150        0                09999        0.89
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K May 17  2000 acs_pr130l_006_syn.fits         01216        0.006            09999        0.89
+  NO        NO         YES           -rwxrwxrwx  1 srefpipe cdbsoper 8.5K May  8  2000 acs_pr200l_004_syn.fits         01608        0.261            11000        0.93
+#
+

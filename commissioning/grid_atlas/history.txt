@@ -1,0 +1,32 @@
+   143	14:09	mkdir grid_atlas
+   144	14:09	cd grid_atlas/
+   145	14:09	cp /grp/hst/cdbs/grid/bz77/bzspectype.ascii .
+   146	14:10	cp /grp/hst/cdbs/grid/pickles/AA_README pickles_readme.txt
+   147	14:10	emacs pickles_readme.txt &
+   148	14:13	python
+   149	14:19	wc -l replace.txt
+   150	14:19	fg
+   151	14:28	alias | grep land
+   152	14:29	grep land ~/.*
+   153	14:29	grep print ~/.*
+   154	14:29	man lpr
+   155	14:31	lpr -Php75 handpick.txt
+   156	14:38	fg
+   157	14:47	lpspr -Olandscape candidates.txt | lpr -Php75
+   158	14:48	lpspr -Olandscape candidates.txt | lpr -Php75
+   159	14:48	lpspr -Olandscape candidates.txt > foo
+   160	17:01	fg
+   161	17:20	man sed
+   162	17:29	fg
+   163	17:36	ls /grp/hst/cdbs/grid/pickles/
+   164	17:37	cp /data/gaudete1/dg1/laidler/ssb/checkout/pysynphot/test/commissioning/wfc3*txt .
+   165	17:38	chmod +x replace.csh
+   166	17:38	replace.csh
+   167	17:39	grep bz77 wfc3_ir_imaging_78_cases.txt | head
+   168	10:39	grep bz77 wfc3_ir_imaging_78_cases.txt | sed 's|grid/bz77|grid/pickles/uvk_dat|'
+   169	10:40	ls /grp/hst/cdbs/grid/pickles
+   170	10:40	head -5 replace.csh
+   171	10:40	foreach x ( `ls wfc3*.txt` )
+   172	10:41	ls
+   173	10:42	pwd
+   174	17:28	history > history.txt

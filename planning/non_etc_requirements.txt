@@ -1,0 +1,50 @@
+== CALACS/CALWP2 support ==
+TENTATIVE: It's not clear what will be the best way to replace synphot
+functionality in the pipelines. It could be that adopting an ETC-like
+model, where pysynphot queries are sent to a server, would be best; or
+it might be best to pre-calculate the necessary quantities into files
+that would be managed, thus breaking the dependency on
+(py)synphot. For purposes of pysynphot planning, we will assume that
+the pipelines will require this functionality, just in case that is
+the route that is decided.
+
+Purpose of this release: allow pipelines to survive the demise of
+synphot
+Pysynphot build: 0.9.x
+Acceptance defined as: CALxxx regression tests pass
+
+- Showfiles: already implemented in 17.1
+
+- Provide method(s) on SpectralElement to calculate:
+
+            URESP           Flux (in flam) of a star that produces a response
+                            of one photon per second in this passband
+            PIVWV           Passband pivot wavelength
+            BANDW           Passband rms width
+            FWHM            Full width half max of equivalent gaussian
+            WPEAK           Wavelength at peak throughput
+            TPEAK           Peak bandpass throughput
+            AVGLAM          Passband average wavelength
+            QTLAM           Dimensionless efficiency
+            EQUVW           Passband equivalent width
+            RECTW           Passband rectangular width
+            EMFLX           Equivalent monochromatic flux
+
+
+
+==Subsequent to 18.0 UI==
+Purpose of this release: complete core synphot functionality.
+Pysynphot build: 1.0
+Acceptance defined as: ???
+
+- Provide ColorIndex objects so they can be used in the same way as
+  SpectralElement objects
+
+- Provide gauss and lgauss AnalyticSpectralElements
+
+- Provide AnalyticSourceSpectrum type for HI absorption spectra
+
+- Provide a means by which to determine the flux at a particular
+  wavelength (analogous to refwave/flux_ref parameters in countrate)
+
+

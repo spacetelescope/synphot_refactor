@@ -1,0 +1,96 @@
+# EP - end point
+# EL - Emission line
+# OUT - take out? (interpolation in Kurucz'93 models at very large wavelengths)
+# NOFITS - no fits files found for these cases (only a few)
+# NLs - spectrum failed with narrow lines
+# HKs - spectrum failed with hot Kurucz model
+# AA - accepted by auto-accept
+# AAs - spectrum accepted by auto-accept
+#
+stis_etc_cases/testefflam/SpecSourcerateSpecCase74 NLs
+stis_etc_cases/testcrspec/calcphotCase42 OUT
+stis_etc_cases/testcrphotlam/SpecSourcerateSpecCase77 AA
+stis_etc_cases/testcrphotlam/countrateCase29 SG
+stis_etc_cases/testcrphotlam/SpecSourcerateSpecCase6 EP
+stis_etc_cases/testcrphotlam/countrateCase25 EP
+stis_etc_cases/testcrphotlam/SpecSourcerateSpecCase20 EP
+stis_etc_cases/testcrphotlam/SpecSourcerateSpecCase62 EP
+stis_etc_cases/testcrphotlam/SpecSourcerateSpecCase44 EP
+stis_etc_cases/testcrphotlam/SpecSourcerateSpecCase14 EP
+stis_etc_cases/testcrphotlam/SpecSourcerateSpecCase45 EP
+stis_etc_cases/testcrphotlam/SpecSourcerateSpecCase52 EP
+stis_etc_cases/testcrphotlam/countrateCase10 SG
+stis_etc_cases/testcrphotlam/countrateCase49 SG
+stis_etc_cases/testcrphotlam/SpecSourcerateSpecCase47 EP
+stis_etc_cases/testcrphotlam/SpecSourcerateSpecCase32 EP
+stis_etc_cases/testcrphotlam/countrateCase39 EP
+stis_etc_cases/testcrphotlam/countrateCase12 SG
+stis_etc_cases/testcrphotlam/SpecSourcerateSpecCase36 EP
+stis_etc_cases/testcrphotlam/SpecSourcerateSpecCase74 SG
+stis_etc_cases/testcrphotlam/countrateCase22 EP
+stis_etc_cases/testcrcounts/SpecSourcerateSpecCase77 SG
+stis_etc_cases/testcrcounts/countrateCase29 SG
+stis_etc_cases/testcrcounts/SpecSourcerateSpecCase6 EP
+stis_etc_cases/testcrcounts/countrateCase25 EP
+stis_etc_cases/testcrcounts/SpecSourcerateSpecCase20 EP
+stis_etc_cases/testcrcounts/SpecSourcerateSpecCase62 EP
+stis_etc_cases/testcrcounts/SpecSourcerateSpecCase44 EP
+stis_etc_cases/testcrcounts/SpecSourcerateSpecCase14 EP
+stis_etc_cases/testcrcounts/countrateCase54 EP
+stis_etc_cases/testcrcounts/SpecSourcerateSpecCase45 EP
+stis_etc_cases/testcrphotlam/countrateCase54 EP
+stis_etc_cases/testcrcounts/SpecSourcerateSpecCase52 EP
+stis_etc_cases/testcrcounts/countrateCase10 SG
+stis_etc_cases/testcrcounts/countrateCase49 SG
+stis_etc_cases/testcrcounts/SpecSourcerateSpecCase47 EP
+stis_etc_cases/testcrcounts/SpecSourcerateSpecCase32 EP
+stis_etc_cases/testcrcounts/countrateCase39 EP
+stis_etc_cases/testcrcounts/SpecSourcerateSpecCase36 EP
+stis_etc_cases/testcrcounts/SpecSourcerateSpecCase74 SG
+stis_etc_cases/testcrcounts/countrateCase22 EP
+stis_etc_cases/testcrspec/calcphotCase61 OUT
+stis_etc_cases/testcrspec/calcphotCase51 OUT
+stis_etc_cases/testcrspec/SpecSourcerateSpecCase77 OUT
+stis_etc_cases/testcrspec/countrateCase41 OUT
+stis_etc_cases/testcrspec/countrateCase7 EP
+stis_etc_cases/testcrspec/countrateCase62 OUT
+stis_etc_cases/testcrspec/countrateCase29 OUT
+stis_etc_cases/testcrspec/SpecSourcerateSpecCase6 EP
+stis_etc_cases/testcrspec/countrateCase25 OUT
+stis_etc_cases/testcrspec/calcphotCase28 OUT
+stis_etc_cases/testcrspec/SpecSourcerateSpecCase20 SG
+stis_etc_cases/testcrspec/SpecSourcerateSpecCase62 OUT
+stis_etc_cases/testcrspec/calcspecCase1 EP
+stis_etc_cases/testcrspec/SpecSourcerateSpecCase14 OUT
+stis_etc_cases/testcrspec/countrateCase54 OUT
+stis_etc_cases/testcrspec/calcphotCase59 OUT
+stis_etc_cases/testcrspec/calcphotCase48 EP
+stis_etc_cases/testcrspec/SpecSourcerateSpecCase45 EP
+stis_etc_cases/testcrspec/countrateCase50 OUT
+stis_etc_cases/testcrspec/calcphotCase23 OUT
+stis_etc_cases/testcrspec/calcphotCase53 OUT
+stis_etc_cases/testcrspec/SpecSourcerateSpecCase69 OUT
+stis_etc_cases/testcrspec/SpecSourcerateSpecCase52 OUT
+stis_etc_cases/testcrspec/countrateCase59 SG
+stis_etc_cases/testcrspec/calcphotCase56 SG
+stis_etc_cases/testcrspec/calcspecCase21 NL
+stis_etc_cases/testcrspec/calcphotCase15 EP
+stis_etc_cases/testcrspec/countrateCase10 OUT
+stis_etc_cases/testcrspec/calcphotCase11 OUT
+stis_etc_cases/testcrspec/calcphotCase49 AA
+stis_etc_cases/testcrspec/calcspecCase22 SG
+stis_etc_cases/testcrspec/calcphotCase8 EP
+stis_etc_cases/testcrspec/countrateCase49 OUT
+stis_etc_cases/testcrspec/SpecSourcerateSpecCase47 OUT
+stis_etc_cases/testcrspec/SpecSourcerateSpecCase32 EP
+stis_etc_cases/testcrspec/countrateCase39 OUT
+stis_etc_cases/testcrspec/countrateCase12 OUT
+stis_etc_cases/testcrspec/SpecSourcerateSpecCase36 EP
+stis_etc_cases/testcrspec/SpecSourcerateSpecCase74 SG
+stis_etc_cases/testcrspec/countrateCase22 OUT
+stis_etc_cases/testefflam/calcphotCase56 NLs
+stis_etc_cases/testefflam/countrateCase10 HKs
+stis_etc_cases/testefflam/calcphotCase11 HKs
+stis_etc_cases/testcountrate/countrateCase10 AAs
+stis_etc_cases/testcountrate/SpecSourcerateSpecCase36 OUT
+stis_etc_cases/testcrspec/calcphotCase19 EP

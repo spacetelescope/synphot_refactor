@@ -1,0 +1,17 @@
+Keep them all:
+
+thermbackCase1   wfc3,ir,f140w  None
+thermbackCase3   wfc3,ir,f098m  None
+thermbackCase4   wfc3,ir,f105w  None
+thermbackCase5   wfc3,ir,f110w  None
+thermbackCase6   wfc3,ir,f125w  None
+thermbackCase7   wfc3,ir,f126n  None
+thermbackCase8   wfc3,ir,f127m  None
+thermbackCase9   wfc3,ir,f128n  None
+thermbackCase10  wfc3,ir,f130n  None
+thermbackCase11  wfc3,ir,f132n  None
+thermbackCase12  wfc3,ir,f139m  None
+thermbackCase13  wfc3,ir,f153m  None
+thermbackCase14  wfc3,ir,f160w  None
+thermbackCase15  wfc3,ir,f164n  None
+thermbackCase16  wfc3,ir,f167n  None

@@ -1,0 +1,35 @@
+How to perform some of the procedures described in endstage.txt
+
+PENULTIMATE STAGE -- aka "Round 1":
+
+4a. Running a test set
+IMPORTANT: must be run under irafdev.
+Use runversion.csh to check out, install, and test.
+Note hardcoded path names: run tests in
+/data/gaudete1/dg2/pysyn_version_compare for simplicity.
+
+Copy the test output to /eng/ssb/syn_pysyn to make generally available
+
+
+4b-e: Generate subset reports
+
+- upload the test results to the database as a named run
+- use tools in test/dbutil
+   - python get_subsets.py testrun
+       - this produces four files, one each for (subset, extreme,
+         countrate, thruput)
+   - inst_sort.csh testrun > testrun_summary.log
+       - this breaks each of the 4 into 4, one for each instrument
+       - summary is printed on stdout
+- mail the appropriate 4 files to each instrument team rep
+- mail the subset files from all 4 instruments to Danny Lennon so he 
+can generate plots
+
+4g: Record accepted failures
+
+- If all are accepted, just use the same list
+- If some are not accepted, require the non-accepted ones be removed
+- either way, then use 
+     python apply_attn.py testrun filename
+
+  for each of the filenames containing accepted failures.

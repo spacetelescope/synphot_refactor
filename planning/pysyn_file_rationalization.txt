@@ -1,0 +1,95 @@
+Requirements:
+------------
+
+1. Pysynphot must support the following scenarios for data file access:
+
+  A. CDBS: All data files are obtained from the CDBS tree.[ETC ops.]
+
+  B1. Customized CDBS, override: All data files are obtained from the
+    CDBS tree *except* for one or more specific directories (e.g., the
+    NICMOS throughput files, or the graph/component tables). [Testing]
+
+  B2. Customized CDBS, augment:  All data files are obtained from the
+    CDBS tree, including one or more additional directories provided
+    by the user. 
+
+  C. Standalone user: Pysynphot still works for Bessell/Cousins/Johnson 
+    photometric calculation without CDBS installed
+
+  D. Customized user: The user provides her/his own preferred set of
+  supported bandpasses.
+
+2. No hardcoded filenames should be included in the Pysynphot code.
+
+3. Synphot and Pysynphot must have the same definitions for variables
+   used in the TMC file (component table).
+
+
+Proposed Solutions:
+------------------
+
+Requirement 1:
+-------------
+The PYSYN_CDBS environment variable is already defined and used to point
+to the directory where pysynphot expects to find its reference
+files. Its use will be modified to support the various cases as follows:
+
+A. PYSYN_CDBS points to the top level of an installed CDBS directory.
+
+B. PYSYN_CDBS points to the top level of an installed CDBS
+directory. B1: Environment variables are set to override the desired
+directories (eg crnicmoscomp or mtab). B2: User adds new directories,
+and edits the CDBS_STRUCT.txt file described below to add shorthand
+names for them. 
+
+C. PYSYN_CDBS is set to an empty or blank string. Pysynphot will use its
+locally bundled data, including the Vega spectrum.
+
+D. PYSYN_CDBS points to a directory containing the file
+SIMPLE_CDBS.txt. The file should contain keyword-value pairs mapping from
+bandpass specification to throughput file, eg:
+
+2mass,j =  2mass_j.fits
+v       =  myccd_v.dat
+
+The files should also be located in the PYSYN_CDBS directory. This
+mapping will be added to the locally bundled mapping, and may override
+elements of it. Users may then specify bp=Band('2mass,j') as
+shorthand for bp=FileBandpass('/full/path/spec/2mass_j.fits').
+
+  
+Requirement 2 (relevant to cases A/B only):
+------------------------------------------
+
+The top level CDBS directory will contain a file named
+CDBS_STRUCT.txt. It will contain a mapping such as:
+
+cracscomp        ./comp/acs/
+mtab             ./mtab/
+crgridk93models  ./grid/k93models/
+
+This file itself will be under configuration control by the CDBS
+group.
+
+Pysynphot will read this file and construct a dictionary that will
+then be used to translate the shorthand names
+(cracscomp$) to full file paths. Environment variables will always be
+checked first and will override the dictionary value if present.
+
+
+
+Requirement 3 (relevant to cases A/B only):
+------------------------------------------
+
+STSDAS will be modified so that:
+  - none of the variables presently defined in zzsetenv.def in terms
+  of crrefer will be defined there. (crrefer itself will still be
+  defined in extern.pkg.)
+  - stsdas.cl will run a script that reads the CDBS_STRUCT.txt file
+  and sets the corresponding variables based on this definition,
+  unless a corresponding environment variable has already been defined.
+
+Note that this change provides more flexibility for user installations
+of stsdas/cdbs. Definitions of the shorthand variables are visible with
+the CDBS files instead of buried in the zzsetenv.def. New variables
+can be easily defined without requiring code changes.
