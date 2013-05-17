@@ -3,7 +3,6 @@
 from __future__ import division
 ## Automatically adapted for numpy.numarray Mar 05, 2007 by
 
-import math
 import numpy as N
 
 

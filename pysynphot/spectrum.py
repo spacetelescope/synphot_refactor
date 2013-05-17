@@ -17,7 +17,6 @@ pyfits, numpy
 
 """
 
-import string
 import re
 import os
 import math

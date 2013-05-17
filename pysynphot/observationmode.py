@@ -3,17 +3,11 @@
 from __future__ import division
 ## Automatically adapted for numpy.numarray Mar 05, 2007 by
 
-import string
-import glob
 import re
-import os
-import warnings
 import numpy as N
-import pyfits
 
 import refs
 import spectrum
-import units
 import locations
 from locations import irafconvert
 import planck

@@ -26,10 +26,8 @@ from spark import GenericScanner, GenericParser, GenericASTTraversal
 from spark import GenericASTBuilder, GenericASTMatcher
 import spectrum
 import reddening
-import observationmode
 import locations
 import catalog
-import os
 from obsbandpass import ObsBandpass
 from .exceptions import DisjointError, OverlapError
 

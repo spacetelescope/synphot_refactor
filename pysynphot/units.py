@@ -14,7 +14,7 @@ from __future__ import division
 
 import math
 import numpy as N
-import locations, spectrum  # Circular import
+import spectrum  # Circular import
 import binning
 
 import refs  # needed for PRIMARY_AREA

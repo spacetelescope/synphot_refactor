@@ -26,7 +26,6 @@ from __future__ import division
 __version__ = 'SPARK-0.6.1'
 
 import re
-import sys
 import string
 
 def _namelist(instance):

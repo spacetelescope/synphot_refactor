@@ -14,7 +14,6 @@ import numpy as np
 
 from observationmode import ObservationMode
 from spectrum import CompositeSpectralElement, TabularSpectralElement
-import wavetable
 import units
 import pysynphot.exceptions as exceptions
 

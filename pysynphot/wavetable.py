@@ -9,7 +9,6 @@ set for a given obsmode.
 """
 
 import re
-import os
 import numpy as N
 import locations
 
