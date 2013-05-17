@@ -1,3 +1,0 @@
-'thermback&obsmode="wfc3,ir,g102,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
-'thermback&obsmode="wfc3,ir,g102,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.
-'thermback&obsmode="wfc3,ir,g141,bkg"&area="45238.93416"&grtbl="mtab$*_tmg.fits"&cmptbl="mtab$*_tmc.fits"&mode="a"'.

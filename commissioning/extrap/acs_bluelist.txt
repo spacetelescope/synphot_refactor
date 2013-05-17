@@ -1,9 +1,0 @@
-acs_f850lp_004_syn.fits     BLUE 5
-acs_f850lp_hrc_003_syn.fits     BLUE 5
-acs_f850lp_wfc_003_syn.fits     BLUE 5
-acs_pr110l_006_syn.fits     BLUE 13
-acs_pr110l_sbc_003_syn.fits     BLUE 13
-acs_pr130l_006_syn.fits     BLUE 13
-acs_pr130l_sbc_003_syn.fits     BLUE 13
-acs_pr200l_004_syn.fits     BLUE 13
-acs_pr200l_hrc_002_syn.fits     BLUE 13
