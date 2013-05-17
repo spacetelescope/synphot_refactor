@@ -1,3 +1,5 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 # For backwards compatibility with py_etc
 try:
     from .version import *

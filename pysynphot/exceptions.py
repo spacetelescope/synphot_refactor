@@ -1,4 +1,9 @@
-"""Custom exceptions for pysynphot to raise"""
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
+"""
+Custom exceptions for pysynphot to raise
+
+"""
 
 
 class PysynphotError(Exception):

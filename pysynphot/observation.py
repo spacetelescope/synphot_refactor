@@ -1,8 +1,13 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from __future__ import division
-"""This will ultimately replace the observation.py module. It defines
+"""
+This will ultimately replace the observation.py module. It defines
 a new Observation class, subclassed from CompositeSourceSpectrum,
 that has some special methods and attributes and explicitly removes
-certain other methods."""
+certain other methods.
+
+"""
 
 import numpy as np
 import math

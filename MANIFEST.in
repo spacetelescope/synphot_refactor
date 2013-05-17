@@ -1,4 +1,4 @@
-include distribute_setup.py ETCSERVER.BAT README
+include distribute_setup.py README
 graft data
 graft doc
 include test/pdk* test/*.doctest test/auto_test test/*.disable test/*.py

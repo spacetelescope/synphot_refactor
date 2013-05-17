@@ -1,7 +1,12 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from __future__ import division
-""" This module handles the wavecat.dat table presently used by the
+"""
+This module handles the wavecat.dat table presently used by the
 synphot countrate task (and thus the ETC) to select an appropriate wavelength
-set for a given obsmode. """
+set for a given obsmode.
+
+"""
 
 import re
 import os

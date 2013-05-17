@@ -1,4 +1,7 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from __future__ import division
+
 #  Copyright (c) 1998-2000 John Aycock
 #  
 #  Permission is hereby granted, free of charge, to any person obtaining

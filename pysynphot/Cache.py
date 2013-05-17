@@ -1,3 +1,5 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from __future__ import division
 """This module is a container for IO-intensive items that should be
 read in only once, and then re-used from memory.

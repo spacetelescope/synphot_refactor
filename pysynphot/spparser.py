@@ -1,3 +1,5 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 """
 This file implements the pysynphot language parser.
 
@@ -16,7 +18,9 @@ tables by reading the docstring, so you can't put anything else
 
 In class Interpreter, the docstring of every function named with p\_
 is part of the instructions to the parser.
+
 """
+
 from __future__ import division
 from spark import GenericScanner, GenericParser, GenericASTTraversal
 from spark import GenericASTBuilder, GenericASTMatcher

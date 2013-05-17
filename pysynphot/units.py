@@ -1,3 +1,5 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 """
 Units class hierarchy: is used to manage both wavelength and flux
 unit conversions
@@ -7,6 +9,7 @@ unit conversions
   vegamag unit conversions require spectrum and locations modules => circular imports.
 
 """
+
 from __future__ import division
 
 import math

@@ -1,7 +1,12 @@
-""" Graph table re-implementation
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
+"""
+Graph table re-implementation
 Data structure & traversal algorithm suggested by Alex Martelli,
 http://stackoverflow.com/questions/844505/is-a-graph-library-eg-networkx-the-right-solution-for-my-python-problem
+
 """
+
 from __future__ import division
 from collections import defaultdict
 import pyfits

@@ -1,9 +1,14 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from __future__ import division
-"""The ObsBandpass user interface needs to support either the usual
+"""
+The ObsBandpass user interface needs to support either the usual
 (acs,hrc,f555w) obsmode style that produce a set of chained throughput
 files; or something like (johnson,v) that has a single throughput file.
 Thus ObsBandpass must be a factory function, returning either an
-ObsModeBandpass (ack, terrible name) or a TabularSpectralElement."""
+ObsModeBandpass (ack, terrible name) or a TabularSpectralElement.
+
+"""
 
 import numpy as np
 
