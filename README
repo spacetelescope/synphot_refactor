@@ -26,8 +26,6 @@ person.
 
 .....
 
-The current revision is $Rev: 2176 $.
-
 It has the following dependencies:
   - numpy v1.0 or higher
   - PyFITS v1.1 or higher
