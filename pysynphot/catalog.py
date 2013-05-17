@@ -21,7 +21,7 @@ http://www.stsci.edu/hst/HST_overview/documents/synphot/AppA_Catalogs.html#57
 """
 
 import os
-import numpy as N
+import numpy as np
 import pyfits
 
 import spectrum
@@ -129,7 +129,7 @@ class Icat(spectrum.TabularSourceSpectrum):
         par = float(parameter)
 
         array = [parameters[index] for parameters in inList]
-        array = N.array(array, dtype=N.float64)
+        array = np.array(array, dtype=np.float64)
 
         upperArray = array[array >= par]
         lowerArray = array[array <= par]

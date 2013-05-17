@@ -13,7 +13,7 @@ unit conversions
 from __future__ import division
 
 import math
-import numpy as N
+import numpy as np
 import spectrum  # Circular import
 import binning
 
@@ -270,11 +270,11 @@ class Photlam(FluxUnits):
 
     def ToABMag(self, wave, flux, **kwargs):
         arg = H * flux * wave
-        return -1.085736 * N.log(arg) + ABZERO
+        return -1.085736 * np.log(arg) + ABZERO
 
     def ToSTMag(self, wave, flux, **kwargs):
         arg = H * C* flux / wave
-        return -1.085736 * N.log(arg) + STZERO
+        return -1.085736 * np.log(arg) + STZERO
 
     def ToOBMag(self, wave, flux, area=None):
         area = area if area else refs.PRIMARY_AREA
@@ -283,13 +283,13 @@ class Photlam(FluxUnits):
 
         arg = flux * bin_widths * area
 
-        return -1.085736 * N.log(arg)
+        return -1.085736 * np.log(arg)
 
     def ToVegaMag(self, wave, flux, **kwargs):
 
         resampled = spectrum.Vega.resample(wave)
         normalized = flux / resampled._fluxtable
-        return -2.5 * N.log10(normalized)
+        return -2.5 * np.log10(normalized)
 
     def ToCounts(self, wave, flux, area=None):
         area = area if area else refs.PRIMARY_AREA

@@ -6,7 +6,7 @@ Objects that represent comp tables and graph tables.
 
 """
 
-import numpy as N
+import numpy as np
 
 import pyfits
 
@@ -113,7 +113,7 @@ class GraphTable(object):
         the modes list, starting at the given innode.
         This method isnt actually used, its just a helper method for
         debugging purposes'''
-        nodes = N.where(self.innodes == innode)
+        nodes = np.where(self.innodes == innode)
 
         ## If there's no entry for the given innode, return -1
         if nodes[0].size == 0:
@@ -121,7 +121,7 @@ class GraphTable(object):
 
         ## If we don't match anything in the modes list, we find the
         ## outnode corresponding the the string 'default'
-        defaultindex = N.where(self.keywords[nodes] == 'default')
+        defaultindex = np.where(self.keywords[nodes] == 'default')
 
         if len(defaultindex[0]) != 0:
             outnode = self.outnodes[nodes[0][defaultindex[0]]]
@@ -132,7 +132,7 @@ class GraphTable(object):
         for mode in modes:
             result = self.keywords[nodes].count(mode)
             if result != 0:
-                index = N.where(self.keywords[nodes]==mode)
+                index = np.where(self.keywords[nodes]==mode)
                 outnode = self.outnodes[nodes[0][index[0]]]
 
 
@@ -157,7 +157,7 @@ class GraphTable(object):
 
             previous_outnode = outnode
 
-            nodes = N.where(self.innodes == innode)
+            nodes = np.where(self.innodes == innode)
 
             # If there are no entries with this innode, we're done
             if nodes[0].size == 0:
@@ -169,10 +169,10 @@ class GraphTable(object):
             # Find the entry corresponding to the component named
             # 'default', bacause thats the one we'll use if we don't
             # match anything in the modes list
-            defaultindex = N.where(self.keywords[nodes] =='default')
+            defaultindex = np.where(self.keywords[nodes] =='default')
 
             if 'default' in self.keywords[nodes]:
-                dfi=N.where(self.keywords[nodes] == 'default')[0][0]
+                dfi=np.where(self.keywords[nodes] == 'default')[0][0]
                 outnode = self.outnodes[nodes[0][dfi]]
                 component = self.compnames[nodes[0][dfi]]
                 thcomponent = self.thcompnames[nodes[0][dfi]]
@@ -188,7 +188,7 @@ class GraphTable(object):
 
                 if mode in self.keywords[nodes]:
                     used_modes.add(mode)
-                    index = N.where(self.keywords[nodes]==mode)
+                    index = np.where(self.keywords[nodes]==mode)
                     if len(index[0])>1:
                         raise KeyError('%d matches found for %s'%(len(index[0]),mode))
                     idx=index[0][0]

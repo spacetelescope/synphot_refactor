@@ -3,7 +3,7 @@
 from __future__ import division
 ## Automatically adapted for numpy.numarray Mar 05, 2007 by
 
-import numpy as N
+import numpy as np
 
 
 H  = 6.6262E-27                # Planck's constant in cgs units
@@ -28,17 +28,17 @@ def bbfunc(wave, temperature):
     '''
     x = wave * temperature
 
-    mask = N.where(x > 0.0, 1, 0)
-    x = N.where(mask==1, 1.43883E8 / x, 0.0)
+    mask = np.where(x > 0.0, 1, 0)
+    x = np.where(mask==1, 1.43883E8 / x, 0.0)
 
-    factor = N.zeros(wave.shape, dtype=N.float64)
+    factor = np.zeros(wave.shape, dtype=np.float64)
 
-    mask1 = N.where(x < LOWER, 0, 1)
-    factor = N.where(mask1 == 0, 2.0 / (x * (x + 2.0)), factor)
+    mask1 = np.where(x < LOWER, 0, 1)
+    factor = np.where(mask1 == 0, 2.0 / (x * (x + 2.0)), factor)
 
-    mask2 = N.where(x < UPPER, 1, 0)
+    mask2 = np.where(x < UPPER, 1, 0)
     mask = mask1 * mask2
-    factor = N.where(mask == 1, 1.0 / (N.exp(x) - 1.0), factor)
+    factor = np.where(mask == 1, 1.0 / (np.exp(x) - 1.0), factor)
 
     x = x * temperature / 1.95722E5
     x = factor * x * x * x
@@ -54,16 +54,16 @@ def llam_SI(wave, temperature):
     '''
     exponent = C2 / (wave * temperature)
 
-    result = N.zeros(wave.shape, dtype=N.float64)
+    result = np.zeros(wave.shape, dtype=np.float64)
 
-    mask1 = N.where(exponent <= LOWER, 0, 1)
-    result = N.where(mask1==0, (2.0 * C1 * (wave**-5.0)) / (exponent * (exponent + 2.0)), result)
+    mask1 = np.where(exponent <= LOWER, 0, 1)
+    result = np.where(mask1==0, (2.0 * C1 * (wave**-5.0)) / (exponent * (exponent + 2.0)), result)
 
-    mask2 = N.where(exponent <= UPPER, 1, 0)
+    mask2 = np.where(exponent <= UPPER, 1, 0)
     mask = mask1 * mask2
-    exponent = N.where(mask2==1, exponent, UPPER)
-    expfactor = N.exp(exponent)
-    result = N.where(mask==1, (C1 * (wave**-5.0) / (expfactor - 1.0)), result)
+    exponent = np.where(mask2==1, exponent, UPPER)
+    expfactor = np.exp(exponent)
+    result = np.where(mask==1, (C1 * (wave**-5.0) / (expfactor - 1.0)), result)
 
     return result
 

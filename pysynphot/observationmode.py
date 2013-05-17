@@ -4,7 +4,7 @@ from __future__ import division
 ## Automatically adapted for numpy.numarray Mar 05, 2007 by
 
 import re
-import numpy as N
+import numpy as np
 
 import refs
 import spectrum
@@ -101,7 +101,7 @@ class BaseObservationMode(object):
         files = []
         for compname in compnames:
             if compname not in [None, '', CLEAR]:
-                index = N.where(comptable.compnames == compname)
+                index = np.where(comptable.compnames == compname)
                 try:
                     iraffilename = comptable.filenames[index[0][0]]
                     filename = irafconvert(iraffilename)
@@ -134,7 +134,7 @@ class BaseObservationMode(object):
     def _computeBandwave(self, coeff):
         (a,b,c,nwave) = self._computeQuadraticCoefficients(coeff)
 
-        result = N.zeros(shape=[nwave,], dtype=N.float64)
+        result = np.zeros(shape=[nwave,], dtype=np.float64)
 
         for i in range(nwave):
             result[i] = ((a * i) + b) * i + c
@@ -178,7 +178,7 @@ class BaseObservationMode(object):
             if not line.startswith('#'):
                 tokens.append(line)
 
-        return N.float_(tokens)
+        return np.float_(tokens)
 
 
 class ObservationMode(BaseObservationMode):
@@ -383,7 +383,7 @@ class _ThermalObservationMode(BaseObservationMode):
     def _getSpectrum(self):
         wave=self._getWavesetIntersection()
         sp = spectrum.ArraySourceSpectrum(wave=wave,
-                       flux=N.zeros(shape=wave.shape,dtype=N.float64),
+                       flux=np.zeros(shape=wave.shape,dtype=np.float64),
                        waveunits='angstrom',
                        fluxunits='photlam',
                        name="%s %s"%(self.name,'ThermalSpectrum'))
@@ -425,14 +425,14 @@ class _ThermalObservationMode(BaseObservationMode):
 
         result = self._mergeEmissivityWavesets()
 
-        result = N.compress(result > minw, result)
-        result = N.compress(result < maxw, result)
+        result = np.compress(result > minw, result)
+        result = np.compress(result < maxw, result)
 
         # intersection with vega spectrum (why???)
         vegasp = spectrum.TabularSourceSpectrum(locations.VegaFile)
         vegaws = vegasp.GetWaveSet()
-        result = N.compress(result > vegaws[0], result)
-        result = N.compress(result < vegaws[-1], result)
+        result = np.compress(result > vegaws[0], result)
+        result = np.compress(result < vegaws[-1], result)
 
         return result
 

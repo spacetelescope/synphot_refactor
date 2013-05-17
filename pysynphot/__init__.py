@@ -34,7 +34,6 @@ can be found at U{http://stsdas.stsci.edu/pysynphot/
 
 
 >>> import pysynphot as S
->>> import os
 >>> print S.__version__
 2.0.0dev
 >>> #Read a spectrum from a file

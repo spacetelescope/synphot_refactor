@@ -22,7 +22,7 @@ is part of the instructions to the parser.
 """
 
 from __future__ import division
-from spark import GenericScanner, GenericParser, GenericASTTraversal
+from spark import GenericScanner
 from spark import GenericASTBuilder, GenericASTMatcher
 import spectrum
 import reddening

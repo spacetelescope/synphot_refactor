@@ -5,7 +5,7 @@ from __future__ import division
 """
 Module: spectrum.py
 
-Contains SourceSpectrum and SpectralElement class defnitions and
+Contains SourceSpectrum and SpectralElement class definitions and
 their subclasses.
 
 Also contains the Vega object, which is an instance of a FileSourceSpectrum
@@ -23,7 +23,7 @@ import math
 import warnings
 
 import pyfits
-import numpy as N
+import numpy as np
 
 import refs
 import units
@@ -63,7 +63,7 @@ def MergeWaveSets(waveset1, waveset2):
     elif waveset1 is None and Waveset2 is None:
         MergedWaveSet = None
     else:
-        MergedWaveSet = N.union1d(waveset1, waveset2)
+        MergedWaveSet = np.union1d(waveset1, waveset2)
 
         # The merged wave sets may sometimes contain numbers which are nearly
         # equal but differ at levels as small as 1e-14. Having values this
@@ -77,7 +77,7 @@ def MergeWaveSets(waveset1, waveset2):
 
         if not (delta > MERGETHRESH).all():
             newlen = len(delta[delta > MERGETHRESH]) + 1
-            newmerged = N.zeros(newlen,dtype=MergedWaveSet.dtype)
+            newmerged = np.zeros(newlen,dtype=MergedWaveSet.dtype)
             newmerged[:-1] = MergedWaveSet[delta > MERGETHRESH]
             newmerged[-1] = MergedWaveSet[-1]
 
@@ -92,11 +92,11 @@ def trimSpectrum(sp, minw, maxw):
     wave = sp.GetWaveSet()
     flux = sp(wave)
 
-    new_wave = N.compress(wave >= minw, wave)
-    new_flux = N.compress(wave >= minw, flux)
+    new_wave = np.compress(wave >= minw, wave)
+    new_flux = np.compress(wave >= minw, flux)
 
-    new_wave = N.compress(new_wave <= maxw, new_wave)
-    new_flux = N.compress(new_wave <= maxw, new_flux)
+    new_wave = np.compress(new_wave <= maxw, new_wave)
+    new_flux = np.compress(new_wave <= maxw, new_flux)
 
     result = TabularSourceSpectrum()
 
@@ -115,7 +115,7 @@ class Integrator(object):
     def trapezoidIntegration(self,x,y):
         npoints = x.size
         if npoints > 0:
-            indices = N.arange(npoints)[:-1]
+            indices = np.arange(npoints)[:-1]
             deltas = x[indices+1] - x[indices]
             integrand = 0.5*(y[indices+1] + y[indices])*deltas
             sum = integrand.sum()
@@ -155,33 +155,33 @@ class Integrator(object):
         "Enforce monotonic, ascending wavelengths with no zero values"
         #First check for invalid values
         wave=self._wavetable
-        if N.any(wave <= 0):
-            wrong=N.where(wave <= 0)[0]
+        if np.any(wave <= 0):
+            wrong=np.where(wave <= 0)[0]
             raise exceptions.ZeroWavelength('Negative or Zero wavelength occurs in wavelength array', rows=wrong)
 
 
 
         #Now check for monotonicity & enforce ascending
-        sorted=N.sort(wave)
-        if not N.alltrue(sorted == wave):
-            if N.alltrue(sorted[::-1] == wave):
+        sorted=np.sort(wave)
+        if not np.alltrue(sorted == wave):
+            if np.alltrue(sorted[::-1] == wave):
                 #monotonic descending is allowed
                 pass
             else:
-                wrong = N.where(sorted != wave)[0]
+                wrong = np.where(sorted != wave)[0]
                 raise exceptions.UnsortedWavelength('Wavelength array is not monotonic', rows=wrong)
 
         #Check for duplicate values
         dw=sorted[1:]-sorted[:-1]
-        if N.any(dw==0):
-            wrong=N.where(dw==0)[0]
+        if np.any(dw==0):
+            wrong=np.where(dw==0)[0]
             raise exceptions.DuplicateWavelength("Wavelength array contains duplicate entries",rows=wrong)
 
     def validate_fluxtable(self):
         "Enforce non-negative fluxes"
         if ((not self.fluxunits.isMag) #neg. magnitudes are legal
             and (self._fluxtable.min() < 0)):
-            idx=N.where(self._fluxtable < 0)
+            idx=np.where(self._fluxtable < 0)
             self._fluxtable[idx]=0.0
             print "Warning, %d of %d bins contained negative fluxes; they have been set to zero."%(len(idx[0]),len(self._fluxtable))
 
@@ -227,7 +227,7 @@ class SourceSpectrum(Integrator):
     def addmag(self,magval):
         """Adding a magnitude is like multiplying a flux. Only works for
         numbers -- not arrays, spectrum objects, etc"""
-        if N.isscalar(magval):
+        if np.isscalar(magval):
             factor = 10**(-0.4*magval)
             return self*factor
         else:
@@ -315,10 +315,10 @@ class SourceSpectrum(Integrator):
         #will still be sorted with no duplicates
         #The value of epsilon is taken from the Synphot FAQ.
 
-        if wave.dtype == N.float64 and _precision == 's':
-            idx=N.where(abs(wave[1:]-wave[:-1]) > syn_epsilon)
+        if wave.dtype == np.float64 and _precision == 's':
+            idx=np.where(abs(wave[1:]-wave[:-1]) > syn_epsilon)
         else:
-            idx=N.where(wave) #=> idx=[:]
+            idx=np.where(wave) #=> idx=[:]
 
         wave=wave[idx]
         flux=flux[idx]
@@ -423,7 +423,7 @@ class SourceSpectrum(Integrator):
         else:
             # Get the arrays in the proper units
             wave_array, flux_array = self.getArrays()
-            if N.isscalar(wave):
+            if np.isscalar(wave):
                 # Find the correct index
                 diff = abs(wave-wave_array)
                 idx = diff.argmin()
@@ -658,8 +658,8 @@ class TabularSourceSpectrum(SourceSpectrum):
         self.waveunits = units.Units('angstrom')
         self.fluxunits = units.Units('flam')
         wlist,flist = self._columnsFromASCII(filename)
-        self._wavetable=N.array(wlist,dtype=N.float64)
-        self._fluxtable=N.array(flist,dtype=N.float64)
+        self._wavetable=np.array(wlist,dtype=np.float64)
+        self._fluxtable=np.array(flist,dtype=np.float64)
 
 
     def __call__(self, wavelengths):
@@ -667,9 +667,9 @@ class TabularSourceSpectrum(SourceSpectrum):
         wavelength array. Returns an array of flux values calculated at
         the wavelength values input.
         '''
-        if N.isscalar(wavelengths):
+        if np.isscalar(wavelengths):
             delta=0.0001
-            ww=N.array([wavelengths-delta,wavelengths,wavelengths+delta])
+            ww=np.array([wavelengths-delta,wavelengths,wavelengths+delta])
             tmp=self.resample(ww)
             return tmp._fluxtable[1]
         else:
@@ -683,8 +683,8 @@ class TabularSourceSpectrum(SourceSpectrum):
         '''Taper the spectrum by adding zeros to each end.
         '''
         OutSpec = TabularSourceSpectrum()
-        wcopy = N.zeros(self._wavetable.size+2,dtype=N.float64)
-        fcopy = N.zeros(self._fluxtable.size+2,dtype=N.float64)
+        wcopy = np.zeros(self._wavetable.size+2,dtype=np.float64)
+        fcopy = np.zeros(self._fluxtable.size+2,dtype=np.float64)
         wcopy[1:-1] = self._wavetable
         fcopy[1:-1] = self._fluxtable
         fcopy[0] = 0.0
@@ -724,11 +724,11 @@ class TabularSourceSpectrum(SourceSpectrum):
         ## Use numpy interpolation function
         if self._wavetable[0]<self._wavetable[-1]:
             oldasc = True
-            ans = N.interp(newwave,self._wavetable,
+            ans = np.interp(newwave,self._wavetable,
                            self._fluxtable)
         else:
             oldasc = False
-            rev = N.interp(newwave,self._wavetable[::-1],
+            rev = np.interp(newwave,self._wavetable[::-1],
                            self._fluxtable[::-1])
             ans = rev[::-1]
 
@@ -897,8 +897,8 @@ class FileSourceSpectrum(TabularSourceSpectrum):
         self.waveunits = units.Units('angstrom')
         self.fluxunits = units.Units('flam')
         wlist,flist = self._columnsFromASCII(filename)
-        self._wavetable=N.array(wlist,dtype=N.float64)
-        self._fluxtable=N.array(flist,dtype=N.float64)
+        self._wavetable=np.array(wlist,dtype=np.float64)
+        self._fluxtable=np.array(flist,dtype=np.float64)
 
         #We don't support headers from ascii files
         self.fheader = dict()
@@ -980,7 +980,7 @@ class GaussianSource(AnalyticSpectrum):
 
         # calculate flux
         flux = self.factor * \
-                N.exp(-0.5 * ((wave - self.center) / self.sigma)**2)
+                np.exp(-0.5 * ((wave - self.center) / self.sigma)**2)
 
         if hasattr(self, 'primary_area'):
             area = self.primary_area
@@ -1000,7 +1000,7 @@ class GaussianSource(AnalyticSpectrum):
         first = self.center - 50.0*increment
         last = self.center + 50.0*increment
 
-        return N.arange(first, last, increment)
+        return np.arange(first, last, increment)
 
 
 class FlatSpectrum(AnalyticSpectrum):
@@ -1020,7 +1020,7 @@ class FlatSpectrum(AnalyticSpectrum):
 
     def __call__(self, wavelength):
         if hasattr(wavelength,'shape'):
-            flux = self._fluxdensity * N.ones(wavelength.shape, dtype=N.float64)
+            flux = self._fluxdensity * np.ones(wavelength.shape, dtype=np.float64)
         else:
             flux = self._fluxdensity
 
@@ -1049,7 +1049,7 @@ class FlatSpectrum(AnalyticSpectrum):
 
 ##This change produces 5 errors and 17 failures in cos_etc_test.py
 ##     def GetWaveSet(self):
-##         return N.array([_default_waveset[0],_default_waveset[-1]])
+##         return np.array([_default_waveset[0],_default_waveset[-1]])
 
 
 class Powerlaw(AnalyticSpectrum):
@@ -1236,7 +1236,7 @@ class SpectralElement(Integrator):
         self.convert(mywaveunits)
 
         if floor != 0:
-            idx = N.where(thru >= floor)
+            idx = np.where(thru >= floor)
             wave = wave[idx]
             thru = thru[idx]
 
@@ -1282,28 +1282,28 @@ class SpectralElement(Integrator):
         self.convert(mywaveunits)
 
         # calculate the average wavelength
-        num = self.trapezoidIntegration(wave, thru * N.log(wave) / wave)
+        num = self.trapezoidIntegration(wave, thru * np.log(wave) / wave)
         den = self.trapezoidIntegration(wave, thru / wave)
 
         if num == 0 or den == 0:
             error_str = 'Could not calculate average wavelength of bandpass.'
             raise exceptions.PysnphotErorr(error_str)
 
-        avg_wave = N.exp(num/den)
+        avg_wave = np.exp(num/den)
 
         if floor != 0:
-            idx = N.where(thru >= floor)
+            idx = np.where(thru >= floor)
             wave = wave[idx]
             thru = thru[idx]
 
         # calcualte the rms width
-        integrand = thru * N.log(wave / avg_wave)**2 / wave
+        integrand = thru * np.log(wave / avg_wave)**2 / wave
         num = self.trapezoidIntegration(wave, integrand)
 
         if num == 0 or den == 0:
             return 0.0
 
-        return avg_wave * N.sqrt(num/den)
+        return avg_wave * np.sqrt(num/den)
 
     def rectwidth(self):
         """RECTW = INT(THRU) / MAX(THRU)"""
@@ -1347,7 +1347,7 @@ class SpectralElement(Integrator):
         Returns True if the LACK of overlap is INsignificant:
         i.e., it is ok to go ahead and do whatever we are doing."""
 
-        swave=self.wave[N.where(self.throughput != 0)]
+        swave=self.wave[np.where(self.throughput != 0)]
         s1,s2=swave.min(),swave.max()
 
         owave=other.wave
@@ -1363,8 +1363,8 @@ class SpectralElement(Integrator):
         #We cannot yet do
         #low=self[slice(*lowrange)].integrate()
         wave=self.wave
-        idxs=[N.searchsorted(wave, lorange, 'left'),
-              N.searchsorted(wave, hirange, 'left')]
+        idxs=[np.searchsorted(wave, lorange, 'left'),
+              np.searchsorted(wave, hirange, 'left')]
 
         excluded=0.0
         for idx in idxs:
@@ -1393,7 +1393,7 @@ class SpectralElement(Integrator):
             #then it's defined everywhere
             return 'full'
 
-        swave=self.wave[N.where(self.throughput != 0)]
+        swave=self.wave[np.where(self.throughput != 0)]
         s1,s2=swave.min(),swave.max()
 
         owave=other.wave
@@ -1439,9 +1439,9 @@ class SpectralElement(Integrator):
             an array of wavelengths in Angstroms at which the
                              throughput should be sampled
         '''
-        if N.isscalar(wavelengths):
+        if np.isscalar(wavelengths):
             delta=0.0001
-            ww=N.array([wavelengths-delta,wavelengths,wavelengths+delta])
+            ww=np.array([wavelengths-delta,wavelengths,wavelengths+delta])
             tmp=self.resample(ww)
             return tmp._throughputtable[1]
         else:
@@ -1459,8 +1459,8 @@ class SpectralElement(Integrator):
         '''
         OutElement = TabularSpectralElement()
 
-        wcopy = N.zeros(self._wavetable.size+2,dtype=N.float64)
-        fcopy = N.zeros(self._throughputtable.size+2,dtype=N.float64)
+        wcopy = np.zeros(self._wavetable.size+2,dtype=np.float64)
+        fcopy = np.zeros(self._throughputtable.size+2,dtype=np.float64)
 
         wcopy[1:-1] = self._wavetable
         fcopy[1:-1] = self._throughputtable
@@ -1516,10 +1516,10 @@ class SpectralElement(Integrator):
         #will still be sorted with no duplicates
         #The value of epsilon is taken from the Synphot FAQ.
 
-        if wave.dtype == N.float64 and _precision == 's':
-            idx=N.where(abs(wave[1:]-wave[:-1]) > syn_epsilon)
+        if wave.dtype == np.float64 and _precision == 's':
+            idx=np.where(abs(wave[1:]-wave[:-1]) > syn_epsilon)
         else:
-            idx=N.where(wave) #=> idx=[:]
+            idx=np.where(wave) #=> idx=[:]
 
         wave=wave[idx]
         thru=thru[idx]
@@ -1608,11 +1608,11 @@ class SpectralElement(Integrator):
         ## Use numpy interpolation function
         if self._wavetable[0]<self._wavetable[-1]:
             oldasc = True
-            ans = N.interp(newwave,self._wavetable,
+            ans = np.interp(newwave,self._wavetable,
                            self._throughputtable)
         else:
             oldasc = False
-            rev = N.interp(newwave,self._wavetable[::-1],
+            rev = np.interp(newwave,self._wavetable[::-1],
                            self._throughputtable[::-1])
             ans = rev[::-1]
 
@@ -1783,7 +1783,7 @@ class UniformTransmission(SpectralElement):
         self.warnings={}
         #The ._wavetable is used only by the .writefits() method at this time
         #It is not for general use.
-        self._wavetable = N.array([refs._default_waveset[0],refs._default_waveset[-1]])
+        self._wavetable = np.array([refs._default_waveset[0],refs._default_waveset[-1]])
 
     def __str__(self):
         return "%g"%self.value
@@ -1806,7 +1806,7 @@ class UniformTransmission(SpectralElement):
 
 ## This produced 15 test failures in cos_etc_test.
 ##     def GetWaveSet(self):
-##         return N.array([_default_waveset[0],_default_waveset[-1]])
+##         return np.array([_default_waveset[0],_default_waveset[-1]])
 ##
 ##     wave = property(GetWaveSet,doc="wave for UniformTransmission")
 
@@ -1866,8 +1866,8 @@ class TabularSpectralElement(SpectralElement):
         self.waveunits = units.Units('angstrom')
         self.throughputunits = 'none'
         wlist,tlist = self._columnsFromASCII(filename)
-        self._wavetable=N.array(wlist,dtype=N.float64)
-        self._throughputtable=N.array(tlist,dtype=N.float64)
+        self._wavetable=np.array(wlist,dtype=np.float64)
+        self._throughputtable=np.array(tlist,dtype=np.float64)
 
 
     def _readFITS(self,filename,thrucol='throughput'):
@@ -1988,8 +1988,8 @@ class FileSpectralElement(TabularSpectralElement):
 
         self.waveunits = units.Units('angstrom')
         wlist,flist = self._columnsFromASCII(filename)
-        self._wavetable=N.array(wlist,dtype=N.float64)
-        self._throughputtable=N.array(flist,dtype=N.float64)
+        self._wavetable=np.array(wlist,dtype=np.float64)
+        self._throughputtable=np.array(flist,dtype=np.float64)
 
         #We don't support headers from asii files
         self.fheader = dict()
@@ -2052,7 +2052,7 @@ class InterpolatedSpectralElement(SpectralElement):
 
         # need interpolation
         elif self.interpval > colWaves[0] and self.interpval < colWaves[-1]:
-            upper_ind = N.searchsorted(colWaves,self.interpval)
+            upper_ind = np.searchsorted(colWaves,self.interpval)
             lower_ind = upper_ind - 1
 
             self._interp_init(wave0,colWaves[lower_ind],colWaves[upper_ind],
@@ -2105,8 +2105,8 @@ class InterpolatedSpectralElement(SpectralElement):
             uwave = waves + (upper_val - self.interpval)
 
             #Interpolate the columns at those ranges
-            lower_thru = N.interp(lwave, waves, lower_thru)
-            upper_thru = N.interp(uwave, waves, upper_thru)
+            lower_thru = np.interp(lwave, waves, lower_thru)
+            upper_thru = np.interp(uwave, waves, upper_thru)
 
         #Then interpolate between the two columns
         w = (self.interpval - lower_val) / (upper_val - lower_val)
@@ -2123,7 +2123,7 @@ class InterpolatedSpectralElement(SpectralElement):
 
             throughput.append(m*self.interpval + b)
 
-        self._throughputtable = N.array(throughput)
+        self._throughputtable = np.array(throughput)
 
 
 class ThermalSpectralElement(TabularSpectralElement):
@@ -2170,7 +2170,7 @@ class Box(SpectralElement):
 
         self.name='Box at %g (%g wide)' % (center,width)
         nwaves = int(((upper - lower) / step)) + 2
-        self._wavetable = N.zeros(shape=[nwaves,], dtype=N.float64)
+        self._wavetable = np.zeros(shape=[nwaves,], dtype=np.float64)
 
         for i in range(nwaves):
             self._wavetable[i] = lower + step * i
@@ -2178,8 +2178,8 @@ class Box(SpectralElement):
         self._wavetable[0]  = self._wavetable[1]  - step
         self._wavetable[-1] = self._wavetable[-2] + step
 
-        self._throughputtable = N.ones(shape=self._wavetable.shape, \
-                                        dtype=N.float64)
+        self._throughputtable = np.ones(shape=self._wavetable.shape, \
+                                        dtype=np.float64)
         self._throughputtable[0]  = 0.0
         self._throughputtable[-1] = 0.0
 

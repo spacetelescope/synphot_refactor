@@ -9,7 +9,7 @@ set for a given obsmode.
 """
 
 import re
-import numpy as N
+import numpy as np
 import locations
 
 
@@ -66,7 +66,7 @@ class Wavetable(object):
                 raise KeyError("%s not found in %s; candidates:%s"%(setkey,self.file,str(candidates)))
 
             elif len(candidates) > 1:
-                setlens=N.array([len(k) for k in candidates])
+                setlens=np.array([len(k) for k in candidates])
                 srtlen=setlens.argsort()
                 k,j=srtlen[-2:]
                 if setlens[k] == setlens[j]:
