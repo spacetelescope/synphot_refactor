@@ -29,12 +29,12 @@ import refs
 import units
 import locations
 import planck
-import pysynphot.exceptions as exceptions #custom pysyn exceptions
+import pysynphot.exceptions as exceptions  # custom pysyn exceptions
 
 from pysynphot import __version__
 try :
     from pysynphot import __svn_revision__
-except ImportError :
+except ImportError:
     __svn_revision__ = 'unk'
 
 # Renormalization constants from synphot:
@@ -42,7 +42,7 @@ PI = 3.14159265               # Mysterious math constant
 RSUN = 6.9599E10              # Radius of sun
 PC = 3.085678E18              # Parsec
 RADIAN = RSUN / PC /1000.
-RENORM = PI * RADIAN * RADIAN # Normalize to 1 solar radius @ 1 kpc
+RENORM = PI * RADIAN * RADIAN  # Normalize to 1 solar radius @ 1 kpc
 
 # MergeWaveSets "too close together" constant
 MERGETHRESH = 1.e-12
@@ -50,12 +50,15 @@ MERGETHRESH = 1.e-12
 #Single-precision epsilon value, taken from the synphot FAQ.
 #This is the minimum separation in wavelength value necessary for
 #synphot to read the entries as distinct single-precision numbers.
-syn_epsilon=0.00032
+syn_epsilon = 0.00032
 
 
 def MergeWaveSets(waveset1, waveset2):
-    """Return the union of the two wavesets, unless one or
-    both of them is None."""
+    """
+    Return the union of the two wavesets, unless one or
+    both of them is None.
+
+    """
     if waveset1 is None and waveset2 is not None:
         MergedWaveSet = waveset2
     elif waveset2 is None and waveset1 is not None:
@@ -87,8 +90,10 @@ def MergeWaveSets(waveset1, waveset2):
 
 
 def trimSpectrum(sp, minw, maxw):
-    ''' Creates a new spectrum with trimmed upper and lower ranges.
-    '''
+    """
+    Creates a new spectrum with trimmed upper and lower ranges.
+
+    """
     wave = sp.GetWaveSet()
     flux = sp(wave)
 
@@ -110,9 +115,11 @@ def trimSpectrum(sp, minw, maxw):
 
 
 class Integrator(object):
-    ''' Integrator engine.
-    '''
-    def trapezoidIntegration(self,x,y):
+    """
+    Integrator engine.
+
+    """
+    def trapezoidIntegration(self, x, y):
         npoints = x.size
         if npoints > 0:
             indices = np.arange(npoints)[:-1]
@@ -120,113 +127,147 @@ class Integrator(object):
             integrand = 0.5*(y[indices+1] + y[indices])*deltas
             sum = integrand.sum()
             if x[-1]<x[0]:
-                sum*= -1.0
+                sum *= -1.0
             return sum
         else:
             return 0.0
 
     def _columnsFromASCII(self, filename):
-        """ Following synphot/TABLES, ASCII files may contain blank lines,
+        """
+        Following synphot/TABLES, ASCII files may contain blank lines,
         comment lines (beginning with '#'), or terminal comments. This routine
         may be called by both Spectrum and SpectralElement objects to extract
-        the first two columns from a file."""
+        the first two columns from a file.
 
-        wlist=[]
-        flist=[]
-        lcount=0
-        fs = open(filename,mode='r')
-        lines=fs.readlines()
+        """
+
+        wlist = []
+        flist = []
+        lcount = 0
+        fs = open(filename, mode='r')
+        lines = fs.readlines()
         fs.close()
         for line in lines:
-            lcount+=1
-            cline=line.strip()
-            if ((len(cline) > 0) and (not cline.startswith('#'))):
+            lcount += 1
+            cline = line.strip()
+            if len(cline) > 0 and not cline.startswith('#'):
                 try:
-                    cols=cline.split()
+                    cols = cline.split()
                     if len(cols) >= 2:
                         wlist.append(float(cols[0]))
                         flist.append(float(cols[1]))
-                except Exception, e:
-                    raise exceptions.BadRow("Error reading %s: %s"%(filename,str(e)),rows=lcount)
-
+                except Exception as e:
+                    raise exceptions.BadRow("Error reading %s: %s" % (filename,
+                                            str(e)),
+                                            rows=lcount
+                                            )
         return wlist, flist
 
     def validate_wavetable(self):
-        "Enforce monotonic, ascending wavelengths with no zero values"
+        """
+        Enforce monotonic, ascending wavelengths with no zero values
+
+        """
         #First check for invalid values
-        wave=self._wavetable
+        wave = self._wavetable
         if np.any(wave <= 0):
             wrong=np.where(wave <= 0)[0]
-            raise exceptions.ZeroWavelength('Negative or Zero wavelength occurs in wavelength array', rows=wrong)
-
-
+            raise exceptions.ZeroWavelength('Negative or Zero wavelength '
+                                            'occurs in wavelength array',
+                                            rows=wrong
+                                            )
 
         #Now check for monotonicity & enforce ascending
-        sorted=np.sort(wave)
+        sorted = np.sort(wave)
         if not np.alltrue(sorted == wave):
             if np.alltrue(sorted[::-1] == wave):
                 #monotonic descending is allowed
                 pass
             else:
                 wrong = np.where(sorted != wave)[0]
-                raise exceptions.UnsortedWavelength('Wavelength array is not monotonic', rows=wrong)
-
+                raise exceptions.UnsortedWavelength('Wavelength array is not '
+                                                    'monotonic', rows=wrong
+                                                    )
         #Check for duplicate values
-        dw=sorted[1:]-sorted[:-1]
+        dw = sorted[1:]-sorted[:-1]
         if np.any(dw==0):
-            wrong=np.where(dw==0)[0]
-            raise exceptions.DuplicateWavelength("Wavelength array contains duplicate entries",rows=wrong)
+            wrong = np.where(dw==0)[0]
+            raise exceptions.DuplicateWavelength("Wavelength array contains "
+                                                 "duplicate entries",
+                                                 rows=wrong
+                                                )
 
     def validate_fluxtable(self):
-        "Enforce non-negative fluxes"
-        if ((not self.fluxunits.isMag) #neg. magnitudes are legal
-            and (self._fluxtable.min() < 0)):
+        """
+        Enforce non-negative fluxes
+
+        """
+        if not self.fluxunits.isMag and self._fluxtable.min() < 0:
+            # neg. magnitudes are legal
             idx=np.where(self._fluxtable < 0)
             self._fluxtable[idx]=0.0
-            print "Warning, %d of %d bins contained negative fluxes; they have been set to zero."%(len(idx[0]),len(self._fluxtable))
+            print "Warning, %d of %d bins contained negative fluxes; " \
+                  "they have been set to zero." % \
+                  (len(idx[0]), len(self._fluxtable))
 
 
 class SourceSpectrum(Integrator):
-    '''Base class for the Source Spectrum object.
-    '''
+    """
+    Base class for the Source Spectrum object.
+
+    """
+
+    wave = property(_getWaveProp, doc="Wavelength property")
+    flux = property(_getFluxProp, doc="Flux property")
 
     def __add__(self, other):
-        '''Source Spectra can be added.  Delegate the work to the
+        """
+        Source Spectra can be added.  Delegate the work to the
         CompositeSourceSpectrum class.
-        '''
+
+        """
         if not isinstance(other, SourceSpectrum):
             raise TypeError("Can only add two SourceSpectrum objects")
 
         return CompositeSourceSpectrum(self, other, 'add')
 
     def __sub__(self, other):
-        """ Source Spectra can be subtracted, which is just another way
-        of adding."""
+        """
+        Source Spectra can be subtracted, which is just another way
+        of adding.
+
+        """
 
         return self.__add__(-1.0*other)
 
     def __mul__(self, other):
-        '''Source Spectra can be multiplied, by constants or by
+        """
+        Source Spectra can be multiplied, by constants or by
         SpectralElement objects.
-        '''
-        #Multiplying by numeric constants is allowed
-        if isinstance(other, (int, float) ):
+
+        """
+        # Multiplying by numeric constants is allowed
+        if isinstance(other, (int, float)):
             other = UniformTransmission(other)
         #so is by SpectralElements. Otherwise, raise an exception.
         if not isinstance(other, SpectralElement):
-            raise TypeError("SourceSpectrum objects can only be multiplied by SpectralElement objects or constants; %s type detected"%type(other))
+            raise TypeError("SourceSpectrum objects can only be multiplied "
+                            "by SpectralElement objects or constants; "
+                            "%s type detected" % type(other))
 
 
-        ## Delegate the work of multiplying to CompositeSourceSpectrum
-
+        # Delegate the work of multiplying to CompositeSourceSpectrum
         return CompositeSourceSpectrum(self, other, 'multiply')
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
-    def addmag(self,magval):
-        """Adding a magnitude is like multiplying a flux. Only works for
-        numbers -- not arrays, spectrum objects, etc"""
+    def addmag(self, magval):
+        """
+        Adding a magnitude is like multiplying a flux. Only works for
+        numbers -- not arrays, spectrum objects, etc
+
+        """
         if np.isscalar(magval):
             factor = 10**(-0.4*magval)
             return self*factor
@@ -234,9 +275,11 @@ class SourceSpectrum(Integrator):
             raise TypeError(".addmag() only takes a constant scalar argument")
 
     def getArrays(self):
-        '''Returns wavelength and flux arrays as a tuple, performing
-           units conversion.
-        '''
+        """
+        Returns wavelength and flux arrays as a tuple, performing
+        units conversion.
+
+        """
         if hasattr(self, 'primary_area'):
             area = self.primary_area
         else:
@@ -245,34 +288,34 @@ class SourceSpectrum(Integrator):
         wave = self.GetWaveSet()
         flux = self(wave)
 
-        flux = units.Photlam().Convert(wave, flux,
-                                        self.fluxunits.name, area=area)
+        flux = units.Photlam().Convert(wave, flux, self.fluxunits.name,
+                                       area=area)
         wave = units.Angstrom().Convert(wave, self.waveunits.name)
-
         return wave, flux
 
-    #Define properties for consistent UI
+    # Define properties for consistent UI
     def _getWaveProp(self):
-        wave,flux=self.getArrays()
+        wave, flux = self.getArrays()
         return wave
 
     def _getFluxProp(self):
-        wave,flux=self.getArrays()
+        wave,flux = self.getArrays()
         return flux
 
-    wave=property(_getWaveProp, doc="Wavelength property")
-    flux=property(_getFluxProp, doc="Flux property")
-
     def validate_units(self):
-        "Ensure that waveunits are WaveUnits and fluxunits are FluxUnits"
-        if (not isinstance(self.waveunits,units.WaveUnits)):
-            raise TypeError("%s is not a valid WaveUnit"%self.waveunits)
-        if (not isinstance(self.fluxunits,units.FluxUnits)):
-            raise TypeError("%s is not a valid FluxUnit"%self.fluxunits)
+        """
+        Ensure that waveunits are WaveUnits and fluxunits are FluxUnits
+
+        """
+        if not isinstance(self.waveunits, units.WaveUnits):
+            raise TypeError("%s is not a valid WaveUnit" % self.waveunits)
+        if not isinstance(self.fluxunits,units.FluxUnits):
+            raise TypeError("%s is not a valid FluxUnit" % self.fluxunits)
 
     def writefits(self, filename, clobber=True, trimzero=True,
-                  binned=False,precision=None,hkeys=None):
-        """Write the spectrum to a FITS file.
+                  binned=False, precision=None, hkeys=None):
+        """
+        Write the spectrum to a FITS file.
 
         Parameters
         ----------
@@ -291,11 +334,11 @@ class SourceSpectrum(Integrator):
 
         """
 
-        pcodes={'d':'D','s':'E'}
         if precision is None:
-            precision=self.flux.dtype.char
-        _precision=precision.lower()[0]
-        pcodes={'d':'D','s':'E','f':'E'}
+            precision = self.flux.dtype.char
+        _precision = precision.lower()[0]
+
+        pcodes = {'d': 'D', 's': 'E', 'f': 'E'}
 
         if clobber:
             try:
@@ -304,34 +347,33 @@ class SourceSpectrum(Integrator):
                 pass
 
         if binned:
-            wave=self.binwave
-            flux=self.binflux
+            wave = self.binwave
+            flux = self.binflux
         else:
-            wave=self.wave
-            flux=self.flux
+            wave = self.wave
+            flux = self.flux
 
-        #Add a check for single/double precision clash, so
-        #that if written out in single precision, the wavelength table
-        #will still be sorted with no duplicates
-        #The value of epsilon is taken from the Synphot FAQ.
+        # Add a check for single/double precision clash, so
+        # that if written out in single precision, the wavelength table
+        # will still be sorted with no duplicates
+        # The value of epsilon is taken from the Synphot FAQ.
 
         if wave.dtype == np.float64 and _precision == 's':
-            idx=np.where(abs(wave[1:]-wave[:-1]) > syn_epsilon)
+            idx = np.where(abs(wave[1:]-wave[:-1]) > syn_epsilon)
         else:
-            idx=np.where(wave) #=> idx=[:]
+            idx = np.where(wave)  # => idx=[:]
 
-        wave=wave[idx]
-        flux=flux[idx]
+        wave = wave[idx]
+        flux = flux[idx]
 
-        first,last=0,len(flux)
-
+        first, last = 0, len(flux)
 
         if trimzero:
-            #Keep one zero at each end
+            # Keep one zero at each end
             nz = flux.nonzero()[0]
             try:
-                first=max(nz[0]-1,first)
-                last=min(nz[-1]+2,last)
+                first = max(nz[0]-1, first)
+                last = min(nz[-1]+2, last)
             except IndexError:
                 pass
 
@@ -345,63 +387,63 @@ class SourceSpectrum(Integrator):
                            unit=self.fluxunits.name,
                            format=pcodes[_precision])
 
-        #Make the primary header
+        # Make the primary header
         hdu = pyfits.PrimaryHDU()
         hdulist = pyfits.HDUList([hdu])
 
-        #User-provided keys are written to the primary header
-        #so are filename and origin
-        bkeys = dict(filename=(os.path.basename(filename),'name of file'),
+        # User-provided keys are written to the primary header
+        # so are filename and origin
+        bkeys = dict(filename=(os.path.basename(filename), 'name of file'),
                      origin=('pysynphot',
-                             'Version (%s, %s)'%(__version__,__svn_revision__)))
-        #User-values if present may override default values
+                             'Version (%s, %s)' % (__version__,
+                                                   __svn_revision__)))
+
+        # User-values if present may override default values
         if hkeys is not None:
             bkeys.update(hkeys)
 
-        #Now update the primary header
-        for key,val in bkeys.items():
+        # Now update the primary header
+        for key, val in bkeys.items():
             hdu.header.update(key, *val)
 
-
-        #Make the extension HDU
+        # Make the extension HDU
         cols = pyfits.ColDefs([cw, cf])
         hdu = pyfits.new_table(cols)
 
-        #There are some standard keywords that should be added
-        #to the extension header.
-        bkeys=dict(expr    =(str(self),'pysyn expression'),
-                   tdisp1  =('G15.7',),
-                   tdisp2  =('G15.7',)
-                   )
-
+        # There are some standard keywords that should be added
+        # to the extension header.
+        bkeys = dict(expr=(str(self), 'pysyn expression'), tdisp1 = ('G15.7', ),
+                     tdisp2 = ('G15.7',)
+                    )
 
         try:
-            bkeys['grftable']=(self.bandpass.obsmode.gtname,)
-            bkeys['cmptable']=(self.bandpass.obsmode.ctname,)
-        except AttributeError:
-            pass #Not all spectra have these
+            bkeys['grftable'] = (self.bandpass.obsmode.gtname,)
+            bkeys['cmptable'] = (self.bandpass.obsmode.ctname,)
+        except AttributeError as e:
+            pass  # Not all spectra have these
 
-        for key,val in bkeys.items():
-            hdu.header.update(key,*val)
+        for key, val in bkeys.items():
+            hdu.header.update(key, *val)
 
-        #Add the header to the list, and write the file
+        # Add the header to the list, and write the file
         hdulist.append(hdu)
         hdulist.writeto(filename)
 
-
-    def integrate(self,fluxunits='photlam'):
-        #Extract the flux in the desired units
-        u=self.fluxunits
+    def integrate(self, fluxunits='photlam'):
+        # Extract the flux in the desired units
+        u = self.fluxunits
         self.convert(fluxunits)
-        wave,flux=self.getArrays()
+        wave, flux = self.getArrays()
         self.convert(u)
         #then do the integration
-        return self.trapezoidIntegration(wave,flux)
+        return self.trapezoidIntegration(wave, flux)
 
+    def sample(self, wave, interp=True):
+        """
+        Return a flux array, in self.fluxunits, on the provided
+        wavetable
 
-    def sample(self,wave, interp=True):
-        """Return a flux array, in self.fluxunits, on the provided
-        wavetable"""
+        """
 
         if interp:
             # convert input wavelengths to Angstroms since the __call__ method
