@@ -25,6 +25,7 @@ if not os.path.isdir(specdir):
     pardir = os.path.join(os.path.dirname(__file__), os.pardir)
     specdir = os.path.join(pardir, 'data')
     setup_py = os.path.join(pardir, 'setup.py')
+
     # Ensure that we're actually in the source tree
     if not os.path.exists(specdir) or not os.path.exists(setup_py):
         # It's possible when running ./setup.py nosetests that we're running
@@ -33,6 +34,7 @@ if not os.path.isdir(specdir):
         pardir = os.path.join(pardir, os.pardir, os.pardir)
         specdir = os.path.join(pardir, 'data')
         setup_py = os.path.join(pardir, 'setup.py')
+
         if not os.path.exists(specdir) or not os.path.exists(setup_py):
             raise RuntimeError('pysynphot data directory missing!')
     del pardir
@@ -40,9 +42,10 @@ if not os.path.isdir(specdir):
 
 specdir = os.path.abspath(specdir) + os.sep
 
-
 # Map of filenames to their actual path
 _data_map = None
+
+
 def get_data_filename(filename):
     global _data_map
 
@@ -58,6 +61,7 @@ def get_data_filename(filename):
 #Eliminate use of temporary directory; use python tmpfile utilities instead
 CAT_TEMPLATE = os.path.join(rootdir, 'grid', '*', 'catalog.fits')
 KUR_TEMPLATE = os.path.join(rootdir, 'grid', '*')
+
 
 #Vega
 VegaFile = get_data_filename('alpha_lyr_stis_005.fits')
@@ -93,11 +97,12 @@ def _refTable(template):
     try:
         return names[-1]
     except IndexError:
-        msg= "No files found for %s." % os.path.join(os.environ['PYSYN_CDBS'],
-                                                     template)
+        msg = "No files found for %s." % os.path.join(os.environ['PYSYN_CDBS'],
+                                                      template)
         raise IOError(msg)
 
 RedLaws = {}
+
 
 def _get_RedLaws():
     global RedLaws
@@ -121,7 +126,7 @@ def _get_RedLaws():
     for f in files:
         lawf = _refTable(f)
 
-        key = pyfits.getval(lawf,'shortnm')
+        key = pyfits.getval(lawf, 'shortnm')
 
         RedLaws[key.lower()] = lawf
 
@@ -137,58 +142,55 @@ _get_RedLaws()
 #............more robust
 #BUG: this dictionary should be in a data file
 CONVERTDICT = {'crrefer':rootdir,
-              'crotacomp':os.path.join(rootdir,'comp','ota'),
-              'cracscomp':os.path.join(rootdir,'comp','acs'),
-              'crcalobs':os.path.join(rootdir,'calobs'),
-              'crcalspec':os.path.join(rootdir,'calspec'),
-              'croldcalspec':os.path.join(rootdir,'oldcalspec'),
-              'crcomp':os.path.join(rootdir,'comp'),
-              'crfgs':os.path.join(rootdir,'fgs'),
-              'crfields':os.path.join(rootdir,'fields'),
-              'crmodewave':os.path.join(rootdir,'modewave'),
-              'crcostarcomp':os.path.join(rootdir,'comp','costar'),
-              'cracscomp':os.path.join(rootdir,'comp','acs'),
-              'crfoccomp':os.path.join(rootdir,'comp','foc'),
-              'crfoscomp':os.path.join(rootdir,'comp','fos'),
-              'crfgscomp':os.path.join(rootdir,'comp','fgs'),
-              'crhrscomp':os.path.join(rootdir,'comp','hrs'),
-              'crhspcomp':os.path.join(rootdir,'comp','hsp'),
-              'crotacomp':os.path.join(rootdir,'comp','ota'),
-              'crnicmoscomp':os.path.join(rootdir,'comp','nicmos'),
-              'crnonhstcomp':os.path.join(rootdir,'comp','nonhst'),
-              'crstiscomp':os.path.join(rootdir,'comp','stis'),
-              'crstiscomp':os.path.join(rootdir,'comp','stis'),
-              'crwfc3comp':os.path.join(rootdir,'comp','wfc3'),
-              'crcoscomp':os.path.join(rootdir,'comp','cos'),
-              'coscomp':os.path.join(rootdir,'comp','cos'),
-              'crwave':os.path.join(rootdir,'crwave'),
-              'crwfpccomp':os.path.join(rootdir,'comp','wfpc'),
-              'crwfpc2comp':os.path.join(rootdir,'comp','wfpc2'),
-              'crgrid':os.path.join(rootdir,'grid'),
-              'crgridbz77':os.path.join(rootdir,'grid','bz77'),
-              'crgridgs':os.path.join(rootdir,'grid','gunnstryker'),
-              'crgridjac':os.path.join(rootdir,'grid','jacobi'),
-              'crgridbpgs':os.path.join(rootdir,'grid','bpgs'),
-              'crgridbk':os.path.join(rootdir,'grid','bkmodels'),
-              'crgridk93':os.path.join(rootdir,'grid','k93models'),
-              'crgridagn':os.path.join(rootdir,'grid','agn'),
-              'crgridgalactic':os.path.join(rootdir,'grid','galactic'),
-              'crgridkc96':os.path.join(rootdir,'grid','kc96'),
-              'mtab':os.path.join(rootdir,'mtab'),
+              'crotacomp': os.path.join(rootdir, 'comp', 'ota'),
+              'cracscomp': os.path.join(rootdir, 'comp', 'acs'),
+              'crcalobs': os.path.join(rootdir, 'calobs'),
+              'crcalspec': os.path.join(rootdir, 'calspec'),
+              'croldcalspec': os.path.join(rootdir, 'oldcalspec'),
+              'crcomp': os.path.join(rootdir, 'comp'),
+              'crfgs': os.path.join(rootdir, 'fgs'),
+              'crfields': os.path.join(rootdir, 'fields'),
+              'crmodewave': os.path.join(rootdir, 'modewave'),
+              'crcostarcomp': os.path.join(rootdir, 'comp', 'costar'),
+              'crfoccomp': os.path.join(rootdir, 'comp', 'foc'),
+              'crfoscomp': os.path.join(rootdir, 'comp', 'fos'),
+              'crfgscomp': os.path.join(rootdir, 'comp', 'fgs'),
+              'crhrscomp': os.path.join(rootdir, 'comp', 'hrs'),
+              'crhspcomp': os.path.join(rootdir, 'comp', 'hsp'),
+              'crnicmoscomp': os.path.join(rootdir, 'comp', 'nicmos'),
+              'crnonhstcomp': os.path.join(rootdir, 'comp', 'nonhst'),
+              'crstiscomp': os.path.join(rootdir, 'comp', 'stis'),
+              'crwfc3comp': os.path.join(rootdir, 'comp', 'wfc3'),
+              'crcoscomp': os.path.join(rootdir, 'comp', 'cos'),
+              'coscomp': os.path.join(rootdir, 'comp', 'cos'),
+              'crwave': os.path.join(rootdir, 'crwave'),
+              'crwfpccomp': os.path.join(rootdir, 'comp', 'wfpc'),
+              'crwfpc2comp': os.path.join(rootdir, 'comp', 'wfpc2'),
+              'crgrid': os.path.join(rootdir, 'grid'),
+              'crgridbz77': os.path.join(rootdir, 'grid', 'bz77'),
+              'crgridgs': os.path.join(rootdir, 'grid', 'gunnstryker'),
+              'crgridjac': os.path.join(rootdir, 'grid', 'jacobi'),
+              'crgridbpgs': os.path.join(rootdir, 'grid', 'bpgs'),
+              'crgridbk': os.path.join(rootdir, 'grid', 'bkmodels'),
+              'crgridk93': os.path.join(rootdir, 'grid', 'k93models'),
+              'crgridagn': os.path.join(rootdir, 'grid', 'agn'),
+              'crgridgalactic': os.path.join(rootdir, 'grid', 'galactic'),
+              'crgridkc96': os.path.join(rootdir, 'grid', 'kc96'),
+              'mtab': os.path.join(rootdir, 'mtab'),
               'synphot': os.path.dirname(__file__) + os.path.sep,
               # PATH for JWST instrument files
-              'crjwstotecomp':os.path.join(rootdir,'comp','jwstote'),
+              'crjwstotecomp':os.path.join(rootdir, 'comp', 'jwstote'),
               # PATH for JWST MIRI instrument files
-              'crmiricomp':os.path.join(rootdir,'comp','miri'),
+              'crmiricomp':os.path.join(rootdir, 'comp', 'miri'),
               # PATH for JWST NIRCam instrument files
-              'crnircamcomp':os.path.join(rootdir,'comp','nircam'),
+              'crnircamcomp':os.path.join(rootdir, 'comp', 'nircam'),
               # PATH for JWST NIRSpec instrument files
-              'crnirspeccomp':os.path.join(rootdir,'comp','nirspec'),
-              }
+              'crnirspeccomp':os.path.join(rootdir, 'comp', 'nirspec'), }
 
 
 def irafconvert(iraffilename):
-    '''Convert the IRAF file name (in directory$file format) to its
+    """
+    Convert the IRAF file name (in directory$file format) to its
     unix equivalent
 
     Parameters
@@ -200,23 +202,24 @@ def irafconvert(iraffilename):
     Output:   string unixfilename
           If '$' not found in the input string, just return
           the input string
-          Non-string input raises an AttributeError'''
+          Non-string input raises an AttributeError
+    """
 
     convertdict = CONVERTDICT
 
     # remove duplicate separators and extraneous relative paths
     iraffilename = os.path.normpath(iraffilename)
 
-    #BUG: supports environment variables only as the leading element in the
+    # BUG: supports environment variables only as the leading element in the
     #     filename
     if iraffilename.startswith('$'):
-        #Then this is an environment variable.
-        #Use a regex to pull off the front piece.
+        # Then this is an environment variable.
+        # Use a regex to pull off the front piece.
         pat = re.compile('\$(\w*)')
-        match = re.match(pat,iraffilename)
+        match = re.match(pat, iraffilename)
         dirname = match.group(1)
         unixdir = os.environ[dirname]
-        basename = iraffilename[match.end()+1:] #1 to omit leading slash
+        basename = iraffilename[match.end()+1:]  # 1 to omit leading slash
         unixfilename = os.path.join(unixdir, basename)
         return unixfilename
     elif '$' in iraffilename:
