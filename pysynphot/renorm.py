@@ -1,13 +1,12 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from __future__ import division
-
 """
 Segregate all the renormalization functions here. Once we have
 one that works, turn it into a method on the spectrum class.
 
 """
 
+from __future__ import division
 import math
 import numpy as np
 from .spectrum import FlatSpectrum, Vega

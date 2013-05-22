@@ -1,7 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from __future__ import division
-
 #  Copyright (c) 1998-2000 John Aycock
 #
 #  Permission is hereby granted, free of charge, to any person obtaining
@@ -23,10 +21,11 @@ from __future__ import division
 #  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-__version__ = 'SPARK-0.6.1'
-
+from __future__ import division
 import re
 import string
+
+__version__ = 'SPARK-0.6.1'
 
 
 def _namelist(instance):
@@ -453,6 +452,7 @@ class GenericASTBuilder(GenericParser):
 #  of a subtree, call the prune() method -- this only makes sense for a
 #  preorder traversal.  Node type is determined via the typestring() method.
 #
+
 
 class GenericASTTraversalPruningException:
     pass

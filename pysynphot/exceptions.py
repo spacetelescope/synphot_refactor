@@ -5,6 +5,7 @@ Custom exceptions for pysynphot to raise
 
 """
 
+from __future__ import division
 
 class PysynphotError(Exception):
     """

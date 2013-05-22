@@ -1,12 +1,12 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from __future__ import division
 """
 This module defines classes used to define reddening laws and
 extinctions.
 
 """
 
+from __future__ import division
 import pyfits
 from spectrum import ArraySpectralElement
 import Cache

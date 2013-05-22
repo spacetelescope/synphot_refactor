@@ -1,8 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 from __future__ import division
-## Automatically adapted for numpy.numarray Mar 05, 2007 by
-
 import numpy as np
 
 

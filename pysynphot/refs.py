@@ -1,5 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+from __future__ import division
 import os.path
 import warnings
 import numpy as np
@@ -17,6 +18,7 @@ THERMTABLE = ''
 THERMDICT = {}
 
 PRIMARY_AREA = 45238.93416  # cm^2 - default to HST mirror
+
 
 def set_default_waveset(minwave=500, maxwave=26000, num=10000.,
                         delta=None, log=True):

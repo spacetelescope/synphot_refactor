@@ -1,6 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from __future__ import division
 """
 The ObsBandpass user interface needs to support either the usual
 (acs,hrc,f555w) obsmode style that produce a set of chained throughput
@@ -10,6 +9,7 @@ ObsModeBandpass (ack, terrible name) or a TabularSpectralElement.
 
 """
 
+from __future__ import division
 import numpy as np
 
 from observationmode import ObservationMode

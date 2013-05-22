@@ -1,7 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from __future__ import division
-
 """
 Module: spectrum.py
 
@@ -16,6 +14,8 @@ pyfits, numpy
 
 
 """
+
+from __future__ import division
 
 import re
 import os
@@ -70,9 +70,9 @@ def MergeWaveSets(waveset1, waveset2):
 
         # The merged wave sets may sometimes contain numbers which are nearly
         # equal but differ at levels as small as 1e-14. Having values this
-        # close together can cause problems down the line so here we test whether
-        # any such small differences are present, with a small difference
-        # defined as less than MERGETHRESH.
+        # close together can cause problems down the line so here we test
+        # whether any such small differences are present, with a small
+        # difference defined as less than MERGETHRESH.
         #
         # If small differences are present we make a copy of the union'ed array
         # with the lower of the close together pairs removed.

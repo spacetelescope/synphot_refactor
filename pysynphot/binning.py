@@ -1,11 +1,11 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from __future__ import division
 """
 Utilities related to wavelength bin calculations.
 
 """
 
+from __future__ import division
 import numpy as np
 
 
