@@ -7,9 +7,13 @@ Custom exceptions for pysynphot to raise
 
 
 class PysynphotError(Exception):
-    """parent class"""
-    def __init__(self,msg):
-        Exception.__init__(self,msg)
+    """
+    parent class
+
+    """
+    def __init__(self, msg):
+        Exception.__init__(self, msg)
+
 
 # Exceptions to do with table access
 class TableFormatError(PysynphotError):
@@ -27,9 +31,11 @@ class TableFormatError(PysynphotError):
 
         self.args = tuple(args)
         self.message = self.args
-        
+
+
 class DuplicateWavelength(TableFormatError):
     pass
+
 
 class ZeroWavelength(TableFormatError):
     pass
@@ -37,6 +43,7 @@ class ZeroWavelength(TableFormatError):
 
 class UnsortedWavelength(TableFormatError):
     pass
+
 
 class BadRow(TableFormatError):
     pass
@@ -46,21 +53,27 @@ class BadRow(TableFormatError):
 class OverlapError(PysynphotError):
     pass
 
+
 class PartialOverlap(OverlapError):
     pass
 
+
 class DisjointError(OverlapError):
     pass
+
 
 # Exceptions to do with graph table traversal
 class GraphtabError(PysynphotError):
     pass
 
+
 class UnusedKeyword(GraphtabError):
     pass
 
+
 class IncompleteObsmode(GraphtabError):
     pass
+
 
 class AmbiguousObsmode(GraphtabError):
     pass
@@ -69,13 +82,13 @@ class AmbiguousObsmode(GraphtabError):
 # Exceptions for undefined optional values
 class UndefinedBinset(PysynphotError):
     pass
-    
-    
+
+
 # Exceptions for interpolation/extrapolation
 class ExtrapolationNotAllowed(PysynphotError):
     pass
-    
-    
+
+
 # Exceptions for catalog problems
 class ParameterOutOfBounds(PysynphotError):
     pass

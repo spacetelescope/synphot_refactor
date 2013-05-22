@@ -17,8 +17,11 @@ import units
 
 
 def DefineStdSpectraForUnits():
-    """Adorn the units with the appropriate kind of spectrum for
-    renormalizing. This is done here to avoid circular imports."""
+    """
+    Adorn the units with the appropriate kind of spectrum for
+    renormalizing. This is done here to avoid circular imports.
+
+    """
 
     # Linear flux-density units
     units.Flam.StdSpectrum = FlatSpectrum(1, fluxunits='flam')
@@ -44,7 +47,10 @@ DefineStdSpectraForUnits()
 
 
 def StdRenorm(spectrum, band, RNval, RNunitstring, force=False):
-    """Another approach to renormalization"""
+    """
+    Another approach to renormalization
+
+    """
 
     # Validate the overlap
     if not force:
@@ -90,7 +96,6 @@ def StdRenorm(spectrum, band, RNval, RNunitstring, force=False):
         ratio = totalflux / up.integrate()
         dmag = RNval + 2.5 * math.log10(ratio)
         newsp = spectrum.addmag(dmag)
-
     #...or in linear flux units.
     else:
         const = RNval * (up.integrate() / totalflux)

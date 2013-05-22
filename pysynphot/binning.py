@@ -18,12 +18,12 @@ def calculate_bin_edges(centers):
 
     Parameters
     ----------
-    centers : array_like
+    centers: array_like
         Sequence of bin centers. Must be 1D and have at least two values.
 
     Returns
     -------
-    edges : ndarray
+    edges: ndarray
         Array of bin edges. Will be 1D and have one more value
         than `centers`.
 
@@ -40,7 +40,7 @@ def calculate_bin_edges(centers):
 
     edges[1:-1] = (centers[1:] + centers[:-1]) / 2.
 
-    #compute the first and last by making them symmetric
+    # compute the first and last by making them symmetric
     edges[0] = centers[0] - (edges[1] - centers[0])
     edges[-1] = centers[-1] + (centers[-1] - edges[-2])
 
@@ -53,12 +53,12 @@ def calculate_bin_widths(edges):
 
     Parameters
     ----------
-    edges : array_like
+    edges: array_like
         Sequence of bin edges. Must be 1D and have at least two values.
 
     Returns
     -------
-    widths : ndarray
+    widths: ndarray
         Array of bin widths. Will be 1D and have one less value than `edges`.
 
     """
@@ -79,12 +79,12 @@ def calculate_bin_centers(edges):
 
     Parameters
     ----------
-    edges : array_like
+    edges: array_like
         Sequence of bin edges. Must be 1D and have at least two values.
 
     Returns
     -------
-    centers : ndarray
+    centers: ndarray
         Array of bin centers. Will be 1D and have one less value than `edges`.
 
     """

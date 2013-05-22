@@ -428,7 +428,10 @@ def ptokens(tlist):
 
 
 def _handleIRAFName(name):
-    """Calls locations.irafconvert() to translate shell or iraf variables"""
+    """
+    Calls locations.irafconvert() to translate shell or iraf variables
+
+    """
 
     return locations.irafconvert(name)
 
