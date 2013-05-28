@@ -7,11 +7,11 @@ import spectrum
 import units
 import refs
 
-_seatonx = np.array([0.,  1.0, 1.1, 1.2, 1.3, 1.4, 1.5, \
-                                1.6, 1.7, 1.8, 1.9, 2.0, 2.1, \
+_seatonx = np.array([0.,  1.0, 1.1, 1.2, 1.3, 1.4, 1.5,
+                                1.6, 1.7, 1.8, 1.9, 2.0, 2.1,
                                 2.2, 2.3, 2.4, 2.5, 2.6, 2.7])
-_seatone = np.array([0., 1.36, 1.64, 1.84, 2.04, 2.24, 2.44, \
-                               2.66, 2.88, 3.14, 3.36, 3.56, 3.77, \
+_seatone = np.array([0., 1.36, 1.64, 1.84, 2.04, 2.24, 2.44,
+                               2.66, 2.88, 3.14, 3.36, 3.56, 3.77,
                                3.96, 4.15, 4.26, 4.40, 4.52, 4.64])
 
 _lmcx = np.array([0.00, 0.29, 0.45, 0.80, 1.11, 1.43, 1.83])
@@ -23,28 +23,29 @@ _lmce = np.array([0.00, 0.16, 0.38, 0.87, 1.50, 2.32, 3.1])
 #and the value of R =3.1 necessary to return A_lambda/E(B-V) as all the
 #other extinction functions do, were provided by Scott Friedman
 #-- see ticket # 63.
-_smcx = np.array([ 0.00,  0.29,  0.45,  0.80,  1.11,  1.43,  1.82,  \
-                         2.35,  2.70,  3.22,  3.34,  3.46,  3.60,  3.75,  \
-                         3.92,  4.09,  4.28,  4.50,  4.73,  5.00,  5.24,  \
-                         5.38,  5.52,  5.70,  5.88,  6.07,  6.27,  6.48,  \
+_smcx = np.array([ 0.00,  0.29,  0.45,  0.80,  1.11,  1.43,  1.82,
+                         2.35,  2.70,  3.22,  3.34,  3.46,  3.60,  3.75,
+                         3.92,  4.09,  4.28,  4.50,  4.73,  5.00,  5.24,
+                         5.38,  5.52,  5.70,  5.88,  6.07,  6.27,  6.48,
                          6.72,  6.98,  7.23,  7.52,  7.84, 10])
 
-_smce = np.array([-3.10, -2.94, -2.72, -2.23, -1.60, -0.78,  0.00,  \
-                         1.00,  1.67,  2.29,  2.65,  3.00,  3.15,  3.49,  \
-                         3.91,  4.24,  4.53,  5.30,  5.85,  6.38,  6.76,  \
-                         6.90,  7.17,  7.71,  8.01,  8.49,  9.06,  9.28,  \
+_smce = np.array([-3.10, -2.94, -2.72, -2.23, -1.60, -0.78,  0.00,
+                         1.00,  1.67,  2.29,  2.65,  3.00,  3.15,  3.49,
+                         3.91,  4.24,  4.53,  5.30,  5.85,  6.38,  6.76,
+                         6.90,  7.17,  7.71,  8.01,  8.49,  9.06,  9.28,
                          9.84, 10.80, 11.51, 12.52, 13.54, 20.64]) + 3.1
 
 
 def _buildDefaultWaveset():
     wave = refs._default_waveset.copy()[::10]
 
-    result = np.empty(shape=[wave.shape[0]+1,],dtype=np.float64)
+    result = np.empty(shape=[wave.shape[0]+1, ], dtype=np.float64)
 
     result[0:-1] = wave
     result[-1] = refs._default_waveset[-1]
 
     return 10000.0 / result     # convert to 1/micron
+
 
 def _interp(xdata, x, y):
     xx = xdata[::-1]     # xdata is arranged in descending order
@@ -52,28 +53,30 @@ def _interp(xdata, x, y):
     xind = np.clip(xind, 0, x.size-2)
     xfract = (xx - x[xind]) / (x[xind+1] - x[xind])
     xfract = np.clip(xfract, 0.0, 1.0)
-    result =  y[xind] + xfract * (y[xind+1] - y[xind])
+    result = y[xind] + xfract * (y[xind+1] - y[xind])
     return result[::-1]
+
 
 def _computeSeaton(x):
     result = _seatone[1] * x * x
 
     mask = np.where(x > 1.0, 1, 0) * np.where(x <= 2.7, 1, 0)
-    result = np.where(mask == 1, \
-             _interp(x, _seatonx, _seatone), result)
+    result = np.where(mask == 1, _interp(x, _seatonx, _seatone), result)
 
     mask = np.where(x > 2.7, 1, 0) * np.where(x <= 3.65, 1, 0)
-    result = np.where(mask == 1, \
-             1.56 + 1.048 * x + 1.01 / ((x-4.6)*(x-4.6) + 0.28), result)
+    result = np.where(mask == 1,
+                      1.56 + 1.048 * x + 1.01 / ((x-4.6)*(x-4.6) + 0.28),
+                      result)
 
     mask = np.where(x > 3.65, 1, 0) * np.where(x <= 7.14, 1, 0)
-    result = np.where(mask == 1, \
-             2.29 + 0.848 * x + 1.01 / ((x-4.6)*(x-4.6) + 0.28), result)
+    result = np.where(mask == 1,
+                      2.29 + 0.848 * x + 1.01 / ((x-4.6)*(x-4.6) + 0.28),
+                      result)
 
-    result = np.where(x > 7.14, \
-             16.17 + x * (-3.20 + 0.2975 * x), result)
+    result = np.where(x > 7.14, 16.17 + x * (-3.20 + 0.2975 * x), result)
 
     return result
+
 
 def _computeLMC(x):
     result = np.zeros(x.shape, dtype=np.float64)
@@ -82,19 +85,21 @@ def _computeLMC(x):
     result = np.where(mask == 1, _interp(x, _lmcx, _lmce), result)
 
     mask = np.where(x >= 1.83, 1, 0) * np.where(x <= 2.75, 1, 0)
-    result = np.where(mask == 1, \
-             3.1 + (2.04 + 0.094 * (x - 1.83)) * (x - 1.83), result)
+    result = np.where(mask == 1,
+                      3.1 + (2.04 + 0.094 * (x - 1.83)) * (x - 1.83), result)
 
     mask = np.where(x > 2.75, 1, 0)
-    result = np.where(mask == 1, \
-             3.1 - 0.236 + 0.462 * x + 0.105 * x * x + \
-             0.454 / ((x - 4.557)**2 + 0.293), result)
-
+    result = np.where(mask == 1,
+                      3.1 - 0.236 + 0.462 * x + 0.105 * x * x + 0.454 / (
+                          (x - 4.557)**2 + 0.293),
+                      result)
     return result
 
+
 def _computeSMC(x):
-    x1 = np.where (x > 10.0, 10.0, x)
+    x1 = np.where(x > 10.0, 10.0, x)
     return _interp(x1, _smcx, _smce)
+
 
 def _computeXgal(x):
     return 2.43 * ((0.011 * x - 0.198) * x + 1.509) * x
@@ -104,11 +109,10 @@ def _computeXgal(x):
 
 _waveset = _buildDefaultWaveset()
 
-_seaton  = _computeSeaton(_waveset)
-_lmc     = _computeLMC(_waveset)
-_smc     = _computeSMC(_waveset)
-_xgal    = _computeXgal(_waveset)
-
+_seaton = _computeSeaton(_waveset)
+_lmc = _computeLMC(_waveset)
+_smc = _computeSMC(_waveset)
+_xgal = _computeXgal(_waveset)
 
 
 class _ExtinctionLaw(object):
@@ -131,19 +135,22 @@ class Gal2(_ExtinctionLaw):
     citation = 'Savage & Mathis 1979 (ARA&A 17:73)'
     name = 'gal2'
     def __init__(self, extval):
-        raise NotImplementedError("Sorry, %s is not yet implemented" % self.name)
-    
+        raise NotImplementedError("Sorry, %s is not yet implemented" %
+                                  self.name)
+
+
 class Gal3(_ExtinctionLaw):
-    citation='Cardelli, Clayton & Mathis 1989 (ApJ 345:245)'
-    name='gal3'
+    citation = 'Cardelli, Clayton & Mathis 1989 (ApJ 345:245)'
+    name = 'gal3'
 
     def __init__(self, extval):
         raise NotImplementedError("Sorry, %s is not yet implemented" % self.name)
 
 
 class Smc(_ExtinctionLaw):
-    citation='Prevot et al.1984 (A&A 132:389)'
-    name='SMC'
+    citation = 'Prevot et al.1984 (A&A 132:389)'
+    name = 'SMC'
+
     def __init__(self, extval):
         global _smc
         self._wavetable = _waveset.copy()
@@ -151,8 +158,9 @@ class Smc(_ExtinctionLaw):
 
 
 class Lmc(_ExtinctionLaw):
-    citation='Howarth 1983 (MNRAS 203:301)'
-    name='LMC'
+    citation = 'Howarth 1983 (MNRAS 203:301)'
+    name = 'LMC'
+
     def __init__(self, extval):
         self.name = 'LMC'
         global _lmc
@@ -162,7 +170,7 @@ class Lmc(_ExtinctionLaw):
 
 class Xgal(_ExtinctionLaw):
     citation = 'Calzetti, Kinney and Storchi-Bergmann, 1994 (ApJ 429:582)'
-    name='XGAL'
+    name = 'XGAL'
     def __init__(self, extval):
         global _xgal
         self._wavetable = _waveset.copy()
@@ -176,21 +184,29 @@ reddeningClasses = {'gal1': Gal1,
                     'lmc':  Lmc,
                     'xgal': Xgal}
 
+
 def factory(redlaw, *args, **kwargs):
     return apply(reddeningClasses[string.lower(redlaw)], args, kwargs)
 
+
 class DeprecatedExtinction(spectrum.SpectralElement):
-    """extinction = Extinction(extinction in magnitudes,
-    'gal1|smc|lmc reddening laws)"""
+    """
+    extinction = Extinction(extinction in magnitudes,
+    'gal1|smc|lmc reddening laws)
+
+    """
+
     def __init__(self, extval, redlaw):
-        ''' Extinction mimics as a spectral element.
-        '''
+        """
+        Extinction mimics as a spectral element.
+
+        """
         law = factory(redlaw, extval)
         self._wavetable = 10000.0 / law._wavetable
         self._throughputtable = law.transparencytable
-        self.name=law.name
-        self.citation=law.citation
-        self.waveunits=units.Units('angstrom')
-        self.isAnalytic=False
-        self.warnings={}
+        self.name = law.name
+        self.citation = law.citation
+        self.waveunits = units.Units('angstrom')
+        self.isAnalytic = False
+        self.warnings = {}
 

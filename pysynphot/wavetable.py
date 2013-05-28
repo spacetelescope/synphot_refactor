@@ -1,6 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from __future__ import division
 
 """
 This module handles the wavecat.dat table presently used by the
@@ -9,6 +8,7 @@ set for a given obsmode.
 
 """
 
+from __future__ import division
 import re
 import numpy as np
 import locations
