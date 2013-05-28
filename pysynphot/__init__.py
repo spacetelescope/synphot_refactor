@@ -110,7 +110,6 @@ from reddening import Extinction
 from observation import Observation
 #Other constructs
 from observationmode import ObservationMode as Obsmode
-from numpy import arange as Waveset
 #Get Vega
 from spectrum import Vega
 #Get cache
@@ -122,10 +121,13 @@ from locations import get_data_filename
 import tables
 
 def _test():
-    "Runs doctest on the examples in this file"
+    """
+    Runs doctest on the examples in this file
+
+    """
     import doctest
-    nfail,ntest=doctest.testfile('__init__.py')
-    return nfail,ntest
+    nfail, ntest = doctest.testfile('__init__.py')
+    return nfail, ntest
 
 if __name__ == '__main__':
-    nfail,ntest=_test()
+    nfail, ntest = _test()

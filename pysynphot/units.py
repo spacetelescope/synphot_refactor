@@ -6,7 +6,8 @@ unit conversions
 
 .. warning::
 
-  vegamag unit conversions require spectrum and locations modules => circular imports.
+  vegamag unit conversions require spectrum and locations modules => circular
+  imports.
 
 """
 
@@ -204,7 +205,7 @@ class Angstrom(WaveUnits):
 
     def ToAngstrom(self, wave):
         if hasattr(wave, 'copy'):
-            return wave.copy()  # to avoid writing over any internal wave objects
+            return wave.copy()  # to avoid writing over internal wave objects
         else:
             return wave         # probably a scalar
 

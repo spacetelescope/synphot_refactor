@@ -1,6 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from __future__ import division
 """
 This module is useful for working with catalog spectra such as Castelli & Kurucz.
 
@@ -20,6 +19,8 @@ http://www.stsci.edu/hst/HST_overview/documents/synphot/AppA_Catalogs.html#57
 
 """
 
+from __future__ import division
+
 import os
 import numpy as np
 import pyfits
@@ -31,6 +32,7 @@ from Cache import CATALOG_CACHE
 
 import pysynphot.exceptions as exceptions
 
+
 class Icat(spectrum.TabularSourceSpectrum):
     """
     This class constructs a model from the grid available in catalogs such
@@ -38,31 +40,33 @@ class Icat(spectrum.TabularSourceSpectrum):
     for more information at
     http://www.stsci.edu/hst/HST_overview/documents/synphot/AppA_Catalogs4.html#48115
 
-    spec = Icat(CDBS directory name,Teff,metallicity,logG).
+    spec = Icat(CDBS directory name, Teff, metallicity,logG).
 
     """
-    def __init__(self,catdir,Teff,metallicity,log_g):
+
+    def __init__(self, catdir, Teff, metallicity, log_g):
         """
         Parameters
         ----------
-        catdir : str
+        catdir: str
             name of directory holding the catalogs
-        Teff : float
+        Teff: float
             effective temperature of model
-        metallicity : float
+        metallicity: float
             metallicity of model
-        log_g : float
+        log_g: float
             log of gravity term for model
 
         """
-        self.isAnalytic=False
+        self.isAnalytic = False
 
         # this is useful for reporting in exceptions which parameter is
         # causing the problems.
-        self.parameter_names = ['Teff','metallicity','log G']
+        self.parameter_names = ['Teff', 'metallicity', 'log G']
 
-        filename = locations.CAT_TEMPLATE.replace('*',catdir)
-        self.name="%s(Teff=%g,z=%g,logG=%g)"%(catdir,Teff,metallicity,log_g)
+        filename = locations.CAT_TEMPLATE.replace('*', catdir)
+        self.name = "%s(Teff=%g,z=%g,logG=%g)" % \
+                    (catdir, Teff, metallicity, log_g)
 
         if filename in CATALOG_CACHE:
             indices = CATALOG_CACHE[filename]
@@ -78,20 +82,20 @@ class Icat(spectrum.TabularSourceSpectrum):
 
             CATALOG_CACHE[filename] = indices
 
-        list0,list1 = self._breakList(indices, 0, Teff)
+        list0, list1 = self._breakList(indices, 0, Teff)
 
-        list2,list3 = self._breakList(list0, 1, metallicity)
-        list4,list5 = self._breakList(list1, 1, metallicity)
+        list2, list3 = self._breakList(list0, 1, metallicity)
+        list4, list5 = self._breakList(list1, 1, metallicity)
 
-        list6,list7   = self._breakList(list2, 2, log_g)
-        list8,list9   = self._breakList(list3, 2, log_g)
-        list10,list11 = self._breakList(list4, 2, log_g)
-        list12,list13 = self._breakList(list5, 2, log_g)
+        list6, list7 = self._breakList(list2, 2, log_g)
+        list8, list9 = self._breakList(list3, 2, log_g)
+        list10, list11 = self._breakList(list4, 2, log_g)
+        list12, list13 = self._breakList(list5, 2, log_g)
 
-        sp1 = self._getSpectrum(list6[0],  catdir)
-        sp2 = self._getSpectrum(list7[0],  catdir)
-        sp3 = self._getSpectrum(list8[0],  catdir)
-        sp4 = self._getSpectrum(list9[0],  catdir)
+        sp1 = self._getSpectrum(list6[0], catdir)
+        sp2 = self._getSpectrum(list7[0], catdir)
+        sp3 = self._getSpectrum(list8[0], catdir)
+        sp4 = self._getSpectrum(list9[0], catdir)
         sp5 = self._getSpectrum(list10[0], catdir)
         sp6 = self._getSpectrum(list11[0], catdir)
         sp7 = self._getSpectrum(list12[0], catdir)
@@ -118,7 +122,7 @@ class Icat(spectrum.TabularSourceSpectrum):
     def _getArgs(self, indices, filenames):
         results = []
 
-        for i,index in enumerate(indices):
+        for i, index in enumerate(indices):
             list1 = [float(x) for x in index.split(',')]
             list1.append(filenames[i])
             results.append(list1)
@@ -152,7 +156,7 @@ class Icat(spectrum.TabularSourceSpectrum):
         upperList = []
         lowerList = []
 
-        for i,parameters in enumerate(inList):
+        for i, parameters in enumerate(inList):
             if array[i] >= par and array[i] <= upper:
                 upperList.append(parameters)
             if array[i] >= lower and array[i] <= par:
@@ -167,7 +171,8 @@ class Icat(spectrum.TabularSourceSpectrum):
         column = name.split('[')[1][:-1]
 
         filename = locations.KUR_TEMPLATE.replace('*',
-                                                  os.path.join(basename,filename))
+                                                  os.path.join(basename,
+                                                               filename))
         sp = spectrum.TabularSourceSpectrum(filename, fluxname=column)
 
         result = []

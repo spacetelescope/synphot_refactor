@@ -1,14 +1,12 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from __future__ import division
-
 """
 Objects that represent comp tables and graph tables.
 
 """
 
+from __future__ import division
 import numpy as np
-
 import pyfits
 
 #Flag to control verbosity
@@ -41,7 +39,8 @@ class CompTable(object):
         # does not work.
         if CFile is None:
             raise TypeError(
-                'initializing CompTable with CFile=None; possible bad/missing CDBS')
+                'initializing CompTable with CFile=None; possible bad/missing'
+                ' CDBS')
 
         cp = pyfits.open(CFile)
 
@@ -82,10 +81,12 @@ class GraphTable(object):
         """
 
         # None is common for various errors.
-        # the default value of None is not useful; pyfits.open(None) does not work.
+        # the default value of None is not useful;
+        # pyfits.open(None) does not work.
         if GFile is None:
             raise TypeError(
-                'initializing GraphTable with GFile=None; possible bad/missing CDBS')
+                'initializing GraphTable with GFile=None; '
+                'possible bad/missing CDBS')
 
         gp = pyfits.open(GFile)
 
@@ -230,7 +231,8 @@ class GraphTable(object):
                 count += 1
                 if count > 3:
                     if DEBUG:
-                        print "same outnode %d > 3 times: stop condition" % outnode
+                        print "same outnode %d > 3 times: stop condition" % \
+                              outnode
                     break
 
         if outnode < 0:

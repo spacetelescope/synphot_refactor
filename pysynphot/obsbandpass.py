@@ -1,6 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from __future__ import division
 """
 The ObsBandpass user interface needs to support either the usual
 (acs,hrc,f555w) obsmode style that produce a set of chained throughput
@@ -10,6 +9,7 @@ ObsModeBandpass (ack, terrible name) or a TabularSpectralElement.
 
 """
 
+from __future__ import division
 import numpy as np
 
 from observationmode import ObservationMode
@@ -17,43 +17,55 @@ from spectrum import CompositeSpectralElement, TabularSpectralElement
 import units
 import pysynphot.exceptions as exceptions
 
+
 def ObsBandpass(obstring, graphtable=None, comptable=None, component_dict={}):
-    """ Generate an ObsModeBandPass or TabularSpectralElement instance
+    """
+    Generate an ObsModeBandPass or TabularSpectralElement instance
 
     obsband = ObsBandpass(string specifying obsmode; for details
     see the Synphot Data User's Guide at
     http://www.stsci.edu/hst/HST_overview/documents/synphot/hst_synphotTOC.html
+
     """
 
-    ##Temporarily create an Obsmode to determine whether an
-    ##ObsModeBandpass or a TabularSpectralElement will be returned.
-    ob=ObservationMode(obstring,graphtable=graphtable,
-                       comptable=comptable,component_dict=component_dict)
+    # Temporarily create an Obsmode to determine whether an
+    # ObsModeBandpass or a TabularSpectralElement will be returned.
+    ob = ObservationMode(obstring,
+                         graphtable=graphtable,
+                         comptable=comptable,
+                         component_dict=component_dict)
     if len(ob) > 1:
         return ObsModeBandpass(ob)
     else:
         return TabularSpectralElement(ob.components[0].throughput_name)
 
-class ObsModeBandpass(CompositeSpectralElement):
-    """Bandpass instantiated from an obsmode string"""
 
-    def __init__(self,ob):
-        """Instantiate a COmpositeSpectralElement by means of an
+class ObsModeBandpass(CompositeSpectralElement):
+    """
+    Bandpass instantiated from an obsmode string
+
+    """
+
+    def __init__(self, ob):
+        """
+        Instantiate a COmpositeSpectralElement by means of an
         ObservationMode (which the caller must have already created from
-        an  obstring"""
+        an  obstring
+
+        """
 
         #Chain the individual components
-        chain=ob.components[0].throughput*ob.components[1].throughput
+        chain = ob.components[0].throughput*ob.components[1].throughput
 
-        for i in range(2,len(ob)-1):
+        for i in range(2, len(ob)-1):
             chain = chain*ob.components[i].throughput
 
-        CompositeSpectralElement.__init__(self,chain,
+        CompositeSpectralElement.__init__(self,
+                                          chain,
                                           ob.components[-1].throughput)
 
-
         self.obsmode = ob
-        self.name = self.obsmode._obsmode #str(self.obsmode)
+        self.name = self.obsmode._obsmode  # str(self.obsmode)
         self.primary_area = ob.primary_area
 
         #Check for valid bounds
@@ -62,39 +74,52 @@ class ObsModeBandpass(CompositeSpectralElement):
         try:
             self.binset = self.obsmode.bandWave()
         except AttributeError:
-            # this is to catch an error raised when the self.obsmode object does not
-            # have a binset attribute because of some problem with the obsmode
-            # used to instatiate it.
+            # this is to catch an error raised when the self.obsmode
+            # object does not have a binset attribute because of some
+            # problem with the obsmode used to instatiate it.
             pass
 
     def __str__(self):
-        """Defer to ObservationMode component """
-        return self.name #self.obsmode._obsmode
+        """
+        Defer to ObservationMode component
+
+        """
+        return self.name  # self.obsmode._obsmode
 
     def __len__(self):
-        """Defer to ObservationMode component """
+        """
+        Defer to ObservationMode component
+
+        """
         return len(self.obsmode)
 
     def showfiles(self):
-        """Defer to ObservationMode component """
+        """
+        Defer to ObservationMode component
+
+        """
         return self.obsmode.showfiles()
 
-
     def _checkbounds(self):
-        thru=self.throughput
+        thru = self.throughput
         if thru[0] != 0 or thru[-1] != 0:
-            print "Warning: throughput for this obsmode is not bounded by zeros. Endpoints: thru[0]=%g, thru[-1]=%g"%(thru[0],thru[-1])
+            print "Warning: throughput for this obsmode is not bounded by " \
+                  "zeros. Endpoints: thru[0]=%g, thru[-1]=%g" % \
+                  (thru[0], thru[-1])
 
     def thermback(self):
-        """Expose the thermal background calculation presently hidden
+        """
+        Expose the thermal background calculation presently hidden
         in the obsmode class.
-        Only bandpasses for which thermal information has been supplied in the graph
-        table supports this method; all others will raise a NotImplementedError.
+        Only bandpasses for which thermal information has been supplied
+        in the graph table supports this method; all others will raise a
+        NotImplementedError.
+
         """
 
-        #The obsmode.ThermalSpectrum method will raise an exception if there is
-        #no thermal information, and that will just propagate up.
-        sp=self.obsmode.ThermalSpectrum()
+        # The obsmode.ThermalSpectrum method will raise an exception if there is
+        # no thermal information, and that will just propagate up.
+        sp = self.obsmode.ThermalSpectrum()
 
         #Thermback is always provided in this non-standard set of units.
         #This code was copied from etc.py.
@@ -114,7 +139,7 @@ class ObsModeBandpass(CompositeSpectralElement):
 
         Parameters
         ----------
-        waveunits : str, optional
+        waveunits: str, optional
             The units of the wavelengths given in `waverange`. Defaults to None.
             If None, the wavelengths are assumed to be in the units of the
             `waveunits` attribute.
@@ -131,13 +156,14 @@ class ObsModeBandpass(CompositeSpectralElement):
         """
         # make sure we have a binset to work with
         if self.binset is None:
-            raise exceptions.UndefinedBinset('No binset specified for this bandpass.')
+            raise exceptions.UndefinedBinset(
+                'No binset specified for this bandpass.')
 
         # start by converting waverange to self.waveunits, if necessary
         if waveunits is not None:
             waveunits = units.Units(waveunits)
 
-            if not isinstance(waverange,np.ndarray):
+            if not isinstance(waverange, np.ndarray):
                 waverange = np.array(waverange)
 
             # convert to angstroms and then whatever self.waveunits is
@@ -160,7 +186,7 @@ class ObsModeBandpass(CompositeSpectralElement):
 
         Parameters
         ----------
-        waveunits : str, optional
+        waveunits: str, optional
             Wavelength units of `cenwave` and the returned wavelength range.
             Defaults to None. If None, the wavelengths are assumed to be in
             the units of the `waveunits` attribute.
@@ -177,7 +203,8 @@ class ObsModeBandpass(CompositeSpectralElement):
         """
         # make sure we have a binset to work with
         if self.binset is None:
-            raise exceptions.UndefinedBinset('No binset specified for this bandpass.')
+            raise exceptions.UndefinedBinset(
+                'No binset specified for this bandpass.')
 
         # convert cenwave from waveunits to self.waveunits, if necessary
         if waveunits is not None:
@@ -201,21 +228,22 @@ class ObsModeBandpass(CompositeSpectralElement):
 
         return wave1, wave2
 
+
 def pixel_range(bins, waverange, round='round'):
     """
     Returns the number of wavelength bins within `waverange`.
 
     Parameters
     ----------
-    bins : ndarray
+    bins: ndarray
         Wavelengths of pixel centers. Must be in the same units as `waverange`.
 
-    waverange : array_like
+    waverange: array_like
         A sequence containing the wavelength range of interest. Only the
         first and last elements are used. Assumed to be in increasing order.
         Must be in the same units as `bins`.
 
-    round : {'round','min','max',None}, optional
+    round: {'round','min','max',None}, optional
         How to deal with pixels at the edges of the wavelength range. All
         of the options, except None, will return an integer number of pixels.
         Defaults to 'round'.
@@ -235,7 +263,7 @@ def pixel_range(bins, waverange, round='round'):
 
     Returns
     -------
-    num : int or float
+    num: int or float
         Number of wavelength bins within `waverange`.
 
     Raises
@@ -249,7 +277,8 @@ def pixel_range(bins, waverange, round='round'):
     """
     # make sure that the round keyword is valid
     if round not in ('round','min','max',None):
-        raise ValueError("round keyword must be one of ('round','ciel','floor',None)")
+        raise ValueError(
+            "round keyword must be one of ('round','ciel','floor',None)")
 
     wave1 = waverange[0]
     wave2 = waverange[-1]
@@ -257,11 +286,13 @@ def pixel_range(bins, waverange, round='round'):
     # make sure the specified waverange is within our .binset
     minwave = bins[0] - (bins[0:2].mean() - bins[0])
     if wave1 < minwave:
-        raise exceptions.OverlapError("Lower bound of waverange is outside of binset. Min = %f" % minwave)
+        raise exceptions.OverlapError(
+            "Lower bound of waverange is outside of binset. Min = %f" % minwave)
 
     maxwave = bins[-1] + (bins[-1] - bins[-2:].mean())
     if wave2 > maxwave:
-        raise exceptions.OverlapError("Upper bound of waverange is outside of binset. Max = %f" % maxwave)
+        raise exceptions.OverlapError(
+            "Upper bound of waverange is outside of binset. Max = %f" % maxwave)
 
     # if the wavelength ends are the same return 0
     if wave1 == wave2:
@@ -322,12 +353,12 @@ def pixel_range(bins, waverange, round='round'):
 
         # calculate fractional indices
         frac1 = ind1 - (bins[ind1] - wave1) / (bins[ind1] - bins[ind1-1])
-
         frac2 = ind2 - (bins[ind2] - wave2) / (bins[ind2] - bins[ind2-1])
 
         num = frac2 - frac1
 
     return num
+
 
 def wave_range(bins, cenwave, npix, round='round'):
     """
@@ -336,17 +367,17 @@ def wave_range(bins, cenwave, npix, round='round'):
 
     Parameters
     ----------
-    bins : ndarray
+    bins: ndarray
         Wavelengths of pixel centers. Must be in the same units as
         `cenwave`.
 
-    cenwave : float
+    cenwave: float
         Central wavelength of range. Must be in the same units as `bins`.
 
-    npix : int
+    npix: int
         Number of pixels in range, centered on `cenwave`.
 
-    round : {'round','min','max',None}, optional
+    round: {'round','min','max',None}, optional
         How to deal with pixels at the edges of the wavelength range. All
         of the options, except None, will return wavelength ends that
         correpsonds to pixel edges.
@@ -371,7 +402,7 @@ def wave_range(bins, cenwave, npix, round='round'):
 
     Returns
     -------
-    waverange : tuple of floats
+    waverange: tuple of floats
         The range of wavelengths spanned by `npix` centered on `cenwave`.
 
     Raises
@@ -380,19 +411,23 @@ def wave_range(bins, cenwave, npix, round='round'):
         If `round` is not an allowed value.
 
     pysynphot.exceptions.OverlapError
-        If `cenwave` is not within the `binset` attribute, or the returned `waverange` would
+        If `cenwave` is not within the `binset` attribute,
+        or the returned `waverange` would
         exceed the limits of the `binset` attribute.
 
     """
     # make sure that the round keyword is valid
-    if round not in (None,'round','min','max'):
-        raise ValueError("round keyword must be one of (None,'round','min','max')")
+    if round not in (None, 'round', 'min', 'max'):
+        raise ValueError(
+            "round keyword must be one of (None,'round','min','max')")
 
     # make sure cenwave is within binset
     if cenwave < bins[0]:
-        raise exceptions.OverlapError("cenwave is not within binset. Min = %f" % bins[0])
+        raise exceptions.OverlapError("cenwave is not within binset. Min = %f"
+                                      % bins[0])
     elif cenwave > bins[-1]:
-        raise exceptions.OverlapError("cenwave is not within binset. Max = %f" % bins[-1])
+        raise exceptions.OverlapError("cenwave is not within binset. Max = %f"
+                                      % bins[-1])
 
     # first figure out what index the central wavelength falls at
     diff = cenwave - bins
@@ -412,10 +447,12 @@ def wave_range(bins, cenwave, npix, round='round'):
 
     # check ends
     if frac_ind1 < -0.5:
-        raise exceptions.OverlapError("Lower wavelength range is below allowed binset.")
+        raise exceptions.OverlapError(
+            "Lower wavelength range is below allowed binset.")
 
     if frac_ind2 > bins.shape[0] - 0.5:
-        raise exceptions.OverlapError("Upper wavelength range is above allowed binset.")
+        raise exceptions.OverlapError(
+            "Upper wavelength range is above allowed binset.")
 
     frac1, int1 = np.modf(frac_ind1)
     frac2, int2 = np.modf(frac_ind2)

@@ -1,17 +1,16 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+from __future__ import division
 import os.path
 import warnings
-
 import numpy as np
-
 from locations import irafconvert, _refTable
 
 _default_waveset = None
 _default_waveset_str = None
 
-#Constants to hold tables.
-GRAPHTABLE= ''
+# Constants to hold tables.
+GRAPHTABLE = ''
 GRAPHDICT = {}
 COMPTABLE = ''
 COMPDICT = {}
@@ -19,6 +18,7 @@ THERMTABLE = ''
 THERMDICT = {}
 
 PRIMARY_AREA = 45238.93416  # cm^2 - default to HST mirror
+
 
 def set_default_waveset(minwave=500, maxwave=26000, num=10000.,
                         delta=None, log=True):
@@ -28,22 +28,22 @@ def set_default_waveset(minwave=500, maxwave=26000, num=10000.,
 
     Parameters
     ----------
-    minwave : float, optional
+    minwave: float, optional
         The starting point of the waveset.
 
-    maxwave : float, optional
+    maxwave: float, optional
         The end point of the waveset.
 
-    num : int, optional
+    num: int, optional
         The number of elements in the waveset. If `delta` is not None this
         is ignored.
 
-    delta : float, optional
+    delta: float, optional
         Delta between values in the waveset. If not None, this overrides
         the `num` parameter. If `log` is True then `delta` is assumed to be
         the spacing in log space.
 
-    log : bool, optional
+    log: bool, optional
         Sets whether the waveset is evenly spaced in log or linear space. If
         `log` is True then `delta` is assumed to be the delta in log space.
         `minwave` and `maxwave` should be given in normal space regardless
@@ -89,17 +89,17 @@ def _set_default_refdata():
     # Component tables are defined here.
 
     try:
-        GRAPHTABLE = _refTable(os.path.join('mtab','*_tmg.fits'))
-        COMPTABLE  = _refTable(os.path.join('mtab','*_tmc.fits'))
-    except IOError, e:
+        GRAPHTABLE = _refTable(os.path.join('mtab', '*_tmg.fits'))
+        COMPTABLE = _refTable(os.path.join('mtab', '*_tmc.fits'))
+    except IOError as e:
         GRAPHTABLE = None
         COMPTABLE = None
         warnings.warn('No graph or component tables found; '
                       'functionality will be SEVERELY crippled. ' + str(e))
 
     try:
-        THERMTABLE = _refTable(os.path.join('mtab','*_tmt.fits'))
-    except IOError, e:
+        THERMTABLE = _refTable(os.path.join('mtab', '*_tmt.fits'))
+    except IOError as e:
         THERMTABLE = None
         warnings.warn('No thermal tables found, '
                       'no thermal calculations can be performed. ' + str(e))
@@ -108,29 +108,33 @@ def _set_default_refdata():
 
     set_default_waveset()
 
-#Do this on import
+# Do this on import
 _set_default_refdata()
 
 
 def setref(graphtable=None, comptable=None, thermtable=None,
            area=None, waveset=None):
-    """provide user access to global reference data.
-    Graph/comp/therm table names must be fully specified."""
+    """
+    provide user access to global reference data.
+    Graph/comp/therm table names must be fully specified.
 
-    global GRAPHTABLE, COMPTABLE, THERMTABLE, PRIMARY_AREA, GRAPHDICT, COMPDICT, THERMDICT
+    """
+
+    global GRAPHTABLE, COMPTABLE, THERMTABLE, PRIMARY_AREA, GRAPHDICT, \
+        COMPDICT, THERMDICT
 
     GRAPHDICT = {}
     COMPDICT = {}
     THERMDICT = {}
 
-    #Check for all None, which means reset
-    kwds=set([graphtable,comptable,thermtable,area,waveset])
+    # Check for all None, which means reset
+    kwds = set([graphtable, comptable, thermtable, area, waveset])
     if kwds == set([None]):
         #then we should reset everything.
         _set_default_refdata()
         return
 
-    #Otherwise, check them all separately
+    # Otherwise, check them all separately
     if graphtable is not None:
         GRAPHTABLE = irafconvert(graphtable)
 
@@ -140,7 +144,7 @@ def setref(graphtable=None, comptable=None, thermtable=None,
     if thermtable is not None:
         THERMTABLE = irafconvert(thermtable)
 
-    #Area is a bit different:
+    # Area is a bit different:
     if area is not None:
         PRIMARY_AREA = area
 
@@ -160,18 +164,22 @@ def setref(graphtable=None, comptable=None, thermtable=None,
             elif waveset[3].lower() == 'linear':
                 log = False
             else:
-                raise ValueError('fourth waveset option must be "log" or "linear"')
+                raise ValueError('fourth waveset option must be "log" or '
+                                 '"linear"')
 
-        set_default_waveset(minwave,maxwave,num,log=log)
+        set_default_waveset(minwave, maxwave, num, log=log)
 
-    #That's it.
+    # That's it.
     return
 
 
 def getref():
-    """Collects & returns the current refdata as a dictionary"""
+    """
+    Collects & returns the current refdata as a dictionary
 
-    ans=dict(graphtable=GRAPHTABLE,
+    """
+
+    ans = dict(graphtable=GRAPHTABLE,
              comptable=COMPTABLE,
              thermtable=THERMTABLE,
              area=PRIMARY_AREA,
@@ -180,7 +188,10 @@ def getref():
 
 
 def showref():
-    """Prints the values settable by setref"""
+    """
+    Prints the values settable by setref
+
+    """
     refdata = getref()
     for k, v in refdata.items():
-        print "%10s: %s" % (k,v)
+        print "%10s: %s" % (k, v)
