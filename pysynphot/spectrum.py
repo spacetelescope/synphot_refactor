@@ -31,12 +31,6 @@ import locations
 import planck
 import pysynphot.exceptions as exceptions  # custom pysyn exceptions
 
-from pysynphot import __version__
-try :
-    from pysynphot import __svn_revision__
-except ImportError:
-    __svn_revision__ = 'junk'
-
 # Renormalization constants from synphot:
 PI = 3.14159265               # Mysterious math constant
 RSUN = 6.9599E10              # Radius of sun
@@ -394,8 +388,7 @@ class SourceSpectrum(Integrator):
         # so are filename and origin
         bkeys = dict(filename=(os.path.basename(filename), 'name of file'),
                      origin=('pysynphot',
-                             'Version (%s, %s)' % (__version__,
-                                                   __svn_revision__)))
+                             'Version (%s, %s)' % (0.0, 0.0)))
 
         # User-values if present may override default values
         if hkeys is not None:
@@ -1694,7 +1687,7 @@ class SpectralElement(Integrator):
                                'name of file'),
                      origin=('pysynphot',
                              'Version (%s, %s)' %
-                             (__version__, __svn_revision__)))
+                             (0.0, 0.0)))
 
         # User-values if present may override default values
         if hkeys is not None:
