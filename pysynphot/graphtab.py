@@ -97,10 +97,10 @@ class GraphTable(object):
         self.inittab()
 
         if self.problemset:
-            print "warning, ambiguous nodes encountered"
-            print "(innode, kwd, (outnode, compname, thcompname)"
+            print("warning, ambiguous nodes encountered")
+            print("(innode, kwd, (outnode, compname, thcompname)")
             for k in self.problemset:
-                print k
+                print(k)
 
         self.all_nodes = set()
         for node in self.tab:
@@ -131,7 +131,7 @@ class GraphTable(object):
                 try:
                     row = line.split()
                 except ValueError as e:
-                    print "Error parsine line %s" % line
+                    print("Error parsing line ", line)
                     raise e
                 self._setrow(row)
             f.close()
@@ -184,8 +184,8 @@ class GraphTable(object):
         # Returns a list of keywords and a dict of paramkeys
         kws, paramdict = extract_keywords(icss)
         if verbose:
-            print kws
-            print paramdict
+            print(kws)
+            print(paramdict)
         # Always start with innode=1
         nextnode = 1
 
@@ -199,7 +199,7 @@ class GraphTable(object):
 
             if found:
                 if verbose:
-                    print found
+                    print(found)
                 # ...and that we don't have ambiguity
                 if len(found) == 1:
                     used.update(found)
@@ -227,7 +227,7 @@ class GraphTable(object):
                 paramcomp[tcomp] = float(paramdict[matchkey])
 
             if verbose:
-                print matchnode
+                print(matchnode)
 
             if nextnode is None:
                 raise ValueError("Incomplete obsmode: legal possibilities %s" %

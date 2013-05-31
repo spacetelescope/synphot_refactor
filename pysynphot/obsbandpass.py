@@ -103,9 +103,8 @@ class ObsModeBandpass(CompositeSpectralElement):
     def _checkbounds(self):
         thru = self.throughput
         if thru[0] != 0 or thru[-1] != 0:
-            print "Warning: throughput for this obsmode is not bounded by " \
-                  "zeros. Endpoints: thru[0]=%g, thru[-1]=%g" % \
-                  (thru[0], thru[-1])
+            print("Warning: throughput for this obsmode is not bounded by "
+                  "zeros. Endpoints: thru[0]=", thru[0], " thru[-1]=", thru[-1])
 
     def thermback(self):
         """

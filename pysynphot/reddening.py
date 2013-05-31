@@ -82,11 +82,11 @@ def print_red_laws():
 
     s = '%-' + str(maxname) + 's   %-' + str(maxref) + 's'
 
-    print(s % ('name', 'reference'))
-    print(s % ('-'*maxname, '-'*maxref))
+    print('name', 'reference')
+    print('-'*maxname, '-'*maxref)
 
     for k in sorted(laws.keys()):
-        print(s % (k, laws[k]))
+        print(k, laws[k])
 
 
 def Extinction(extval, name=None):

@@ -64,7 +64,7 @@ class GenericScanner:
         return string.join(rv, '|')
 
     def error(self, s, pos):
-        print "Lexical error at position %s" % pos
+        print("Lexical error at position ", pos)
         raise SystemExit
 
     def tokenize(self, s):
@@ -564,14 +564,14 @@ class GenericASTMatcher(GenericParser):
 
 def _dump(tokens, states):
     for i in range(len(states)):
-        print 'state', i
+        print('state', i)
         for (lhs, rhs), pos, parent in states[i]:
-            print '\t', lhs, '::=',
-            print string.join(rhs[:pos]),
-            print '.',
-            print string.join(rhs[pos:]),
-            print ',', parent
+            print('\t', lhs, '::=')
+            print(string.join(rhs[:pos]))
+            print('.')
+            print(string.join(rhs[pos:]))
+            print(',', parent)
         if i < len(tokens):
-            print
-            print 'token', str(tokens[i])
-            print
+            print('')
+            print('token', str(tokens[i]))
+            print('')
