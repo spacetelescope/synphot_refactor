@@ -7,7 +7,7 @@ that has some special methods and attributes and explicitly removes
 certain other methods.
 
 """
-from __future__ import division
+from __future__ import division, print_function
 
 import numpy as np
 import math

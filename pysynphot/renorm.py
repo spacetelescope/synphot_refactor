@@ -6,7 +6,7 @@ one that works, turn it into a method on the spectrum class.
 
 """
 
-from __future__ import division
+from __future__ import division, print_function
 import math
 import numpy as np
 from .spectrum import FlatSpectrum, Vega
