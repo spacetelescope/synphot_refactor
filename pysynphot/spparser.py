@@ -21,7 +21,7 @@ is part of the instructions to the parser.
 
 """
 
-from __future__ import division
+from __future__ import division, print_function
 from spark import GenericScanner
 from spark import GenericASTBuilder, GenericASTMatcher
 import spectrum

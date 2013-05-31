@@ -8,7 +8,7 @@ set for a given obsmode.
 
 """
 
-from __future__ import division
+from __future__ import division, print_function
 import re
 import numpy as np
 import locations
