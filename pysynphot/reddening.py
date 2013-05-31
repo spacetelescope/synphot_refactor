@@ -6,7 +6,7 @@ extinctions.
 
 """
 
-from __future__ import division
+from __future__ import division, print_function
 import pyfits
 from spectrum import ArraySpectralElement
 import Cache

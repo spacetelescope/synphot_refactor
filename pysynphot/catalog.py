@@ -19,7 +19,7 @@ http://www.stsci.edu/hst/HST_overview/documents/synphot/AppA_Catalogs.html#57
 
 """
 
-from __future__ import division
+from __future__ import division, print_function
 
 import os
 import numpy as np

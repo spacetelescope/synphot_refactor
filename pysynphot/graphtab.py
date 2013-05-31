@@ -7,7 +7,7 @@ http://stackoverflow.com/questions/844505/is-a-graph-library-eg-networkx-the-rig
 
 """
 
-from __future__ import division
+from __future__ import division, print_function
 from collections import defaultdict
 import pyfits
 
