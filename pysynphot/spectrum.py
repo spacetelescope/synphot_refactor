@@ -199,9 +199,9 @@ class Integrator(object):
             # neg. magnitudes are legal
             idx = np.where(self._fluxtable < 0)
             self._fluxtable[idx] = 0.0
-            print "Warning, %d of %d bins contained negative fluxes; " \
-                  "they have been set to zero." % \
-                  (len(idx[0]), len(self._fluxtable))
+            print("Warning, {0:d} of {1:d} bins contained negative fluxes; "
+                  "they have been set to zero.".format(len(idx[0]),
+                                                       len(self._fluxtable)))
 
 
 class SourceSpectrum(Integrator):
@@ -532,7 +532,7 @@ class SourceSpectrum(Integrator):
         return StdRenorm(self, band, RNval, RNUnits, force=force)
 
     def effstim(self, fluxunits='photlam'):
-        print "?? %s" % fluxunits
+        print("?? {0:s}".format(fluxunits))
         raise NotImplementedError("Ticket #140: calcphot.effstim functionality")
 
 
@@ -1255,8 +1255,8 @@ class SpectralElement(Integrator):
         if isinstance(other, (int, float)):
             return CompositeSpectralElement(self, UniformTransmission(other))
         else:
-            print "SpectralElements can only be multiplied by other " + \
-                  "SpectralElements or SourceSpectrum objects"
+            print("SpectralElements can only be multiplied by other "
+                  "SpectralElements or SourceSpectrum objects")
 
     def __rmul__(self, other):
         return self.__mul__(other)

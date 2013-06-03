@@ -194,4 +194,4 @@ def showref():
     """
     refdata = getref()
     for k, v in refdata.items():
-        print "%10s: %s" % (k, v)
+        print("{O:10s}: {1:s}".format(k, v))
