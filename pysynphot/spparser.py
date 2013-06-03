@@ -304,7 +304,7 @@ class Interpreter(GenericASTMatcher):
             args = tree[2].value
         fname = tree[0].value
         if fname not in syfunctions:
-            print "Error: unknown function:", fname
+            print("Error: unknown function:", fname)
             self.error(fname)
         else:
             if fname == 'unit':
@@ -316,7 +316,7 @@ class Interpreter(GenericASTMatcher):
             elif fname == 'pl':
                 # power law
                 if args[2] not in synforms:
-                    print "Error: unrecognized units:", args[2]
+                    print("Error: unrecognized units:", args[2])
                 # code to create powerlaw spectrum object
                 tree.value = spectrum.Powerlaw(args[0], args[1],
                                                fluxunits=args[2]
@@ -424,7 +424,7 @@ def interpret(ast):
 
 def ptokens(tlist):
     for token in tlist:
-        print token.type, token.attr
+        print(token.type, token.attr)
 
 
 def _handleIRAFName(name):

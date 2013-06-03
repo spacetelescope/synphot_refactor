@@ -108,7 +108,7 @@ class GraphTable(object):
         ##        for comp in self.compnames:
         ##            try:
         ##                if comp.index('nic') == 0:
-        ##                    print comp
+        ##                    print(comp)
         ##            except:
         ##                pass
 
@@ -117,7 +117,7 @@ class GraphTable(object):
         ##        for keyword in self.keywords:
         ##            i = i + 1
         ##            if keyword == 'acs':
-        ##                print self.compnames[i]
+        ##                print(self.compnames[i])
 
         gp.close()
 
@@ -169,7 +169,7 @@ class GraphTable(object):
         count = 0
         while outnode >= 0:
             if (DEBUG and (outnode < 0)):
-                print "outnode == %d: stop condition" % outnode
+                print("outnode == {0:d}: stop condition".fortmat(outnode))
 
             previous_outnode = outnode
 
@@ -178,7 +178,7 @@ class GraphTable(object):
             # If there are no entries with this innode, we're done
             if nodes[0].size == 0:
                 if DEBUG:
-                    print "no such innode %d: stop condition" % innode
+                    print("no such innode {0:d}: stop condition".format(innode))
                     #return (components,thcomponents)
                 break
 
@@ -215,9 +215,8 @@ class GraphTable(object):
                     used_default = False
 
             if DEBUG:
-                print "Innode %d  Outnode %d  Compname %s" % (
-                    innode, outnode, component
-                )
+                print("Innode {0:d}  Outnode {1:d}  Compname {2:s}".format(
+                    innode, outnode, component))
             components.append(component)
             thcomponents.append(thcomponent)
 
@@ -225,24 +224,25 @@ class GraphTable(object):
 
             if outnode == previous_outnode:
                 if DEBUG:
-                    print "Innode: %d  Outnode:%d  Used default: %s" % (
-                        innode, outnode, used_default
-                    )
+                    print("Innode: {0:d}  Outnode:{1:d}  "
+                          "Used default: {2:s}".format(innode,
+                                                       outnode,
+                                                       used_default))
                 count += 1
                 if count > 3:
                     if DEBUG:
-                        print "same outnode %d > 3 times: stop condition" % \
-                              outnode
+                        print("same outnode {0:d} > 3 times: stop "
+                              "condition".format(outnode))
                     break
 
         if outnode < 0:
             if DEBUG:
-                print "outnode == %d: stop condition" % outnode
-            raise ValueError("Incomplete obsmode %s" % str(modes))
+                print("outnode == {0:d}: stop condition".format(outnode))
+            raise ValueError("Incomplete obsmode {0:s}".format(modes))
 
         #Check for unused modes
         if inmodes != used_modes:
             unused = str(inmodes.difference(used_modes))
-            raise ValueError("Warning: unused keywords %s" % unused)
+            raise ValueError("Warning: unused keywords {0:s}".format(unused))
 
         return components, thcomponents
