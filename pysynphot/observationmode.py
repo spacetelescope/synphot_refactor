@@ -89,7 +89,7 @@ class BaseObservationMode(object):
             pass
         except ValueError as e:
             # wavetable will raise a ValueError if the key was ambiguous
-            print "Warning, %s" % str(e)
+            print("Warning, ", str(e))
 
     def __str__(self):
         return self._obsmode
@@ -124,7 +124,7 @@ class BaseObservationMode(object):
         """
         for name in self._throughput_filenames:
             if name != 'clear':
-                print name
+                print(name)
 
     def bandWave(self):
         """

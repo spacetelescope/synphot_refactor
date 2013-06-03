@@ -111,15 +111,3 @@ from refs import setref, showref
 #
 from locations import get_data_filename
 import tables
-
-def _test():
-    """
-    Runs doctest on the examples in this file
-
-    """
-    import doctest
-    nfail, ntest = doctest.testfile('__init__.py')
-    return nfail, ntest
-
-if __name__ == '__main__':
-    nfail, ntest = _test()
