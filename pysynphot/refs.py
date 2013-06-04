@@ -4,7 +4,7 @@ from __future__ import division, print_function
 import os.path
 import warnings
 import numpy as np
-from locations import irafconvert, _refTable
+from .locations import irafconvert, _refTable
 
 _default_waveset = None
 _default_waveset_str = None

@@ -25,10 +25,10 @@ import warnings
 import pyfits
 import numpy as np
 
-import refs
-import units
-import locations
-import planck
+from . import refs
+from . import units
+from . import locations
+from . import planck
 from . import exceptions  # custom pysyn exceptions
 
 # Renormalization constants from synphot:

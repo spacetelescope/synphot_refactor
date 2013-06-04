@@ -10,7 +10,7 @@ Kurucz and Castelli-Kurucz model atlases.
 """
 
 from __future__ import division, print_function
-from locations import RedLaws
+from .locations import RedLaws
 
 # if PYSYN_CDBS is undefined RedLaws will be an empty dictionary
 # so we should check whether these assignments are possible
