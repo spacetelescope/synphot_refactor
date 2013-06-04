@@ -24,10 +24,10 @@ is part of the instructions to the parser.
 from __future__ import division, print_function
 from .spark import GenericScanner
 from .spark import GenericASTBuilder, GenericASTMatcher
-from . import spectrum
-from . import reddening
-from . import locations
-from . import catalog
+import spectrum
+import reddening
+import locations
+import catalog
 from .obsbandpass import ObsBandpass
 from .exceptions import DisjointError, OverlapError
 

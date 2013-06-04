@@ -14,8 +14,8 @@ import numpy as np
 
 from .observationmode import ObservationMode
 from .spectrum import CompositeSpectralElement, TabularSpectralElement
-from . import units
-from . import exceptions
+import units
+import exceptions
 
 
 def ObsBandpass(obstring, graphtable=None, comptable=None, component_dict={}):

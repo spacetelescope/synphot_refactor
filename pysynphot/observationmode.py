@@ -4,12 +4,12 @@ from __future__ import division, print_function
 import re
 import numpy as np
 
-from . import refs
-from . import spectrum
-from . import locations
+import refs
+import spectrum
+import locations
 from .locations import irafconvert
-from . import planck
-from . import wavetable
+import planck
+import wavetable
 from .tables import CompTable, GraphTable
 
 
