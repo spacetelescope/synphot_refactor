@@ -56,4 +56,4 @@ from refs import setref, showref
 from locations import get_data_filename
 import tables
 
-__version__ = "3.0dev"
+__version__ = "3.0.0.dev"
