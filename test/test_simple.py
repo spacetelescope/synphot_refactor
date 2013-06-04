@@ -8,11 +8,6 @@ from __future__ import division, print_function
 import pysynphot as pysyn
 
 
-def test_version():
-    version = pysyn.__version__
-    assert(version == "3.0dev")
-
-
 def test_blackbody():
     bb=pysyn.BlackBody(40000)
     # BB(T=40000)
