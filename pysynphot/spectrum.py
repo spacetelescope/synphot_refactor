@@ -29,7 +29,7 @@ import refs
 import units
 import locations
 import planck
-import pysynphot.exceptions as exceptions  # custom pysyn exceptions
+from . import exceptions  # custom pysyn exceptions
 
 # Renormalization constants from synphot:
 PI = 3.14159265               # Mysterious math constant
