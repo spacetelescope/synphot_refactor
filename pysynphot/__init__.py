@@ -49,11 +49,11 @@ from .observationmode import ObservationMode as Obsmode
 #Get Vega
 from .spectrum import Vega
 #Get cache
-import Cache
+from . import Cache
 #Permit resetting refdata
 from .refs import setref, showref
 #
 from .locations import get_data_filename
-import tables
+from . import tables
 
 __version__ = "3.0.0.dev"

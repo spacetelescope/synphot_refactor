@@ -12,7 +12,7 @@ import numpy as np
 from .spectrum import FlatSpectrum, Vega
 from .refs import _default_waveset
 from .exceptions import DisjointError, OverlapError
-import units
+from . import units
 
 
 def DefineStdSpectraForUnits():
