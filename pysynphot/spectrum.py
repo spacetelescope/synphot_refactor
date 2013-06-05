@@ -57,7 +57,7 @@ def MergeWaveSets(waveset1, waveset2):
         MergedWaveSet = waveset2
     elif waveset2 is None and waveset1 is not None:
         MergedWaveSet = waveset1
-    elif waveset1 is None and Waveset2 is None:
+    elif waveset1 is None and waveset2 is None:
         MergedWaveSet = None
     else:
         MergedWaveSet = np.union1d(waveset1, waveset2)
