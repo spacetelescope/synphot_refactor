@@ -57,7 +57,7 @@ def MergeWaveSets(waveset1, waveset2):
         MergedWaveSet = waveset2
     elif waveset2 is None and waveset1 is not None:
         MergedWaveSet = waveset1
-    elif waveset1 is None and Waveset2 is None:
+    elif waveset1 is None and waveset2 is None:
         MergedWaveSet = None
     else:
         MergedWaveSet = np.union1d(waveset1, waveset2)
@@ -210,9 +210,6 @@ class SourceSpectrum(Integrator):
 
     """
 
-    wave = property(_getWaveProp, doc="Wavelength property")
-    flux = property(_getFluxProp, doc="Flux property")
-
     def __add__(self, other):
         """
         Source Spectra can be added.  Delegate the work to the
@@ -293,6 +290,9 @@ class SourceSpectrum(Integrator):
     def _getFluxProp(self):
         wave, flux = self.getArrays()
         return flux
+
+    wave = property(_getWaveProp, doc="Wavelength property")
+    flux = property(_getFluxProp, doc="Flux property")
 
     def validate_units(self):
         """
