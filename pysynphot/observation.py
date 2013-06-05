@@ -19,7 +19,7 @@ import binning
 from obsbandpass import pixel_range, wave_range
 from spectrum import ArraySourceSpectrum
 
-import exceptions
+import pysynphot.exceptions as exceptions
 
 try:
   import pysynphot_utils

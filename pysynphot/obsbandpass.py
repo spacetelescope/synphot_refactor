@@ -15,7 +15,7 @@ import numpy as np
 from observationmode import ObservationMode
 from spectrum import CompositeSpectralElement, TabularSpectralElement
 import units
-import exceptions
+import pysynphot.exceptions as exceptions
 
 
 def ObsBandpass(obstring, graphtable=None, comptable=None, component_dict={}):

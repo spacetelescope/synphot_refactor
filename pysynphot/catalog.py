@@ -28,7 +28,7 @@ import pyfits
 import spectrum
 import locations
 from Cache import CATALOG_CACHE
-import exceptions
+import pysynphot.exceptions as exceptions
 
 
 class Icat(spectrum.TabularSourceSpectrum):
