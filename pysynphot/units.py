@@ -16,9 +16,9 @@ from __future__ import division, print_function
 import math
 import numpy as np
 
-from .spectrum import Vega  # Circular import?
-from . import binning
-from . import refs  # needed for PRIMARY_AREA
+import spectrum  # Circular import
+import binning
+import refs  # needed for PRIMARY_AREA
 # cannot just import the constant because it won't get updated
 # when the setref() function is used to change it.
 
@@ -319,7 +319,7 @@ class Photlam(FluxUnits):
 
     def ToVegaMag(self, wave, flux, **kwargs):
 
-        resampled = Vega.resample(wave)
+        resampled = spectrum.Vega.resample(wave)
         normalized = flux / resampled._fluxtable
         return -2.5 * np.log10(normalized)
 
@@ -622,7 +622,7 @@ class VegaMag(LogFluxUnits):
     def __init__(self):
         LogFluxUnits.__init__(self)
         self.name = 'vegamag'
-        self.vegaspec = Vega
+        self.vegaspec = spectrum.Vega
 
     def ToPhotlam(self, wave, flux, **kwargs):
         resampled = self.vegaspec.resample(wave)

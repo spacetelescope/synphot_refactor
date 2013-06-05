@@ -9,10 +9,10 @@ one that works, turn it into a method on the spectrum class.
 from __future__ import division, print_function
 import math
 import numpy as np
-from .spectrum import FlatSpectrum, Vega
-from .refs import _default_waveset
-from .exceptions import DisjointError, OverlapError
-from . import units
+from spectrum import FlatSpectrum, Vega
+from refs import _default_waveset
+from exceptions import DisjointError, OverlapError
+import units
 
 
 def DefineStdSpectraForUnits():

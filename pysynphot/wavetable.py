@@ -11,7 +11,7 @@ set for a given obsmode.
 from __future__ import division, print_function
 import re
 import numpy as np
-from . import locations
+import locations
 
 
 class Wavetable(object):

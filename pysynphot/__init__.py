@@ -28,32 +28,32 @@ from __future__ import division, print_function
 
 #UI:
 #AnalyticSpectra:
-from .spectrum import BlackBody, GaussianSource, FlatSpectrum
-from .spectrum import Powerlaw as PowerLaw
+from spectrum import BlackBody, GaussianSource, FlatSpectrum
+from spectrum import Powerlaw as PowerLaw
 #Tabular Spectra
-from .spectrum import FileSourceSpectrum as FileSpectrum
-from .spectrum import ArraySourceSpectrum as ArraySpectrum
-from .catalog import Icat
+from spectrum import FileSourceSpectrum as FileSpectrum
+from spectrum import ArraySourceSpectrum as ArraySpectrum
+from catalog import Icat
 #Analytic Spectral Elements
-from .spectrum import Box, UniformTransmission
+from spectrum import Box, UniformTransmission
 #Tabular Spectral Elements
-from .spectrum import FileSpectralElement as FileBandpass
-from .spectrum import ArraySpectralElement as ArrayBandpass
+from spectrum import FileSpectralElement as FileBandpass
+from spectrum import ArraySpectralElement as ArrayBandpass
 #Complicated spectral elements
-from .obsbandpass import ObsBandpass
-from .reddening import Extinction
+from obsbandpass import ObsBandpass
+from reddening import Extinction
 #Observations
-from .observation import Observation
+from observation import Observation
 #Other constructs
-from .observationmode import ObservationMode as Obsmode
+from observationmode import ObservationMode as Obsmode
 #Get Vega
-from .spectrum import Vega
+from spectrum import Vega
 #Get cache
-from . import Cache
+import Cache
 #Permit resetting refdata
-from .refs import setref, showref
+from refs import setref, showref
 #
-from .locations import get_data_filename
-from . import tables
+from locations import get_data_filename
+import tables
 
 __version__ = "3.0.0.dev"

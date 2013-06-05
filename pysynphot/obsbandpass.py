@@ -12,10 +12,10 @@ ObsModeBandpass (ack, terrible name) or a TabularSpectralElement.
 from __future__ import division, print_function
 import numpy as np
 
-from .observationmode import ObservationMode
-from .spectrum import CompositeSpectralElement, TabularSpectralElement
-from . import units
-from . import exceptions
+from observationmode import ObservationMode
+from spectrum import CompositeSpectralElement, TabularSpectralElement
+import units
+import exceptions
 
 
 def ObsBandpass(obstring, graphtable=None, comptable=None, component_dict={}):

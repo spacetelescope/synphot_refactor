@@ -25,11 +25,11 @@ import warnings
 import pyfits
 import numpy as np
 
-from . import refs
-from . import units
-from . import locations
-from . import planck
-from . import exceptions  # custom pysyn exceptions
+import refs
+import units
+import locations
+import planck
+import exceptions  # custom pysyn exceptions
 
 # Renormalization constants from synphot:
 PI = 3.14159265               # Mysterious math constant

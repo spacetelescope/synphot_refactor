@@ -25,10 +25,10 @@ import os
 import numpy as np
 import pyfits
 
-from . import spectrum
-from . import locations
-from .Cache import CATALOG_CACHE
-from . import exceptions
+import spectrum
+import locations
+from Cache import CATALOG_CACHE
+import exceptions
 
 
 class Icat(spectrum.TabularSourceSpectrum):
