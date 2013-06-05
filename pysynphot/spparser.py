@@ -29,7 +29,7 @@ import reddening
 import locations
 import catalog
 from obsbandpass import ObsBandpass
-from .exceptions import DisjointError, OverlapError
+from exceptions import DisjointError, OverlapError
 
 syfunctions = [
     'spec',
