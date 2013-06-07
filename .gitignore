@@ -33,6 +33,7 @@ distribute-*.tar.gz
 .*.swp
 *~
 .idea
+.c9revisions
 
 # Mac OSX
 .DS_Store
