@@ -9,9 +9,9 @@ import pysynphot as pysyn
 
 
 def test_blackbody():
-    bb=pysyn.BlackBody(40000)
+    bb = pysyn.spectrum.BlackBody(40000)
     # BB(T=40000)
-    assert(bb)
+    assert bb
 
 
 # >>> pl=S.PowerLaw(10000,-2)
