@@ -5,7 +5,7 @@ import numpy as N
 
 import pysynphot as S
 from pysynphot import spparser
-from pysynphot.exceptions import OverlapError
+from pysynphot.pysynexcept import OverlapError
 from stpysyn.test import testutil
 from pysynphot import locations, refs
 

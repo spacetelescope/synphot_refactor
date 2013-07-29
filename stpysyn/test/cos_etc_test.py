@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import numpy as N
 
-from pysynphot import spectrum, observationmode, exceptions
+from pysynphot import spectrum, observationmode, pysynexcept
 from pysynphot import locations, refs
 from pysynphot import spparser as P
 from pysynphot import planck
@@ -366,7 +366,7 @@ class ParserTestCase(testutil.FPTestCase):
         self.assertApproxFP(integral, 1.0E-18, accuracy=0.0025)
 
     def testzeroang(self):
-        self.assertRaises(exceptions.ZeroWavelength,
+        self.assertRaises(pysynexcept.ZeroWavelength,
                           spparser.parse_spec,
                           'spec(zeroang.dat)')
 
@@ -763,19 +763,19 @@ class EnforceWave(testutil.FPTestCase):
 
     def testzero(self):
         self.args=self.argdict['zero']
-        self.assertRaises(exceptions.ZeroWavelength,
+        self.assertRaises(pysynexcept.ZeroWavelength,
                           self.constructor,
                           *self.args)
 
     def testneg(self):
         self.args=self.argdict['neg']
-        self.assertRaises(exceptions.ZeroWavelength,
+        self.assertRaises(pysynexcept.ZeroWavelength,
                           self.constructor,
                           *self.args)
 
     def testmixed(self):
         self.args=self.argdict['mixed']
-        self.assertRaises(exceptions.UnsortedWavelength,
+        self.assertRaises(pysynexcept.UnsortedWavelength,
                           self.constructor,
                           *self.args)
 

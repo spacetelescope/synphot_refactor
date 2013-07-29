@@ -3,7 +3,7 @@ from stpysyn.test import testutil
 
 """Tests varying legal cases for ASCII file spectrum data"""
 import pysynphot as S
-from pysynphot import exceptions
+from pysynphot import pysynexcept
 import os, sys
 import numpy as N
 
@@ -116,7 +116,7 @@ class badline(testutil.FPTestCase):
         os.remove(self.fname)
 
     def testerror(self):
-        self.assertRaises(exceptions.BadRow,S.FileSpectrum,self.fname)
+        self.assertRaises(pysynexcept.BadRow,S.FileSpectrum,self.fname)
 
 if __name__ == '__main__':
     if 'debug' in sys.argv:

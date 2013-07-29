@@ -9,7 +9,7 @@ from stpysyn.test import testutil
 
 import pysynphot as S
 from pysynphot import locations
-import pysynphot.exceptions as exceptions
+import pysynphot.pysynexcept as exceptions
 
 # test whether the InterpolatedSpectralElement grabs the correct column
 # when the input value is a column (no interpolation required) and an "ERROR"

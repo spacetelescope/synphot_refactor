@@ -6,7 +6,7 @@ import numpy as N
 
 from stpysyn.test import testutil
 import pysynphot as S
-from pysynphot import exceptions
+from pysynphot import pysynexcept
 
 
 class EnforceWave(testutil.FPTestCase):
@@ -44,19 +44,19 @@ class EnforceWave(testutil.FPTestCase):
 
     def testzero(self):
         self.args=self.argdict['zero']
-        self.assertRaises(exceptions.ZeroWavelength,
+        self.assertRaises(pysynexcept.ZeroWavelength,
                           self.constructor,
                           *self.args)
 
     def testneg(self):
         self.args=self.argdict['neg']
-        self.assertRaises(exceptions.ZeroWavelength,
+        self.assertRaises(pysynexcept.ZeroWavelength,
                           self.constructor,
                           *self.args)
 
     def testmixed(self):
         self.args=self.argdict['mixed']
-        self.assertRaises(exceptions.UnsortedWavelength,
+        self.assertRaises(pysynexcept.UnsortedWavelength,
                           self.constructor,
                           *self.args)
 
