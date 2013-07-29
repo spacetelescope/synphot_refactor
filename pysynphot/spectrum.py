@@ -29,7 +29,7 @@ import refs
 import units
 import locations
 import planck
-import pysynphot.exceptions as exceptions  # custom pysyn exceptions
+from . import pysynexcept # custom pysyn exceptions
 
 # Renormalization constants from synphot:
 PI = 3.14159265               # Mysterious math constant
@@ -151,7 +151,7 @@ class Integrator(object):
                         wlist.append(float(cols[0]))
                         flist.append(float(cols[1]))
                 except Exception as e:
-                    raise exceptions.BadRow("Error reading %s: %s" % (filename,
+                    raise pysynexcept.BadRow("Error reading %s: %s" % (filename,
                                             str(e)),
                                             rows=lcount
                                             )
@@ -166,7 +166,7 @@ class Integrator(object):
         wave = self._wavetable
         if np.any(wave <= 0):
             wrong = np.where(wave <= 0)[0]
-            raise exceptions.ZeroWavelength('Negative or Zero wavelength '
+            raise pysynexcept.ZeroWavelength('Negative or Zero wavelength '
                                             'occurs in wavelength array',
                                             rows=wrong
                                             )
@@ -179,14 +179,14 @@ class Integrator(object):
                 pass
             else:
                 wrong = np.where(sorted != wave)[0]
-                raise exceptions.UnsortedWavelength('Wavelength array is not '
+                raise pysynexcept.UnsortedWavelength('Wavelength array is not '
                                                     'monotonic', rows=wrong
                                                     )
         #Check for duplicate values
         dw = sorted[1:]-sorted[:-1]
         if np.any(dw == 0):
             wrong = np.where(dw == 0)[0]
-            raise exceptions.DuplicateWavelength("Wavelength array contains "
+            raise pysynexcept.DuplicateWavelength("Wavelength array contains "
                                                  "duplicate entries",
                                                  rows=wrong)
 
@@ -595,7 +595,7 @@ class CompositeSourceSpectrum(SourceSpectrum):
                       '%f, %s: %f'
                 err = err % (str(source1), source1_area,
                              str(source2), source2_area)
-                raise exceptions.IncompatibleSources(err)
+                raise pysynexcept.IncompatibleSources(err)
 
     def __str__(self):
         opdict = {'add': '+', 'multiply': '*'}
@@ -1401,7 +1401,7 @@ class SpectralElement(Integrator):
 
         if num == 0 or den == 0:
             error_str = 'Could not calculate average wavelength of bandpass.'
-            raise exceptions.PysnphotErorr(error_str)
+            raise pysynexcept.PysnphotErorr(error_str)
 
         avg_wave = np.exp(num/den)
 
@@ -1873,7 +1873,7 @@ class CompositeSpectralElement(SpectralElement):
                       '%s: %f, %s: %f'
                 err = err % (str(component1), comp1_area,
                              str(component2), comp2_area)
-                raise exceptions.IncompatibleSources(err)
+                raise pysynexcept.IncompatibleSources(err)
 
     def __call__(self, wavelength):
         """
@@ -2263,7 +2263,7 @@ class InterpolatedSpectralElement(SpectralElement):
         elif not extrapolate and 'THROUGHPUT' not in fs[1].data.names:
             s = 'Cannot extrapolate and no default throughput for %s' % \
                 (fileName,)
-            raise exceptions.ExtrapolationNotAllowed(s)
+            raise pysynexcept.ExtrapolationNotAllowed(s)
         # assign units
         self.waveunits = units.Units(fs[1].header['tunit1'].lower())
         self.throughputunits = 'none'

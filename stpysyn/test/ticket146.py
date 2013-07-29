@@ -6,7 +6,7 @@ import numpy as N
 
 from stpysyn.test import testutil
 import pysynphot as S
-from pysynphot import spparser, exceptions
+from pysynphot import spparser, pysynexcept
 
 
 class Precision(testutil.FPTestCase):
@@ -60,7 +60,7 @@ class Sorted(testutil.FPTestCase):
         self.failIf(num != 1, "%d occurrences found"%num)
 
     def testinputfix(self):
-        self.assertRaises(exceptions.DuplicateWavelength,
+        self.assertRaises(pysynexcept.DuplicateWavelength,
                           S.ArraySpectrum,
                           wave=N.array([1,2,3,4,4,5]),
                           flux=N.ones(6))
@@ -82,7 +82,7 @@ class SortedBP(Sorted):
         self.failIf(num != 1, "%d occurrences found"%num)
 
     def testinputfix(self):
-        self.assertRaises(exceptions.DuplicateWavelength,
+        self.assertRaises(pysynexcept.DuplicateWavelength,
                           S.ArrayBandpass,
                           wave=N.array([1,2,3,4,4,5]),
                           throughput=N.ones(6))

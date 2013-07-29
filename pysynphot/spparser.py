@@ -29,7 +29,7 @@ import reddening
 import locations
 import catalog
 from obsbandpass import ObsBandpass
-from exceptions import DisjointError, OverlapError
+from . import pysynexcept # pysynexcept.DisjoinError, pysynexcept.OverlapError
 
 syfunctions = [
     'spec',
@@ -351,13 +351,14 @@ class Interpreter(GenericASTMatcher):
                 # Always force the renormalization to occur: prevent exceptions
                 # in case of partial overlap. Less robust but duplicates
                 # synphot. Force the renormalization in the case of partial
-                # overlap (OverlapError), but raise an exception if the
-                # spectrum and bandpass are entirely disjoint (DisjointError)
+                # overlap (pysynexcept.OverlapError), but raise an exception if
+                # the spectrum and bandpass are entirely disjoint
+                # (pysynexcept.DisjoinError)
                 try:
                     tree.value = sp.renorm(args[2], args[3], args[1])
-                except DisjointError:
+                except pysynexcept.DisjoinError:
                     raise
-                except OverlapError:
+                except pysynexcept.OverlapError:
                     tree.value = sp.renorm(args[2], args[3],
                                            args[1], force=True)
                     tree.value.warnings['force_renorm'] = \

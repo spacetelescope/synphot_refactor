@@ -4,7 +4,7 @@ import numpy as np
 from stpysyn.test import testutil
 import pysynphot as S
 import pysynphot.Cache as Cache
-import pysynphot.exceptions as exceptions
+import pysynphot.pysynexcept as exceptions
 
 # this test passes before changes, and should pass after the changes
 class ICatK93Test(testutil.FPTestCase):

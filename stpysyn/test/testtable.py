@@ -3,7 +3,7 @@ in file access, but many of them apply to ArraySpectrum objects
 as well & can be tested that way.
 """
 
-from pysynphot import exceptions, spectrum
+from pysynphot import pysynexcept, spectrum
 
 import os
 import unittest
@@ -16,7 +16,7 @@ class WaveProblems(unittest.TestCase):
         self.fx=self.wv
 
     def testraise(self):
-        self.assertRaises(exceptions.DuplicateWavelength,
+        self.assertRaises(pysynexcept.DuplicateWavelength,
                           spectrum.ArraySourceSpectrum,
                           self.wv, self.fx)
 
@@ -27,18 +27,18 @@ class WaveProblems(unittest.TestCase):
     def testrows(self):
         try:
             sp=spectrum.ArraySourceSpectrum(self.wv, self.fx)
-        except exceptions.DuplicateWavelength, e:
+        except pysynexcept.DuplicateWavelength, e:
             self.assertEqual(e.rows, 1)
 
     def testneg(self):
         self.wv[0]=0
-        self.assertRaises(exceptions.ZeroWavelength,
+        self.assertRaises(pysynexcept.ZeroWavelength,
                           spectrum.ArraySourceSpectrum,
                           self.wv, self.fx)
 
     def testsort(self):
         random.shuffle(self.wv)
-        self.assertRaises(exceptions.UnsortedWavelength,
+        self.assertRaises(pysynexcept.UnsortedWavelength,
                           spectrum.ArraySourceSpectrum,
                           self.wv, self.fx)
 
@@ -63,12 +63,12 @@ class TestFile(unittest.TestCase):
             pass #ok, not there
 
     def testraises(self):
-        self.assertRaises(exceptions.BadRow,
+        self.assertRaises(pysynexcept.BadRow,
                           spectrum.FileSourceSpectrum,
                           self.fname)
 
     def testrow(self):
         try:
             sp=spectrum.FileSourceSpectrum(self.fname)
-        except exceptions.BadRow, e:
+        except pysynexcept.BadRow, e:
             self.assertEqual(e.rows, 3)

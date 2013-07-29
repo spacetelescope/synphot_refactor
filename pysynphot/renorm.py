@@ -11,7 +11,7 @@ import math
 import numpy as np
 from spectrum import FlatSpectrum, Vega
 from refs import _default_waveset
-from exceptions import DisjointError, OverlapError
+from . import pysynexcept
 import units
 
 
@@ -64,12 +64,13 @@ def StdRenorm(spectrum, band, RNval, RNunitstring, force=False):
                       'throughput has data, therefore proceeding anyway. '
                       'Spectrum will be extrapolated at constant value.')
             else:
-                raise OverlapError('Spectrum and renormalization band do not '
-                                   'fully overlap. You may use force=True to '
-                                   'force the renormalization to proceed.')
+                raise pysynexcept.OverlapError('Spectrum and renormalization '
+                                               'band do not fully overlap. You '
+                                               'may use force=True to force the'
+                                               ' renormalization to proceed.')
         elif stat == 'none':
-            raise DisjointError('Spectrum and renormalization band are '
-                                'disjoint.')
+            raise pysynexcept.DisjointError('Spectrum and renormalization band '
+                                            'are disjoint.')
 
     # Compute the flux of the spectrum through the bandpass and make sure
     # the result makes sense.

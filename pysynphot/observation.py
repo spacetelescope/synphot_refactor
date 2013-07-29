@@ -19,7 +19,7 @@ import binning
 from obsbandpass import pixel_range, wave_range
 from spectrum import ArraySourceSpectrum
 
-import pysynphot.exceptions as exceptions
+from . import pysynexcept
 
 try:
   import pysynphot_utils
@@ -578,7 +578,7 @@ class Observation(spectrum.CompositeSourceSpectrum):
 
         Raises
         ------
-        pysynphot.exceptions.UndefinedBinset
+        pysynphot.pysynexcept.UndefinedBinset
             If the `binwave` attribute is None.
 
         See Also
@@ -588,7 +588,7 @@ class Observation(spectrum.CompositeSourceSpectrum):
         """
         # make sure we have a binset to work with
         if self.binwave is None:
-            raise exceptions.UndefinedBinset('No binset specified for this '
+            raise pysynexcept.UndefinedBinset('No binset specified for this '
                                              'bandpass.')
 
         # start by converting waverange to self.waveunits, if necessary
@@ -623,7 +623,7 @@ class Observation(spectrum.CompositeSourceSpectrum):
 
         Raises
         ------
-        pysynphot.exceptions.UndefinedBinset
+        pysynphot.pysynexcept.UndefinedBinset
             If the `binwave` attribute is None.
 
         See Also
@@ -633,7 +633,7 @@ class Observation(spectrum.CompositeSourceSpectrum):
         """
         # make sure we have a binset to work with
         if self.binwave is None:
-            raise exceptions.UndefinedBinset('No binset specified for this '
+            raise pysynexcept.UndefinedBinset('No binset specified for this '
                                              'bandpass.')
 
         # convert cenwave from waveunits to self.waveunits, if necessary

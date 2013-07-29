@@ -15,7 +15,7 @@ from pysynphot.spectrum import FlatSpectrum
 from pysynphot.spectrum import Integrator
 from pysynphot.spectrum import CompositeSpectralElement
 from pysynphot.observation import Observation
-from pysynphot.exceptions import IncompatibleSources
+from pysynphot.pysynexcept import IncompatibleSources
 
 import pysynphot.units as units
 
