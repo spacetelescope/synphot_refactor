@@ -22,14 +22,14 @@ is part of the instructions to the parser.
 """
 
 from __future__ import division, print_function
-from spark import GenericScanner
-from spark import GenericASTBuilder, GenericASTMatcher
-import spectrum
-import reddening
-import locations
-import catalog
-from obsbandpass import ObsBandpass
-from . import pysynexcept # pysynexcept.DisjoinError, pysynexcept.OverlapError
+
+from . import spark
+from . import spectrum
+from . import reddening
+from . import locations
+from . import catalog
+from . import obsbandpass
+from . import pysynexcept
 
 syfunctions = [
     'spec',
@@ -102,13 +102,13 @@ class AST:
         return cmp(self.type, o)
 
 
-class BaseScanner(GenericScanner):
+class BaseScanner(spark.GenericScanner):
     def __init__(self):
-        GenericScanner.__init__(self)
+        spark.GenericScanner.__init__(self)
 
     def tokenize(self, input):
         self.rv = []
-        GenericScanner.tokenize(self, input)
+        spark.GenericScanner.tokenize(self, input)
         return self.rv
 
     def t_whitespace(self, s):
@@ -156,9 +156,9 @@ class Scanner(BaseScanner):
         self.rv.append(Token(type='/'))
 
 
-class BaseParser(GenericASTBuilder):
+class BaseParser(spark.GenericASTBuilder):
     def __init__(self, ASTclass, start='top'):
-        GenericASTBuilder.__init__(self, ASTclass, start)
+        spark.GenericASTBuilder.__init__(self, ASTclass, start)
 
     def p_top(self, args):
         """
@@ -192,12 +192,12 @@ class BaseParser(GenericASTBuilder):
     def nonterminal(self, type, args):
         if len(args) == 1:
             return args[0]
-        return GenericASTBuilder.nonterminal(self, type, args)
+        return spark.GenericASTBuilder.nonterminal(self, type, args)
 
 
-class Interpreter(GenericASTMatcher):
+class Interpreter(spark.GenericASTMatcher):
     def __init__(self, ast):
-        GenericASTMatcher.__init__(self, 'V', ast)
+        spark.GenericASTMatcher.__init__(self, 'V', ast)
 
     def error(self, token):
         raise ValueError("problems in interpreting AST")
@@ -332,8 +332,8 @@ class Interpreter(GenericASTMatcher):
                 )
             elif fname == 'band':
                 # passband
-                args=tree[2].svalue
-                tree.value = ObsBandpass(args)
+                args = tree[2].svalue
+                tree.value = obsbandpass.ObsBandpass(args)
             elif fname == 'em':
                 # emission line
                 tree.value = spectrum.GaussianSource(args[2], args[0],
