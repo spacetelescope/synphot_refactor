@@ -12,9 +12,9 @@ ObsModeBandpass (ack, terrible name) or a TabularSpectralElement.
 from __future__ import division, print_function
 import numpy as np
 
-from observationmode import ObservationMode
-from spectrum import CompositeSpectralElement, TabularSpectralElement
-import units
+from . import observationmode
+from . import spectrum
+from . import units
 from . import pysynexcept
 
 
@@ -30,17 +30,17 @@ def ObsBandpass(obstring, graphtable=None, comptable=None, component_dict={}):
 
     # Temporarily create an Obsmode to determine whether an
     # ObsModeBandpass or a TabularSpectralElement will be returned.
-    ob = ObservationMode(obstring,
-                         graphtable=graphtable,
-                         comptable=comptable,
-                         component_dict=component_dict)
+    ob = observationmode.ObservationMode(obstring,
+                                         graphtable=graphtable,
+                                         comptable=comptable,
+                                         component_dict=component_dict)
     if len(ob) > 1:
         return ObsModeBandpass(ob)
     else:
-        return TabularSpectralElement(ob.components[0].throughput_name)
+        return spectrum.TabularSpectralElement(ob.components[0].throughput_name)
 
 
-class ObsModeBandpass(CompositeSpectralElement):
+class ObsModeBandpass(spectrum.CompositeSpectralElement):
     """
     Bandpass instantiated from an obsmode string
 
@@ -60,9 +60,9 @@ class ObsModeBandpass(CompositeSpectralElement):
         for i in range(2, len(ob)-1):
             chain = chain*ob.components[i].throughput
 
-        CompositeSpectralElement.__init__(self,
-                                          chain,
-                                          ob.components[-1].throughput)
+        spectrum.CompositeSpectralElement.__init__(self,
+                                                   chain,
+                                                   ob.components[-1].throughput)
 
         self.obsmode = ob
         self.name = self.obsmode._obsmode  # str(self.obsmode)
@@ -275,7 +275,7 @@ def pixel_range(bins, waverange, round='round'):
 
     """
     # make sure that the round keyword is valid
-    if round not in ('round','min','max',None):
+    if round not in ('round', 'min', 'max', None):
         raise ValueError(
             "round keyword must be one of ('round','ciel','floor',None)")
 
@@ -418,15 +418,15 @@ def wave_range(bins, cenwave, npix, round='round'):
     # make sure that the round keyword is valid
     if round not in (None, 'round', 'min', 'max'):
         raise ValueError(
-            "round keyword must be one of (None,'round','min','max')")
+            "round keyword must be one of (None, 'round', 'min', 'max')")
 
     # make sure cenwave is within binset
     if cenwave < bins[0]:
         raise pysynexcept.OverlapError("cenwave is not within binset. Min = %f"
-                                      % bins[0])
+                                       % bins[0])
     elif cenwave > bins[-1]:
         raise pysynexcept.OverlapError("cenwave is not within binset. Max = %f"
-                                      % bins[-1])
+                                       % bins[-1])
 
     # first figure out what index the central wavelength falls at
     diff = cenwave - bins
