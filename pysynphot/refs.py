@@ -4,7 +4,8 @@ from __future__ import division, print_function
 import os.path
 import warnings
 import numpy as np
-from locations import irafconvert, _refTable
+
+from . import locations
 
 _default_waveset = None
 _default_waveset_str = None
@@ -89,8 +90,8 @@ def _set_default_refdata():
     # Component tables are defined here.
 
     try:
-        GRAPHTABLE = _refTable(os.path.join('mtab', '*_tmg.fits'))
-        COMPTABLE = _refTable(os.path.join('mtab', '*_tmc.fits'))
+        GRAPHTABLE = locations._refTable(os.path.join('mtab', '*_tmg.fits'))
+        COMPTABLE = locations._refTable(os.path.join('mtab', '*_tmc.fits'))
     except IOError as e:
         GRAPHTABLE = None
         COMPTABLE = None
@@ -98,7 +99,7 @@ def _set_default_refdata():
                       'functionality will be SEVERELY crippled. ' + str(e))
 
     try:
-        THERMTABLE = _refTable(os.path.join('mtab', '*_tmt.fits'))
+        THERMTABLE = locations._refTable(os.path.join('mtab', '*_tmt.fits'))
     except IOError as e:
         THERMTABLE = None
         warnings.warn('No thermal tables found, '
@@ -136,13 +137,13 @@ def setref(graphtable=None, comptable=None, thermtable=None,
 
     # Otherwise, check them all separately
     if graphtable is not None:
-        GRAPHTABLE = irafconvert(graphtable)
+        GRAPHTABLE = locations.irafconvert(graphtable)
 
     if comptable is not None:
-        COMPTABLE = irafconvert(comptable)
+        COMPTABLE = locations.irafconvert(comptable)
 
     if thermtable is not None:
-        THERMTABLE = irafconvert(thermtable)
+        THERMTABLE = locations.irafconvert(thermtable)
 
     # Area is a bit different:
     if area is not None:
