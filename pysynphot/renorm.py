@@ -9,10 +9,11 @@ one that works, turn it into a method on the spectrum class.
 from __future__ import division, print_function
 import math
 import numpy as np
-from spectrum import FlatSpectrum, Vega
-from refs import _default_waveset
+
+from . import spectrum
+from . import refs
 from . import pysynexcept
-import units
+from . import units
 
 
 def DefineStdSpectraForUnits():
@@ -23,22 +24,22 @@ def DefineStdSpectraForUnits():
     """
 
     # Linear flux-density units
-    units.Flam.StdSpectrum = FlatSpectrum(1, fluxunits='flam')
-    units.Fnu.StdSpectrum = FlatSpectrum(1, fluxunits='fnu')
-    units.Photlam.StdSpectrum = FlatSpectrum(1, fluxunits='photlam')
-    units.Photnu.StdSpectrum = FlatSpectrum(1, fluxunits='photnu')
-    units.Jy.StdSpectrum = FlatSpectrum(1, fluxunits='jy')
-    units.mJy.StdSpectrum = FlatSpectrum(1, fluxunits='mjy')
+    units.Flam.StdSpectrum = spectrum.FlatSpectrum(1, fluxunits='flam')
+    units.Fnu.StdSpectrum = spectrum.FlatSpectrum(1, fluxunits='fnu')
+    units.Photlam.StdSpectrum = spectrum.FlatSpectrum(1, fluxunits='photlam')
+    units.Photnu.StdSpectrum = spectrum.FlatSpectrum(1, fluxunits='photnu')
+    units.Jy.StdSpectrum = spectrum.FlatSpectrum(1, fluxunits='jy')
+    units.mJy.StdSpectrum = spectrum.FlatSpectrum(1, fluxunits='mjy')
 
     # Non-density units
-    scale = 1.0 / _default_waveset.size
-    units.Counts.StdSpectrum = FlatSpectrum(1, fluxunits='counts') * scale
-    units.OBMag.StdSpectrum = FlatSpectrum(1, fluxunits='counts') * scale
+    scale = 1.0 / refs._default_waveset.size
+    units.Counts.StdSpectrum = spectrum.FlatSpectrum(1, fluxunits='counts') * scale
+    units.OBMag.StdSpectrum = spectrum.FlatSpectrum(1, fluxunits='counts') * scale
 
     # Magnitude flux-density units
-    units.ABMag.StdSpectrum = FlatSpectrum(3.63e-20, fluxunits='fnu')
-    units.STMag.StdSpectrum = FlatSpectrum(3.63e-9, fluxunits='flam')
-    units.VegaMag.StdSpectrum = Vega
+    units.ABMag.StdSpectrum = spectrum.FlatSpectrum(3.63e-20, fluxunits='fnu')
+    units.STMag.StdSpectrum = spectrum.FlatSpectrum(3.63e-9, fluxunits='flam')
+    units.VegaMag.StdSpectrum = spectrum.Vega
 
 
 # Call this function so the attributes get added upon import.
