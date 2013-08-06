@@ -2379,4 +2379,9 @@ class Box(SpectralElement):
         self.isAnalytic = False
         self.warnings = {}
 
-Vega = FileSourceSpectrum(locations.VegaFile)
+
+class Vega(FileSourceSpectrum):
+    def __init__(self):
+        FileSourceSpectrum.__init__(locations.VegaFile)
+
+
