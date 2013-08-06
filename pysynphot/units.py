@@ -17,8 +17,8 @@ import math
 import numpy as np
 
 import spectrum  # Circular import
-import binning
-import refs  # needed for PRIMARY_AREA
+from . import binning
+from . import refs  # needed for PRIMARY_AREA
 # cannot just import the constant because it won't get updated
 # when the setref() function is used to change it.
 
