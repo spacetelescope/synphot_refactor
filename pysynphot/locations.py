@@ -6,7 +6,7 @@ import os
 import re
 import warnings
 
-import pyfits
+import pyfits as pf
 
 
 # Replace cdbs_roots lookup with an environment variable
@@ -126,7 +126,7 @@ def _get_RedLaws():
     for f in files:
         lawf = _refTable(f)
 
-        key = pyfits.getval(lawf, 'shortnm')
+        key = pf.getval(lawf, 'shortnm')
 
         RedLaws[key.lower()] = lawf
 
