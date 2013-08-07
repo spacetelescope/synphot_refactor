@@ -7,10 +7,11 @@ extinctions.
 """
 
 from __future__ import division, print_function
-import pyfits
-from spectrum import ArraySpectralElement
-import Cache
-import extinction  # temporary(?) backwards compatibility
+import pyfits as pf
+
+from . import spectrum
+from . import Cache
+from . import extinction  # temporary(?) backwards compatibility
 
 
 class CustomRedLaw(object):
@@ -33,7 +34,7 @@ class CustomRedLaw(object):
 
         """
         T = 10.0**(-0.4*extval*self.obscuration)
-        ans = ArraySpectralElement(wave=self.wave,
+        ans = spectrum.ArraySpectralElement(wave=self.wave,
                                    waveunits=self.waveunits,
                                    throughput=T,
                                    name='%s(Av=%g)' % (self.name, extval)
@@ -48,7 +49,7 @@ class RedLaw(CustomRedLaw):
 
     """
     def __init__(self, filename):
-        f = pyfits.open(filename)
+        f = pf.open(filename)
         d = f[1].data
         CustomRedLaw.__init__(self,
                               wave=d.field('wavelength'),

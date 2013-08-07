@@ -10,13 +10,16 @@ Kurucz and Castelli-Kurucz model atlases.
 """
 
 from __future__ import division, print_function
-from locations import RedLaws
+from . import locations
 
 # if PYSYN_CDBS is undefined RedLaws will be an empty dictionary
 # so we should check whether these assignments are possible
-if 'mwavg' in RedLaws:
-    RedLaws[None]=RedLaws['mwavg']  # Establishes default
-    RedLaws['gal3']=RedLaws['mwavg']  # Temporary: for syn_pysyn testing
+if 'mwavg' in locations.RedLaws:
+    # Establishes default
+    locations.RedLaws[None] = locations.RedLaws['mwavg']
+
+    # Temporary: for syn_pysyn testing
+    locations.RedLaws['gal3'] = locations.RedLaws['mwavg']
 
 CATALOG_CACHE = {}
 

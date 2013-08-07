@@ -12,10 +12,10 @@ ObsModeBandpass (ack, terrible name) or a TabularSpectralElement.
 from __future__ import division, print_function
 import numpy as np
 
-from observationmode import ObservationMode
-from spectrum import CompositeSpectralElement, TabularSpectralElement
-import units
-import pysynphot.exceptions as exceptions
+from . import observationmode
+from . import spectrum
+from . import units
+from . import pysynexcept
 
 
 def ObsBandpass(obstring, graphtable=None, comptable=None, component_dict={}):
@@ -30,17 +30,17 @@ def ObsBandpass(obstring, graphtable=None, comptable=None, component_dict={}):
 
     # Temporarily create an Obsmode to determine whether an
     # ObsModeBandpass or a TabularSpectralElement will be returned.
-    ob = ObservationMode(obstring,
-                         graphtable=graphtable,
-                         comptable=comptable,
-                         component_dict=component_dict)
+    ob = observationmode.ObservationMode(obstring,
+                                         graphtable=graphtable,
+                                         comptable=comptable,
+                                         component_dict=component_dict)
     if len(ob) > 1:
         return ObsModeBandpass(ob)
     else:
-        return TabularSpectralElement(ob.components[0].throughput_name)
+        return spectrum.TabularSpectralElement(ob.components[0].throughput_name)
 
 
-class ObsModeBandpass(CompositeSpectralElement):
+class ObsModeBandpass(spectrum.CompositeSpectralElement):
     """
     Bandpass instantiated from an obsmode string
 
@@ -60,9 +60,9 @@ class ObsModeBandpass(CompositeSpectralElement):
         for i in range(2, len(ob)-1):
             chain = chain*ob.components[i].throughput
 
-        CompositeSpectralElement.__init__(self,
-                                          chain,
-                                          ob.components[-1].throughput)
+        spectrum.CompositeSpectralElement.__init__(self,
+                                                   chain,
+                                                   ob.components[-1].throughput)
 
         self.obsmode = ob
         self.name = self.obsmode._obsmode  # str(self.obsmode)
@@ -145,17 +145,17 @@ class ObsModeBandpass(CompositeSpectralElement):
 
         Raises
         ------
-        pysynphot.exceptions.UndefinedBinset
+        pysynphot.pysynexcept.UndefinedBinset
             If the `binset` attribute is None.
 
         See Also
         --------
-        pixel_range, pysynphot.exceptions.UndefinedBinset
+        pixel_range, pysynphot.pysynexcept.UndefinedBinset
 
         """
         # make sure we have a binset to work with
         if self.binset is None:
-            raise exceptions.UndefinedBinset(
+            raise pysynexcept.UndefinedBinset(
                 'No binset specified for this bandpass.')
 
         # start by converting waverange to self.waveunits, if necessary
@@ -192,17 +192,17 @@ class ObsModeBandpass(CompositeSpectralElement):
 
         Raises
         ------
-        exceptions.UndefinedBinset
+        pysynexcept.UndefinedBinset
             If the `binset` attribute is None.
 
         See Also
         --------
-        wave_range, pysynphot.exceptions.UndefinedBinset
+        wave_range, pysynphot.pysynexcept.UndefinedBinset
 
         """
         # make sure we have a binset to work with
         if self.binset is None:
-            raise exceptions.UndefinedBinset(
+            raise pysynexcept.UndefinedBinset(
                 'No binset specified for this bandpass.')
 
         # convert cenwave from waveunits to self.waveunits, if necessary
@@ -270,12 +270,12 @@ def pixel_range(bins, waverange, round='round'):
     ValueError
         If `round` is not an allowed value.
 
-    pysynphot.exceptions.OverlapError
+    pysynphot.pysynexcept.OverlapError
         If `waverange` exceeds the bounds of `bins`.
 
     """
     # make sure that the round keyword is valid
-    if round not in ('round','min','max',None):
+    if round not in ('round', 'min', 'max', None):
         raise ValueError(
             "round keyword must be one of ('round','ciel','floor',None)")
 
@@ -285,12 +285,12 @@ def pixel_range(bins, waverange, round='round'):
     # make sure the specified waverange is within our .binset
     minwave = bins[0] - (bins[0:2].mean() - bins[0])
     if wave1 < minwave:
-        raise exceptions.OverlapError(
+        raise pysynexcept.OverlapError(
             "Lower bound of waverange is outside of binset. Min = %f" % minwave)
 
     maxwave = bins[-1] + (bins[-1] - bins[-2:].mean())
     if wave2 > maxwave:
-        raise exceptions.OverlapError(
+        raise pysynexcept.OverlapError(
             "Upper bound of waverange is outside of binset. Max = %f" % maxwave)
 
     # if the wavelength ends are the same return 0
@@ -409,7 +409,7 @@ def wave_range(bins, cenwave, npix, round='round'):
     ValueError
         If `round` is not an allowed value.
 
-    pysynphot.exceptions.OverlapError
+    pysynphot.pysynexcept.OverlapError
         If `cenwave` is not within the `binset` attribute,
         or the returned `waverange` would
         exceed the limits of the `binset` attribute.
@@ -418,15 +418,15 @@ def wave_range(bins, cenwave, npix, round='round'):
     # make sure that the round keyword is valid
     if round not in (None, 'round', 'min', 'max'):
         raise ValueError(
-            "round keyword must be one of (None,'round','min','max')")
+            "round keyword must be one of (None, 'round', 'min', 'max')")
 
     # make sure cenwave is within binset
     if cenwave < bins[0]:
-        raise exceptions.OverlapError("cenwave is not within binset. Min = %f"
-                                      % bins[0])
+        raise pysynexcept.OverlapError("cenwave is not within binset. Min = %f"
+                                       % bins[0])
     elif cenwave > bins[-1]:
-        raise exceptions.OverlapError("cenwave is not within binset. Max = %f"
-                                      % bins[-1])
+        raise pysynexcept.OverlapError("cenwave is not within binset. Max = %f"
+                                       % bins[-1])
 
     # first figure out what index the central wavelength falls at
     diff = cenwave - bins
@@ -446,11 +446,11 @@ def wave_range(bins, cenwave, npix, round='round'):
 
     # check ends
     if frac_ind1 < -0.5:
-        raise exceptions.OverlapError(
+        raise pysynexcept.OverlapError(
             "Lower wavelength range is below allowed binset.")
 
     if frac_ind2 > bins.shape[0] - 0.5:
-        raise exceptions.OverlapError(
+        raise pysynexcept.OverlapError(
             "Upper wavelength range is above allowed binset.")
 
     frac1, int1 = np.modf(frac_ind1)

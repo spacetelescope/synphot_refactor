@@ -25,10 +25,10 @@ import os
 import numpy as np
 import pyfits
 
-import spectrum
-import locations
-from Cache import CATALOG_CACHE
-import pysynphot.exceptions as exceptions
+from . import spectrum
+from . import locations
+from . import Cache
+from . import pysynexcept
 
 
 class Icat(spectrum.TabularSourceSpectrum):
@@ -58,7 +58,7 @@ class Icat(spectrum.TabularSourceSpectrum):
         """
         self.isAnalytic = False
 
-        # this is useful for reporting in exceptions which parameter is
+        # this is useful for reporting in pysynexcept which parameter is
         # causing the problems.
         self.parameter_names = ['Teff', 'metallicity', 'log G']
 
@@ -66,8 +66,8 @@ class Icat(spectrum.TabularSourceSpectrum):
         self.name = "%s(Teff=%g,z=%g,logG=%g)" % \
                     (catdir, Teff, metallicity, log_g)
 
-        if filename in CATALOG_CACHE:
-            indices = CATALOG_CACHE[filename]
+        if filename in Cache.CATALOG_CACHE:
+            indices = Cache.CATALOG_CACHE[filename]
         else:
             table = pyfits.open(filename)
 
@@ -78,7 +78,7 @@ class Icat(spectrum.TabularSourceSpectrum):
 
             indices = self._getArgs(indexList, filenameList)
 
-            CATALOG_CACHE[filename] = indices
+            Cache.CATALOG_CACHE[filename] = indices
 
         list0, list1 = self._breakList(indices, 0, Teff)
 
@@ -140,13 +140,13 @@ class Icat(spectrum.TabularSourceSpectrum):
             maxAllowed = array.max()
             s = "Parameter '%s' exceeds data. Max allowed=%f, entered=%f."
             s = s % (self.parameter_names[index], maxAllowed, parameter)
-            raise exceptions.ParameterOutOfBounds(s)
+            raise pysynexcept.ParameterOutOfBounds(s)
 
         elif lowerArray.size == 0:
             minAllowed = array.min()
             s = "Parameter '%s' exceeds data. Min allowed=%f, entered=%f."
             s = s % (self.parameter_names[index], minAllowed, parameter)
-            raise exceptions.ParameterOutOfBounds(s)
+            raise pysynexcept.ParameterOutOfBounds(s)
 
         upper = upperArray.min()
         lower = lowerArray.max()

@@ -4,14 +4,12 @@ from __future__ import division, print_function
 import re
 import numpy as np
 
-import refs
-import spectrum
-import locations
-from locations import irafconvert
-import planck
-import wavetable
-from tables import CompTable, GraphTable
-
+from . import refs
+from . import spectrum
+from . import locations
+from . import planck
+from . import wavetable
+from . import tables
 
 #Flag to control verbosity
 DEBUG = False
@@ -56,11 +54,11 @@ class BaseObservationMode(object):
         else:
             self.modes = modes
 
-#        gt = GraphTable(graphtable)
+#        gt = tables.GraphTable(graphtable)
         if graphtable in refs.GRAPHDICT.keys():
             gt = refs.GRAPHDICT[graphtable]
         else:
-            gt = GraphTable(graphtable)
+            gt = tables.GraphTable(graphtable)
             refs.GRAPHDICT[graphtable] = gt
 
         self.gtname = graphtable
@@ -104,7 +102,7 @@ class BaseObservationMode(object):
                 index = np.where(comptable.compnames == compname)
                 try:
                     iraffilename = comptable.filenames[index[0][0]]
-                    filename = irafconvert(iraffilename)
+                    filename = locations.irafconvert(iraffilename)
                     files.append(filename.lstrip())
                 except IndexError:
                     raise IndexError("Can't find %s in comptable %s" %
@@ -174,7 +172,7 @@ class BaseObservationMode(object):
         return (a, b, c, nwave)
 
     def _getBandwaveFomFile(self, filename):
-        name = irafconvert(filename)
+        name = locations.irafconvert(filename)
 
         fs = open(name, mode='r')
         lines = fs.readlines()
@@ -203,11 +201,11 @@ class ObservationMode(BaseObservationMode):
 
         BaseObservationMode.__init__(self, obsmode, method, graphtable)
 
-#        ct = CompTable(comptable)
+#        ct = tables.CompTable(comptable)
         if comptable in refs.COMPDICT.keys():
             ct = refs.COMPDICT[comptable]
         else:
-            ct = CompTable(comptable)
+            ct = tables.CompTable(comptable)
             refs.COMPDICT[comptable] = ct
 
         self.ctname = comptable
@@ -321,22 +319,22 @@ class _ThermalObservationMode(BaseObservationMode):
             raise NotImplementedError("No thermal support provided for %s"
                                       % obsmode)
 
-#        ct = CompTable(comptable)
+#        ct = tables.CompTable(comptable)
         if comptable in refs.COMPDICT.keys():
             ct = refs.COMPDICT[comptable]
         else:
-            ct = CompTable(comptable)
+            ct = tables.CompTable(comptable)
             refs.COMPDICT[comptable] = ct
 
         self.ctname = comptable
 
         throughput_filenames = self._getFileNames(ct, self.compnames)
 
-#        thct = CompTable(thermtable)
+#        thct = tables.CompTable(thermtable)
         if thermtable in refs.THERMDICT.keys():
             thct = refs.THERMDICT[thermtable]
         else:
-            thct = CompTable(thermtable)
+            thct = tables.CompTable(thermtable)
             refs.THERMDICT[thermtable] = thct
 
         self.thname = thermtable

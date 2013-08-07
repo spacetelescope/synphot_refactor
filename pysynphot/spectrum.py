@@ -22,14 +22,14 @@ import os
 import math
 import warnings
 
-import pyfits
+import pyfits as pf
 import numpy as np
 
-import refs
-import units
-import locations
-import planck
-import pysynphot.exceptions as exceptions  # custom pysyn exceptions
+from . import refs
+from . import units
+from . import locations
+from . import planck
+from . import pysynexcept  # custom pysyn exceptions
 
 # Renormalization constants from synphot:
 PI = 3.14159265               # Mysterious math constant
@@ -151,7 +151,7 @@ class Integrator(object):
                         wlist.append(float(cols[0]))
                         flist.append(float(cols[1]))
                 except Exception as e:
-                    raise exceptions.BadRow("Error reading %s: %s" % (filename,
+                    raise pysynexcept.BadRow("Error reading %s: %s" % (filename,
                                             str(e)),
                                             rows=lcount
                                             )
@@ -166,7 +166,7 @@ class Integrator(object):
         wave = self._wavetable
         if np.any(wave <= 0):
             wrong = np.where(wave <= 0)[0]
-            raise exceptions.ZeroWavelength('Negative or Zero wavelength '
+            raise pysynexcept.ZeroWavelength('Negative or Zero wavelength '
                                             'occurs in wavelength array',
                                             rows=wrong
                                             )
@@ -179,14 +179,14 @@ class Integrator(object):
                 pass
             else:
                 wrong = np.where(sorted != wave)[0]
-                raise exceptions.UnsortedWavelength('Wavelength array is not '
+                raise pysynexcept.UnsortedWavelength('Wavelength array is not '
                                                     'monotonic', rows=wrong
                                                     )
         #Check for duplicate values
         dw = sorted[1:]-sorted[:-1]
         if np.any(dw == 0):
             wrong = np.where(dw == 0)[0]
-            raise exceptions.DuplicateWavelength("Wavelength array contains "
+            raise pysynexcept.DuplicateWavelength("Wavelength array contains "
                                                  "duplicate entries",
                                                  rows=wrong)
 
@@ -371,18 +371,18 @@ class SourceSpectrum(Integrator):
                 pass
 
         # Construct the columns and HDUlist
-        cw = pyfits.Column(name='WAVELENGTH',
-                           array=wave[first:last],
-                           unit=self.waveunits.name,
-                           format=pcodes[_precision])
-        cf = pyfits.Column(name='FLUX',
-                           array=flux[first:last],
-                           unit=self.fluxunits.name,
-                           format=pcodes[_precision])
+        cw = pf.Column(name='WAVELENGTH',
+                       array=wave[first:last],
+                       unit=self.waveunits.name,
+                       format=pcodes[_precision])
+        cf = pf.Column(name='FLUX',
+                       array=flux[first:last],
+                       unit=self.fluxunits.name,
+                       format=pcodes[_precision])
 
         # Make the primary header
-        hdu = pyfits.PrimaryHDU()
-        hdulist = pyfits.HDUList([hdu])
+        hdu = pf.PrimaryHDU()
+        hdulist = pf.HDUList([hdu])
 
         # User-provided keys are written to the primary header
         # so are filename and origin
@@ -399,8 +399,8 @@ class SourceSpectrum(Integrator):
             hdu.header.update(key, *val)
 
         # Make the extension HDU
-        cols = pyfits.ColDefs([cw, cf])
-        hdu = pyfits.new_table(cols)
+        cols = pf.ColDefs([cw, cf])
+        hdu = pf.new_table(cols)
 
         # There are some standard keywords that should be added
         # to the extension header.
@@ -595,7 +595,7 @@ class CompositeSourceSpectrum(SourceSpectrum):
                       '%f, %s: %f'
                 err = err % (str(source1), source1_area,
                              str(source2), source2_area)
-                raise exceptions.IncompatibleSources(err)
+                raise pysynexcept.IncompatibleSources(err)
 
     def __str__(self):
         opdict = {'add': '+', 'multiply': '*'}
@@ -698,7 +698,7 @@ class TabularSourceSpectrum(SourceSpectrum):
             self._readASCII(filename)
 
     def _readFITS(self, filename, fluxname):
-        fs = pyfits.open(filename)
+        fs = pf.open(filename)
 
         self._wavetable = fs[1].data.field('wavelength')
         if fluxname == None:
@@ -953,7 +953,7 @@ class FileSourceSpectrum(TabularSourceSpectrum):
             self._readASCII(filename)
 
     def _readFITS(self, filename, fluxname):
-        fs = pyfits.open(filename)
+        fs = pf.open(filename)
 
         self._wavetable = fs[1].data.field('wavelength')
         if fluxname is None:
@@ -1401,7 +1401,7 @@ class SpectralElement(Integrator):
 
         if num == 0 or den == 0:
             error_str = 'Could not calculate average wavelength of bandpass.'
-            raise exceptions.PysnphotErorr(error_str)
+            raise pysynexcept.PysnphotErorr(error_str)
 
         avg_wave = np.exp(num/den)
 
@@ -1668,18 +1668,18 @@ class SpectralElement(Integrator):
                 pass
 
         # Construct the columns and HDUlist
-        cw = pyfits.Column(name='WAVELENGTH',
-                           array=wave[first:last],
-                           unit=self.waveunits.name,
-                           format=pcodes[_precision])
-        cf = pyfits.Column(name='THROUGHPUT',
-                           array=thru[first:last],
-                           unit='         ',
-                           format=pcodes[_precision])
+        cw = pf.Column(name='WAVELENGTH',
+                       array=wave[first:last],
+                       unit=self.waveunits.name,
+                       format=pcodes[_precision])
+        cf = pf.Column(name='THROUGHPUT',
+                       array=thru[first:last],
+                       unit='         ',
+                       format=pcodes[_precision])
 
         # Make the primary header
-        hdu = pyfits.PrimaryHDU()
-        hdulist = pyfits.HDUList([hdu])
+        hdu = pf.PrimaryHDU()
+        hdulist = pf.HDUList([hdu])
 
         # User-provided keys are written to the primary header;
         # so are filename and origin
@@ -1698,8 +1698,8 @@ class SpectralElement(Integrator):
             hdu.header.update(key, *val)
 
         # Make the extension HDU
-        cols = pyfits.ColDefs([cw, cf])
-        hdu = pyfits.new_table(cols)
+        cols = pf.ColDefs([cw, cf])
+        hdu = pf.new_table(cols)
 
         # There are also some keys to be written to the extension header
         bkeys = dict(expr=(str(self), 'pysyn expression'),
@@ -1873,7 +1873,7 @@ class CompositeSpectralElement(SpectralElement):
                       '%s: %f, %s: %f'
                 err = err % (str(component1), comp1_area,
                              str(component2), comp2_area)
-                raise exceptions.IncompatibleSources(err)
+                raise pysynexcept.IncompatibleSources(err)
 
     def __call__(self, wavelength):
         """
@@ -2025,7 +2025,7 @@ class TabularSpectralElement(SpectralElement):
         self._throughputtable = np.array(tlist, dtype=np.float64)
 
     def _readFITS(self, filename, thrucol='throughput'):
-        fs = pyfits.open(filename)
+        fs = pf.open(filename)
 
         self._wavetable = fs[1].data.field('wavelength')
         self._throughputtable = fs[1].data.field(thrucol)
@@ -2130,7 +2130,7 @@ class FileSpectralElement(TabularSpectralElement):
             self._readASCII(filename)
 
     def _readFITS(self, filename, throughputname):
-        fs = pyfits.open(filename)
+        fs = pf.open(filename)
 
         self._wavetable = fs[1].data.field('wavelength')
         if throughputname is None:
@@ -2189,7 +2189,7 @@ class InterpolatedSpectralElement(SpectralElement):
 
         self.interpval = wavelength
 
-        fs = pyfits.open(self.name)
+        fs = pf.open(self.name)
 
         # if the file has the PARAMS header keyword and if it is set to
         # WAVELENGTH then we want to perform a wavelength shift before
@@ -2228,8 +2228,7 @@ class InterpolatedSpectralElement(SpectralElement):
                                  fs[1].data[colNames[colWaves.index(wavelength)]
                                             ])
         # need interpolation
-        elif self.interpval > colWaves[0] \
-                and self.interpval < colWaves[-1]:
+        elif (self.interpval > colWaves[0]) and (self.interpval < colWaves[-1]):
             upper_ind = np.searchsorted(colWaves, self.interpval)
             lower_ind = upper_ind - 1
 
@@ -2263,7 +2262,7 @@ class InterpolatedSpectralElement(SpectralElement):
         elif not extrapolate and 'THROUGHPUT' not in fs[1].data.names:
             s = 'Cannot extrapolate and no default throughput for %s' % \
                 (fileName,)
-            raise exceptions.ExtrapolationNotAllowed(s)
+            raise pysynexcept.ExtrapolationNotAllowed(s)
         # assign units
         self.waveunits = units.Units(fs[1].header['tunit1'].lower())
         self.throughputunits = 'none'
@@ -2380,4 +2379,9 @@ class Box(SpectralElement):
         self.isAnalytic = False
         self.warnings = {}
 
-Vega = FileSourceSpectrum(locations.VegaFile)
+
+class Vega(FileSourceSpectrum):
+    def __init__(self):
+        FileSourceSpectrum.__init__(locations.VegaFile)
+
+

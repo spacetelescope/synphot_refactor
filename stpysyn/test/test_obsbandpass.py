@@ -2,7 +2,7 @@ import unittest
 import nose.tools
 
 import pysynphot as S
-import pysynphot.exceptions as exceptions
+import pysynphot.pysynexcept as exceptions
 
 from pysynphot.obsbandpass import pixel_range, wave_range
 from stpysyn.test import testutil

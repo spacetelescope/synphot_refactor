@@ -34,6 +34,7 @@ distribute-*.tar.gz
 *~
 .idea
 .c9revisions
+.svn
 
 # Mac OSX
 .DS_Store
