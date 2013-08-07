@@ -12,20 +12,19 @@ from __future__ import division, print_function
 import numpy as np
 import math
 
-import spectrum
-import units
-import binning
+from . import spectrum
+from . import units
+from . import binning
 
-from obsbandpass import pixel_range, wave_range
-from spectrum import ArraySourceSpectrum
-
-import pysynphot.exceptions as exceptions
+from . import obsbandpass
+from . import pysynexcept
 
 try:
-  import pysynphot_utils
-  utils_imported = True
+    import pysynphot_utils
+    utils_imported = True
 except ImportError:
-  utils_imported = False
+    pysynphot_utils = None
+    utils_imported = False
 
 
 def check_overlap(a, b):
@@ -578,7 +577,7 @@ class Observation(spectrum.CompositeSourceSpectrum):
 
         Raises
         ------
-        pysynphot.exceptions.UndefinedBinset
+        pysynphot.pysynexcept.UndefinedBinset
             If the `binwave` attribute is None.
 
         See Also
@@ -588,7 +587,7 @@ class Observation(spectrum.CompositeSourceSpectrum):
         """
         # make sure we have a binset to work with
         if self.binwave is None:
-            raise exceptions.UndefinedBinset('No binset specified for this '
+            raise pysynexcept.UndefinedBinset('No binset specified for this '
                                              'bandpass.')
 
         # start by converting waverange to self.waveunits, if necessary
@@ -603,7 +602,7 @@ class Observation(spectrum.CompositeSourceSpectrum):
 
             waverange = units.Angstrom().Convert(waverange, self.waveunits.name)
 
-        return pixel_range(self.binwave, waverange, round=round)
+        return obsbandpass.pixel_range(self.binwave, waverange, round=round)
 
     def wave_range(self, cenwave, npix, waveunits=None, round='round'):
         """
@@ -623,7 +622,7 @@ class Observation(spectrum.CompositeSourceSpectrum):
 
         Raises
         ------
-        pysynphot.exceptions.UndefinedBinset
+        pysynphot.pysynexcept.UndefinedBinset
             If the `binwave` attribute is None.
 
         See Also
@@ -633,7 +632,7 @@ class Observation(spectrum.CompositeSourceSpectrum):
         """
         # make sure we have a binset to work with
         if self.binwave is None:
-            raise exceptions.UndefinedBinset('No binset specified for this '
+            raise pysynexcept.UndefinedBinset('No binset specified for this '
                                              'bandpass.')
 
         # convert cenwave from waveunits to self.waveunits, if necessary
@@ -644,7 +643,7 @@ class Observation(spectrum.CompositeSourceSpectrum):
             cenwave = waveunits.ToAngstrom(cenwave)
             cenwave = units.Angstrom().Convert(cenwave, self.waveunits.name)
 
-        wave1, wave2 = wave_range(self.binwave, cenwave, npix, round=round)
+        wave1, wave2 = obsbandpass.wave_range(self.binwave, cenwave, npix, round=round)
 
         # translate ends to waveunits, if necessary
         if waveunits is not None:
@@ -684,9 +683,9 @@ class Observation(spectrum.CompositeSourceSpectrum):
         else:
             wave, flux = self.wave, self.flux
 
-        result = ArraySourceSpectrum(wave, flux,
-                                     self.waveunits,
-                                     self.fluxunits,
-                                     name=self.name,
-                                     keepneg=True)
+        result = spectrum.ArraySourceSpectrum(wave, flux,
+                                              self.waveunits,
+                                              self.fluxunits,
+                                              name=self.name,
+                                              keepneg=True)
         return result

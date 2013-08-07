@@ -1,7 +1,7 @@
 import unittest
 from nose.exc import SkipTest
 import pysynphot.spparser as parser
-from pysynphot.exceptions import DisjointError, OverlapError
+from pysynphot.pysynexcept import DisjointError, OverlapError
 
 def test_double_slash():
     sp = parser.parse_spec("spec($PYSYN_CDBS//calspec/gd71_mod_005.fits)")

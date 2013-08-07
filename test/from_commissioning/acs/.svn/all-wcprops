@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/astrolib/!svn/ver/3355/trunk/pysynphot/test/from_commissioning/acs
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/astrolib/!svn/ver/3355/trunk/pysynphot/test/from_commissioning/acs/__init__.py
+END
+test1.py
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/astrolib/!svn/ver/3355/trunk/pysynphot/test/from_commissioning/acs/test1.py
+END
+test2.py
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/astrolib/!svn/ver/3355/trunk/pysynphot/test/from_commissioning/acs/test2.py
+END
+test3.py
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/astrolib/!svn/ver/3355/trunk/pysynphot/test/from_commissioning/acs/test3.py
+END
+test4.py
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/astrolib/!svn/ver/3355/trunk/pysynphot/test/from_commissioning/acs/test4.py
+END
+test5.py
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/astrolib/!svn/ver/3355/trunk/pysynphot/test/from_commissioning/acs/test5.py
+END
+test6.py
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/astrolib/!svn/ver/3355/trunk/pysynphot/test/from_commissioning/acs/test6.py
+END
+test7.py
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/astrolib/!svn/ver/3355/trunk/pysynphot/test/from_commissioning/acs/test7.py
+END

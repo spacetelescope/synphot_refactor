@@ -8,8 +8,8 @@ http://stackoverflow.com/questions/844505/is-a-graph-library-eg-networkx-the-rig
 """
 
 from __future__ import division, print_function
-from collections import defaultdict
-import pyfits
+import collections
+import pyfits as pf
 
 
 class GraphNode(object):
@@ -91,7 +91,7 @@ class GraphPath(object):
 
 class GraphTable(object):
     def __init__(self, fname):
-        self.tab = defaultdict(GraphNode)
+        self.tab = collections.defaultdict(GraphNode)
         self.tname = fname
         self.problemset = set()
         self.inittab()
@@ -111,7 +111,7 @@ class GraphTable(object):
         # Both FITS files and text files are supported
         # In either case, process one row at a time
         if self.tname.endswith('.fits'):
-            f = pyfits.open(self.tname)
+            f = pf.open(self.tname)
 
             if 'PRIMAREA' in f[0].header:
                 self.primary_area = f[0].header['PRIMAREA']
@@ -350,7 +350,7 @@ class CompTable(object):
         # Support fits or text files
         # Should the filenames be converted at this point, or later?
         if self.tname.endswith('.fits'):
-            f = pyfits.open(self.tname)
+            f = pf.open(self.tname)
             for row in f[1].data:
                 self.tab[row.field('compname')] = row.field('filename')
             f.close()

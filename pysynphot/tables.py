@@ -7,7 +7,7 @@ Objects that represent comp tables and graph tables.
 
 from __future__ import division, print_function
 import numpy as np
-import pyfits
+import pyfits as pf
 
 #Flag to control verbosity
 DEBUG = False
@@ -35,14 +35,14 @@ class CompTable(object):
         """
 
         # None is common for various errors.
-        # the default value of None is not useful; pyfits.open(None)
+        # the default value of None is not useful; pf.open(None)
         # does not work.
         if CFile is None:
             raise TypeError(
                 'initializing CompTable with CFile=None; possible bad/missing'
                 ' CDBS')
 
-        cp = pyfits.open(CFile)
+        cp = pf.open(CFile)
 
         self.compnames = cp[1].data.field('compname')
         self.filenames = cp[1].data.field('filename')
@@ -82,13 +82,13 @@ class GraphTable(object):
 
         # None is common for various errors.
         # the default value of None is not useful;
-        # pyfits.open(None) does not work.
+        # pf.open(None) does not work.
         if GFile is None:
             raise TypeError(
                 'initializing GraphTable with GFile=None; '
                 'possible bad/missing CDBS')
 
-        gp = pyfits.open(GFile)
+        gp = pf.open(GFile)
 
         if 'PRIMAREA' in gp[0].header:
             self.primary_area = gp[0].header['PRIMAREA']
