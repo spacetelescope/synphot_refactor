@@ -1,17 +1,28 @@
 from __future__ import division
-import sys
-import os
 
-import numpy as N
-import pyfits
-from stpysyn.test import testutil
+# STDLIB
+import os
+import sys
+
+# THIRD-PARTY
+import numpy as np
+
+# ASTROPY
+from astropy.io import fits
+
+# PYSYNPHOT
+import pysynphot as S
 from pysynphot import units, locations, spectrum, refs
 from pysynphot.obsbandpass import ObsBandpass
-import pysynphot as S
+
+# LOCAL
+from . import testutil
+
 
 ## TO RUN IN A SINGLE TEST IN DEBUG MODE:
 ## import ui_test
 ## ui_test.FileTestCase('testwave').debug()
+
 
 class MergeTestCase(testutil.FPTestCase):
     """Demonstrate the problem described in ticket #34:
@@ -20,15 +31,16 @@ class MergeTestCase(testutil.FPTestCase):
 
     def testwave(self):
         """tickettest.MergeTestCase('testwave'): merge simple identical wavesets: #34"""
-        foo=N.array(range(10,20),dtype=N.float64)
+        foo=np.array(range(10,20),dtype=np.float64)
         x=spectrum.MergeWaveSets(foo,foo)
         self.assertEqualNumpy(foo,x)
+
 
 class FileTestCase(testutil.FPTestCase):
     def setUp(self):
         self.fname = os.path.join(locations.rootdir,'calspec','feige66_002.fits')
         self.sp = S.FileSpectrum(self.fname)
-        self.openfits = pyfits.open(self.fname)
+        self.openfits = fits.open(self.fname)
 
     def testwave(self):
         "ui_test.FileTestCase('testwave'): r164 wave"
@@ -47,9 +59,9 @@ class FileTestCase(testutil.FPTestCase):
 
     def testresample(self):
         "ui_test.FileTestCase('testresample'): Tests #24"
-        sp2=self.sp.resample(N.arange(10000,18000,2))
+        sp2=self.sp.resample(np.arange(10000,18000,2))
         self.failIf(sp2.fluxunits is None)
-        #self.assertEqualNumpy(sp2.wave, N.arange(10000,18000,2))
+        #self.assertEqualNumpy(sp2.wave, np.arange(10000,18000,2))
 
     def testadd(self):
         "ui_test.FileTestCase('testadd'): Add two spectra"
@@ -67,18 +79,18 @@ class FileTestCase(testutil.FPTestCase):
     def tearDown(self):
         self.openfits.close()
 
+
 class TabTestCase(testutil.FPTestCase):
     def setUp(self):
         self.fname = os.path.join(locations.rootdir,'calspec','feige66_002.fits')
         self.old_sp = S.FileSpectrum(self.fname)
-        self.openfits = pyfits.open(self.fname)
+        self.openfits = fits.open(self.fname)
         fdata=self.openfits[1].data
         self.new_sp = S.ArraySpectrum(wave=fdata.field('wavelength'),
                                       flux=fdata.field('flux'),
                                       waveunits=self.openfits[1].header['tunit1'],
                                       fluxunits=self.openfits[1].header['tunit2'],
                                       name='table from feige66')
-
 
     def testwave(self):
         "ui_test.TabTestCase('testwave'): .wave equal"
@@ -114,6 +126,7 @@ class TabTestCase(testutil.FPTestCase):
 
     def tearDown(self):
         self.openfits.close()
+
 
 class FSSTestCase(testutil.FPTestCase):
     "Test operations on a FileSourceSpectrum"
@@ -174,6 +187,7 @@ class BandTestCase(testutil.FPTestCase):
         bp1=ObsBandpass('acs,hrc,f555w')
         self.assert_(len(bp1) == 6)
 
+
 class UnitTestCase(testutil.FPTestCase):
     def setUp(self):
         self.uspec=S.FlatSpectrum(1.0,fluxunits='flam')
@@ -184,6 +198,7 @@ class UnitTestCase(testutil.FPTestCase):
         numerical issues."""
         self.uspec.convert('fnu')
         self.failIf(self.uspec.flux.mean() == 1.0)
+
 
 class EnforceUnitsCase(testutil.FPTestCase):
     def setUp(self):
@@ -206,11 +221,12 @@ class EnforceUnitsCase(testutil.FPTestCase):
                           self.sp.wave,self.sp.flux,
                           'angstrom',self.fluxunits)
 
+
 class TabularCase(testutil.FPTestCase):
     """Test new ArraySpectrum inheriting from TabularSourceSpectrum"""
     def setUp(self):
         self.inwave=S.Waveset(1300,1800)
-        self.influx=-2.5*N.log10(self.inwave**2)
+        self.influx=-2.5*np.log10(self.inwave**2)
         self.sp=S.ArraySpectrum(wave=self.inwave,flux=self.influx,
                                 fluxunits='abmag')
 
@@ -224,15 +240,16 @@ class TabularCase(testutil.FPTestCase):
 
     def testconvert(self):
         self.sp.convert('flam')
-        self.failIf(N.any(self.influx == self.sp.flux))
+        self.failIf(np.any(self.influx == self.sp.flux))
 
     def teststring(self):
         foo=str(self.sp)
 
+
 class Tab2(TabularCase):
     def setUp(self):
         self.inwave=S.Waveset(1300,1800)
-        self.influx=N.random.lognormal(size=len(self.inwave))*1e-15
+        self.influx=np.random.lognormal(size=len(self.inwave))*1e-15
         self.sp=S.ArraySpectrum(wave=self.inwave,flux=self.influx,
                                 waveunits='nm',fluxunits='fnu',
                                 name='Tab2 spectrum')
@@ -243,6 +260,7 @@ class Tab2(TabularCase):
 
     def teststring(self):
         self.assert_(str(self.sp) == 'Tab2 spectrum')
+
 
 if __name__ == '__main__':
     if 'debug' in sys.argv:

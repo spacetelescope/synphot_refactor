@@ -18,13 +18,18 @@ More information on catalogs can be found at
 http://www.stsci.edu/hst/HST_overview/documents/synphot/AppA_Catalogs.html#57
 
 """
-
 from __future__ import division, print_function
 
+# STDLIB
 import os
-import numpy as np
-import pyfits
 
+# THIRD-PARTY
+import numpy as np
+
+# ASTROPY
+from astropy.io import fits
+
+# LOCAL
 from . import spectrum
 from . import locations
 from . import Cache
@@ -69,12 +74,9 @@ class Icat(spectrum.TabularSourceSpectrum):
         if filename in Cache.CATALOG_CACHE:
             indices = Cache.CATALOG_CACHE[filename]
         else:
-            table = pyfits.open(filename)
-
-            indexList = table[1].data.field('INDEX')
-            filenameList = table[1].data.field('FILENAME')
-
-            table.close()
+            with fits.open(filename) as table:
+                indexList = table[1].data.field('INDEX')
+                filenameList = table[1].data.field('FILENAME')
 
             indices = self._getArgs(indexList, filenameList)
 

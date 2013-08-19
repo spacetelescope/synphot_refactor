@@ -1,13 +1,21 @@
 from __future__ import division
+
+# STDLIB
 import os
 import sys
 
-import numpy as N
-import pyfits
+# THIRD-PARTY
+import numpy as np
 
-from stpysyn.test import testutil
+# ASTROPY
+from astropy.io import fits
+
+# PYSYNPHOT
 import pysynphot as S
 from pysynphot import locations
+
+# LOCAL
+from . import testutil
 
 
 ## TO RUN IN A SINGLE TEST IN DEBUG MODE:
@@ -19,7 +27,7 @@ class FileTestCase(testutil.FPTestCase):
     def setUp(self):
         self.fname = os.path.join(locations.rootdir,'calspec','feige66_002.fits')
         self.sp = S.FileSpectrum(self.fname)
-        self.openfits = pyfits.open(self.fname)
+        self.openfits = fits.open(self.fname)
 
     def testsubtract(self):
         "ui_test.FileTestCase('testsub'): Subtract two spectra, #23"
@@ -30,17 +38,19 @@ class FileTestCase(testutil.FPTestCase):
     def tearDown(self):
         self.openfits.close()
 
+
 class TicketXX(testutil.FPTestCase):
     def setUp(self):
         self.sp=S.FlatSpectrum(1)
         self.z=2.5
-        self.wavecheck=N.array([550])
+        self.wavecheck=np.array([550])
 
 
     def testfluxpt(self):
         tst=self.sp.redshift(self.z)
         tstpt=tst(self.wavecheck)[0]
         self.assert_(tst.flux.max() == tstpt,"tstpt=%f"%tstpt)
+
 
 class FileSpecIRAF(testutil.FPTestCase):
     def setUp(self):
@@ -54,6 +64,7 @@ class FileSpecIRAF(testutil.FPTestCase):
         self.assertEqual(os.path.normpath(self.ref.name),
                          os.path.normpath(self.tst.name))
 
+
 class FileSpecEnv(FileSpecIRAF):
     def setUp(self):
         self.opener = S.FileSpectrum
@@ -61,6 +72,7 @@ class FileSpecEnv(FileSpecIRAF):
         self.ref=S.FileSpectrum(os.path.join(os.environ['PYSYN_CDBS'],
                                              'calspec',
                                              'hz2_005.fits'))
+
 
 class FileBandIRAF(FileSpecIRAF):
     def setUp(self):
@@ -70,6 +82,7 @@ class FileBandIRAF(FileSpecIRAF):
                                                'comp','ota',
                                                'hst_ota_007_syn.fits'))
 
+
 class FileBandEnv(FileSpecIRAF):
     def setUp(self):
         self.opener = S.FileBandpass
@@ -77,6 +90,7 @@ class FileBandEnv(FileSpecIRAF):
         self.ref = S.FileBandpass(os.path.join(os.environ['PYSYN_CDBS'],
                                                'comp','ota',
                                                'hst_ota_007_syn.fits'))
+
 
 if __name__ == '__main__':
     if 'debug' in sys.argv:
