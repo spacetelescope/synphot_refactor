@@ -1,12 +1,14 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-
 from __future__ import division, print_function
+
+# STDLIB
 import glob
 import os
 import re
 import warnings
 
-import pyfits as pf
+# ASTROPY
+from astropy.io import fits
 
 
 # Replace cdbs_roots lookup with an environment variable
@@ -126,7 +128,7 @@ def _get_RedLaws():
     for f in files:
         lawf = _refTable(f)
 
-        key = pf.getval(lawf, 'shortnm')
+        key = fits.getval(lawf, 'shortnm')
 
         RedLaws[key.lower()] = lawf
 

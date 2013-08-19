@@ -15,7 +15,7 @@ interface for interactive use.
 Dependencies
 =============
 - numpy 1.5.1 or greater
-- pyfits 2.4 or greater
+- astropy 0.2 or greater
 
 
 Environment
