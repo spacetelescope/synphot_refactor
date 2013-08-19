@@ -1,22 +1,26 @@
 from __future__ import division
-from unittest import TestCase
+
+# STDLIB
 import os
+from unittest import TestCase
 
-from stpysyn.test.testutil import skip
-
+# PYSYNPHOT
 try:
     from pysynphot.graphtab import GraphTable
 except ImportError:
     print "Warning, the tests won't run; GraphTable not yet implemented"
 
+# LOCAL
+from .testutil import skip
+
 
 def make_tmg(strdata,tmgname):
     """Helper function"""
-    out=open(tmgname,'w')
-    out.write(strdata)
-    out.flush()
-    out.close()
-##     tbhdu=pyfits.tcreate('data.txt',cdfile='cdfile.txt',hfile='h1.txt')
+    with open(tmgname,'w') as out:
+        out.write(strdata)
+        out.flush()
+
+##     tbhdu=fits.tcreate('data.txt',cdfile='cdfile.txt',hfile='h1.txt')
 ##     tbhdu.writeto(tmgname, clobber=True)
 
 

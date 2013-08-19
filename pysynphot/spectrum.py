@@ -1,35 +1,33 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-
 """
-Module: spectrum.py
-
 Contains SourceSpectrum and SpectralElement class definitions and
 their subclasses.
 
 Also contains the Vega object, which is an instance of a FileSourceSpectrum
 that can be imported from this file and used for Vega-related calculations.
 
-:Dependencies:
-pyfits, numpy
-
-
 """
-
 from __future__ import division, print_function
 
-import re
-import os
+# STDLIB
 import math
+import os
+import re
 import warnings
 
-import pyfits as pf
+# THIRD-PARTY
 import numpy as np
 
+# ASTROPY
+from astropy.io import fits
+
+# LOCAL
 from . import refs
 from . import units
 from . import locations
 from . import planck
 from . import pysynexcept  # custom pysyn exceptions
+
 
 # Renormalization constants from synphot:
 PI = 3.14159265               # Mysterious math constant
@@ -371,18 +369,18 @@ class SourceSpectrum(Integrator):
                 pass
 
         # Construct the columns and HDUlist
-        cw = pf.Column(name='WAVELENGTH',
-                       array=wave[first:last],
-                       unit=self.waveunits.name,
-                       format=pcodes[_precision])
-        cf = pf.Column(name='FLUX',
-                       array=flux[first:last],
-                       unit=self.fluxunits.name,
-                       format=pcodes[_precision])
+        cw = fits.Column(name='WAVELENGTH',
+                         array=wave[first:last],
+                         unit=self.waveunits.name,
+                         format=pcodes[_precision])
+        cf = fits.Column(name='FLUX',
+                         array=flux[first:last],
+                         unit=self.fluxunits.name,
+                         format=pcodes[_precision])
 
         # Make the primary header
-        hdu = pf.PrimaryHDU()
-        hdulist = pf.HDUList([hdu])
+        hdu = fits.PrimaryHDU()
+        hdulist = fits.HDUList([hdu])
 
         # User-provided keys are written to the primary header
         # so are filename and origin
@@ -399,8 +397,8 @@ class SourceSpectrum(Integrator):
             hdu.header.update(key, *val)
 
         # Make the extension HDU
-        cols = pf.ColDefs([cw, cf])
-        hdu = pf.new_table(cols)
+        cols = fits.ColDefs([cw, cf])
+        hdu = fits.new_table(cols)
 
         # There are some standard keywords that should be added
         # to the extension header.
@@ -698,17 +696,14 @@ class TabularSourceSpectrum(SourceSpectrum):
             self._readASCII(filename)
 
     def _readFITS(self, filename, fluxname):
-        fs = pf.open(filename)
+        with fits.open(filename) as fs:
+            self._wavetable = fs[1].data.field('wavelength')
+            if fluxname == None:
+                fluxname = 'flux'
+            self._fluxtable = fs[1].data.field(fluxname)
 
-        self._wavetable = fs[1].data.field('wavelength')
-        if fluxname == None:
-            fluxname = 'flux'
-        self._fluxtable = fs[1].data.field(fluxname)
-
-        self.waveunits = units.Units(fs[1].header['tunit1'].lower())
-        self.fluxunits = units.Units(fs[1].header['tunit2'].lower())
-
-        fs.close()
+            self.waveunits = units.Units(fs[1].header['tunit1'].lower())
+            self.fluxunits = units.Units(fs[1].header['tunit2'].lower())
 
     def _readASCII(self, filename):
         """
@@ -953,22 +948,19 @@ class FileSourceSpectrum(TabularSourceSpectrum):
             self._readASCII(filename)
 
     def _readFITS(self, filename, fluxname):
-        fs = pf.open(filename)
+        with fits.open(filename) as fs:
+            self._wavetable = fs[1].data.field('wavelength')
+            if fluxname is None:
+                fluxname = 'flux'
+            self._fluxtable = fs[1].data.field(fluxname)
+            self.waveunits = units.Units(fs[1].header['tunit1'].lower())
+            self.fluxunits = units.Units(fs[1].header['tunit2'].lower())
 
-        self._wavetable = fs[1].data.field('wavelength')
-        if fluxname is None:
-            fluxname = 'flux'
-        self._fluxtable = fs[1].data.field(fluxname)
-        self.waveunits = units.Units(fs[1].header['tunit1'].lower())
-        self.fluxunits = units.Units(fs[1].header['tunit2'].lower())
-
-        # Retain the header information as a convenience for the user.
-        # If duplicate keywords exist, the value in the extension
-        # header will override that in the primary.
-        self.fheader = dict(fs[0].header)
-        self.fheader.update(dict(fs[1].header))
-
-        fs.close()
+            # Retain the header information as a convenience for the user.
+            # If duplicate keywords exist, the value in the extension
+            # header will override that in the primary.
+            self.fheader = dict(fs[0].header)
+            self.fheader.update(dict(fs[1].header))
 
     def _readASCII(self, filename):
         """
@@ -1668,18 +1660,18 @@ class SpectralElement(Integrator):
                 pass
 
         # Construct the columns and HDUlist
-        cw = pf.Column(name='WAVELENGTH',
-                       array=wave[first:last],
-                       unit=self.waveunits.name,
-                       format=pcodes[_precision])
-        cf = pf.Column(name='THROUGHPUT',
-                       array=thru[first:last],
-                       unit='         ',
-                       format=pcodes[_precision])
+        cw = fits.Column(name='WAVELENGTH',
+                         array=wave[first:last],
+                         unit=self.waveunits.name,
+                         format=pcodes[_precision])
+        cf = fits.Column(name='THROUGHPUT',
+                         array=thru[first:last],
+                         unit='         ',
+                         format=pcodes[_precision])
 
         # Make the primary header
-        hdu = pf.PrimaryHDU()
-        hdulist = pf.HDUList([hdu])
+        hdu = fits.PrimaryHDU()
+        hdulist = fits.HDUList([hdu])
 
         # User-provided keys are written to the primary header;
         # so are filename and origin
@@ -1698,8 +1690,8 @@ class SpectralElement(Integrator):
             hdu.header.update(key, *val)
 
         # Make the extension HDU
-        cols = pf.ColDefs([cw, cf])
-        hdu = pf.new_table(cols)
+        cols = fits.ColDefs([cw, cf])
+        hdu = fits.new_table(cols)
 
         # There are also some keys to be written to the extension header
         bkeys = dict(expr=(str(self), 'pysyn expression'),
@@ -2025,17 +2017,14 @@ class TabularSpectralElement(SpectralElement):
         self._throughputtable = np.array(tlist, dtype=np.float64)
 
     def _readFITS(self, filename, thrucol='throughput'):
-        fs = pf.open(filename)
+        with fits.open(filename) as fs:
+            self._wavetable = fs[1].data.field('wavelength')
+            self._throughputtable = fs[1].data.field(thrucol)
 
-        self._wavetable = fs[1].data.field('wavelength')
-        self._throughputtable = fs[1].data.field(thrucol)
+            self.waveunits = units.Units(fs[1].header['tunit1'].lower())
+            self.throughputunits = 'none'
 
-        self.waveunits = units.Units(fs[1].header['tunit1'].lower())
-        self.throughputunits = 'none'
-
-        self.getHeaderKeywords(fs[1].header)
-
-        fs.close()
+            self.getHeaderKeywords(fs[1].header)
 
     def getHeaderKeywords(self, header):
         """
@@ -2130,21 +2119,18 @@ class FileSpectralElement(TabularSpectralElement):
             self._readASCII(filename)
 
     def _readFITS(self, filename, throughputname):
-        fs = pf.open(filename)
+        with fits.open(filename) as fs:
+            self._wavetable = fs[1].data.field('wavelength')
+            if throughputname is None:
+                throughputname = 'throughput'
+            self._throughputtable = fs[1].data.field(throughputname)
+            self.waveunits = units.Units(fs[1].header['tunit1'].lower())
 
-        self._wavetable = fs[1].data.field('wavelength')
-        if throughputname is None:
-            throughputname = 'throughput'
-        self._throughputtable = fs[1].data.field(throughputname)
-        self.waveunits = units.Units(fs[1].header['tunit1'].lower())
-
-        # Retain the header information as a convenience for the user.
-        # If duplicate keywords exist, the value in the extension
-        # header will override that in the primary.
-        self.fheader = dict(fs[0].header)
-        self.fheader.update(dict(fs[1].header))
-
-        fs.close()
+            # Retain the header information as a convenience for the user.
+            # If duplicate keywords exist, the value in the extension
+            # header will override that in the primary.
+            self.fheader = dict(fs[0].header)
+            self.fheader.update(dict(fs[1].header))
 
     def _readASCII(self, filename):
         """
@@ -2189,83 +2175,83 @@ class InterpolatedSpectralElement(SpectralElement):
 
         self.interpval = wavelength
 
-        fs = pf.open(self.name)
+        with fits.open(self.name) as fs:
 
-        # if the file has the PARAMS header keyword and if it is set to
-        # WAVELENGTH then we want to perform a wavelength shift before
-        # interpolation, otherwise we don't want to shift.
-        if 'PARAMS' in fs[0].header and fs[0].header['PARAMS'].lower() == \
-                'wavelength':
-            doshift = True
-        else:
-            doshift = False
+            # if the file has the PARAMS header keyword and if it is set to
+            # WAVELENGTH then we want to perform a wavelength shift before
+            # interpolation, otherwise we don't want to shift.
+            if (('PARAMS' in fs[0].header) and
+                    (fs[0].header['PARAMS'].lower() == 'wavelength')):
+                doshift = True
+            else:
+                doshift = False
 
-        # check whether we are supposed to extrapolate when we're given an
-        # interpolation value beyond the columns of the table.
-        # extrapolation is assumed to false if the EXTRAP keyword is missing.
-        if 'EXTRAP' in fs[0].header and fs[0].header['EXTRAP'] is True:
-            extrapolate = True
-        else:
-            extrapolate = False
+            # check whether we are supposed to extrapolate when we're given an
+            # interpolation value beyond the columns of the table.
+            # extrapolation is assumed false if the EXTRAP keyword is missing.
+            if 'EXTRAP' in fs[0].header and fs[0].header['EXTRAP'] is True:
+                extrapolate = True
+            else:
+                extrapolate = False
 
-        # The wavelength table will have to be adjusted before use
-        wave0 = fs[1].data.field('wavelength')
+            # The wavelength table will have to be adjusted before use
+            wave0 = fs[1].data.field('wavelength')
 
-        #Determine the columns that bracket the desired value
-        # grab all columns that begin with the parameter name (e.g. 'MJD#')
-        # then split off the numbers after the '#'
-        colNames = [n for n in fs[1].data.names if
-                    n.startswith(colSpec.upper())]
-        colWaves = [float(cn.split('#')[1]) for cn in colNames]
+            #Determine the columns that bracket the desired value
+            # grab all columns that begin with the parameter name (e.g. 'MJD#')
+            # then split off the numbers after the '#'
+            colNames = [n for n in fs[1].data.names if
+                        n.startswith(colSpec.upper())]
+            colWaves = [float(cn.split('#')[1]) for cn in colNames]
 
-        if colNames:
-            raise StandardError('File %s contains no interpolated columns.' %
-                                (fileName,))
+            if colNames:
+                raise StandardError('File {0} contains no interpolated '
+                                    'columns.'.format(fileName))
 
-        # easy case: wavelength matches a column
-        if self.interpval in colWaves:
-            self._no_interp_init(wave0,
-                                 fs[1].data[colNames[colWaves.index(wavelength)]
-                                            ])
-        # need interpolation
-        elif (self.interpval > colWaves[0]) and (self.interpval < colWaves[-1]):
-            upper_ind = np.searchsorted(colWaves, self.interpval)
-            lower_ind = upper_ind - 1
+            # easy case: wavelength matches a column
+            if self.interpval in colWaves:
+                self._no_interp_init(
+                    wave0, fs[1].data[colNames[colWaves.index(wavelength)]])
+            # need interpolation
+            elif ((self.interpval > colWaves[0]) and
+                  (self.interpval < colWaves[-1])):
+                upper_ind = np.searchsorted(colWaves, self.interpval)
+                lower_ind = upper_ind - 1
 
-            self._interp_init(wave0,
-                              colWaves[lower_ind],
-                              colWaves[upper_ind],
-                              fs[1].data[colNames[lower_ind]],
-                              fs[1].data[colNames[upper_ind]], doshift)
-        # extrapolate below lowest columns
-        elif extrapolate and self.interpval < colWaves[0]:
-            self._extrap_init(wave0,
-                              colWaves[0],
-                              colWaves[1],
-                              fs[1].data[colNames[0]],
-                              fs[1].data[colNames[1]])
-        # extrapolate above highest columns
-        elif extrapolate and self.interpval > colWaves[-1]:
-            self._extrap_init(wave0,
-                              colWaves[-2],
-                              colWaves[-1],
-                              fs[1].data[colNames[-2]],
-                              fs[1].data[colNames[-1]])
-        # can't extrapolate, use default
-        elif not extrapolate and 'THROUGHPUT' in fs[1].data.names:
-            s = 'Extrapolation not allowed, using default throughput for %s' % \
-                (fileName,)
-            warnings.warn(s, UserWarning)
-            self.warnings['DefaultThroughput'] = True
-            self._no_interp_init(wave0, fs[1].data['THROUGHPUT'])
-        # can't extrapolate and no default
-        elif not extrapolate and 'THROUGHPUT' not in fs[1].data.names:
-            s = 'Cannot extrapolate and no default throughput for %s' % \
-                (fileName,)
-            raise pysynexcept.ExtrapolationNotAllowed(s)
-        # assign units
-        self.waveunits = units.Units(fs[1].header['tunit1'].lower())
-        self.throughputunits = 'none'
+                self._interp_init(wave0,
+                                  colWaves[lower_ind],
+                                  colWaves[upper_ind],
+                                  fs[1].data[colNames[lower_ind]],
+                                  fs[1].data[colNames[upper_ind]], doshift)
+            # extrapolate below lowest columns
+            elif extrapolate and self.interpval < colWaves[0]:
+                self._extrap_init(wave0,
+                                  colWaves[0],
+                                  colWaves[1],
+                                  fs[1].data[colNames[0]],
+                                  fs[1].data[colNames[1]])
+            # extrapolate above highest columns
+            elif extrapolate and self.interpval > colWaves[-1]:
+                self._extrap_init(wave0,
+                                  colWaves[-2],
+                                  colWaves[-1],
+                                  fs[1].data[colNames[-2]],
+                                  fs[1].data[colNames[-1]])
+            # can't extrapolate, use default
+            elif not extrapolate and 'THROUGHPUT' in fs[1].data.names:
+                s = 'Extrapolation not allowed, using default throughput ' \
+                    'for {0}'.format(fileName)
+                warnings.warn(s, UserWarning)
+                self.warnings['DefaultThroughput'] = True
+                self._no_interp_init(wave0, fs[1].data['THROUGHPUT'])
+            # can't extrapolate and no default
+            elif not extrapolate and 'THROUGHPUT' not in fs[1].data.names:
+                s = 'Cannot extrapolate and no default throughput for %s' % \
+                    (fileName,)
+                raise pysynexcept.ExtrapolationNotAllowed(s)
+            # assign units
+            self.waveunits = units.Units(fs[1].header['tunit1'].lower())
+            self.throughputunits = 'none'
 
         fs.close()
 

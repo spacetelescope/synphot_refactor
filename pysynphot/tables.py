@@ -1,13 +1,16 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-
 """
 Objects that represent comp tables and graph tables.
 
 """
-
 from __future__ import division, print_function
+
+# THIRD-PARTY
 import numpy as np
-import pyfits as pf
+
+# ASTROPY
+from astropy.io import fits
+
 
 #Flag to control verbosity
 DEBUG = False
@@ -35,22 +38,20 @@ class CompTable(object):
         """
 
         # None is common for various errors.
-        # the default value of None is not useful; pf.open(None)
+        # the default value of None is not useful; fits.open(None)
         # does not work.
         if CFile is None:
             raise TypeError(
                 'initializing CompTable with CFile=None; possible bad/missing'
                 ' CDBS')
 
-        cp = pf.open(CFile)
+        with fits.open(CFile) as cp:
+            self.compnames = cp[1].data.field('compname')
+            self.filenames = cp[1].data.field('filename')
+            compdict = {}
+            for i in range(len(self.compnames)):
+                compdict[self.compnames[i]] = self.filenames[i]
 
-        self.compnames = cp[1].data.field('compname')
-        self.filenames = cp[1].data.field('filename')
-        compdict = {}
-        for i in range(len(self.compnames)):
-            compdict[self.compnames[i]] = self.filenames[i]
-
-        cp.close()
         self.name = CFile
 
 
@@ -82,44 +83,40 @@ class GraphTable(object):
 
         # None is common for various errors.
         # the default value of None is not useful;
-        # pf.open(None) does not work.
+        # fits.open(None) does not work.
         if GFile is None:
             raise TypeError(
                 'initializing GraphTable with GFile=None; '
                 'possible bad/missing CDBS')
 
-        gp = pf.open(GFile)
+        with fits.open(GFile) as gp:
+            if 'PRIMAREA' in gp[0].header:
+                self.primary_area = gp[0].header['PRIMAREA']
 
-        if 'PRIMAREA' in gp[0].header:
-            self.primary_area = gp[0].header['PRIMAREA']
+            self.keywords = gp[1].data.field('keyword')
+            self.innodes = gp[1].data.field('innode')
+            self.outnodes = gp[1].data.field('outnode')
+            self.compnames = gp[1].data.field('compname')
+            self.thcompnames = gp[1].data.field('thcompname')
 
-        self.keywords = gp[1].data.field('keyword')
-        self.innodes = gp[1].data.field('innode')
-        self.outnodes = gp[1].data.field('outnode')
-        self.compnames = gp[1].data.field('compname')
-        self.thcompnames = gp[1].data.field('thcompname')
+            # keywords must be forced to lower case (STIS keywords are
+            # mixed mode %^&^(*^*^%%%@#$!!!)
+            for i in xrange(len(self.keywords)):
+                self.keywords[i] = self.keywords[i].lower()
 
-        # keywords must be forced to lower case (STIS keywords are
-        # mixed mode %^&^(*^*^%%%@#$!!!)
-        for i in range(len(self.keywords)):
-            self.keywords[i] = self.keywords[i].lower()
+            ##        for comp in self.compnames:
+            ##            try:
+            ##                if comp.index('nic') == 0:
+            ##                    print(comp)
+            ##            except:
+            ##                pass
 
-
-        ##        for comp in self.compnames:
-        ##            try:
-        ##                if comp.index('nic') == 0:
-        ##                    print(comp)
-        ##            except:
-        ##                pass
-
-        # prints components associated with a given keyword
-        ##        i = -1
-        ##        for keyword in self.keywords:
-        ##            i = i + 1
-        ##            if keyword == 'acs':
-        ##                print(self.compnames[i])
-
-        gp.close()
+            # prints components associated with a given keyword
+            ##        i = -1
+            ##        for keyword in self.keywords:
+            ##            i = i + 1
+            ##            if keyword == 'acs':
+            ##                print(self.compnames[i])
 
     def GetNextNode(self, modes, innode):
         '''GetNextNode returns the outnode that matches an element from
