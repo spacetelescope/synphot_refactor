@@ -1,14 +1,15 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-
 """
 This module defines classes used to define reddening laws and
 extinctions.
 
 """
-
 from __future__ import division, print_function
-import pyfits as pf
 
+# ASTROPY
+from astropy.io import fits
+
+# LOCAL
 from . import spectrum
 from . import Cache
 from . import extinction  # temporary(?) backwards compatibility
@@ -49,15 +50,14 @@ class RedLaw(CustomRedLaw):
 
     """
     def __init__(self, filename):
-        f = pf.open(filename)
-        d = f[1].data
-        CustomRedLaw.__init__(self,
-                              wave=d.field('wavelength'),
-                              waveunits=f[1].header['tunit1'],
-                              Avscaled=d.field('Av/E(B-V)'),
-                              litref=f[0].header['litref'],
-                              name=f[0].header['shortnm'])
-        f.close()
+        with fits.open(filename) as f:
+            d = f[1].data
+            CustomRedLaw.__init__(self,
+                                  wave=d.field('wavelength'),
+                                  waveunits=f[1].header['tunit1'],
+                                  Avscaled=d.field('Av/E(B-V)'),
+                                  litref=f[0].header['litref'],
+                                  name=f[0].header['shortnm'])
 
 
 def print_red_laws():

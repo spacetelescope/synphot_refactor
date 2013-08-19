@@ -6,10 +6,13 @@ Data structure & traversal algorithm suggested by Alex Martelli,
 http://stackoverflow.com/questions/844505/is-a-graph-library-eg-networkx-the-right-solution-for-my-python-problem
 
 """
-
 from __future__ import division, print_function
+
+# STDLIB
 import collections
-import pyfits as pf
+
+# ASTROPY
+from astropy.io import fits
 
 
 class GraphNode(object):
@@ -111,30 +114,28 @@ class GraphTable(object):
         # Both FITS files and text files are supported
         # In either case, process one row at a time
         if self.tname.endswith('.fits'):
-            f = pf.open(self.tname)
+            with fits.open(self.tname) as f:
+                if 'PRIMAREA' in f[0].header:
+                    self.primary_area = f[0].header['PRIMAREA']
 
-            if 'PRIMAREA' in f[0].header:
-                self.primary_area = f[0].header['PRIMAREA']
+                for row in f[1].data:
+                    if not row.field('compname').endswith('graph'):
+                        # Make it a list because FITS_records don't fully
+                        # implement all the usual sequence behaviors
+                        self._setrow(list(row))
+                    else:
+                        raise NotImplementedError('Segmented graph tables not '
+                                                  'yet supported')
 
-            for row in f[1].data:
-                if not row.field('compname').endswith('graph'):
-                    # Make it a list because FITS_records don't fully
-                    # implement all the usual sequence behaviors
-                    self._setrow(list(row))
-                else:
-                    raise NotImplementedError('Segmented graph tables not yet '
-                                              'supported')
-            f.close()
         else:  # Not a FITS file; assume text
-            f = open(self.tname)
-            for line in f:
-                try:
-                    row = line.split()
-                except ValueError as e:
-                    print("Error parsing line ", line)
-                    raise e
-                self._setrow(row)
-            f.close()
+            with open(self.tname) as f:
+                for line in f:
+                    try:
+                        row = line.split()
+                    except ValueError as e:
+                        print("Error parsing line ", line)
+                        raise e
+                    self._setrow(row)
 
     def _setrow(self, row):
         """
@@ -350,14 +351,12 @@ class CompTable(object):
         # Support fits or text files
         # Should the filenames be converted at this point, or later?
         if self.tname.endswith('.fits'):
-            f = pf.open(self.tname)
-            for row in f[1].data:
-                self.tab[row.field('compname')] = row.field('filename')
-            f.close()
+            with fits.open(self.tname) as f:
+                for row in f[1].data:
+                    self.tab[row.field('compname')] = row.field('filename')
         else:
             #Only simple text file supported
-            f = open(self.tname)
-            for line in f:
-                compname, filename = line.split()
-                self.tab[compname] = filename
-            f.close()
+            with open(self.tname) as f:
+                for line in f:
+                    compname, filename = line.split()
+                    self.tab[compname] = filename
