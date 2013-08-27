@@ -1,5 +1,5 @@
 include distribute_setup.py README
 graft data
-graft doc
-include stpysyn/test/pdk* stpysyn/test/*.doctest stpysyn/test/auto_test stpysyn/test/*.disable stpysyn/test/*.py
-graft stpysyn/test/data
+graft docs
+include tests/*.py
+graft tests/data
