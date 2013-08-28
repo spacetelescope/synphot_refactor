@@ -1,98 +1,121 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""This module handles
+:ref:`Planck law for blackbody radiation <synphot-planck-law>`.
 
+"""
 from __future__ import division, print_function
+
+# THIRD-PARTY
 import numpy as np
 
+# ASTROPY
+from astropy import constants as const
+from astropy import units as u
 
-H = 6.6262E-27                # Planck's constant in cgs units
-HS = 6.6262E-34                # Planck's constant in standard units
-C = 2.997925E+8               # speed of light in standard units
-K = 1.38062E-23               # Boltzmann constant in standard units
-
-C1 = 2.0 * HS * C * C          # Power * unit area / steradian
-C2 = HS * C / K
-
-F = 2.3504386381829069E-25     # convert from m^2/steradian/m to
-                               # cm^2/sq.arcsec/A (see below)
-
-LOWER = 1.0E-4                 # taken from synphot's bbfunc.
-UPPER = 85.
+# LOCAL
+from . import units
 
 
-def bbfunc(wave, temperature):
-    """
-    Planck function in photlam.
-    wavelength in Angstrom, temperature in Kelvin.
-    Adapted from bbfunc in synphot.
-
-    """
-    x = wave * temperature
-
-    mask = np.where(x > 0.0, 1, 0)
-    x = np.where(mask == 1, 1.43883E8 / x, 0.0)
-
-    factor = np.zeros(wave.shape, dtype=np.float64)
-
-    mask1 = np.where(x < LOWER, 0, 1)
-    factor = np.where(mask1 == 0, 2.0 / (x * (x + 2.0)), factor)
-
-    mask2 = np.where(x < UPPER, 1, 0)
-    mask = mask1 * mask2
-    factor = np.where(mask == 1, 1.0 / (np.exp(x) - 1.0), factor)
-
-    x = x * temperature / 1.95722E5
-    x = factor * x * x * x
-
-    return x / (H * wave)     # cgs -> photlam conversion
+__all__ = ['bbfunc', 'bb_photlam_arcsec', 'bb_photlam']
 
 
-def llam_SI(wave, temperature):
-    """
-    Planck function in standard units.
-    wavelength in meters, temperature in Kelvin.
-    Adapted from Anand's spp code in synphot.
+def bbfunc(wavelengths, temperature):
+    """Planck law for blackbody radiation in PHOTLAM per steradian.
+
+    Parameters
+    ----------
+    wavelengths : array_like or `astropy.units.quantity.Quantity`
+        Wavelength values. If not a Quantity, assumed to be in Angstrom.
+
+    temperature : float or `astropy.units.quantity.Quantity`
+        Blackbody temperature. If not a Quantity, assumed to be in Kelvin.
+
+    Returns
+    -------
+    fluxes : `astropy.units.quantity.Quantity`
+        Blackbody radiation in PHOTLAM per steradian.
 
     """
-    exponent = C2 / (wave * temperature)
+    if not isinstance(wavelengths, u.Quantity):
+        wavelengths = u.Quantity(wavelengths, unit=u.AA)
 
-    result = np.zeros(wave.shape, dtype=np.float64)
+    # Calculations must use Hz
+    freq = wavelengths.to(u.Hz, equivalencies=units.wave_conversion)
 
-    mask1 = np.where(exponent <= LOWER, 0, 1)
-    result = np.where(mask1 == 0,
-                      (2.0 * C1 * (wave**-5.0)) / (exponent * (exponent + 2.0)),
-                      result)
+    # Calculations must use Kelvin
+    temperature = units.validate_quantity(temperature, u.K)
 
-    mask2 = np.where(exponent <= UPPER, 1, 0)
-    mask = mask1 * mask2
-    exponent = np.where(mask2 == 1, exponent, UPPER)
-    expfactor = np.exp(exponent)
-    result = np.where(mask == 1, (C1 * (wave**-5.0) / (expfactor - 1.0)),
-                      result)
-    return result
+    # Calculate blackbody radiation in FNU, then convert to PHOTLAM
+    factor = np.exp(const.h * freq / (const.k_B * temperature)) - 1
+    bb_nu = 2 * const.h * freq * freq * freq / (const.c ** 2 * factor)
+    bb_lam = units.FNU.to(
+        units.PHOTLAM, (wavelengths.value, bb_nu.cgs.value),
+        equivalencies=units.flux_conversion_freq)
+
+    return u.Quantity(bb_lam, unit=units.PHOTLAM/u.sr)
 
 
-def bb_photlam_arcsec(wave, temperature):
+def bb_photlam_arcsec(wavelengths, temperature):
+    """Planck law for blackbody radiation in PHOTLAM per square arcsec.
+
+    Parameters
+    ----------
+    wavelengths : array_like or `astropy.units.quantity.Quantity`
+        Wavelength values. If not a Quantity, assumed to be in Angstrom.
+
+    temperature : float or `astropy.units.quantity.Quantity`
+        Blackbody temperature. If not a Quantity, assumed to be in Kelvin.
+
+    Returns
+    -------
+    fluxes : `astropy.units.quantity.Quantity`
+        Blackbody radiation in PHOTLAM per square arcsec.
+
     """
-    Planck function in photlam / square arcsec.
-    wavelength in Angstrom, temperature in Kelvin.
-    Translated from Anand's spp code in synphot.
+    fac = u.Quantity(u.rad.to(u.arcsec) ** 2, u.arcsec**2/u.sr)
+    bb_photlam = bbfunc(wavelengths, temperature)
+    return bb_photlam / fac
+
+
+def bb_photlam(wavelengths, temperature, r=const.R_sun, d=const.kpc):
+    """Planck law for blackbody radiation in PHOTLAM,
+    where the radiation is normalized to a star of given radius
+    at a given distance.
+
+    .. math::
+
+        \\Omega = \\frac{\\pi r^{2}}{d^{2}}
+
+    where :math:`\\Omega` is the solid angle in steradian, *r* is
+    the radius of the star, and *d* is the distance.
+
+    Parameters
+    ----------
+    wavelengths : array_like or `astropy.units.quantity.Quantity`
+        Wavelength values. If not a Quantity, assumed to be in Angstrom.
+
+    temperature : float or `astropy.units.quantity.Quantity`
+        Blackbody temperature. If not a Quantity, assumed to be in Kelvin.
+
+    r : float or `astropy.units.quantity.Quantity`
+        Radius of the star. If not a Quantity, assumed to be in meter.
+        Default is a solar radius.
+
+    d : float or `astropy.units.quantity.Quantity`
+        Distance to the star. If not a Quantity, assumed to be in the
+        same unit as ``r``. Default is 1 kpc.
+
+    Returns
+    -------
+    fluxes : `astropy.units.quantity.Quantity`
+        Normalized blackbody radiation in PHOTLAM.
 
     """
-    lam = wave * 1.0E-10    # Angstrom -> meter
+    if not isinstance(r, u.Quantity):
+        r = u.Quantity(r, u.m)
 
-    return F * llam_SI(lam, temperature) / (HS * C / lam)
+    d = units.validate_quantity(d, r.unit)
+    fac = u.Quantity(np.pi * (r.value / d.value) ** 2, unit=u.sr)
+    bb_photlam = bbfunc(wavelengths, temperature)
 
-#  Anand's original comments for the F factor:
-#
-#       >>> af = 0.01 * 0.01    # per m^2  -->  per cm^2
-#       >>> af
-#       0.0001
-#       >>> sf = 206265.0 * 206265.0
-#       >>> sf = 1/sf
-#       >>> sf                  # per sr  -->  per sqarcsec
-#       2.3504386381829067e-11
-#       >>> af * sf
-#       2.3504386381829069e-15
-#       >>> af * sf * 1.0e-10   # per m  -->  per Angstrom
-#       2.3504386381829069e-25
-#
+    return bb_photlam * fac

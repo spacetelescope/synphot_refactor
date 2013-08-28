@@ -1,9 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 # UI:
-import Cache
-import obsbandpass
-import observationmode
-import observation
-import reddening
-import spectrum
+from .spectrum import *
+from .observation import *
+from .reddening import *
+
+# Version
+from .ver import __version__, __vdate__

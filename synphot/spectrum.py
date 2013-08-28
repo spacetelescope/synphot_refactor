@@ -1,2373 +1,2125 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""
-Contains SourceSpectrum and SpectralElement class definitions and
-their subclasses.
+"""This module defines the different type of synphot spectra.
 
-Also contains the Vega object, which is an instance of a FileSourceSpectrum
-that can be imported from this file and used for Vega-related calculations.
+Here are the two main classes:
+
+    * `SourceSpectrum` - For a spectrum with wavelengths and fluxes.
+    * `SpectralElement` - For observatory passband (e.g., filters) with
+      wavelengths and throughput, which is unitless.
 
 """
 from __future__ import division, print_function
 
 # STDLIB
-import math
 import os
-import re
-import warnings
+from copy import deepcopy
 
 # THIRD-PARTY
 import numpy as np
 
 # ASTROPY
-from astropy.io import fits
+from astropy import log
+from astropy import units as u
 
 # LOCAL
-#from . import refs
-from . import units
-#from . import locations
-from . import planck
-from . import synexceptions  # custom pysyn exceptions
+from . import binning, planck, synexceptions, synconfig, synio, synutils, units
 
 
-# Renormalization constants from synphot:
-PI = 3.14159265               # Mysterious math constant
-RSUN = 6.9599E10              # Radius of sun
-PC = 3.085678E18              # Parsec
-RADIAN = RSUN / PC /1000.
-RENORM = PI * RADIAN * RADIAN  # Normalize to 1 solar radius @ 1 kpc
-
-# MergeWaveSets "too close together" constant
-MERGETHRESH = 1.e-12
-
-#Single-precision epsilon value, taken from the synphot FAQ.
-#This is the minimum separation in wavelength value necessary for
-#synphot to read the entries as distinct single-precision numbers.
-syn_epsilon = 0.00032
+__all__ = ['convert_fluxes', 'BaseSpectrum', 'BaseUnitlessSpectrum',
+           'SourceSpectrum', 'SpectralElement']
 
 
-def MergeWaveSets(waveset1, waveset2):
+#-------------------------------------------------------------------------#
+# Flux conversion function.                                               #
+# It is here instead of units.py because it relies on source spectrum.    #
+# Having this in units.py would cause circular import.                    #
+#-------------------------------------------------------------------------#
+
+def convert_fluxes(wavelengths, fluxes, out_flux_unit, **kwargs):
+    """Perform :ref:`flux conversion <synphot-flux-conversion>`.
+
+    Parameters
+    ----------
+    wavelengths : array_like or `astropy.units.quantity.Quantity`
+        Wavelength values. If not a Quantity, assumed to be in
+        Angstrom.
+
+    fluxes : array_like or `astropy.units.quantity.Quantity`
+        Flux values. If not a Quantity, assumed to be in PHOTLAM.
+
+    out_flux_unit : str or `astropy.units.core.Unit`
+        Output flux unit.
+
+    area : float or `astropy.units.quantity.Quantity`
+        Area that fluxes cover. If not a Quantity, assumed to be in cm^2.
+        This value *must* be provided for conversions involving
+        OBMAG and count, otherwise it is not needed.
+
+    vegaspec : `synphot.spectrum.SourceSpectrum`
+        Vega spectrum from :func:`SourceSpectrum.from_vega`.
+        This is *only* used for conversions involving VEGAMAG.
+
+    Returns
+    -------
+    out_flux : `astropy.units.quantity.Quantity`
+        Converted flux values.
+
+    Raises
+    ------
+    astropy.units.core.UnitsError
+        Conversion failed.
+
+    synphot.synexceptions.SynphotError
+        Area or Vega spectrum is not given when needed.
+
     """
-    Return the union of the two wavesets, unless one or
-    both of them is None.
+    if not isinstance(fluxes, u.Quantity):
+        fluxes = u.Quantity(fluxes, unit=units.PHOTLAM)
 
-    """
-    if waveset1 is None and waveset2 is not None:
-        MergedWaveSet = waveset2
-    elif waveset2 is None and waveset1 is not None:
-        MergedWaveSet = waveset1
-    elif waveset1 is None and waveset2 is None:
-        MergedWaveSet = None
+    out_flux_unit = units.validate_unit(out_flux_unit)
+    out_flux_unit_name = out_flux_unit.to_string()
+    in_flux_unit_name = fluxes.unit.to_string()
+
+    # No conversion necessary
+    if in_flux_unit_name == out_flux_unit_name:
+        return fluxes
+
+    # Use built-in astropy.units conversion
+    if (fluxes.unit.physical_type != 'unknown' and
+            fluxes.unit.physical_type == out_flux_unit.physical_type):
+        return fluxes.to(out_flux_unit)
+
+    # Wavelengths must be in Angstrom
+    wavelengths = units.validate_quantity(
+        wavelengths, u.AA, equivalencies=units.wave_conversion)
+
+    # Convert input unit to PHOTLAM
+    if in_flux_unit_name == units.PHOTLAM.to_string():
+        flux_photlam = fluxes
     else:
-        MergedWaveSet = np.union1d(waveset1, waveset2)
-
-        # The merged wave sets may sometimes contain numbers which are nearly
-        # equal but differ at levels as small as 1e-14. Having values this
-        # close together can cause problems down the line so here we test
-        # whether any such small differences are present, with a small
-        # difference defined as less than MERGETHRESH.
-        #
-        # If small differences are present we make a copy of the union'ed array
-        # with the lower of the close together pairs removed.
-        delta = MergedWaveSet[1:] - MergedWaveSet[:-1]
-
-        if not (delta > MERGETHRESH).all():
-            newlen = len(delta[delta > MERGETHRESH]) + 1
-            newmerged = np.zeros(newlen, dtype=MergedWaveSet.dtype)
-            newmerged[:-1] = MergedWaveSet[delta > MERGETHRESH]
-            newmerged[-1] = MergedWaveSet[-1]
-
-            MergedWaveSet = newmerged
-
-    return MergedWaveSet
-
-
-def trimSpectrum(sp, minw, maxw):
-    """
-    Creates a new spectrum with trimmed upper and lower ranges.
-
-    """
-    wave = sp.GetWaveSet()
-    flux = sp(wave)
-
-    new_wave = np.compress(wave >= minw, wave)
-    new_flux = np.compress(wave >= minw, flux)
-
-    new_wave = np.compress(new_wave <= maxw, new_wave)
-    new_flux = np.compress(new_wave <= maxw, new_flux)
-
-    result = TabularSourceSpectrum()
-
-    result._wavetable = new_wave
-    result._fluxtable = new_flux
-
-    result.waveunits = units.Units(sp.waveunits.name)
-    result.fluxunits = units.Units(sp.fluxunits.name)
-
-    return result
-
-
-class Integrator(object):
-    """
-    Integrator engine.
-
-    """
-    def trapezoidIntegration(self, x, y):
-        npoints = x.size
-        if npoints > 0:
-            indices = np.arange(npoints)[:-1]
-            deltas = x[indices+1] - x[indices]
-            integrand = 0.5*(y[indices+1] + y[indices])*deltas
-            sum = integrand.sum()
-            if x[-1] < x[0]:
-                sum *= -1.0
-            return sum
+        # Handles different prefixes of Jy by converting it to FNU
+        # so the equivalencies can understand.
+        if (fluxes.unit.physical_type == 'spectral flux density' and
+                in_flux_unit_name != units.FNU.to_string()):
+            flux_tmp = fluxes.to(units.FNU)
         else:
-            return 0.0
+            flux_tmp = fluxes
 
-    def _columnsFromASCII(self, filename):
-        """
-        Following synphot/TABLES, ASCII files may contain blank lines,
-        comment lines (beginning with '#'), or terminal comments. This routine
-        may be called by both Spectrum and SpectralElement objects to extract
-        the first two columns from a file.
+        flux_photlam = _convert_fluxes(
+            wavelengths, flux_tmp, units.PHOTLAM, **kwargs)
 
-        """
+    # Convert PHOTLAM to output unit
+    if out_flux_unit_name == units.PHOTLAM.to_string():
+        out_flux = flux_photlam
+    elif (out_flux_unit.physical_type == 'spectral flux density' and
+          out_flux_unit_name != units.FNU.to_string()):  # xJy
+        flux_tmp = _convert_fluxes(
+            wavelengths, flux_photlam, units.FNU, **kwargs)
+        out_flux = flux_tmp.to(out_flux_unit)
+    else:
+        out_flux = _convert_fluxes(
+            wavelengths, flux_photlam, out_flux_unit, **kwargs)
 
-        wlist = []
-        flist = []
-        lcount = 0
-        fs = open(filename, mode='r')
-        lines = fs.readlines()
-        fs.close()
-        for line in lines:
-            lcount += 1
-            cline = line.strip()
-            if len(cline) > 0 and not cline.startswith('#'):
-                try:
-                    cols = cline.split()
-                    if len(cols) >= 2:
-                        wlist.append(float(cols[0]))
-                        flist.append(float(cols[1]))
-                except Exception as e:
-                    raise pysynexcept.BadRow("Error reading %s: %s" % (filename,
-                                            str(e)),
-                                            rows=lcount
-                                            )
-        return wlist, flist
-
-    def validate_wavetable(self):
-        """
-        Enforce monotonic, ascending wavelengths with no zero values
-
-        """
-        #First check for invalid values
-        wave = self._wavetable
-        if np.any(wave <= 0):
-            wrong = np.where(wave <= 0)[0]
-            raise pysynexcept.ZeroWavelength('Negative or Zero wavelength '
-                                            'occurs in wavelength array',
-                                            rows=wrong
-                                            )
-
-        #Now check for monotonicity & enforce ascending
-        sorted = np.sort(wave)
-        if not np.alltrue(sorted == wave):
-            if np.alltrue(sorted[::-1] == wave):
-                #monotonic descending is allowed
-                pass
-            else:
-                wrong = np.where(sorted != wave)[0]
-                raise pysynexcept.UnsortedWavelength('Wavelength array is not '
-                                                    'monotonic', rows=wrong
-                                                    )
-        #Check for duplicate values
-        dw = sorted[1:]-sorted[:-1]
-        if np.any(dw == 0):
-            wrong = np.where(dw == 0)[0]
-            raise pysynexcept.DuplicateWavelength("Wavelength array contains "
-                                                 "duplicate entries",
-                                                 rows=wrong)
-
-    def validate_fluxtable(self):
-        """
-        Enforce non-negative fluxes
-
-        """
-        if not self.fluxunits.isMag and self._fluxtable.min() < 0:
-            # neg. magnitudes are legal
-            idx = np.where(self._fluxtable < 0)
-            self._fluxtable[idx] = 0.0
-            print("Warning, {0:d} of {1:d} bins contained negative fluxes; "
-                  "they have been set to zero.".format(len(idx[0]),
-                                                       len(self._fluxtable)))
+    return out_flux
 
 
-class SourceSpectrum(Integrator):
+def _convert_fluxes(wavelengths, fluxes, out_flux_unit, area=None,
+                    vegaspec=None):
+    """Flux conversion worker."""
+    flux_unit_names = (fluxes.unit.to_string(), out_flux_unit.to_string())
+
+    # VEGAMAG
+    if units.VEGAMAG.to_string() in flux_unit_names:
+        if not isinstance(vegaspec, SourceSpectrum):
+            raise synexceptions.SynphotError('Vega spectrum is missing.')
+
+        flux_vega = convert_fluxes(
+            wavelengths, vegaspec.resample(wavelengths), units.PHOTLAM,
+            area=area, vegaspec=None)
+        out_flux = fluxes.unit.to(
+            out_flux_unit, (fluxes.value, flux_vega.value),
+            equivalencies=units.flux_conversion_vegamag)
+
+    # OBMAG or count
+    elif (u.count.to_string() in flux_unit_names or
+          units.OBMAG.to_string() in flux_unit_names):
+        if area is None:
+            raise synexceptions.SynphotError(
+                'Area must be provided for conversion involving count or OBMAG.')
+
+        area = units.validate_quantity(area, units.AREA)
+        area_arr = np.empty(fluxes.shape, dtype=fluxes.dtype)
+        area_arr.fill(area.value)
+        bin_widths = binning.calculate_bin_widths(
+            binning.calculate_bin_edges(wavelengths))
+        out_flux = fluxes.unit.to(
+            out_flux_unit, (fluxes.value, bin_widths.value, area_arr),
+            equivalencies=units.flux_conversion_nondensity)
+
+    # FLAM or STMAG
+    elif (units.FLAM.to_string() in flux_unit_names or
+          units.STMAG.to_string() in flux_unit_names):
+        out_flux = fluxes.unit.to(
+            out_flux_unit, (wavelengths.value, fluxes.value),
+            equivalencies=units.flux_conversion_wav)
+
+    # PHOTNU, FNU, or ABMAG
+    elif (units.PHOTNU.to_string() in flux_unit_names or
+          units.FNU.to_string() in flux_unit_names or
+          units.ABMAG.to_string() in flux_unit_names):
+        out_flux = fluxes.unit.to(
+            out_flux_unit, (wavelengths.value, fluxes.value),
+            equivalencies=units.flux_conversion_freq)
+
+    else:
+        raise u.UnitsError('{0} and {1} are not convertible'.format(
+                fluxes.unit, out_flux_unit))
+
+    return u.Quantity(out_flux, unit=out_flux_unit)
+
+
+#-------------------------------------------------------------------------#
+# Spectrum classes.                                                       #
+#-------------------------------------------------------------------------#
+
+class BaseSpectrum(object):
+    """Base class for generic spectrum that should not be used directly.
+
+    Wavelengths must be monotonic ascending/descending without zeroes
+    or duplicate values.
+
+    Fluxes, if not magnitudes, are checked for negative values.
+    If found, warning is issued and negative values are set to zeroes.
+
+    Parameters
+    ----------
+    wavelengths : array_like or `astropy.units.quantity.Quantity`
+        Wavelength values. If not a Quantity, assumed to be in
+        Angstrom.
+
+    fluxes : array_like or `astropy.units.quantity.Quantity`
+        Flux values. If not a Quantity, assumed to be in ``flux_unit``.
+
+    flux_unit : str or `astropy.units.core.Unit`
+        Flux unit, which defaults to FLAM. This is *only* used if
+        ``fluxes`` is not Quantity.
+
+    area : float or `astropy.units.quantity.Quantity`, optional
+        Area that fluxes cover. Usually, this is the area of
+        the primary mirror of the observatory of interest.
+        If not a Quantity, assumed to be in cm^2.
+
+    header : dict, optional
+        Metadata.
+
+    Attributes
+    ----------
+    wave, flux : `astropy.units.quantity.Quantity`
+        Wavelength and flux of the spectrum.
+
+    primary_area : `astropy.units.quantity.Quantity` or `None`
+        Area that flux covers in cm^2.
+
+    metadata : dict
+        Metadata. ``self.metadata['expr']`` must contain a descriptive string of the object.
+
+    warnings : dict
+        Dictionary of warning key-value pairs related to spectrum object.
+
+    Raises
+    ------
+    synphot.synexceptions.SynphotError
+        If wavelengths and fluxes do not match, or if they have invalid units.
+
+    synphot.synexceptions.DuplicateWavelength
+        If wavelength array contains duplicate entries.
+
+    synphot.synexceptions.UnsortedWavelength
+        If wavelength array is not monotonic.
+
+    synphot.synexceptions.ZeroWavelength
+        If negative or zero wavelength occurs in wavelength array.
+
     """
-    Base class for the Source Spectrum object.
+    def __init__(self, wavelengths, fluxes, flux_unit=units.FLAM, area=None,
+                 header={}):
+        self.warnings = {}
 
-    """
-
-    def __add__(self, other):
-        """
-        Source Spectra can be added.  Delegate the work to the
-        CompositeSourceSpectrum class.
-
-        """
-        if not isinstance(other, SourceSpectrum):
-            raise TypeError("Can only add two SourceSpectrum objects")
-
-        return CompositeSourceSpectrum(self, other, 'add')
-
-    def __sub__(self, other):
-        """
-        Source Spectra can be subtracted, which is just another way
-        of adding.
-
-        """
-
-        return self.__add__(-1.0*other)
-
-    def __mul__(self, other):
-        """
-        Source Spectra can be multiplied, by constants or by
-        SpectralElement objects.
-
-        """
-        # Multiplying by numeric constants is allowed
-        if isinstance(other, (int, float)):
-            other = UniformTransmission(other)
-        #so is by SpectralElements. Otherwise, raise an exception.
-        if not isinstance(other, SpectralElement):
-            raise TypeError("SourceSpectrum objects can only be multiplied "
-                            "by SpectralElement objects or constants; "
-                            "%s type detected" % type(other))
-
-        # Delegate the work of multiplying to CompositeSourceSpectrum
-        return CompositeSourceSpectrum(self, other, 'multiply')
-
-    def __rmul__(self, other):
-        return self.__mul__(other)
-
-    def addmag(self, magval):
-        """
-        Adding a magnitude is like multiplying a flux. Only works for
-        numbers -- not arrays, spectrum objects, etc
-
-        """
-        if np.isscalar(magval):
-            factor = 10**(-0.4*magval)
-            return self*factor
+        if not isinstance(fluxes, u.Quantity):
+            self.flux = u.Quantity(fluxes, unit=flux_unit)
         else:
-            raise TypeError(".addmag() only takes a constant scalar argument")
+            self.flux = fluxes.copy()
 
-    def getArrays(self):
-        """
-        Returns wavelength and flux arrays as a tuple, performing
-        units conversion.
+        self._validate_flux_unit(self.flux.unit)
+        self._validate_flux_value()
 
-        """
-        if hasattr(self, 'primary_area'):
-            area = self.primary_area
+        if not isinstance(wavelengths, u.Quantity):
+            self.wave = u.Quantity(wavelengths, unit=u.AA)
         else:
-            area = None
+            self.wave = wavelengths.copy()
 
-        wave = self.GetWaveSet()
-        flux = self(wave)
+        synutils.validate_wavelengths(self.wave)
 
-        flux = units.Photlam().Convert(wave, flux, self.fluxunits.name,
-                                       area=area)
-        wave = units.Angstrom().Convert(wave, self.waveunits.name)
-        return wave, flux
+        if self.wave.value.shape != self.flux.value.shape:
+            raise synexceptions.SynphotError(
+                'Fluxes expected to have shape of {0} but has shape of '
+                '{1}'.format(self.wave.value.shape, self.flux.value.shape))
 
-    # Define properties for consistent UI
-    def _getWaveProp(self):
-        wave, flux = self.getArrays()
-        return wave
+        if area is None:
+            self.primary_area = None
+        else:
+            self.primary_area = units.validate_quantity(area, units.AREA)
 
-    def _getFluxProp(self):
-        wave, flux = self.getArrays()
-        return flux
+        self.metadata = header
+        if 'expr' not in self.metadata:
+            self.metadata['expr'] = self.__class__.__name__
 
-    wave = property(_getWaveProp, doc="Wavelength property")
-    flux = property(_getFluxProp, doc="Flux property")
+    def _validate_flux_unit(self, new_unit):
+        """Check flux unit before conversion."""
+        pass  # To be implemented by child classes
 
-    def validate_units(self):
-        """
-        Ensure that waveunits are WaveUnits and fluxunits are FluxUnits
+    def _validate_flux_value(self):
+        """Enforce non-negative fluxes if they are not in magnitudes."""
 
-        """
-        if not isinstance(self.waveunits, units.WaveUnits):
-            raise TypeError("%s is not a valid WaveUnit" % self.waveunits)
-        if not isinstance(self.fluxunits,units.FluxUnits):
-            raise TypeError("%s is not a valid FluxUnit" % self.fluxunits)
+        if self.flux.unit.decompose() != u.mag and self.flux.value.min() < 0:
+            idx = np.where(self.flux.value < 0)
+            self.flux.value[idx] = 0.0
 
-    def writefits(self, filename, clobber=True, trimzero=True,
-                  binned=False, precision=None, hkeys=None):
-        """
-        Write the spectrum to a FITS file.
+            warn_str = '{0:d} of {1:d} bins contained negative flux or throughput; they have been set to zero.'.format(len(idx[0]), self.flux.size)
+            self.warnings['NegativeFlux'] = warn_str
+            log.warn(warn_str)
+
+    def __str__(self):
+        """Descriptive info of the object."""
+        return self.metadata['expr']
+
+    def merge_wave(self, other, **kwargs):
+        """Return the union of the two sets of wavelengths.
+
+        The result is returned as a separate variable instead of
+        overwriting attribute because this method is called by
+        other method that deals with merging both wavelength and
+        flux/throughput. Relevant ``self`` attribute should be updated
+        in the calling method to avoid confusion.
 
         Parameters
         ----------
-        filename: string
-            name of file to write to
-        clobber: bool [Default: True]
-            Will clobber existing file by default
-        trimzero: bool [Default:True]
-            Will trim zero-flux elements from both ends by default
-        binned: bool [Default: False]
-            Will write in native waveset by default
-        precision: {'single','double', None}
-            Will write in native precision by default
-        hkeys:  dict
-            Optional dictionary of {keyword:(value,comment)} to be added to
-            primary FITS header
+        other : obj
+            Another spectrum object.
+
+        kwargs : dict
+            Keywords accepted by :func:`synphot.synutils.merge_wavelengths`.
+
+        Returns
+        -------
+        out_wavelengths : `astropy.units.quantity.Quantity`
+            Merged wavelengths in the unit of ``self.wave``.
 
         """
+        # Convert to self.wave unit
+        other_wave = units.validate_quantity(
+            other.wave, self.wave.unit, equivalencies=units.wave_conversion)
 
-        if precision is None:
-            precision = self.flux.dtype.char
-        _precision = precision.lower()[0]
+        out_wavelengths = synutils.merge_wavelengths(
+            self.wave.value, other_wave.value, **kwargs)
 
-        pcodes = {'d': 'D', 's': 'E', 'f': 'E'}
+        return u.Quantity(out_wavelengths, unit=self.wave.unit)
 
-        if clobber:
-            try:
-                os.remove(filename)
-            except OSError:
-                pass
+    def resample(self, wavelengths):
+        """Resample flux or throughput to match the given
+        wavelengths, using :func:`numpy.interp`.
 
-        if binned:
-            wave = self.binwave
-            flux = self.binflux
+        Given wavelengths must satisfy
+        :func:`synphot.synutils.validate_wavelengths`.
+
+        The result is returned as a separate variable instead of
+        overwriting attribute because this method is called by
+        other method that deals with merging both wavelength and
+        flux/throughput. Relevant ``self`` attribute should be updated
+        in the calling method to avoid confusion.
+
+        .. warning::
+
+            If given wavelengths fall outside ``self.wave``,
+            extrapolation is done. This may compromise the
+            quality of the spectrum.
+
+        Parameters
+        ----------
+        wavelengths : array_like or `astropy.units.quantity.Quantity`
+            Wavelength values for resampling. If not a Quantity,
+            assumed to be the unit of ``self.wave``.
+
+        Returns
+        -------
+        resampled_result : `astropy.units.quantity.Quantity`
+            Resampled flux or throughput that is in-sync with
+            given wavelengths. Might have negative values.
+
+        """
+        if not isinstance(wavelengths, u.Quantity):
+            wavelengths = u.Quantity(wavelengths, unit=self.wave.unit)
+
+        synutils.validate_wavelengths(wavelengths)
+
+        # Interpolation will be done in given wavelength unit, not self
+        self_wave = units.validate_quantity(
+            self.wave, wavelengths.unit, equivalencies=units.wave_conversion)
+        old_wave = self_wave.value
+        new_wave = wavelengths.value
+
+        # Check whether given wavelengths are in descending order
+        if np.isscalar(new_wave) or new_wave[0] < new_wave[-1]:
+            newasc = True
         else:
-            wave = self.wave
-            flux = self.flux
+            new_wave = new_wave[::-1]
+            newasc = False
 
-        # Add a check for single/double precision clash, so
-        # that if written out in single precision, the wavelength table
-        # will still be sorted with no duplicates
-        # The value of epsilon is taken from the Synphot FAQ.
-
-        if wave.dtype == np.float64 and _precision == 's':
-            idx = np.where(abs(wave[1:]-wave[:-1]) > syn_epsilon)
+        # Interpolation flux/throughput
+        if old_wave[0] < old_wave[-1]:
+            oldasc = True
+            resampled_result = np.interp(new_wave, old_wave, self.flux.value)
         else:
-            idx = np.where(wave)  # => idx=[:]
+            oldasc = False
+            rev = np.interp(new_wave, old_wave[::-1], self.flux.value[::-1])
+            resampled_result = rev[::-1]
 
-        wave = wave[idx]
-        flux = flux[idx]
+        # If the new and old wavelengths do not have the same parity,
+        # the answer has to be flipped again.
+        if newasc != oldasc:
+            resampled_result = resampled_result[::-1]
 
-        first, last = 0, len(flux)
+        return u.Quantity(resampled_result, unit=self.flux.unit)
 
-        if trimzero:
-            # Keep one zero at each end
-            nz = flux.nonzero()[0]
-            try:
-                first = max(nz[0]-1, first)
-                last = min(nz[-1]+2, last)
-            except IndexError:
-                pass
+    def _operate_on(self, other, op_type):
+        """Perform given operation between self and other
+        spectra/scalar value.
 
-        # Construct the columns and HDUlist
-        cw = fits.Column(name='WAVELENGTH',
-                         array=wave[first:last],
-                         unit=self.waveunits.name,
-                         format=pcodes[_precision])
-        cf = fits.Column(name='FLUX',
-                         array=flux[first:last],
-                         unit=self.fluxunits.name,
-                         format=pcodes[_precision])
+        Addition and subtraction are done in the units of
+        ``self``. Multiplication is only allowed if either
+        self or other is unitless or scalar. Division is
+        only allowed if other is unitless or scalar.
+        Operation between mag and linear flux is not allowed.
 
-        # Make the primary header
-        hdu = fits.PrimaryHDU()
-        hdulist = fits.HDUList([hdu])
+        New spectrum object:
 
-        # User-provided keys are written to the primary header
-        # so are filename and origin
-        bkeys = dict(filename=(os.path.basename(filename), 'name of file'),
-                     origin=('pysynphot',
-                             'Version (%s, %s)' % (0.0, 0.0)))
+            #. has same units as ``self``
+            #. inherits metadata from both, with ``self`` having
+               higher priority
+            #. does *not* inherit old warnings (they are thrown away)
 
-        # User-values if present may override default values
-        if hkeys is not None:
-            bkeys.update(hkeys)
+        Parameters
+        ----------
+        other : obj or number
+            The other spectrum or scalar value to operate on.
 
-        # Now update the primary header
-        for key, val in bkeys.items():
-            hdu.header.update(key, *val)
+        op_type : {'+', '-', '*', '/'}
+            Allowed operations:
+                * '+' - :math:`self + other`
+                * '-' - :math:`self - other`
+                * '*' - :math:`self * other`
+                * '/' - :math:`self / other`
 
-        # Make the extension HDU
-        cols = fits.ColDefs([cw, cf])
-        hdu = fits.new_table(cols)
+        Returns
+        -------
+        newspec : obj
+            Resultant spectrum, same class and units as ``self``.
+
+        Raises
+        ------
+        synphot.synexceptions.SynphotError
+            If operation type not supported.
+
+        synphot.synexceptions.IncompatibleSources
+            If self and other are not compatible.
+
+        """
+        # Scalar operation
+        if isinstance(other, (int, long, float)):
+            is_scalar_op = True
+            new_wave = self.wave
+            resamp_flux_1 = self.flux
+
+            # So Astropy Quantity will not crash
+            if op_type in ('+', '-'):
+                resamp_flux_2 = u.Quantity(other, unit=self.flux.unit)
+            else:
+                resamp_flux_2 = other
+
+        # Spectra operation
+        elif isinstance(other, BaseSpectrum):
+            is_scalar_op = False
+
+            if self.primary_area != other.primary_area:
+                raise synexceptions.IncompatibleSources(
+                    'Areas covered by flux are not the same: {0}, {1}'.format(
+                        self.primary_area, other.primary_area))
+
+            # Spectrum can only divided by dimensionless value
+            if op_type == '/' and other.flux.unit != u.dimensionless_unscaled:
+                raise synexceptions.IncompatibleSources(
+                    'The other spectrum must be dimensionless in / op')
+
+            # Multiplication can only be between spectrum and dimensionless
+            if (op_type == '*' and
+                  self.flux.unit != u.dimensionless_unscaled and
+                  other.flux.unit != u.dimensionless_unscaled):
+                raise synexceptions.IncompatibleSources(
+                    'One of the spectra must be dimensionless in * op')
+
+            # Addition and subtraction cannot mix SourceSpectrum and
+            # SpectralElement
+            if op_type in ('+', '-') and not isinstance(other, self.__class__):
+                raise synexceptions.IncompatibleSources(
+                    'Cannot perform {0} between {1} and {2}'.format(
+                        op_type, self.__class__.__name__,
+                        other.__class__.__name__))
+
+            # Operation between mag and linear flux is not allowed
+            if ((self.flux.unit.decompose() == u.mag and
+                   other.flux.unit.decompose() not in
+                   (u.dimensionless_unscaled, u.mag)) or
+                  (self.flux.unit.decompose() != u.mag and
+                   other.flux.unit.decompose() == u.mag)):  # pragma: no cover
+                raise synexceptions.IncompatibleSources(
+                    'Operation between mag and linear flux is not allowed')
+
+            # Merged wavelengths in self.wave.unit
+            new_wave = self.merge_wave(other)
+
+            # Resampled self.flux in self.flux.unit
+            resamp_flux_1 = self.resample(new_wave)
+
+            if op_type in ('+', '-'):
+                # Convert to self.flux.unit
+                other2 = deepcopy(other)
+                other2.convert_flux(self.flux.unit)
+                resamp_flux_2 = other2.resample(new_wave)
+            else:
+                # Retain other.flux.unit
+                resamp_flux_2 = other.resample(new_wave)
+
+        else:
+            raise synexceptions.IncompatibleSources(
+                'other is not a number or a spectrum object')
+
+        # Perform operation on the flux quantities
+        if op_type == '+':
+            result = resamp_flux_1 + resamp_flux_2
+        elif op_type == '-':
+            result = resamp_flux_1 - resamp_flux_2
+        elif op_type == '*':
+            result = resamp_flux_1 * resamp_flux_2
+        elif op_type == '/':
+            result = resamp_flux_1 / resamp_flux_2
+        else:  # pragma: no cover
+            raise synexceptions.SynphotError(
+                'Operation type {0} not supported'.format(op_type))
+
+        # Merge metadata (self overwrites other if duplicate exists)
+        if is_scalar_op:
+            new_metadata = {}
+        else:
+            new_metadata = deepcopy(other.metadata)
+
+        new_metadata.update(self.metadata)
+        del new_metadata['expr']  # Let init re-assign this
+
+        return self.__class__(new_wave, result, area=self.primary_area,
+                              header=new_metadata)
+
+    def __add__(self, other):
+        """Add self with other."""
+        return self._operate_on(other, '+')
+
+    def __sub__(self, other):
+        """Subtract other from self."""
+        return self._operate_on(other, '-')
+
+    def __mul__(self, other):
+        """Multiply self and other."""
+        return self._operate_on(other, '*')
+
+    def __rmul__(self, other):
+        """This is only called if ``other.__mul__`` cannot operate."""
+        return self.__mul__(other)
+
+    def __truediv__(self, other):
+        """Divide self by other."""
+        return self._operate_on(other, '/')
+
+    def convert_wave(self, out_wave_unit):
+        """Convert ``self.wave`` to a different unit.
+        The attribute is updated in-place.
+
+        Parameters
+        ----------
+        out_wave_unit : str or `astropy.units.core.Unit`
+            Output wavelength unit.
+
+        """
+        self.wave = units.validate_quantity(
+            self.wave, out_wave_unit, equivalencies=units.wave_conversion)
+
+    def integrate(self, wavelengths=None):
+        """Perform trapezoid integration.
+
+        If a wavelength range is provided, flux is first resampled
+        with :func:`resample` and then integrated. Otherwise,
+        the entire range is used.
+
+        Parameters
+        ----------
+        wavelengths : array_like, `astropy.units.quantity.Quantity`, or `None`
+            Wavelength values for integration. If not a Quantity,
+            assumed to be the unit of ``self.wave``. If `None`,
+            ``self.wave`` is used.
+
+        Returns
+        -------
+        result : `astropy.units.quantity.Quantity`
+            Integrated result in ``self.flux`` unit.
+            It is zero if wavelengths are invalid.
+
+        """
+        if wavelengths is None:
+            x = self.wave.value
+            y = self.flux.value
+        else:
+            y = self.resample(wavelengths).value
+            if isinstance(wavelengths, u.Quantity):
+                x = wavelengths.value
+            else:
+                x = wavelengths
+
+        result = synutils.trapezoid_integration(x, y)
+
+        return u.Quantity(result, unit=self.flux.unit)
+
+    def check_overlap(self, other, threshold=0.01):
+        """Check for wavelength overlap between two spectra.
+
+        For `synphot.spectrum.SpectralElement` objects, only
+        wavelengths where the throughput is non-zero are
+        considered.
+
+        Parameters
+        ----------
+        other : obj
+            Another spectrum object.
+
+        threshold : float
+            If less than this fraction of flux or throughput falls
+            outside wavelength overlap, the *lack* of overlap is
+            *insignificant*. This is only used when partial overlap
+            is detected. Default is 1%.
+
+        Returns
+        -------
+        result : {'full', 'partial_most', 'partial_notmost', 'none'}
+            * 'full' - ``self.wave`` is within or same as ``other.wave``
+            * 'partial_most' - Less than ``threshold`` fraction of
+                  ``self`` flux is outside the overlapping wavelength
+                  region, i.e., the *lack* of overlap is *insignificant*
+            * 'partial_notmost' - ``self.wave`` partially overlaps with
+                  ``other.wave`` but does not qualify for 'partial_most'
+            * 'none' - ``self.wave`` does not overlap ``other.wave``
+
+        """
+        # Get the wavelength arrays
+        waves = [x.wave[x.thru.value != 0] if isinstance(x, SpectralElement)
+                 else x.wave for x in (self, other)]
+
+        # Convert other wave unit to self wave unit, and extract values
+        a = waves[0].value
+        b = units.validate_quantity(
+            waves[1], waves[0].unit, equivalencies=units.wave_conversion).value
+
+        # Do the comparison
+        result = synutils.overlap_status(a, b)
+
+        if result == 'partial':
+            lorange = sorted([a.min(), b.min()])
+            hirange = sorted([a.max(), b.max()])
+
+            # Get the full throughput
+            totalflux = self.integrate().value
+            synutils.validate_totalflux(totalflux)
+
+            # Now get the other two pieces
+            idxs = [np.searchsorted(self.wave.value, lorange, 'left'),
+                    np.searchsorted(self.wave.value, hirange, 'left')]
+            excluded = 0.0
+            for idx in idxs:
+                wave = self.wave[slice(*idx)]
+                if wave.size > 0:
+                    excluded += self.integrate(wavelengths=wave).value
+
+            if excluded / totalflux < threshold:
+                result = 'partial_most'
+            else:
+                result = 'partial_notmost'
+
+        return result
+
+    def trim_spectrum(self, min_wave, max_wave):
+        """Create a trimmed spectrum with given wavelength limits.
+
+        Parameters
+        ----------
+        min_wave, max_wave : number or `astropy.units.quantity.Quantity`
+            Wavelength limits, inclusive.
+            If not a Quantity, assumed to be in ``self.wave.unit``.
+
+        Returns
+        -------
+        newspec : obj
+            Trimmed spectrum in same units as ``self``.
+
+        """
+        wave_limits = [units.validate_quantity(
+                w, self.wave.unit, equivalencies=units.wave_conversion)
+                       for w in (min_wave, max_wave)]
+        minw = wave_limits[0].value
+        maxw = wave_limits[1].value
+
+        mask = (self.wave.value >= minw) & (self.wave.value <= maxw)
+        new_wave = self.wave[mask]
+        new_flux = self.flux[mask]
+
+        return self.__class__(new_wave, new_flux, area=self.primary_area,
+                              header=deepcopy(self.metadata))
+
+    def taper(self):
+        """Taper the spectrum by adding zero flux or throughput
+        to each end.
+
+        The wavelengths to use for the first and last points are
+        calculated by using the same ratio as for the 2 interior points.
+
+        Skipped if ends are already zeros. Attributes are updated in-place.
+
+        """
+        wave_value = self.wave.value
+        flux_value = self.flux.value
+        has_insertion = False
+
+        if flux_value[0] != 0:
+            has_insertion = True
+            wave_value = np.insert(wave_value, 0,
+                                   wave_value[0] ** 2 / wave_value[1])
+            flux_value = np.insert(flux_value, 0, 0.0)
+
+        if flux_value[-1] != 0:
+            has_insertion = True
+            wave_value = np.insert(wave_value, wave_value.size,
+                                   wave_value[-1] ** 2 / wave_value[-2])
+            flux_value = np.insert(flux_value, flux_value.size, 0.0)
+
+        if has_insertion:
+            self.wave = u.Quantity(wave_value, unit=self.wave.unit)
+            self.flux = u.Quantity(flux_value, unit=self.flux.unit)
+
+    def plot(self, overplot_data=None, xlog=False, ylog=False,
+             left=None, right=None, bottom=None, top=None,
+             show_legend=True, data_labels=('Spectrum data', 'User data'),
+             xlabel='', ylabel='', title='', save_as=''):  # pragma: no cover
+        """Plot the spectrum.
+
+        .. note:: Uses :mod:`matplotlib`.
+
+        Parameters
+        ----------
+        overplot_data : tuple of array_like
+            Another ``(wave, flux)`` pair to overplot.
+            Assumed to be in ``self`` units.
+
+        xlog, ylog : bool
+            Plot X and Y axes, respectively, in log scale.
+            Default is linear scale.
+
+        left, right : `None` or number
+            Minimum and maximum wavelengths to plot.
+            If `None`, uses the whole range. If a number is given,
+            must be in ``self`` wavelength unit.
+
+        bottom, top : `None` or number
+            Minimum and maximum flux/throughput to plot.
+            If `None`, uses the whole range. If a number is given,
+            must be in ``self`` flux/throughput unit.
+
+        show_legend : bool
+            Display legend (automatically positioned).
+
+        data_labels : tuple of str
+            Data labels for legend. Only used if ``show_legend=True``.
+
+        xlabel, ylabel : str
+            Labels for X and Y axes. By default, they are based on
+            data units.
+
+        title : str
+            Custom plot title. By default, 'expr' from metadata
+            is displayed.
+
+        save_as : str
+            Save the plot to an image file. The file type is
+            automatically determined by given file extension.
+
+        Raises
+        ------
+        synphot.synexceptions.SynphotError
+            Invalid inputs.
+
+        """
+        import matplotlib.pyplot as plt
+
+        if overplot_data is not None:
+            other_wave = overplot_data[0]
+            other_flux = overplot_data[1]
+
+        # Lower wavelength limit
+        if left is None:
+            left = self.wave.value.min()
+        elif not isinstance(left, (int, long, float)):
+            raise synexceptions.SynphotError(
+                '{0} must be a number'.format(left))
+
+        # Upper wavelength limit
+        if right is None:
+            right = self.wave.value.max()
+        elif not isinstance(right, (int, long, float)):
+            raise synexceptions.SynphotError(
+                '{0} must be a number'.format(right))
+
+        # Lower flux/throughput limit
+        if bottom is None:
+            bottom = self.flux.value.min()
+        elif not isinstance(bottom, (int, long, float)):
+            raise synexceptions.SynphotError(
+                '{0} must be a number'.format(bottom))
+
+        # Upper flux/throughput limit
+        if top is None:
+            top = self.flux.value.max()
+        elif not isinstance(top, (int, long, float)):
+            raise synexceptions.SynphotError(
+                '{0} must be a number'.format(top))
+
+        fig, ax = plt.subplots()
+
+        if not xlabel:
+            if self.wave.unit.physical_type == 'frequency':
+                xlabel = 'Frequency ({0})'.format(self.wave.unit)
+            elif self.wave.unit.physical_type == 'wavenumber':
+                xlabel = 'Wave number ({0})'.format(self.wave.unit)
+            else:  # length
+                xlabel = 'Wavelength ({0})'.format(self.wave.unit)
+        if not ylabel:
+            if self.flux.unit == u.dimensionless_unscaled:
+                ylabel = 'Throughput'
+            else:
+                ylabel = 'Flux ({0})'.format(self.flux.unit)
+        if not title:
+            title = self.metadata['expr']
+
+        ax.plot(self.wave.value, self.flux.value, label=data_labels[0])
+        if overplot_data is not None:
+            ax.plot(other_wave, other_flux, label=data_labels[1])
+        ax.set_xlim(left, right)
+        ax.set_ylim(bottom, top)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+
+        if xlog:
+            ax.set_xscale('log')
+        if ylog:
+            ax.set_yscale('log')
+
+        if show_legend:
+            ax.legend(loc='best')
+
+        plt.draw()
+
+        if save_as:
+            plt.savefig(save_as)
+            log.info('Plot saved as {0}'.format(save_as))
+
+
+class BaseUnitlessSpectrum(BaseSpectrum):
+    """Base class for unitless spectrum that should not be used directly.
+
+    Wavelengths must be monotonic ascending/descending without zeroes
+    or duplicate values.
+
+    Values for the unitless component (hereafter, known as throughput)
+    must be dimensionless. They are checked for negative values.
+    If found, warning is issued and negative values are set to zeroes.
+
+    Parameters
+    ----------
+    wavelengths : array_like or `astropy.units.quantity.Quantity`
+        Wavelength values. If not a Quantity, assumed to be in
+        Angstrom.
+
+    throughput : array_like or `astropy.units.quantity.Quantity`
+        Throughput values. Must be dimensionless.
+        If not a Quantity, assumed to be in THROUGHPUT.
+
+    kwargs : dict
+        Keywords accepted by `BaseSpectrum`, except ``flux_unit``.
+
+    Attributes
+    ----------
+    wave, thru : `astropy.units.quantity.Quantity`
+        Wavelength and throughput of the spectrum.
+
+    primary_area : `astropy.units.quantity.Quantity` or `None`
+        Area that flux covers in cm^2.
+
+    metadata : dict
+        Metadata. ``self.metadata['expr']`` must contain a descriptive string of the object.
+
+    warnings : dict
+        List of warnings related to spectrum object.
+
+    Raises
+    ------
+    synphot.synexceptions.SynphotError
+        If wavelengths and throughput do not match, or if they have
+        invalid units.
+
+    synphot.synexceptions.DuplicateWavelength
+        If wavelength array contains duplicate entries.
+
+    synphot.synexceptions.UnsortedWavelength
+        If wavelength array is not monotonic.
+
+    synphot.synexceptions.ZeroWavelength
+        If negative or zero wavelength occurs in wavelength array.
+
+    """
+    def __init__(self, wavelengths, throughput, **kwargs):
+        kwargs['flux_unit'] = units.THROUGHPUT
+        BaseSpectrum.__init__(self, wavelengths, throughput, **kwargs)
+
+        # Rename attribute to avoid confusion. They are interchangable.
+        self.thru = self.flux
+
+    def _validate_flux_unit(self, new_unit):
+        """Check throughput unit, which must be dimensionless."""
+        new_unit = units.validate_unit(new_unit)
+        if new_unit.decompose() != u.dimensionless_unscaled:
+            raise synexceptions.SynphotError(
+                'Throughput unit {0} is not dimensionless'.format(new_unit))
+
+    def __mul__(self, other):
+        """If other is a SourceSpectrum, result is a SourceSpectrum,
+        not a BaseUnitlessSpectrum.
+
+        """
+        if isinstance(other, SourceSpectrum):
+            return other.__mul__(self)
+        else:
+            return BaseSpectrum.__mul__(self, other)
+
+    def convert_flux(self, out_flux_unit):
+        """This merely returns ``self.thru``."""
+        return self.thru
+
+    def taper(self):
+        """Taper the spectrum by adding zero flux or throughput
+        to each end.
+
+        The wavelengths to use for the first and last points are
+        calculated by using the same ratio as for the 2 interior points.
+
+        Skipped if ends are already zeros. Attributes are updated in-place.
+
+        """
+        BaseSpectrum.taper(self)
+        self.thru = self.flux
+
+
+class SourceSpectrum(BaseSpectrum):
+    """Class to handle a source spectrum.
+
+    Wavelengths must be monotonic ascending/descending without zeroes
+    or duplicate values.
+
+    Fluxes, if not magnitudes, are checked for negative values.
+    If found, warning is issued and negative values are set to zeroes.
+
+    Parameters
+    ----------
+    wavelengths : array_like or `astropy.units.quantity.Quantity`
+        Wavelength values. If not a Quantity, assumed to be in
+        Angstrom.
+
+    fluxes : array_like or `astropy.units.quantity.Quantity`
+        Flux values. If not a Quantity, assumed to be in FLAM.
+
+    kwargs : dict
+        Keywords accepted by `BaseSpectrum`.
+
+    Attributes
+    ----------
+    wave, flux : `astropy.units.quantity.Quantity`
+        Wavelength and flux of the spectrum.
+
+    primary_area : `astropy.units.quantity.Quantity` or `None`
+        Area that flux covers in cm^2.
+
+    metadata : dict
+        Metadata. ``self.metadata['expr']`` must contain a descriptive string of the object.
+
+    warnings : dict
+        Dictionary of warning key-value pairs related to spectrum object.
+
+    Raises
+    ------
+    synphot.synexceptions.SynphotError
+        If wavelengths and fluxes do not match, or if they have invalid units.
+
+    synphot.synexceptions.DuplicateWavelength
+        If wavelength array contains duplicate entries.
+
+    synphot.synexceptions.UnsortedWavelength
+        If wavelength array is not monotonic.
+
+    synphot.synexceptions.ZeroWavelength
+        If negative or zero wavelength occurs in wavelength array.
+
+    """
+    def __init__(self, wavelengths, fluxes, **kwargs):
+        BaseSpectrum.__init__(self, wavelengths, fluxes, **kwargs)
+
+    def _validate_flux_unit(self, new_unit):
+        """Check flux unit before conversion."""
+        new_unit = units.validate_unit(new_unit)
+        unit_name = new_unit.to_string()
+        unit_type = new_unit.physical_type
+
+        # These have 'unknown' physical type.
+        # Only linear flux density is supported in the calculations.
+        acceptable_unknown_units = (
+            units.PHOTLAM.to_string(), units.PHOTNU.to_string(),
+            units.FLAM.to_string())
+
+        if (unit_name not in acceptable_unknown_units and
+                unit_type != 'spectral flux density'):
+            raise synexceptions.SynphotError(
+                '{0} cannot operate in {1}, use '
+                'synphot.spectrum.convert_fluxes() to convert flux to '
+                'PHOTLAM, PHOTNU, FLAM, FNU, or Jy first.'.format(
+                    self.__class__.__name__, unit_name))
+
+    def add_mag(self, mag):
+        """Add a scalar magnitude to flux.
+
+        .. math::
+
+            result = flux_{linear} * 10^{-0.4 * mag}
+
+            result = flux_{mag} + mag
+
+        Parameters
+        ----------
+        mag : number or `astropy.units.quantity.Quantity`
+            Scalar magnitude to add.
+
+        Returns
+        -------
+        newspec : obj
+            Resultant spectrum, same class and units as ``self``.
+
+        Raises
+        ------
+        synphot.synexceptions.SynphotError
+            Magnitude is invalid.
+
+        """
+        if isinstance(mag, u.Quantity):
+            magval = mag.value
+            is_mag = mag.unit.decompose() == u.mag
+        else:
+            magval = mag
+            is_mag = True
+
+        if not isinstance(magval, (int, long, float)) or not is_mag:
+            raise synexceptions.SynphotError(
+                '{0} cannot be added to spectrum'.format(mag))
+
+        if self.flux.unit.decompose() == u.mag:  # pragma: no cover
+            newspec = self.__add__(magval)
+        else:
+            newspec = self.__mul__(10**(-0.4 * magval))
+
+        return newspec
+
+    def convert_flux(self, out_flux_unit):
+        """Convert ``self.flux`` to a different unit.
+        The attribute is updated in-place.
+
+        See :func:`convert_fluxes` for more details.
+
+        Parameters
+        ----------
+        out_flux_unit : str or `astropy.units.core.Unit`
+            Output flux unit.
+
+        """
+        self._validate_flux_unit(out_flux_unit)
+        self.flux = convert_fluxes(self.wave, self.flux, out_flux_unit,
+                                   area=self.primary_area, vegaspec=None)
+
+    def apply_redshift(self, z):
+        """Return a new spectrum with redshifted wavelengths.
+
+        .. math::
+
+            \\lambda_{obs} = (1 + z) * \\lambda_{rest}
+
+            \\nu_{obs} = \\frac{\\nu_{rest}}{1 + z}
+
+        .. note::
+
+            Wave number has the same formula as :math:`\\nu`.
+
+        Parameters
+        ----------
+        z : float
+            Redshift to apply.
+
+        Returns
+        -------
+        newspec : obj
+            Spectrum with redshifted wavelengths, same class and
+            units as ``self``.
+
+        Raises
+        ------
+        synphot.synexceptions.SynphotError
+            Invalid redshift value.
+
+        """
+        if not isinstance(z, (int, long, float)):
+            raise synexceptions.SynphotError('Redshift must be a number.')
+
+        wave_type = self.wave.unit.physical_type
+        fac = 1.0 + z
+
+        if wave_type == 'length':
+            new_wave = self.wave * fac
+        else:  # frequency or wavenumber
+            new_wave = self.wave / fac
+
+        new_metadata = deepcopy(self.metadata)
+        new_metadata['expr'] = '{0} at z={1}'.format(str(self), z)
+
+        return self.__class__(new_wave, self.flux, area=self.primary_area,
+                              header=new_metadata)
+
+    @classmethod
+    def from_file(cls, filename, area=None, **kwargs):
+        """Creates a spectrum object from file.
+
+        If filename has 'fits' or 'fit' suffix, it is read as FITS.
+        Otherwise, it is read as ASCII.
+
+        Parameters
+        ----------
+        filename : str
+            Spectrum filename.
+
+        area : float or `astropy.units.quantity.Quantity`, optional
+            Area that fluxes cover. Usually, this is the area of
+            the primary mirror of the observatory of interest.
+            If not a Quantity, assumed to be in cm^2.
+
+        kwargs : dict
+            Keywords acceptable by
+            :func:`synphot.synio.read_fits_spec` (if FITS) or
+            :func:`synphot.synio.read_ascii_spec` (if ASCII).
+
+        Returns
+        -------
+        newspec : obj
+            New spectrum object.
+
+        """
+        header, wavelengths, fluxes = synio.read_spec(filename, **kwargs)
+        return cls(wavelengths, fluxes, area=area, header=header)
+
+    def to_fits(self, filename, **kwargs):
+        """Write the spectrum to a FITS file.
+
+        Parameters
+        ----------
+        filename : str
+            Output filename.
+
+        kwargs : dict
+            Keywords accepted by :func:`synphot.synio.write_fits_spec`.
+
+        """
+        # There are some standard keywords that should be added
+        # to the extension header.
+        bkeys = {
+            'expr': (str(self), 'synphot expression'),
+            'tdisp1': 'G15.7',
+            'tdisp2': 'G15.7' }
+
+        if 'ext_header' in kwargs:
+            kwargs['ext_header'].update(bkeys)
+        else:
+            kwargs['ext_header'] = bkeys
+
+        synio.write_fits_spec(filename, self.wave, self.flux, **kwargs)
+
+    @classmethod
+    def from_vega(cls, area=None, **kwargs):
+        """Load :ref:`Vega spectrum <synphot-vega-spec>`.
+
+        Parameters
+        ----------
+        area : float or `astropy.units.quantity.Quantity`, optional
+            Area that fluxes cover. Usually, this is the area of
+            the primary mirror of the observatory of interest.
+            If not a Quantity, assumed to be in cm^2.
+
+        kwargs : dict
+            Keywords acceptable by :func:`synphot.synio.read_remote_spec`.
+
+        Returns
+        -------
+        vegaspec : obj
+            Vega spectrum.
+
+        """
+        filename = synconfig.VEGA_FILE()
+        header, wavelengths, fluxes = synio.read_remote_spec(filename, **kwargs)
+        header['expr'] = 'Vega from {0}'.format(os.path.basename(filename))
+        header['filename'] = filename
+        return cls(wavelengths, fluxes, area=area, header=header)
+
+    @classmethod
+    def from_flat_spectrum(cls, flux_unit, area=None):
+        """Create a :ref:`flat spectrum <synphot-flat-spec>`.
+
+        Wavelengths are automatically generated by
+        :func:`synphot.synutils.generate_wavelengths` and
+        converted to Angstrom.
+
+        Parameters
+        ----------
+        flux_unit : str or `astropy.units.core.Unit`
+            Flux unit of flat spectrum.
+
+        area : float or `astropy.units.quantity.Quantity`, optional
+            Area that fluxes cover. Usually, this is the area of
+            the primary mirror of the observatory of interest.
+            If not a Quantity, assumed to be in cm^2.
+
+        Returns
+        -------
+        flatspec : obj
+            Flat spectrum in given flux unit.
+
+        Raises
+        ------
+        synphot.synexceptions.SynphotError
+            Flat spectrum is not defined for given flux unit.
+
+        """
+        flux_unit = units.validate_unit(flux_unit)
+        flux_unit_name = flux_unit.to_string()
+        wavelengths = synutils.generate_wavelengths(wave_unit=u.AA)[0]
+        flux_value = np.empty(wavelengths.size)
+
+        # Magnitude flux-density units
+        if flux_unit_name == units.STMAG.to_string():
+            x = convert_fluxes(1, u.Quantity(0, units.STMAG), units.FLAM)
+            flux_value.fill(x.value)
+            fluxes = u.Quantity(flux_value, unit=x.unit)
+
+        elif flux_unit_name == units.ABMAG.to_string():
+            x = convert_fluxes(1, u.Quantity(0, units.ABMAG), units.FNU)
+            flux_value.fill(x.value)
+            fluxes = u.Quantity(flux_value, unit=x.unit)
+
+        # Linear flux-density units
+        elif (flux_unit.physical_type == 'spectral flux density' or
+              flux_unit_name in (
+                units.PHOTLAM.to_string(), units.PHOTNU.to_string(),
+                units.FLAM.to_string())):
+            flux_value.fill(1.0)
+            fluxes = u.Quantity(flux_value, unit=flux_unit)
+
+        else:
+            raise synexceptions.SynphotError(
+                'No standard spectrum available for {0}'.format(flux_unit_name))
+
+        header = {
+            'expr': 'Flat spectrum for {0}'.format(flux_unit_name)}
+
+        return cls(wavelengths, fluxes, area=area, header=header)
+
+    def renorm(self, renorm_val, band, force=False, vegaspec=None):
+        """Renormalize the spectrum to the given Quantity and band.
+
+        Parameters
+        ----------
+        renorm_val : number or `astropy.units.quantity.Quantity`
+            Value to renormalize the spectrum to. If not a Quantity,
+            assumed to be in ``self.flux.unit``.
+
+        band : `synphot.spectrum.SpectralElement`
+            Spectrum of the passband to use in renormalization.
+
+        force : bool
+            By default (`False`), renormalization is only done
+            when band wavelength limits are within ``self``
+            or at least 99% of the flux is within the overlap.
+            Set to `True` to force renormalization for partial overlap.
+            Disjoint passband raises an exception regardless.
+
+        vegaspec : `synphot.spectrum.SourceSpectrum`
+            Vega spectrum from :func:`SourceSpectrum.from_vega`.
+            This is *only* used if flux is renormalized to VEGAMAG.
+
+        Returns
+        -------
+        newsp : obj
+            Renormalized spectrum in units of ``self``.
+
+        Raises
+        ------
+        synphot.synexceptions.DisjointError
+            Renormalization band does not overlap with ``self``.
+
+        synphot.synexceptions.OverlapError
+            Renormalization band only partially overlaps with ``self``
+            and significant amount of flux falls outside the overlap.
+
+        synphot.synexceptions.SynphotError
+            Invalid inputs or calculation failed.
+
+        """
+        if not isinstance(band, SpectralElement):
+            raise synexceptions.SynphotError(
+                'Renormalization passband must be a SpectralElement.')
+
+        # Validate the overlap.
+        stat = band.check_overlap(self)
+        warnings = {}
+
+        if stat == 'none':
+            raise synexceptions.DisjointError(
+                'Spectrum and renormalization band are disjoint.')
+
+        elif stat == 'partial_most':
+            warn_str = (
+                'Spectrum is not defined everywhere in renormalization' +
+                'passband. At least 99% of the band throughput has' +
+                'data. Spectrum will be extrapolated at constant value.')
+            warnings['PartialRenorm'] = warn_str
+            log.warn(warn_str)
+
+        elif stat == 'partial_notmost':
+            if force:
+                warn_str = (
+                    'Spectrum is not defined everywhere in renormalization' +
+                    'passband. Less than 99% of the band throughput has' +
+                    'data. Spectrum will be extrapolated at constant value.')
+                warnings['PartialRenorm'] = warn_str
+                log.warn(warn_str)
+            else:
+                raise synexceptions.OverlapError(
+                    'Spectrum and renormalization band do not fully overlap.'
+                    'You may use force=True to force the renormalization to '
+                    'proceed.')
+
+        elif stat != 'full':  # pragma: no cover
+            raise synexceptions.SynphotError(
+                'Overlap result of {0} is unexpected'.format(stat))
+
+        if not isinstance(renorm_val, u.Quantity):
+            renorm_val = u.Quantity(renorm_val, unit=self.flux.unit)
+
+        renorm_unit_name = renorm_val.unit.to_string()
+
+        # Compute the flux of the spectrum through the passband
+        sp = self.__mul__(band)
+
+        # Special handling for non-density units
+        if renorm_unit_name in (u.count.to_string(), units.OBMAG.to_string()):
+            stdflux = 1.0
+            flux_tmp = convert_fluxes(
+                sp.wave, sp.flux, u.count, area=sp.primary_area)
+            totalflux = flux_tmp.sum()
+
+        # Flux density units and VEGAMAG
+        else:
+            totalflux = sp.integrate()
+
+            # Get the standard unit spectrum in the renormalization units.
+            if renorm_unit_name == units.VEGAMAG.to_string():
+                if not isinstance(vegaspec, SourceSpectrum):
+                    raise synexceptions.SynphotError(
+                        'Vega spectrum is missing.')
+                stdspec = vegaspec
+            else:
+                stdspec = SourceSpectrum.from_flat_spectrum(
+                    renorm_val.unit, area=self.primary_area)
+
+            up = stdspec * band
+            up.convert_flux(totalflux.unit)
+            stdflux = up.integrate().value
+
+        synutils.validate_totalflux(totalflux.value)
+
+        # Renormalize in magnitudes
+        if renorm_val.unit.decompose() == u.mag:
+            const = renorm_val.value + 2.5 * np.log10(totalflux.value / stdflux)
+            newsp = self.add_mag(const)
+
+        # Renormalize in linear flux units
+        else:
+            const = renorm_val.value * (stdflux / totalflux.value)
+            newsp = self.__mul__(const)
+
+        newsp.warnings.update(warnings)
+        return newsp
+
+    @classmethod
+    def from_gaussian(cls, total_flux, center, fwhm, area=None):
+        """Create spectrum from :ref:`Gaussian source <synphot-gaussian>`.
+
+        Wavelength increment is :math:`0.1 * \\sigma`, with limits
+        set at 50 times the increment from center. Therefore, the
+        wavelength array has 100 values.
+
+        .. warning::
+
+            Behaviors in frequency and wave number space are untested.
+
+        Parameters
+        ----------
+        total_flux : float or `astropy.units.quantity.Quantity`
+            Total flux under gaussian. If not a Quantity, assumed
+            to be in FLAM.
+
+        center : float or `astropy.units.quantity.Quantity`
+            Central wavelength of gaussian.
+            If not a Quantity, assumed to be in Angstrom.
+
+        fwhm : float or `astropy.units.quantity.Quantity`
+            Full-width-at-half-maximum (FWHM) of gaussian.
+            If not a Quantity, assumed to be in the same unit
+            as ``center``.
+
+        area : float or `astropy.units.quantity.Quantity`, optional
+            Area that fluxes cover. Usually, this is the area of
+            the primary mirror of the observatory of interest.
+            If not a Quantity, assumed to be in cm^2.
+
+        Returns
+        -------
+        newspec : obj
+            Spectrum from Gaussian source.
+
+        """
+        if not isinstance(total_flux, u.Quantity):
+            total_flux = u.Quantity(total_flux, unit=units.FLAM)
+        if not isinstance(center, u.Quantity):
+            center = u.Quantity(center, unit=u.AA)
+
+        fwhm = units.validate_quantity(
+            fwhm, center.unit, equivalencies=units.wave_conversion)
+        sigma = fwhm / np.sqrt(8.0 * np.log(2.0))
+        factor = total_flux / (np.sqrt(2.0 * np.pi) * sigma.value)
+
+        # Calculate wavelength
+        dw = 0.1 * sigma
+        first = center - 50.0 * dw
+        last = center + 50.0 * dw
+        wavelengths = u.Quantity(np.arange(first.value, last.value, dw.value),
+                                 unit=center.unit)
+
+        # Calculate flux
+        fluxes = factor * np.exp(-0.5 * ((wavelengths - center) / sigma)**2)
+
+        header = {
+            'expr': 'Gaussian: mu={0}, fwhm={1}, total_flux={2}'.format(
+                center, fwhm, total_flux),
+            'center' : center,
+            'fwhm' : fwhm,
+            'sigma' : sigma,
+            'factor' : factor,
+            'total_flux' : total_flux }
+
+        return cls(wavelengths, fluxes, area=area, header=header)
+
+    @classmethod
+    def from_powerlaw(cls, refwave, index, flux_unit=units.FLAM, area=None):
+        """Create a :ref:`power-law spectrum <synphot-powerlaw>`.
+
+        Flux is normalized to 1 in ``flux_units`` at ``refwave``.
+
+        Wavelengths are generated using
+        :func:`synphot.synutils.generate_wavelengths` in the unit
+        of ``refwave``.
+
+        Parameters
+        ----------
+        refwave : float or `astropy.units.quantity.Quantity`
+            Reference wavelength. If not a Quantity, assumed
+            to be in Angstrom.
+
+        index : number
+            Index of the power law.
+
+        flux_unit : str or `astropy.units.core.Unit`, optional
+            Flux unit of the spectrum. Default is FLAM.
+
+        area : float or `astropy.units.quantity.Quantity`, optional
+            Area that fluxes cover. Usually, this is the area of
+            the primary mirror of the observatory of interest.
+            If not a Quantity, assumed to be in cm^2.
+
+        Returns
+        -------
+        newspec : obj
+            Power-law spectrum.
+
+        Raises
+        ------
+        synphot.synexceptions.SynphotError
+            Index is invalid.
+
+        """
+        flux_unit = units.validate_unit(flux_unit)
+
+        if not isinstance(index, (int, long, float)):
+            raise synexceptions.SynphotError(
+                'Index {0} must be a number.'.format(index))
+
+        if not isinstance(refwave, u.Quantity):
+            refwave = u.Quantity(refwave, unit=u.AA)
+
+        # Generate wavelengths
+        tmp_wave = synutils.generate_wavelengths(wave_unit=u.AA)[0]
+        wavelengths = tmp_wave.to(
+            refwave.unit, equivalencies=units.wave_conversion)
+
+        # Calculate flux
+        fluxes = ((wavelengths / refwave) ** index) * flux_unit
+
+        header = {
+            'expr': 'Power law: refwave {0}, index {1}'.format(refwave, index),
+            'refwave': refwave,
+            'index': index }
+
+        return cls(wavelengths, fluxes, area=area, header=header)
+
+    @classmethod
+    def from_blackbody(cls, temperature, flux_unit=units.FLAM, area=None):
+        """Create a :ref:`blackbody spectrum <synphot-planck-law>`
+        with given temperature.
+
+        Flux is normalized to a star of solar radius at a
+        distance of 1 kpc.
+
+        Wavelengths are generated using
+        :func:`synphot.synutils.generate_wavelengths` in Angstrom.
+
+        Parameters
+        ----------
+        temperature : float or `astropy.units.quantity.Quantity`
+            Blackbody temperature. If not a Quantity, assumed
+            to be in Kelvin.
+
+        flux_unit : str or `astropy.units.core.Unit`, optional
+            Flux unit of the spectrum. Default is FLAM.
+
+        area : float or `astropy.units.quantity.Quantity`, optional
+            Area that fluxes cover. Usually, this is the area of
+            the primary mirror of the observatory of interest.
+            If not a Quantity, assumed to be in cm^2.
+
+        """
+        flux_unit = units.validate_unit(flux_unit)
+
+        if not isinstance(temperature, u.Quantity):
+            temperature = u.Quantity(temperature, unit=u.K)
+
+        # Generate wavelengths
+        wavelengths = synutils.generate_wavelengths(wave_unit=u.AA)[0]
+
+        # Calculate flux and renormalize to 1 R_sun at 1 kpc
+        bbflux = planck.bb_photlam(wavelengths, temperature)
+        fluxes = convert_fluxes(wavelengths, bbflux, flux_unit, area=area)
+
+        header = {
+            'expr': 'BB(T = {0})'.format(temperature),
+            'temperature': temperature }
+
+        return cls(wavelengths, fluxes, area=area, header=header)
+
+
+class SpectralElement(BaseUnitlessSpectrum):
+    """Class to handle a spectral element.
+    That is, throughput for filter, detector, et cetera.
+
+    Wavelengths must be monotonic ascending/descending without zeroes
+    or duplicate values.
+
+    Throughput values must be dimensionless.
+    They are checked for negative values.
+    If found, warning is issued and negative values are set to zeroes.
+
+    Parameters
+    ----------
+    wavelengths : array_like or `astropy.units.quantity.Quantity`
+        Wavelength values. If not a Quantity, assumed to be in
+        Angstrom.
+
+    throughput : array_like or `astropy.units.quantity.Quantity`
+        Throughput values. Must be dimensionless.
+        If not a Quantity, assumed to be in THROUGHPUT.
+
+    kwargs : dict
+        Keywords accepted by `BaseSpectrum`, except ``flux_unit``.
+
+    Attributes
+    ----------
+    wave, thru : `astropy.units.quantity.Quantity`
+        Wavelength and throughput of the spectrum.
+
+    primary_area : `astropy.units.quantity.Quantity` or `None`
+        Area that flux covers in cm^2.
+
+    metadata : dict
+        Metadata. ``self.metadata['expr']`` must contain a descriptive string of the object.
+
+    warnings : dict
+        List of warnings related to spectrum object.
+
+    Raises
+    ------
+    synphot.synexceptions.SynphotError
+        If wavelengths and throughput do not match, or if they have
+        invalid units.
+
+    synphot.synexceptions.DuplicateWavelength
+        If wavelength array contains duplicate entries.
+
+    synphot.synexceptions.UnsortedWavelength
+        If wavelength array is not monotonic.
+
+    synphot.synexceptions.ZeroWavelength
+        If negative or zero wavelength occurs in wavelength array.
+
+    """
+    def unit_response(self):
+        """Calculate :ref:`unit response <synphot-formula-uresp>`
+        of this passband.
+
+        Returns
+        -------
+        uresp : `astropy.units.quantity.Quantity`
+            Flux (in FLAM) of a star that produces a response of
+            one photon per second in this passband.
+
+        Raises
+        ------
+        synphot.synexceptions.SynphotError
+            If ``self.primary_area``, which is compulsory for this
+            calculation, is undefined.
+
+        """
+        if self.primary_area is None:
+            raise synexceptions.SynphotError('Area is undefined.')
+
+        # Only correct if wavelengths are in Angstrom.
+        wave = self.wave.to(u.AA, equivalencies=units.wave_conversion)
+
+        int_val = synutils.trapezoid_integration(
+            wave.value, (self.thru * wave).value)
+        uresp = units.HC / (self.primary_area.cgs * int_val)
+
+        return u.Quantity(uresp.value, unit=units.FLAM)
+
+    def pivot(self):
+        """Calculate :ref:`passband pivot wavelength <synphot-formula-pivwv>`.
+
+        Returns
+        -------
+        pivwv : `astropy.units.quantity.Quantity`
+            Passband pivot wavelength.
+
+        """
+        wave = synutils.to_length(self.wave)
+        num = synutils.trapezoid_integration(
+            wave.value, self.thru.value * wave.value)
+        den = synutils.trapezoid_integration(
+            wave.value, self.thru.value / wave.value)
+
+        if den == 0:  # pragma: no cover
+            pivwv = 0.0
+        else:
+            val = num / den
+            if val < 0:  # pragma: no cover
+                pivwv = 0.0
+            else:
+                pivwv = np.sqrt(val)
+
+        return u.Quantity(pivwv, unit=wave.unit)
+
+    def rmswidth(self, threshold=None):
+        """Calculate the passband RMS width as in
+        :ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>`, page 836.
+
+        Not to be confused with :func:`photbw`.
+
+        Parameters
+        ----------
+        threshold : float, optional
+            Data points with throughput below this value are not
+            included in the calculation. By default, all data points
+            are included.
+
+        Returns
+        -------
+        rms_width : `astropy.units.quantity.Quantity`
+            RMS width of the passband.
+
+        Raises
+        ------
+        synphot.synexceptions.SynphotError
+            Threshold is invalid.
+
+        """
+        wave = synutils.to_length(self.wave)
+
+        if threshold is None:
+            wave = wave
+            thru = self.thru
+        elif isinstance(threshold, (int, long, float)):
+            mask = self.thru.value >= threshold
+            wave = wave[mask]
+            thru = self.thru[mask]
+        else:
+            raise synexceptions.SynphotError(
+                '{0} is not a valid threshold'.format(threshold))
+
+        num = synutils.trapezoid_integration(
+            wave.value, ((wave - self.avgwave())**2 * thru).value)
+        den = self.integrate(wavelengths=wave).value
+
+        if den == 0:  # pragma: no cover
+            rms_width = 0.0
+        else:
+            val = num / den
+            if val < 0:  # pragma: no cover
+                rms_width = 0.0
+            else:
+                rms_width = np.sqrt(val)
+
+        return u.Quantity(rms_width, unit=wave.unit)
+
+    def photbw(self, threshold=None):
+        """Calculate the
+        :ref:`passband RMS width as in IRAF SYNPHOT <synphot-formula-bandw>`.
+
+        This is a compatibility function. To calculate the actual
+        passband RMS width, use :func:`rmswidth`.
+
+        Parameters
+        ----------
+        threshold : float, optional
+            Data points with throughput below this value are not
+            included in the calculation. By default, all data points
+            are included.
+
+        Returns
+        -------
+        bandw : `astropy.units.quantity.Quantity`
+            IRAF SYNPHOT RMS width of the passband.
+
+        Raises
+        ------
+        synphot.synexceptions.SynphotError
+            Threshold is invalid.
+
+        """
+        wv = synutils.to_length(self.wave)
+        avg_wave = synutils.barlam(wv.value, self.thru.value)
+
+        if threshold is None:
+            wave = wv.value
+            thru = self.thru.value
+        elif isinstance(threshold, (int, long, float)):
+            mask = self.thru.value >= threshold
+            wave = wv[mask].value
+            thru = self.thru[mask].value
+        else:
+            raise synexceptions.SynphotError(
+                '{0} is not a valid threshold'.format(threshold))
+
+        # calculate the rms width
+        num = synutils.trapezoid_integration(
+            wave, thru * np.log(wave / avg_wave) ** 2 / wave)
+        den = synutils.trapezoid_integration(wave, thru / wave)
+
+        if den == 0:  # pragma: no cover
+            bandw = 0.0
+        else:
+            val = num / den
+            if val < 0:  # pragma: no cover
+                bandw = 0.0
+            else:
+                bandw = avg_wave * np.sqrt(val)
+
+        return u.Quantity(bandw, unit=wv.unit)
+
+    def fwhm(self, threshold=None):
+        """Calculate :ref:`synphot-formula-fwhm` of equivalent gaussian.
+
+        Parameters
+        ----------
+        threshold : float, optional
+            Data points with throughput below this value are not
+            included in the calculation. By default, all data points
+            are included.
+
+        Returns
+        -------
+        fwhm_val : `astropy.units.quantity.Quantity`
+            FWHM of equivalent gaussian.
+
+        """
+        return np.sqrt(8 * np.log(2)) * self.photbw(threshold=threshold)
+
+    def avgwave(self):
+        """Calculate the passband average wavelength using
+        :func:`synphot.synutils.avg_wavelength`.
+
+        Returns
+        -------
+        avg_wave : `astropy.units.quantity.Quantity`
+            Passband average wavelength.
+
+        """
+        wave = synutils.to_length(self.wave)
+        avg_wave = synutils.avg_wavelength(wave.value, self.thru.value)
+        return u.Quantity(avg_wave, unit=wave.unit)
+
+    def tlambda(self):
+        """Calculate throughput at
+        :ref:`passband average wavelength <synphot-formula-avgwv>`.
+
+        Returns
+        -------
+        t_lambda : `astropy.units.quantity.Quantity`
+            Throughput at passband average wavelength.
+
+        """
+        return self.resample(self.avgwave())
+
+    def tpeak(self):
+        """Calculate :ref:`peak bandpass throughput <synphot-formula-tpeak>`.
+
+        Returns
+        -------
+        tpeak : `astropy.units.quantity.Quantity`
+            Peak bandpass throughput.
+
+        """
+        return self.thru.max()
+
+    def wpeak(self):
+        """Calculate
+        :ref:`wavelength at peak throughput <synphot-formula-tpeak>`.
+
+        If there are multiple data points with peak throughput
+        value, only the first match is returned.
+
+        Returns
+        -------
+        wpeak : `astropy.units.quantity.Quantity`
+            Wavelength at peak throughput.
+
+        """
+        wave = synutils.to_length(self.wave)
+        return wave[self.thru == self.tpeak()][0]
+
+    def equivwidth(self):
+        """Calculate :ref:`passband equivalent width <synphot-formula-equvw>`.
+
+        Returns
+        -------
+        equvw : `astropy.units.quantity.Quantity`
+            Passband equivalent width.
+
+        """
+        wave = synutils.to_length(self.wave)
+        equvw = synutils.trapezoid_integration(wave.value, self.thru.value)
+        return u.Quantity(equvw, unit=wave.unit)
+
+    def rectwidth(self):
+        """Calculate :ref:`passband rectangular width <synphot-formula-rectw>`.
+
+        Returns
+        -------
+        rectw : `astropy.units.quantity.Quantity`
+            Passband rectangular width.
+
+        """
+        equvw = self.equivwidth()
+        tpeak = self.tpeak()
+
+        if tpeak.value == 0:  # pragma: no cover
+            rectw = u.Quantity(0.0, unit=equvw.unit)
+        else:
+            rectw = equvw / tpeak
+
+        return rectw
+
+    def efficiency(self):
+        """Calculate :ref:`dimensionless efficiency <synphot-formula-qtlam>`.
+
+        Returns
+        -------
+        qtlam : `astropy.units.quantity.Quantity`
+            Dimensionless efficiency.
+
+        """
+        wave = synutils.to_length(self.wave)
+        qtlam = synutils.trapezoid_integration(
+            wave.value, self.thru.value / wave.value)
+        return u.Quantity(qtlam, unit=u.dimensionless_unscaled)
+
+    def emflx(self):
+        """Calculate
+        :ref:`equivalent monochromatic flux <synphot-formula-emflx>`.
+
+        Returns
+        -------
+        em_flux : `astropy.units.quantity.Quantity`
+            Equivalent monochromatic flux in FLAM.
+
+        """
+        t_lambda = self.tlambda()
+
+        if t_lambda == 0:  # pragma: no cover
+            em_flux = u.Quantity(0.0, unit=units.FLAM)
+        else:
+            fac = self.tpeak() / t_lambda
+            em_flux = self.unit_response() * self.rectwidth().value * fac
+
+        return em_flux
+
+    @classmethod
+    def from_file(cls, filename, area=None, **kwargs):
+        """Creates a throughput object from file.
+
+        If filename has 'fits' or 'fit' suffix, it is read as FITS.
+        Otherwise, it is read as ASCII.
+
+        Parameters
+        ----------
+        filename : str
+            Throughput filename.
+
+        area : float or `astropy.units.quantity.Quantity`, optional
+            Area that fluxes cover. Usually, this is the area of
+            the primary mirror of the observatory of interest.
+            If not a Quantity, assumed to be in cm^2.
+
+        kwargs : dict
+            Keywords acceptable by
+            :func:`synphot.synio.read_fits_spec` (if FITS) or
+            :func:`synphot.synio.read_ascii_spec` (if ASCII).
+
+        Returns
+        -------
+        newspec : obj
+            New throughput object.
+
+        """
+        if 'flux_unit' not in kwargs:
+            kwargs['flux_unit'] = units.THROUGHPUT
+
+        if ((filename.endswith('fits') or filename.endswith('fit')) and
+                'flux_col' not in kwargs):
+            kwargs['flux_col'] = 'THROUGHPUT'
+
+        header, wavelengths, throughput = synio.read_spec(filename, **kwargs)
+        return cls(wavelengths, throughput, area=area, header=header)
+
+    def to_fits(self, filename, **kwargs):
+        """Write the spectrum to a FITS file.
+
+        Throughput column is automatically named 'THROUGHPUT'.
+
+        Parameters
+        ----------
+        filename : str
+            Output filename.
+
+        kwargs : dict
+            Keywords accepted by :func:`synphot.synio.write_fits_spec`.
+
+        """
+        kwargs['flux_col'] = 'THROUGHPUT'
+        kwargs['flux_unit'] = units.THROUGHPUT
 
         # There are some standard keywords that should be added
         # to the extension header.
-        bkeys = dict(expr=(str(self), 'pysyn expression'), tdisp1 = ('G15.7', ),
-                     tdisp2 = ('G15.7',))
+        bkeys = {'expr': (str(self), 'synphot expression'),
+                 'tdisp1': 'G15.7',
+                 'tdisp2': 'G15.7'}
 
-        try:
-            bkeys['grftable'] = (self.bandpass.obsmode.gtname,)
-            bkeys['cmptable'] = (self.bandpass.obsmode.ctname,)
-        except AttributeError:
-            pass  # Not all spectra have these
-
-        for key, val in bkeys.items():
-            hdu.header.update(key, *val)
-
-        # Add the header to the list, and write the file
-        hdulist.append(hdu)
-        hdulist.writeto(filename)
-
-    def integrate(self, fluxunits='photlam'):
-        # Extract the flux in the desired units
-        u = self.fluxunits
-        self.convert(fluxunits)
-        wave, flux = self.getArrays()
-        self.convert(u)
-        #then do the integration
-        return self.trapezoidIntegration(wave, flux)
-
-    def sample(self, wave, interp=True):
-        """
-        Return a flux array, in self.fluxunits, on the provided
-        wavetable
-
-        """
-
-        if interp:
-            # convert input wavelengths to Angstroms since the __call__ method
-            # will be expecting that
-            angwave = self.waveunits.ToAngstrom(wave)
-
-            #First use the __call__ to get it in photlam
-            flux = self(angwave)
-
-            if hasattr(self, 'primary_area'):
-                area = self.primary_area
-            else:
-                area = None
-
-            #Then convert to the desired units
-            ans = units.Photlam().Convert(angwave, flux,
-                                          self.fluxunits.name, area=area)
-
+        if 'ext_header' in kwargs:
+            kwargs['ext_header'].update(bkeys)
         else:
-            # Get the arrays in the proper units
-            wave_array, flux_array = self.getArrays()
-            if np.isscalar(wave):
-                # Find the correct index
-                diff = abs(wave-wave_array)
-                idx = diff.argmin()
+            kwargs['ext_header'] = bkeys
 
-                ans = flux_array[idx]
+        synio.write_fits_spec(filename, self.wave, self.thru, **kwargs)
 
-            else:
-                raise NotImplementedError(
-                    "Interp=False not yet supported for non-scalars")
-
-        return ans
-
-    def convert(self, targetunits):
-        """
-        Convert to other units. This method actually just changes the
-        wavelength and flux units objects, it does not recompute the
-        internally kept wave and flux data; these are kept always in internal
-        units. Method getArrays does the actual computation.
-
-        """
-        nunits = units.Units(targetunits)
-
-        if nunits.isFlux:
-            self.fluxunits = nunits
-        else:
-            self.waveunits = nunits
-
-    def redshift(self, z):
-        """
-        Returns a new redshifted spectrum.
-
-        """
-        #By default, apply only the doppler shift.
-
-        waveunits = self.waveunits
-        self.convert('angstrom')
-        newwave = self.wave*(1.0+z)
-        copy = ArraySourceSpectrum(wave=newwave,
-                                   flux=self.flux,
-                                   waveunits=self.waveunits,
-                                   fluxunits=self.fluxunits,
-                                   name="%s at z=%g" % (self.name, z))
-
-        self.convert(waveunits)
-        return copy
-
-    def setMagnitude(self, band, value):
-        """
-        Makes the magnitude of the source in the band equal to value.
-        band is a SpectralElement.
-        This method is marked for deletion once the .renorm method is
-        well tested.
-
-        """
-        objectFlux = band.calcTotalFlux(self)
-        vegaFlux = band.calcVegaFlux()
-        magDiff = -2.5*math.log10(objectFlux/vegaFlux)
-        factor = 10**(-0.4*(value - magDiff))
-
-        # Object returned is a CompositeSourceSpectrum
-        return self * factor
-
-    def renorm(self, RNval, RNUnits, band, force=False):
-        """
-        Renormalize the spectrum to the specified value (in the specified
-        flux units) in the specified band.
-        Calls a function in another module to alleviate circular import
-        issues.
-
-        """
-        from renorm import StdRenorm
-
-        return StdRenorm(self, band, RNval, RNUnits, force=force)
-
-    def effstim(self, fluxunits='photlam'):
-        print("?? {0:s}".format(fluxunits))
-        raise NotImplementedError("Ticket #140: calcphot.effstim functionality")
-
-
-class CompositeSourceSpectrum(SourceSpectrum):
-    """
-    Composite Source Spectrum object, handles addition, multiplication
-    and keeping track of the wavelength set.
-
-    """
-    def __init__(self, source1, source2, operation):
-        self.component1 = source1
-        self.component2 = source2
-        self.operation = operation
-
-        self.name = str(self)
-
-        #Propagate warnings
-        self.warnings = {}
-        self.warnings.update(source1.warnings)
-        self.warnings.update(source2.warnings)
-
-        # for now we keep these attributes here, in spite of the internal
-        # units model. There is code that still breaks down if these attributes
-        # are not here.
-        try:
-            self.waveunits = source1.waveunits
-            self.fluxunits = source1.fluxunits
-        except AttributeError:
-            self.waveunits = source2.waveunits
-            self.fluxunits = source2.fluxunits
-
-        self.isAnalytic = source1.isAnalytic and source2.isAnalytic
-
-        # check areas
-        if hasattr(source1, 'primary_area'):
-            source1_area = source1.primary_area
-        else:
-            source1_area = None
-
-        if hasattr(source2, 'primary_area'):
-            source2_area = source2.primary_area
-        else:
-            source2_area = None
-
-        if not source1_area and not source2_area:
-            self.primary_area = None
-
-        elif source1_area and not source2_area:
-            self.primary_area = source1_area
-
-        elif not source1_area and source2_area:
-            self.primary_area = source2_area
-
-        else:
-            if source1_area == source2_area:
-                self.primary_area = source1_area
-
-            else:
-                err = 'Components have different area attributes: %s: ' \
-                      '%f, %s: %f'
-                err = err % (str(source1), source1_area,
-                             str(source2), source2_area)
-                raise pysynexcept.IncompatibleSources(err)
-
-    def __str__(self):
-        opdict = {'add': '+', 'multiply': '*'}
-        return "%s %s %s" % (str(self.component1),
-                             opdict[self.operation],
-                             str(self.component2))
-
-    def __call__(self, wavelength):
-        """
-        Add or multiply components, delegating the function calculation
-        to the individual objects.
-
-        """
-        if self.operation == 'add':
-            return self.component1(wavelength) + self.component2(wavelength)
-
-        if self.operation == 'multiply':
-            return self.component1(wavelength) * self.component2(wavelength)
-
-    def __iter__(self):
-        """
-        Allow iteration over each component.
-
-        """
-        complist = self.complist()
-
-        return complist.__iter__()
-
-    def complist(self):
-        ans = []
-        for comp in (self.component1, self.component2):
-            try:
-                ans.extend(comp.complist())
-            except AttributeError:
-                ans.append(comp)
-        return ans
-
-    def GetWaveSet(self):
-        """
-        Obtain the wavelength set for the composite source by forming
-        the union of wavelengths from each component.
-
-        """
-        waveset1 = self.component1.GetWaveSet()
-        waveset2 = self.component2.GetWaveSet()
-
-        return MergeWaveSets(waveset1, waveset2)
-
-    def tabulate(self):
-        """
-        Evaluate the spectrum in order to return a tabular source
-        spectrum
-
-        """
-        sp = ArraySourceSpectrum(wave=self.wave,
-                                 flux=self.flux,
-                                 waveunits=self.waveunits,
-                                 fluxunits=self.fluxunits,
-                                 name='%s (tabulated)' % self.name)
-        return sp
-
-
-class TabularSourceSpectrum(SourceSpectrum):
-    """
-    Class for a source spectrum that is read in from a table.
-
-    """
-
-    def __init__(self, filename=None, fluxname=None, keepneg=False):
-        self.isAnalytic = False
-        self.warnings = {}
-        if filename:
-            self._readSpectrumFile(filename, fluxname)
-            self.filename = filename
-            self.validate_units()
-            self.validate_wavetable()
-            if not keepneg:
-                self.validate_fluxtable()
-            self.ToInternal()
-            self.name = self.filename
-            self.isAnalytic = False
-        else:
-            self._wavetable = None
-            self._fluxtable = None
-            self.waveunits = None
-            self.fluxunits = None
-            self.filename = None
-            self.name = self.filename
-
-    def _reverse_wave(self):
-        self._wavetable = self._wavetable[::-1]
-
-    def __str__(self):
-        return str(self.name)
-
-    def _readSpectrumFile(self, filename, fluxname):
-        if filename.endswith('.fits') or filename.endswith('.fit'):
-            self._readFITS(filename, fluxname)
-        else:
-            self._readASCII(filename)
-
-    def _readFITS(self, filename, fluxname):
-        with fits.open(filename) as fs:
-            self._wavetable = fs[1].data.field('wavelength')
-            if fluxname == None:
-                fluxname = 'flux'
-            self._fluxtable = fs[1].data.field(fluxname)
-
-            self.waveunits = units.Units(fs[1].header['tunit1'].lower())
-            self.fluxunits = units.Units(fs[1].header['tunit2'].lower())
-
-    def _readASCII(self, filename):
-        """
-        Ascii files have no headers. Following synphot, this
-        routine will assume the first column is wavelength in Angstroms,
-        and the second column is flux in Flam.
-
-        """
-
-        self.waveunits = units.Units('angstrom')
-        self.fluxunits = units.Units('flam')
-        wlist, flist = self._columnsFromASCII(filename)
-        self._wavetable = np.array(wlist, dtype=np.float64)
-        self._fluxtable = np.array(flist, dtype=np.float64)
-
-    def __call__(self, wavelengths):
-        """
-        This is where the flux array is actually calculated given a
-        wavelength array. Returns an array of flux values calculated at
-        the wavelength values input.
-
-        """
-        if np.isscalar(wavelengths):
-            delta = 0.0001
-            ww = np.array([wavelengths-delta, wavelengths, wavelengths+delta])
-            tmp = self.resample(ww)
-            return tmp._fluxtable[1]
-        else:
-            return self.resample(wavelengths)._fluxtable
-
-    def taper(self):
-        """
-        Taper the spectrum by adding zeros to each end.
-
-        """
-        OutSpec = TabularSourceSpectrum()
-        wcopy = np.zeros(self._wavetable.size+2, dtype=np.float64)
-        fcopy = np.zeros(self._fluxtable.size+2, dtype=np.float64)
-        wcopy[1:-1] = self._wavetable
-        fcopy[1:-1] = self._fluxtable
-        fcopy[0] = 0.0
-        fcopy[-1] = 0.0
-
-        ## The wavelengths to use for the first and last points are
-        ## calculated by using the same ratio as for the 2 interior points
-        wcopy[0] = wcopy[1]*wcopy[1]/wcopy[2]
-        wcopy[-1] = wcopy[-2]*wcopy[-2]/wcopy[-3]
-
-        OutSpec._wavetable = wcopy
-        OutSpec._fluxtable = fcopy
-        OutSpec.waveunits = units.Units(str(self.waveunits))
-        OutSpec.fluxunits = units.Units(str(self.fluxunits))
-
-        return OutSpec
-
-    def resample(self, resampledWaveTab):
-        """
-        Interpolate flux given a wavelength array that is monotonically
-        increasing and the TabularSourceSpectrum object.
+    @classmethod
+    def from_box(cls, center, width, step=0.05, area=None):
+        """Create a box passband with given central wavelength and width.
 
         Parameters
         ----------
-        resampledWaveTab: ndarray
-            new wavelength table IN ANGSTROMS
-
-        """
-
-        ##Check whether the input wavetab is in descending order
-        if resampledWaveTab[0] < resampledWaveTab[-1]:
-            newwave = resampledWaveTab
-            newasc = True
-        else:
-            newwave = resampledWaveTab[::-1]
-            newasc = False
-
-        ## Use numpy interpolation function
-        if self._wavetable[0] < self._wavetable[-1]:
-            oldasc = True
-            ans = np.interp(newwave, self._wavetable, self._fluxtable)
-        else:
-            oldasc = False
-            rev = np.interp(newwave, self._wavetable[::-1],
-                            self._fluxtable[::-1])
-            ans = rev[::-1]
-
-        # If the new and old waveset don't have the same parity,
-        # the answer has to be flipped again
-        if newasc != oldasc:
-            ans = ans[::-1]
-
-        # Finally, make the new object
-        # NB: these manipulations were done using the internal
-        # tables in Angstrom and photlam, so those are the units
-        # that must be fed to the constructor.
-        resampled = ArraySourceSpectrum(wave=resampledWaveTab.copy(),
-                                        waveunits='angstroms',
-                                        flux=ans.copy(),
-                                        fluxunits='photlam',
-                                        keepneg=True)
-
-        # Use the convert method to set the units desired by the user.
-        resampled.convert(self.waveunits)
-        resampled.convert(self.fluxunits)
-
-        return resampled
-
-    def GetWaveSet(self):
-        """
-        For a TabularSource Spectrum, the WaveSet is just the _wavetable
-        member.  Return a copy so that there is no reference to the original
-        object.
-
-        """
-
-        return self._wavetable.copy()
-
-    def ToInternal(self):
-        """
-        Convert to the internal representation of (angstroms, photlam).
-
-        """
-        self.validate_units()
-
-        savewunits = self.waveunits
-        savefunits = self.fluxunits
-
-        if hasattr(self, 'primary_area'):
-            area = self.primary_area
-        else:
-            area = None
-
-        angwave = self.waveunits.Convert(self.GetWaveSet(), 'angstrom')
-        phoflux = self.fluxunits.Convert(angwave,
-                                         self._fluxtable,
-                                         'photlam',
-                                         area=area)
-
-        self._wavetable = angwave.copy()
-        self._fluxtable = phoflux.copy()
-
-        self.waveunits = savewunits
-        self.fluxunits = savefunits
-
-
-class ArraySourceSpectrum(TabularSourceSpectrum):
-    """
-    Create a spectrum from arrays.
-
-    spec = ArraySpectrum(numpy array containing wavelength table,
-    numpy array containing flux table, waveunits, fluxunits,
-    name=human-readable nickname for spectrum, keepneg=True to
-    override the default behavior of setting negative flux values to zero)
-
-    """
-
-    def __init__(self,
-                 wave=None,
-                 flux=None,
-                 waveunits='angstrom',
-                 fluxunits='photlam',
-                 name='UnnamedArraySpectrum',
-                 keepneg=False):
-        """
-        Parameters
-        -----------
-        wave: ndarray
-            Wavelength array
-        flux: ndarray
-            Flux array
-        waveunits: :py:class:`~pysynphot.units.WaveUnits` object or subclass
-            Units of wave
-        fluxunits: :py:class:`~pysynphot.units.FluxUnits` object or subclass
-            Units of flux
-        name: string
-            Description of this array
-        keepneg:  bool [Default: False]
-            If true, negative flux values will be retained; by default,
-            they are forced to zero
-
-        """
-        if len(wave) != len(flux):
-            raise ValueError("wave and flux arrays must be of equal length")
-
-        self._wavetable = wave
-        self._fluxtable = flux
-        self.waveunits = units.Units(waveunits)
-        self.fluxunits = units.Units(fluxunits)
-        self.name = name
-        self.isAnalytic = False
-        self.warnings = {}
-
-        self.validate_units()  # must do before validate_fluxtable because it
-                               # tests against unit type
-        self.validate_wavetable()  # must do before ToInternal in case of
-                                   # descending
-        if not keepneg:
-            self.validate_fluxtable()
-
-        self.ToInternal()
-
-
-class FileSourceSpectrum(TabularSourceSpectrum):
-    """
-    Create a spectrum from a file.
-
-    spec = FileSpectrum(filename (FITS or ASCII),
-    fluxname=column name containing flux (for FITS tables only),
-    keepneg=True to override thedefault behavior of setting negative
-    flux values to zero)
-
-    """
-
-    def __init__(self, filename, fluxname=None, keepneg=False):
-        """
-        Parameters
-        -----------
-        filename: string
-            FITS or ASCII file containing the spectrum
-
-        fluxname: string
-            Column name specifying the flux (FITS only)
-
-        keepneg: bool [Default: False]
-            If true, negative flux values will be retained; by default,
-            they are forced to zero
-
-        """
-        self.name = locations.irafconvert(filename)
-        self._readSpectrumFile(self.name, fluxname)
-        self.validate_units()
-        self.validate_wavetable()
-        if not keepneg:
-            self.validate_fluxtable()
-        self.ToInternal()
-        self.isAnalytic = False
-        self.warnings = {}
-
-    def _readSpectrumFile(self, filename, fluxname):
-        if filename.endswith('.fits') or filename.endswith('.fit'):
-            self._readFITS(filename, fluxname)
-        else:
-            self._readASCII(filename)
-
-    def _readFITS(self, filename, fluxname):
-        with fits.open(filename) as fs:
-            self._wavetable = fs[1].data.field('wavelength')
-            if fluxname is None:
-                fluxname = 'flux'
-            self._fluxtable = fs[1].data.field(fluxname)
-            self.waveunits = units.Units(fs[1].header['tunit1'].lower())
-            self.fluxunits = units.Units(fs[1].header['tunit2'].lower())
-
-            # Retain the header information as a convenience for the user.
-            # If duplicate keywords exist, the value in the extension
-            # header will override that in the primary.
-            self.fheader = dict(fs[0].header)
-            self.fheader.update(dict(fs[1].header))
-
-    def _readASCII(self, filename):
-        """
-        Ascii files have no headers. Following synphot, this
-        routine will assume the first column is wavelength in Angstroms,
-        and the second column is flux in Flam.
-
-        """
-
-        self.waveunits = units.Units('angstrom')
-        self.fluxunits = units.Units('flam')
-        wlist, flist = self._columnsFromASCII(filename)
-        self._wavetable = np.array(wlist, dtype=np.float64)
-        self._fluxtable = np.array(flist, dtype=np.float64)
-
-        #We don't support headers from ascii files
-        self.fheader = dict()
-
-
-class AnalyticSpectrum(SourceSpectrum):
-    """
-    Base class for analytic functions. These are spectral forms
-    which are defined, by default, on top of the default synphot
-    waveset.
-
-    """
-
-    def __init__(self, waveunits='angstrom', fluxunits='photlam'):
-        """
-        All AnalyticSpectra must set wave & flux units; do it here.
-
-        """
-        self.waveunits = units.Units(waveunits)
-        self.fluxunits = units.Units(fluxunits)
-        self.validate_units()
-        self.isAnalytic = True
-        self.warnings = {}
-
-    def GetWaveSet(self):
-        return refs._default_waveset.copy()
-
-
-class GaussianSource(AnalyticSpectrum):
-    """
-    Defines a gaussian source
-
-
-    spec = GaussianSource(TotalFlux under Gaussian,
-                             central wavelength of Gaussian,
-                             FWHM of Gaussian,
-                             waveunits,
-                             fluxunits)
-
-    """
-
-    def __init__(self, flux, center, fwhm, waveunits='angstrom',
-                 fluxunits='flam'):
-        """
-        Parameters
-        ----------
-        flux: float
-            TotalFlux under gaussian
-        center: float
-            central wavelength of gaussian
-        fwhm: float
-            full-width half-maximum (FWHM) of gaussian
-        waveunits: string [Default: 'angstrom']
-            units of input wavelengths
-        fluxunits: string [Default: 'flam']
-            units of input fluxes
-
-        """
-
-        AnalyticSpectrum.__init__(self, waveunits, fluxunits)
-        self.center = center
-        self.fwhm = fwhm
-        self.total_flux = flux
-        self._input_flux_units = self.fluxunits
-        self._input_wave_units = self.waveunits
-        self.sigma = fwhm / math.sqrt(8.0 * math.log(2.0))
-        self.factor = flux / (math.sqrt(2.0 * math.pi) * self.sigma)
-        self.name = "Gaussian: mu=%g %s,fwhm=%g %s, total flux=%g %s" % \
-                    (self.center,
-                     self._input_wave_units,
-                     self.fwhm,
-                     self._input_wave_units,
-                     self.total_flux,
-                     self._input_flux_units)
-
-    def __str__(self):
-        return self.name
-
-    def __call__(self, wavelength):
-        # wavelength comes in as Angstom but Gaussian properties are stored
-        # in user defined units
-        wave = units.Angstrom().Convert(wavelength, self._input_wave_units.name)
-
-        # calculate flux
-        flux = self.factor * \
-               np.exp(-0.5 * ((wave - self.center) / self.sigma)**2)
-
-        if hasattr(self, 'primary_area'):
-            area = self.primary_area
-        else:
-            area = None
-
-        # convert flux to photlam before returning
-        return self._input_flux_units.ToPhotlam(wave, flux, area=area)
-
-    def GetWaveSet(self):
-        """
-        Return a wavelength set that describes the Gaussian.
-        Overrides the base class to compute 101 values, from
-        center - 5*sigma to center + 5*sigma, in units of
-        0.1*sigma
-
-        """
-        increment = 0.1*self.sigma
-        first = self.center - 50.0*increment
-        last = self.center + 50.0*increment
-
-        return np.arange(first, last, increment)
-
-
-class FlatSpectrum(AnalyticSpectrum):
-    """
-    Defines a flat spectrum in units of fluxunits.
-
-    spec = FlatSpectrum(Flux density, waveunits, fluxunits).
-
-    """
-
-    def __init__(self, fluxdensity, waveunits='angstrom', fluxunits='photlam'):
-        AnalyticSpectrum.__init__(self, waveunits, fluxunits)
-        self.wavelength = None
-        self._fluxdensity = fluxdensity
-        self._input_flux_units = self.fluxunits
-        self.name="Flat spectrum of %g %s" % (self._fluxdensity,
-                                              self._input_flux_units)
-
-    def __str__(self):
-        return self.name
-
-    def __call__(self, wavelength):
-        if hasattr(wavelength, 'shape'):
-            flux = self._fluxdensity * np.ones(wavelength.shape,
-                                               dtype=np.float64)
-        else:
-            flux = self._fluxdensity
-
-        # __call__ is supposed to return photflam so we need to do the
-        # conversion here since it doesn't make sense to store the _fluxdensity
-        # attribute in photlam
-        wave = units.Angstrom().Convert(wavelength, self.waveunits.name)
-
-        if hasattr(self, 'primary_area'):
-            area = self.primary_area
-        else:
-            area = None
-
-        return self._input_flux_units.ToPhotlam(wave, flux, area=area)
-
-    def redshift(self, z):
-        """
-        Call the parent's method, which returns a TabularSourceSpectrum,
-        then use its results to create a new FlatSpectrum with the correct
-        value.
-
-        """
-
-        tmp = SourceSpectrum.redshift(self, z)
-        ans = FlatSpectrum(tmp.flux.max(),
-                           fluxunits=tmp.fluxunits)
-        return ans
-
-    # This change produces 5 errors and 17 failures in cos_etc_test.py
-    #def GetWaveSet(self):
-    #    return np.array([_default_waveset[0], _default_waveset[-1]])
-
-
-class Powerlaw(AnalyticSpectrum):
-    """
-    Defines a power law spectrum
-
-    spec=PowerLaw(refwave, exponent, waveunits, fluxunits).
-
-    Power law spectrum of the form (lambda/refval)**exponent,
-    where refval is in Angstroms.
-    The spectrum is normalized to a flux of 1 in "fluxunits" at "refval".
-
-    """
-    def __init__(self, refwave, index, waveunits='angstrom',
-                 fluxunits='photlam'):
-
-        AnalyticSpectrum.__init__(self, waveunits, fluxunits)
-        self.wavelength = None
-        self._input_flux_units = self.fluxunits
-        self._input_wave_units = self.waveunits
-        self._refwave = refwave
-        self._index = index
-        self.name = "Power law: refwave %g %s, index %g" % \
-                    (self._refwave, self._input_wave_units, self._index)
-
-    def __str__(self):
-        return self.name
-
-    def __call__(self, wavelength):
-        # input wavelength is assumed to be angstroms
-        # and either a scalar or a numpy array
-
-        # need to first convert input wavelength to the units the user
-        # specified when creating this object
-        wave = units.Angstrom().Convert(wavelength, self._input_wave_units.name)
-        flux = (wave / self._refwave) ** self._index
-
-        if hasattr(self, 'primary_area'):
-            area = self.primary_area
-        else:
-            area = None
-
-        # convert flux to photlam before returning
-        return self._input_flux_units.ToPhotlam(wave, flux, area=area)
-
-
-class BlackBody(AnalyticSpectrum):
-    """
-    Blackbody spectrum with specified temperature, in Kelvin.
-
-    spec = BlackBody(T in Kelvin)
-
-    The flux of the spectrum is normalized to a star of solar radius
-    at a distance of 1 kpc.L
-
-    """
-
-    def __init__(self, temperature):
-        waveunits = units.Units('angstrom')
-        fluxunits = units.Units('photlam')
-        AnalyticSpectrum.__init__(self, waveunits, fluxunits)
-        self.wavelength = None
-        self.temperature = temperature
-        self.name = 'BB(T=%d)' % self.temperature
-
-    def __str__(self):
-        return self.name
-
-    def __call__(self, wavelength):
-        return planck.bbfunc(wavelength, self.temperature) * RENORM
-
-
-class SpectralElement(Integrator):
-    """
-    Base class for a Spectral Element (e.g. Filter, Detector...).
-
-    """
-
-    def __init__(self):
-        self.binset = None
-
-    def validate_units(self):
-        """
-        Ensure that waveunits are WaveUnits
-
-        """
-        if not isinstance(self.waveunits,units.WaveUnits):
-            raise TypeError("%s is not a valid WaveUnit" % self.waveunits)
-
-    def __mul__(self, other):
-        """
-        Permitted to multiply a SpectralElement by another
-        SpectralElement, or by a SourceSpectrum.  In the former
-        case we return a CompositeSpectralElement, while in the
-        latter case a CompositeSourceSpectrum.
-
-        """
-        if isinstance(other, SpectralElement):
-            return CompositeSpectralElement(self, other)
-
-        if isinstance(other, SourceSpectrum):
-            return CompositeSourceSpectrum(self, other, 'multiply')
-
-        # Multiplying by a constant is the same as multiplying by a
-        # UniformTransmission object
-        if isinstance(other, (int, float)):
-            return CompositeSpectralElement(self, UniformTransmission(other))
-        else:
-            print("SpectralElements can only be multiplied by other "
-                  "SpectralElements or SourceSpectrum objects")
-
-    def __rmul__(self, other):
-        return self.__mul__(other)
-
-    def integrate(self,wave=None):
-        """
-        Integrate the throughput over the specified waveset,
-        if None, integrate over the full waveset.
-
-        """
-        if wave is None:
-            wave = self.wave
-        ans = self.trapezoidIntegration(wave, self(wave))
-        return ans
-
-#..................................................................
-# Methods to implement bandpar functionality go here
-#..................................................................
-    def avgwave(self):
-        """
-        Implement the equation for lambda nought as defined
-        in Koornneef et al 1987, p 836.
-        Should be equivalent to bandpar.avglam = bandpar.avgwv
-
-        """
-        mywaveunits = self.waveunits.name
-        self.convert('angstroms')
-
-        wave = self.wave
-        thru = self.throughput
-        self.convert(mywaveunits)
-
-        num = self.trapezoidIntegration(wave, thru*wave)
-        den = self.trapezoidIntegration(wave, thru)
-
-        if 0.0 in (num, den):
-            return 0.0
-        else:
-            return num/den
-
-    def pivot(self, binned=False):
-        """
-        This is the calculation performed when the ETC invokes calcphot.
-        Does this need to be calculated on binned waveset, or may
-        it be calculated on native waveset?
-
-        """
-        if binned:
-            try:
-                wave = self.binwave
-            except AttributeError:
-                raise AttributeError('Class ' + str(type(self)) +
-                                     ' does not support binning.')
-        else:
-            wave = self.wave
-
-        countmulwave = self(wave)*wave
-        countdivwave = self(wave)/wave
-
-        num = self.trapezoidIntegration(wave, countmulwave)
-        den = self.trapezoidIntegration(wave, countdivwave)
-
-        if num == 0.0 or den == 0.0:
-            return 0.0
-
-        return math.sqrt(num/den)
-
-    def rmswidth(self, floor=0):
-        """
-        Calculate the RMS width as in Koornneef et al 1987, p 836.
-
-        Parameters
-        ----------
-        floor: float, optional
-            Points with throughputs below this threshold are not
-            included in the calculation. By default all points
-            are included.
+        center : float or `astropy.units.quantity.Quantity`
+            Central wavelength of the passband. If not a Quantity,
+            assumed to be in Angstrom.
+
+        width : float or `astropy.units.quantity.Quantity`
+            Width of the passband. If not a Quantity, assumed to be
+            in the unit of ``center``.
+
+        step : float or `astropy.units.quantity.Quantity`
+            Linear wavelength spacing. If not a Quantity, assumed
+            to be in the unit of ``center``.
+
+        area : float or `astropy.units.quantity.Quantity`, optional
+            Area that fluxes cover. Usually, this is the area of
+            the primary mirror of the observatory of interest.
+            If not a Quantity, assumed to be in cm^2.
 
         Returns
         -------
-        rmswidth: float
-            RMS width of the bandpass.
+        newspec : obj
+            Box-shaped passband.
 
         """
+        if not isinstance(center, u.Quantity):
+            center = u.Quantity(center, unit=u.AA)
 
-        mywaveunits = self.waveunits.name
-        self.convert('angstroms')
+        width = units.validate_quantity(
+            width, center.unit, equivalencies=units.wave_conversion)
+        step = units.validate_quantity(
+            step, center.unit, equivalencies=units.wave_conversion)
 
-        wave = self.wave
-        thru = self.throughput
-        self.convert(mywaveunits)
+        # Generate wavelengths
+        half_width = width / 2.0
+        lower = center - half_width - step
+        upper = center + half_width + step
+        wave_value = np.arange(
+            lower.value, upper.value, step.value, dtype=np.float64)
+        wavelengths = u.Quantity(wave_value, unit=center.unit)
 
-        if floor != 0:
-            idx = np.where(thru >= floor)
-            wave = wave[idx]
-            thru = thru[idx]
+        # Generate throughput
+        thru_value = np.ones(wavelengths.shape, dtype=np.float64)
+        thru_value[0] = 0.0
+        thru_value[-1] = 0.0
+        throughput = u.Quantity(thru_value, unit=units.THROUGHPUT)
 
-        integrand = (wave-self.avgwave())**2 * thru
-        num = self.trapezoidIntegration(wave, integrand)
-        den = self.trapezoidIntegration(wave, thru)
+        header = {
+            'expr': 'Box at {0} ({1} wide)'.format(center, width),
+            'box_center': center,
+            'box_width': width }
 
-        if 0.0 in (num, den):
-            return 0.0
-        else:
-            ans = math.sqrt(num/den)
-            return ans
+        return cls(wavelengths, throughput, area=area, header=header)
 
-    def photbw(self, floor=0):
-        """
-        This is a compatibility function allowing pysynphot to calculate
-        the bandpass RMS width in the same way as Synphot (documented
-        in the Synphot Manual section 5.1). This is the value returned
-        in the BANDW keyword by Synphot's bandpar function.
-
-        This function is designed only for use to get the same results
-        as Synphot. To calculate the bandpass RMS width use the
-        `rmswidth` method.
+    @classmethod
+    def from_filter(cls, filtername, area=None, **kwargs):
+        """Load :ref:`pre-defined filter passband <synphot-passband-create>`.
 
         Parameters
         ----------
-        floor: float, optional
-            Points with throughputs below this threshold are not
-            included in the calculation. By default all points
-            are included.
+        filtername : {'bessel_j', 'bessel_h', 'bessel_k', 'cousins_r', 'cousins_i', 'johnson_u', 'johnson_b', 'johnson_v', 'johnson_r', 'johnson_i', 'johnson_j', 'johnson_k'}
+            Filter name.
+
+        area : float or `astropy.units.quantity.Quantity`, optional
+            Area that fluxes cover. Usually, this is the area of
+            the primary mirror of the observatory of interest.
+            If not a Quantity, assumed to be in cm^2.
+
+        kwargs : dict
+            Keywords acceptable by :func:`synphot.synio.read_remote_spec`.
 
         Returns
         -------
-        photbw: float
-            RMS width of the bandpass.
+        newspec : obj
+            Passband object for the given filter.
+
+        Raises
+        ------
+        synphot.synexceptions.SynphotError
+            Invalid filter name.
 
         """
-        mywaveunits = self.waveunits.name
-        self.convert('angstroms')
+        filtername = filtername.lower()
 
-        wave = self.wave
-        thru = self.throughput
-        self.convert(mywaveunits)
-
-        # calculate the average wavelength
-        num = self.trapezoidIntegration(wave, thru * np.log(wave) / wave)
-        den = self.trapezoidIntegration(wave, thru / wave)
-
-        if num == 0 or den == 0:
-            error_str = 'Could not calculate average wavelength of bandpass.'
-            raise pysynexcept.PysnphotErorr(error_str)
-
-        avg_wave = np.exp(num/den)
-
-        if floor != 0:
-            idx = np.where(thru >= floor)
-            wave = wave[idx]
-            thru = thru[idx]
-
-        # calcualte the rms width
-        integrand = thru * np.log(wave / avg_wave)**2 / wave
-        num = self.trapezoidIntegration(wave, integrand)
-
-        if num == 0 or den == 0:
-            return 0.0
-
-        return avg_wave * np.sqrt(num/den)
-
-    def rectwidth(self):
-        """
-        RECTW = INT(THRU) / MAX(THRU)
-
-        """
-        mywaveunits = self.waveunits.name
-        self.convert('angstroms')
-
-        wave = self.wave
-        thru = self.throughput
-        self.convert(mywaveunits)
-
-        num = self.trapezoidIntegration(wave, thru)
-        den = thru.max()
-
-        if 0.0 in (num, den):
-            return 0.0
+        # Select filename based on filter name
+        if filtername == 'bessel_j':
+            cfgitem = synconfig.BESSEL_J_FILE
+        elif filtername == 'bessel_h':
+            cfgitem = synconfig.BESSEL_H_FILE
+        elif filtername == 'bessel_k':
+            cfgitem = synconfig.BESSEL_K_FILE
+        elif filtername == 'cousins_r':
+            cfgitem = synconfig.COUSINS_R_FILE
+        elif filtername == 'cousins_i':
+            cfgitem = synconfig.COUSINS_I_FILE
+        elif filtername == 'johnson_u':
+            cfgitem = synconfig.JOHNSON_U_FILE
+        elif filtername == 'johnson_b':
+            cfgitem = synconfig.JOHNSON_B_FILE
+        elif filtername == 'johnson_v':
+            cfgitem = synconfig.JOHNSON_V_FILE
+        elif filtername == 'johnson_r':
+            cfgitem = synconfig.JOHNSON_R_FILE
+        elif filtername == 'johnson_i':
+            cfgitem = synconfig.JOHNSON_I_FILE
+        elif filtername == 'johnson_j':
+            cfgitem = synconfig.JOHNSON_J_FILE
+        elif filtername == 'johnson_k':
+            cfgitem = synconfig.JOHNSON_K_FILE
         else:
-            return num/den
+            raise synexceptions.SynphotError(
+                'Filter name {0} is invalid.'.format(filtername))
 
-    def equivwidth(self):
-        """
-        EQUVW = INT(THRU)
+        filename = cfgitem()
 
-        """
+        if 'flux_unit' not in kwargs:
+            kwargs['flux_unit'] = units.THROUGHPUT
 
-        return self.integrate()
+        if ((filename.endswith('fits') or filename.endswith('fit')) and
+                'flux_col' not in kwargs):
+            kwargs['flux_col'] = 'THROUGHPUT'
 
-    def efficiency(self):
-        """
-        QTLAM = dimensionless efficience
-                 = INT(THRU / LAM)
+        header, wavelengths, throughput = synio.read_remote_spec(filename,
+                                                                  **kwargs)
+        header['expr'] = filtername
+        header['filename'] = filename
+        header['descrip'] = cfgitem.description
 
-        """
-        mywaveunits = self.waveunits.name
-        self.convert('angstroms')
-
-        wave = self.wave
-        thru = self.throughput
-        self.convert(mywaveunits)
-
-        ans = self.trapezoidIntegration(wave, thru/wave)
-        return ans
-
-    def check_sig(self, other):
-        """
-        Only call this if check_overlap returns 'partial'.
-        Returns True if the LACK of overlap is INsignificant:
-        i.e., it is ok to go ahead and do whatever we are doing.
-
-        """
-        swave = self.wave[np.where(self.throughput != 0)]
-        s1, s2 = swave.min(), swave.max()
-
-        owave = other.wave
-        o1, o2 = owave.min(), owave.max()
-
-        lorange = sorted([s1, o1])
-        hirange = sorted([s2, o2])
-
-        # Get the full throughput
-        total = self.integrate()
-
-        # Now get the other two pieces
-        # We cannot yet do
-        # low = self[slice(*lowrange)].integrate()
-        wave = self.wave
-        idxs = [np.searchsorted(wave, lorange, 'left'),
-                np.searchsorted(wave, hirange, 'left')]
-
-        excluded = 0.0
-        for idx in idxs:
-            try:
-                excluded += self.integrate(wave=wave[slice(*idx)])
-            except IndexError:
-                pass  # If the range is zero, do nothing
-
-        if excluded/total < 0.01:
-            return True
-        else:
-            return False
-
-    def check_overlap(self, other):
-        """
-        Check whether the wavelength range of other is defined everywhere
-        that the wavelength range of self is defined.
-        Returns "full", "partial", "none".
-        Normally used for checking whether a spectrum is fully defined over
-        the range of a bandpass.
-        Note that the full overlap case is asymmetric: if the range of 'self'
-        extends past the limits of 'other', this will return a partial
-        overlap.
-
-        """
-
-        if other.isAnalytic:
-            # then it's defined everywhere
-            return 'full'
-
-        swave = self.wave[np.where(self.throughput != 0)]
-        s1, s2 = swave.min(), swave.max()
-
-        owave = other.wave
-        o1, o2 = owave.min(), owave.max()
-
-        if s1 >= o1 and s2 <= o2:
-            ans = 'full'
-        elif s2 < o1 or o2 < s1:
-            ans = 'none'
-        else:
-            ans = 'partial'
-
-        return ans
-
-    def convert(self, targetunits):
-        """
-        Convert to other units. This method actually just changes the
-        wavelength unit objects, it does not recompute the
-        internally kept wave data; these are kept always in internal
-        units. Method getWaveSet does the actual computation.
-
-        """
-        nunits = units.Units(targetunits)
-        self.waveunits = nunits
-
-    def ToInternal(self):
-        """
-        Convert wavelengths to the internal representation of angstroms..
-        Note: This is not yet used, but should be for safety when creating
-        TabularSpectralElements from files. It will also be necessary for the
-        ArraySpectralElement class that we want to create RSN.
-
-        """
-        self.validate_units()
-        savewunits = self.waveunits
-        angwave = self.waveunits.Convert(self.GetWaveSet(), 'angstrom')
-        self._wavetable = angwave.copy()
-        self.waveunits = savewunits
-
-    def __call__(self, wavelengths):
-        """
-        This is where the throughput array is calculated for a given
-        input wavelength table.
-        wavelengths: ndarray
-            an array of wavelengths in Angstroms at which the
-                             throughput should be sampled
-
-        """
-        if np.isscalar(wavelengths):
-            delta = 0.0001
-            ww = np.array([wavelengths-delta, wavelengths, wavelengths+delta])
-            tmp = self.resample(ww)
-            return tmp._throughputtable[1]
-        else:
-            return self.resample(wavelengths)._throughputtable
-
-    def sample(self, wave):
-        """
-        Provide a more normal user interface to the __call__
-
-        """
-        angwave = self.waveunits.ToAngstrom(wave)
-
-        return self.__call__(angwave)
-
-    def taper(self):
-        """
-        Taper the spectrum by adding zeros to each end.
-
-        """
-        OutElement = TabularSpectralElement()
-
-        wcopy = np.zeros(self._wavetable.size+2, dtype=np.float64)
-        fcopy = np.zeros(self._throughputtable.size+2, dtype=np.float64)
-
-        wcopy[1:-1] = self._wavetable
-        fcopy[1:-1] = self._throughputtable
-
-        fcopy[0] = 0.0
-        fcopy[-1] = 0.0
-
-        ## The wavelengths to use for the first and last points are
-        ## calculated by using the same ratio as for the 2 interior points
-        wcopy[0] = wcopy[1]*wcopy[1]/wcopy[2]
-        wcopy[-1] = wcopy[-2]*wcopy[-2]/wcopy[-3]
-
-        OutElement._wavetable = wcopy
-        OutElement._throughputtable = fcopy
-
-        return OutElement
-
-    def writefits(self, filename, clobber=True, trimzero=True,
-                  precision=None, hkeys=None):
-        """
-        Write the bandpass to a FITS file.
-
-        Parameters
-        -----------
-        filename: string
-            name of file to write to
-        clobber: bool [Default: True]
-            Will clobber existing file by default
-        trimzero: bool [Default: True]
-            Will trim zero-flux elements from both ends by default
-        precision: {'single','double',None}
-            Will write in native precision by default
-        hkeys: dict, optional
-            Optional dictionary of {keyword:(value,comment)}
-                   to be added to primary FITS header
-
-        """
-        if precision is None:
-            precision = self.throughput.dtype.char
-        _precision = precision.lower()[0]
-        pcodes = {'d': 'D', 's': 'E', 'f': 'E'}
-
-        if clobber:
-            try:
-                os.remove(filename)
-            except OSError:
-                pass
-
-        wave = self.wave
-        thru = self.throughput
-
-        # Add a check for single/double precision clash, so
-        # that if written out in single precision, the wavelength table
-        # will still be sorted with no duplicates
-        # The value of epsilon is taken from the Synphot FAQ.
-
-        if wave.dtype == np.float64 and _precision == 's':
-            idx = np.where(abs(wave[1:]-wave[:-1]) > syn_epsilon)
-        else:
-            idx = np.where(wave)  # => idx=[:]
-
-        wave = wave[idx]
-        thru = thru[idx]
-
-        first, last = 0, len(thru)
-        if trimzero:
-            # Keep one zero at each end
-            nz = thru.nonzero()[0]
-            try:
-                first = max(nz[0]-1, first)
-                last = min(nz[-1]+2, last)
-            except IndexError:
-                pass
-
-        # Construct the columns and HDUlist
-        cw = fits.Column(name='WAVELENGTH',
-                         array=wave[first:last],
-                         unit=self.waveunits.name,
-                         format=pcodes[_precision])
-        cf = fits.Column(name='THROUGHPUT',
-                         array=thru[first:last],
-                         unit='         ',
-                         format=pcodes[_precision])
-
-        # Make the primary header
-        hdu = fits.PrimaryHDU()
-        hdulist = fits.HDUList([hdu])
-
-        # User-provided keys are written to the primary header;
-        # so are filename and origin
-        bkeys = dict(filename=(os.path.basename(filename),
-                               'name of file'),
-                     origin=('pysynphot',
-                             'Version (%s, %s)' %
-                             (0.0, 0.0)))
-
-        # User-values if present may override default values
-        if hkeys is not None:
-            bkeys.update(hkeys)
-
-        # Now update the primary header
-        for key, val in bkeys.items():
-            hdu.header.update(key, *val)
-
-        # Make the extension HDU
-        cols = fits.ColDefs([cw, cf])
-        hdu = fits.new_table(cols)
-
-        # There are also some keys to be written to the extension header
-        bkeys = dict(expr=(str(self), 'pysyn expression'),
-                     tdisp1=('G15.7',),
-                     tdisp2=('G15.7',)
-                     )
-
-        try:
-            bkeys['grftable'] = (os.path.basename(self.obsmode.gtname),
-                                 'graph table used')
-            bkeys['cmptable'] = (os.path.basename(self.obsmode.ctname),
-                                 'component table used')
-        except AttributeError:
-            pass  # Not all bandpasses have these
-
-        for key, val in bkeys.items():
-            hdu.header.update(key, *val)
-
-        # Add the extension to the list, and write to file.
-        hdulist.append(hdu)
-        hdulist.writeto(filename)
-
-    def resample(self, resampledWaveTab):
-        """
-        Interpolate throughput given a wavelength array that is
-        monotonically increasing and the TabularSpectralElement object.
-
-        """
-
-        # Check whether the input wavetab is in descending order
-        if resampledWaveTab[0] < resampledWaveTab[-1]:
-            newwave = resampledWaveTab
-            newasc = True
-        else:
-            newwave = resampledWaveTab[::-1]
-            newasc = False
-
-        # Use numpy interpolation function
-        if self._wavetable[0] < self._wavetable[-1]:
-            oldasc = True
-            ans = np.interp(newwave, self._wavetable, self._throughputtable)
-        else:
-            oldasc = False
-            rev = np.interp(newwave, self._wavetable[::-1],
-                            self._throughputtable[::-1])
-            ans = rev[::-1]
-
-        # If the new and old waveset don't have the same parity,
-        # the answer has to be flipped again
-        if newasc != oldasc:
-            ans = ans[::-1]
-
-        # Finally, make the new object.
-        # NB: these manipulations were done using the internal
-        # tables in Angstrom, so those are the units
-        # that must be fed to the constructor.
-        resampled = ArraySpectralElement(wave=resampledWaveTab.copy(),
-                                         waveunits='angstroms',
-                                         throughput=ans.copy())
-
-        # Use the convert method to set the units desired by the user.
-        resampled.convert(self.waveunits)
-
-        return resampled
-
-    def unit_response(self):
-        """
-        Returns flux, in flam, of a star that produces a response of
-        one photon per second in this passband.
-
-        Only correct if waveunits are Angstrom.
-
-        """
-        hc = units.HC
-
-        if hasattr(self, 'primary_area'):
-            area = self.primary_area
-        else:
-            area = refs.PRIMARY_AREA
-
-        wave = self.GetWaveSet()
-        thru = self(wave)
-
-        return hc / (area * self.trapezoidIntegration(wave, thru*wave))
-
-    def GetWaveSet(self):
-        """
-        Return the waveset in the requested units.
-
-        """
-        wave = units.Angstrom().Convert(self._wavetable, self.waveunits.name)
-        return wave
-
-    def GetThroughput(self):
-        """
-        Return the throughput for the internal wavetable.
-
-        """
-        # NB: Throughput never changes units no matter what the
-        # wavelength does. There is an implicit assumption here that
-        # the units of the input waveset to the __call__ are always
-        # Angstroms.
-        self.convert('angstroms')
-        return self.__call__(self.wave)
-
-    wave = property(GetWaveSet, doc='Waveset for bandpass')
-    throughput = property(GetThroughput, doc='Throughput for bandpass')
-
-    def fwhm(self):
-        raise NotImplementedError("#139: Implement calcband functionality")
-
-
-class CompositeSpectralElement(SpectralElement):
-    """
-    CompositeSpectralElement Class, which knows how to calculate
-    its throughput by delegating the calculating the calculating to
-    its components.
-
-    """
-    def __init__(self, component1, component2):
-        SpectralElement.__init__(self)
-
-        if not isinstance(component1, SpectralElement) or not \
-                isinstance(component2, SpectralElement):
-            raise TypeError("Arguments must be SpectralElements")
-
-        self.component1 = component1
-        self.component2 = component2
-
-        self.isAnalytic = component1.isAnalytic and component2.isAnalytic
-
-        if component1.waveunits.name == component2.waveunits.name:
-            self.waveunits = component1.waveunits
-        else:
-            msg = "Components have different waveunits (%s and %s)" % \
-                  (component1.waveunits, component2.waveunits)
-            raise NotImplementedError(msg)
-
-        self.throughputunits = None
-        self.name = "(%s * %s)" % (str(self.component1), str(self.component2))
-
-        self.warnings = {}
-        self.warnings.update(component1.warnings)
-        self.warnings.update(component2.warnings)
-
-        # check areas
-        if hasattr(component1, 'primary_area'):
-            comp1_area = component1.primary_area
-        else:
-            comp1_area = None
-
-        if hasattr(component2, 'primary_area'):
-            comp2_area = component2.primary_area
-        else:
-            comp2_area = None
-
-        if not comp1_area and not comp2_area:
-            self.primary_area = None
-
-        elif comp1_area and not comp2_area:
-            self.primary_area = comp1_area
-
-        elif not comp1_area and comp2_area:
-            self.primary_area = comp2_area
-
-        else:
-            if comp1_area == comp2_area:
-                self.primary_area = comp1_area
-            else:
-                err = 'Components have different area attributes: ' \
-                      '%s: %f, %s: %f'
-                err = err % (str(component1), comp1_area,
-                             str(component2), comp2_area)
-                raise pysynexcept.IncompatibleSources(err)
-
-    def __call__(self, wavelength):
-        """
-        This is where the throughput calculation is delegated.
-
-        """
-        return self.component1(wavelength) * self.component2(wavelength)
-
-    def __str__(self):
-        return self.name
-
-    def complist(self):
-        ans = []
-        for comp in (self.component1, self.component2):
-            try:
-                ans.extend(comp.complist())
-            except AttributeError:
-                ans.append(comp)
-        return ans
-
-    def GetWaveSet(self):
-        """
-        This method returns a wavelength set appropriate for a composite
-        object by forming the union of the wavelengths of the components.
-
-        """
-        wave1 = self.component1.GetWaveSet()
-        wave2 = self.component2.GetWaveSet()
-
-        return MergeWaveSets(wave1, wave2)
-
-    wave = property(GetWaveSet, doc="wave for CompositeSpectralElement")
-
-
-class UniformTransmission(SpectralElement):
-    """
-    bandpass=UniformTransmission(dimensionless throughput)
-
-    .. todo::
-
-        Need to add a GetWaveSet method (or just return None).
-
-    """
-    def __init__(self, value, waveunits='angstrom'):
-        SpectralElement.__init__(self)
-
-        self.waveunits = units.Units(waveunits)
-        self.value = value
-        self.name = str(self)
-        self.isAnalytic = True
-        self.warnings = {}
-        # The ._wavetable is used only by the .writefits() method at this time
-        # It is not for general use.
-        self._wavetable = np.array([refs._default_waveset[0],
-                                    refs._default_waveset[-1]])
-
-    def __str__(self):
-        return "%g" % self.value
-
-    def GetWaveSet(self):
-        return None
-
-    def check_overlap(self, spectrum):
-        """
-        Apply special overlap logic for UniformTransmission.
-
-        By definition, a UniformTransmission is defined everywhere.
-        Therefore, this is a special case for which the overlap check
-        should be ignored (because the alternative is that it will
-        always fail and always require users to override it, so it
-        becomes meaningless).
-
-        """
-        pass
-
-    # This produced 15 test failures in cos_etc_test.
-    #def GetWaveSet(self):
-        #return np.array([_default_waveset[0],_default_waveset[-1]])
-
-        #wave = property(GetWaveSet,doc="wave for UniformTransmission")
-
-    def __call__(self, wavelength):
-        """
-        __call__ returns the constant value as an array, given a
-        wavelength array as argument.
-
-        """
-        return 0.0 * wavelength + self.value
-
-
-class TabularSpectralElement(SpectralElement):
-    """
-    bandpass = FileBandpass(FITS or ASCII filename, thrucol = name of
-    column containing throughput values (for FITS tables only)
-
-    """
-
-    def __init__(self, fileName=None, thrucol='throughput'):
-        """
-        __init__ takes a character string argument that contains the name
-        of the file with the spectral element table.
-
-        """
-        SpectralElement.__init__(self)
-
-        self.isAnalytic = False
-        self.warnings = {}
-        if fileName:
-            if fileName.endswith('.fits') or fileName.endswith('.fit'):
-                self._readFITS(fileName, thrucol)
-            else:
-                self._readASCII(fileName)
-            self.name = fileName
-        else:
-            self.name = None
-            self._wavetable = None
-            self._throughputtable = None
-            self.waveunits = None
-            self.throughputunits = None
-
-    def _reverse_wave(self):
-        self._wavetable = self._wavetable[::-1]
-
-    def __str__(self):
-        return str(self.name)
-
-    def ToInternal(self):
-        """
-        Convert wavelengths to the internal representation of angstroms..
-
-        """
-        self.validate_units()
-        savewunits = self.waveunits
-        angwave = self.waveunits.Convert(self._wavetable, 'angstrom')
-        self._wavetable = angwave.copy()
-        self.waveunits = savewunits
-
-    def _readASCII(self, filename):
-        """
-        Ascii files have no headers. Following synphot, this
-        routine will assume the first column is wavelength in Angstroms,
-        and the second column is throughput (dimensionless).
-
-        """
-        self.waveunits = units.Units('angstrom')
-        self.throughputunits = 'none'
-        wlist,tlist = self._columnsFromASCII(filename)
-        self._wavetable = np.array(wlist, dtype=np.float64)
-        self._throughputtable = np.array(tlist, dtype=np.float64)
-
-    def _readFITS(self, filename, thrucol='throughput'):
-        with fits.open(filename) as fs:
-            self._wavetable = fs[1].data.field('wavelength')
-            self._throughputtable = fs[1].data.field(thrucol)
-
-            self.waveunits = units.Units(fs[1].header['tunit1'].lower())
-            self.throughputunits = 'none'
-
-            self.getHeaderKeywords(fs[1].header)
-
-    def getHeaderKeywords(self, header):
-        """
-        This is a placeholder for subclasses to get header keywords without
-        having to reopen the file again.
-
-        """
-        pass
-
-
-class ArraySpectralElement(TabularSpectralElement):
-    """
-    spec = ArraySpectrum(numpy array containing wavelength table,
-    numpy array containing throughput table, waveunits,
-    name = human-readable nickname for bandpass.
-
-    """
-
-    def __init__(self,
-                 wave=None,
-                 throughput=None,
-                 waveunits='angstrom',
-                 name='UnnamedArrayBandpass'):
-        """
-        Create a spectrum from arrays.
-
-        Parameters
-        ----------
-        wave: ndarray
-            Wavelength array
-        throughput: ndarray
-            Throughput array
-        waveunits: :py:class:`~pysynphot.units.WaveUnits` object or subclass
-            Units of wave
-        name: string
-            Description of this spectral element
-
-        """
-        if len(wave) != len(throughput):
-            raise ValueError("wave and throughput arrays must"
-                             " be of equal length")
-
-        self._wavetable = wave
-        self._throughputtable = throughput
-        self.waveunits = units.Units(waveunits)
-        self.name = name
-        self.isAnalytic = False
-        self.warnings = {}
-
-        self.validate_units()  # must do before validate_fluxtable because it
-                               #  tests against unit type
-        self.validate_wavetable()  # must do before ToInternal in case of
-                                   # descending
-        self.ToInternal()
-
-
-class FileSpectralElement(TabularSpectralElement):
-    """
-    Create a bandpass from a file.
-
-    spec = FileSpectrum(filename (FITS or ASCII),
-    throughputname = column name containing throughput (for FITS tables only),
-    keepneg =True to override the default behavior of setting negative
-    throughput values to zero)
-
-    """
-
-    def __init__(self, filename, thrucol=None):
-        """
-
-        Parameters
-        -----------
-        filename: string
-            FITS or ASCII file containing the bandpass
-        thrucol: string
-            Column name specifying the throughput (FITS only)
-
-        """
-        self.name = locations.irafconvert(filename)
-        self._readThroughputFile(self.name, thrucol)
-
-        self.validate_units()
-        self.validate_wavetable()
-        self.ToInternal()
-        self.isAnalytic = False
-        self.warnings = {}
-
-    def _readThroughputFile(self, filename, throughputname):
-        if filename.endswith('.fits') or filename.endswith('.fit'):
-            self._readFITS(filename, throughputname)
-        else:
-            self._readASCII(filename)
-
-    def _readFITS(self, filename, throughputname):
-        with fits.open(filename) as fs:
-            self._wavetable = fs[1].data.field('wavelength')
-            if throughputname is None:
-                throughputname = 'throughput'
-            self._throughputtable = fs[1].data.field(throughputname)
-            self.waveunits = units.Units(fs[1].header['tunit1'].lower())
-
-            # Retain the header information as a convenience for the user.
-            # If duplicate keywords exist, the value in the extension
-            # header will override that in the primary.
-            self.fheader = dict(fs[0].header)
-            self.fheader.update(dict(fs[1].header))
-
-    def _readASCII(self, filename):
-        """
-        Ascii files have no headers. Following synphot, this
-        routine will assume the first column is wavelength in Angstroms,
-        and the second column is throughput in Flam.
-
-        """
-
-        self.waveunits = units.Units('angstrom')
-        wlist,flist = self._columnsFromASCII(filename)
-        self._wavetable = np.array(wlist, dtype=np.float64)
-        self._throughputtable = np.array(flist, dtype=np.float64)
-
-        # We don't support headers from asii files
-        self.fheader = dict()
-
-
-class InterpolatedSpectralElement(SpectralElement):
-    """
-    The InterpolatedSpectralElement class handles spectral elements
-    that are interpolated from columns stored in FITS tables
-
-    """
-
-    def __init__(self, fileName, wavelength):
-        """
-        The file name contains a suffix with a column name specification
-        in between square brackets, such as [fr388n#]. The wavelength
-        parameter (poorly named -- it is not always a wavelength) is used to
-        interpolate between two columns in the file.
-
-        """
-        SpectralElement.__init__(self)
-
-        xre = re.search('\[(?P<col>.*?)\]', fileName)
-        self.name = os.path.expandvars(fileName[0:(xre.start())])
-        colSpec = xre.group('col')
-
-        self.analytic = False
-        self.warnings = {}
-
-        self.interpval = wavelength
-
-        with fits.open(self.name) as fs:
-
-            # if the file has the PARAMS header keyword and if it is set to
-            # WAVELENGTH then we want to perform a wavelength shift before
-            # interpolation, otherwise we don't want to shift.
-            if (('PARAMS' in fs[0].header) and
-                    (fs[0].header['PARAMS'].lower() == 'wavelength')):
-                doshift = True
-            else:
-                doshift = False
-
-            # check whether we are supposed to extrapolate when we're given an
-            # interpolation value beyond the columns of the table.
-            # extrapolation is assumed false if the EXTRAP keyword is missing.
-            if 'EXTRAP' in fs[0].header and fs[0].header['EXTRAP'] is True:
-                extrapolate = True
-            else:
-                extrapolate = False
-
-            # The wavelength table will have to be adjusted before use
-            wave0 = fs[1].data.field('wavelength')
-
-            #Determine the columns that bracket the desired value
-            # grab all columns that begin with the parameter name (e.g. 'MJD#')
-            # then split off the numbers after the '#'
-            colNames = [n for n in fs[1].data.names if
-                        n.startswith(colSpec.upper())]
-            colWaves = [float(cn.split('#')[1]) for cn in colNames]
-
-            if colNames:
-                raise StandardError('File {0} contains no interpolated '
-                                    'columns.'.format(fileName))
-
-            # easy case: wavelength matches a column
-            if self.interpval in colWaves:
-                self._no_interp_init(
-                    wave0, fs[1].data[colNames[colWaves.index(wavelength)]])
-            # need interpolation
-            elif ((self.interpval > colWaves[0]) and
-                  (self.interpval < colWaves[-1])):
-                upper_ind = np.searchsorted(colWaves, self.interpval)
-                lower_ind = upper_ind - 1
-
-                self._interp_init(wave0,
-                                  colWaves[lower_ind],
-                                  colWaves[upper_ind],
-                                  fs[1].data[colNames[lower_ind]],
-                                  fs[1].data[colNames[upper_ind]], doshift)
-            # extrapolate below lowest columns
-            elif extrapolate and self.interpval < colWaves[0]:
-                self._extrap_init(wave0,
-                                  colWaves[0],
-                                  colWaves[1],
-                                  fs[1].data[colNames[0]],
-                                  fs[1].data[colNames[1]])
-            # extrapolate above highest columns
-            elif extrapolate and self.interpval > colWaves[-1]:
-                self._extrap_init(wave0,
-                                  colWaves[-2],
-                                  colWaves[-1],
-                                  fs[1].data[colNames[-2]],
-                                  fs[1].data[colNames[-1]])
-            # can't extrapolate, use default
-            elif not extrapolate and 'THROUGHPUT' in fs[1].data.names:
-                s = 'Extrapolation not allowed, using default throughput ' \
-                    'for {0}'.format(fileName)
-                warnings.warn(s, UserWarning)
-                self.warnings['DefaultThroughput'] = True
-                self._no_interp_init(wave0, fs[1].data['THROUGHPUT'])
-            # can't extrapolate and no default
-            elif not extrapolate and 'THROUGHPUT' not in fs[1].data.names:
-                s = 'Cannot extrapolate and no default throughput for %s' % \
-                    (fileName,)
-                raise pysynexcept.ExtrapolationNotAllowed(s)
-            # assign units
-            self.waveunits = units.Units(fs[1].header['tunit1'].lower())
-            self.throughputunits = 'none'
-
-        fs.close()
-
-    def __str__(self):
-        return "%s#%g" % (self.name, self.interpval)
-
-    def _no_interp_init(self, waves, throughput):
-        self._wavetable = waves
-        self._throughputtable = throughput
-
-    def _interp_init(self, waves, lower_val, upper_val, lower_thru, upper_thru,
-                     doshift):
-        self._wavetable = waves
-
-        if doshift:
-            # Adjust the wavelength table to bracket the range
-            lwave = waves + (lower_val - self.interpval)
-            uwave = waves + (upper_val - self.interpval)
-
-            # Interpolate the columns at those ranges
-            lower_thru = np.interp(lwave, waves, lower_thru)
-            upper_thru = np.interp(uwave, waves, upper_thru)
-
-        # Then interpolate between the two columns
-        w = (self.interpval - lower_val) / (upper_val - lower_val)
-        self._throughputtable = (upper_thru * w) + lower_thru * (1.0 - w)
-
-    def _extrap_init(self, waves, lower_val, upper_val, lower_thru, upper_thru):
-        self._wavetable = waves
-
-        throughput = []
-
-        for y1, y2 in zip(lower_thru, upper_thru):
-            m = (y2 - y1) / (upper_val - lower_val)
-            b = y1 - m * lower_val
-
-            throughput.append(m*self.interpval + b)
-
-        self._throughputtable = np.array(throughput)
-
-
-class ThermalSpectralElement(TabularSpectralElement):
-    """
-    The ThermalSpectralElement class handles spectral elements
-    that have associated thermal properties read from a FITS table.
-
-    ThermalSpectralElements differ from regular SpectralElements in
-    that they carry thermal parameters such as temperature and beam
-    filling factor, but otherwise they operate just as regular
-    SpectralElements. They don't know how to apply themselves to an
-    existing beam, in the sense that their emissivities should be
-    handled explicitly, outside the objects themselves.
-
-    """
-    def __init__(self, fileName):
-
-        TabularSpectralElement.__init__(self,
-                                        fileName=fileName,
-                                        thrucol='emissivity')
-        self.warnings = {}
-
-    def getHeaderKeywords(self, header):
-        """
-        Overrides base class in order to get thermal keywords.
-
-        """
-        self.temperature = header['DEFT']
-        self.beamFillFactor = header['BEAMFILL']
-
-
-class Box(SpectralElement):
-    """
-    bandpass = Box(central wavelength, width) - both in Angstroms
-
-    """
-
-    def __init__(self, center, width, waveunits=None):
-        """
-        Both center and width are assumed to be in Angstrom
-        units, according to the synphot definition.
-
-        """
-        SpectralElement.__init__(self)
-
-        if waveunits is None:
-            self.waveunits = units.Units('angstrom')  # per docstring: for now
-        else:
-            self.waveunits = units.Units(waveunits)
-            center = self.waveunits.Convert(center, 'angstrom')
-            width = self.waveunits.Convert(width, 'angstrom')
-
-        lower = center - width / 2.0
-        upper = center + width / 2.0
-        step = 0.05  # fixed step for now (in A)
-
-        self.name = 'Box at %g (%g wide)' % (center, width)
-        nwaves = int(((upper - lower) / step)) + 2
-        self._wavetable = np.zeros(shape=[nwaves, ], dtype=np.float64)
-
-        for i in range(nwaves):
-            self._wavetable[i] = lower + step * i
-
-        self._wavetable[0] = self._wavetable[1] - step
-        self._wavetable[-1] = self._wavetable[-2] + step
-
-        self._throughputtable = np.ones(shape=self._wavetable.shape,
-                                        dtype=np.float64)
-        self._throughputtable[0] = 0.0
-        self._throughputtable[-1] = 0.0
-
-        self.isAnalytic = False
-        self.warnings = {}
-
-
-class Vega(FileSourceSpectrum):
-    def __init__(self):
-        FileSourceSpectrum.__init__(locations.VegaFile)
-
-
+        return cls(wavelengths, throughput, area=area, header=header)

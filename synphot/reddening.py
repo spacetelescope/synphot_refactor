@@ -1,121 +1,342 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""
-This module defines classes used to define reddening laws and
-extinctions.
-
-"""
+"""This module defines reddening laws and extinction curves."""
 from __future__ import division, print_function
 
 # ASTROPY
-from astropy.io import fits
+from astropy import units as u
 
 # LOCAL
-from . import spectrum
-from . import Cache
-from . import extinction  # temporary(?) backwards compatibility
+from . import spectrum, synconfig, synexceptions, synio, units
 
 
-class CustomRedLaw(object):
-    def __init__(self,
-                 wave=None,
-                 waveunits='InverseMicrons',
-                 Avscaled=None,
-                 name='Unknown Reddening Law',
-                 litref=None):
+__all__ = ['ReddeningLaw', 'ExtinctionCurve']
 
-        self.wave = wave
-        self.waveunits = waveunits
-        self.obscuration = Avscaled
-        self.name = name
-        self.litref = litref
 
-    def reddening(self, extval):
+class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
+    """Class to handle reddening law.
+
+    Wavelengths must be monotonic ascending/descending without zeroes
+    or duplicate values.
+
+    R(V) values must be dimensionless.
+    They are checked for negative values.
+    If found, warning is issued and negative values are set to zeroes.
+
+    Parameters
+    ----------
+    wavelengths : array_like or `astropy.units.quantity.Quantity`
+        Wavelength values. If not a Quantity, assumed to be in
+        Angstrom.
+
+    rvs : array_like or `astropy.units.quantity.Quantity`
+        R(V) values. Must be dimensionless.
+        If not a Quantity, assumed to be in THROUGHPUT.
+
+    kwargs : dict
+        Keywords accepted by `~synphot.spectrum.BaseSpectrum`,
+        except ``flux_unit``.
+
+    Attributes
+    ----------
+    wave, thru : `astropy.units.quantity.Quantity`
+        Wavelength and R(V) of the reddening law.
+
+    primary_area : `astropy.units.quantity.Quantity` or `None`
+        Area that flux covers in cm^2.
+
+    metadata : dict
+        Metadata. ``self.metadata['expr']`` must contain a descriptive string of the object.
+
+    warnings : dict
+        List of warnings related to spectrum object.
+
+    Raises
+    ------
+    synphot.synexceptions.SynphotError
+        If wavelengths and R(V) do not match, or if they have invalid units.
+
+    synphot.synexceptions.DuplicateWavelength
+        If wavelength array contains duplicate entries.
+
+    synphot.synexceptions.UnsortedWavelength
+        If wavelength array is not monotonic.
+
+    synphot.synexceptions.ZeroWavelength
+        If negative or zero wavelength occurs in wavelength array.
+
+    """
+    @classmethod
+    def from_file(cls, filename, area=None, **kwargs):
+        """Create a reddening law from file.
+
+        If filename has 'fits' or 'fit' suffix, it is read as FITS.
+        Otherwise, it is read as ASCII.
+
+        Parameters
+        ----------
+        filename : str
+            Reddening law filename.
+
+        area : float or `astropy.units.quantity.Quantity`, optional
+            Area that fluxes cover. Usually, this is the area of
+            the primary mirror of the observatory of interest.
+            If not a Quantity, assumed to be in cm^2.
+
+        kwargs : dict
+            Keywords acceptable by
+            :func:`synphot.synio.read_fits_spec` (if FITS) or
+            :func:`synphot.synio.read_ascii_spec` (if ASCII).
+
+        Returns
+        -------
+        newspec : obj
+            New reddening law.
+
         """
-        Compute the reddening for the provided value of the extinction.
+        if 'flux_unit' not in kwargs:
+            kwargs['flux_unit'] = units.THROUGHPUT
+
+        if ((filename.endswith('fits') or filename.endswith('fit')) and
+                'flux_col' not in kwargs):
+            kwargs['flux_col'] = 'Av/E(B-V)'
+
+        header, wavelengths, rvs = synio.read_spec(filename, **kwargs)
+        return cls(wavelengths, rvs, area=area, header=header)
+
+    def to_fits(self, filename, **kwargs):
+        """Write the reddening law to a FITS file.
+
+        R(V) column is automatically named 'Av/E(B-V)'.
+
+        Parameters
+        ----------
+        filename : str
+            Output filename.
+
+        kwargs : dict
+            Keywords accepted by :func:`synphot.synio.write_fits_spec`.
 
         """
-        T = 10.0**(-0.4*extval*self.obscuration)
-        ans = spectrum.ArraySpectralElement(wave=self.wave,
-                                   waveunits=self.waveunits,
-                                   throughput=T,
-                                   name='%s(Av=%g)' % (self.name, extval)
-                                   )
-        ans.citation = self.litref
-        return ans
+        kwargs['flux_col'] = 'Av/E(B-V)'
+        kwargs['flux_unit'] = units.THROUGHPUT
+
+        # No need to trim/pad zeroes, unless user chooses to do so.
+        if 'pad_zero_ends' not in kwargs:
+            kwargs['pad_zero_ends'] = False
+        if 'trim_zero' not in kwargs:
+            kwargs['trim_zero'] = False
+
+        # There are some standard keywords that should be added
+        # to the extension header.
+        bkeys = {'expr': (str(self), 'synphot expression'),
+                 'tdisp1': 'G15.7',
+                 'tdisp2': 'G15.7'}
+
+        if 'ext_header' in kwargs:
+            kwargs['ext_header'].update(bkeys)
+        else:
+            kwargs['ext_header'] = bkeys
+
+        synio.write_fits_spec(filename, self.wave, self.thru, **kwargs)
+
+    @classmethod
+    def from_model(cls, modelname, area=None, **kwargs):
+        """Load :ref:`pre-defined extinction model <synphot_reddening>`.
+
+        Parameters
+        ----------
+        modelname : {'lmc30dor', 'lmcavg', 'mwavg', 'mwdense', 'mwrv21', 'mwrv40', 'smcbar', 'xgalsb'}
+            Extinction model name.
+
+        area : float or `astropy.units.quantity.Quantity`, optional
+            Area that fluxes cover. Usually, this is the area of
+            the primary mirror of the observatory of interest.
+            If not a Quantity, assumed to be in cm^2.
+
+        kwargs : dict
+            Keywords acceptable by :func:`synphot.synio.read_remote_spec`.
+
+        Returns
+        -------
+        newspec : obj
+            Reddening law for the given model.
+
+        Raises
+        ------
+        synphot.synexceptions.SynphotError
+            Invalid model name.
+
+        """
+        modelname = modelname.lower()
+
+        # Select filename based on model name
+        if modelname == 'lmc30dor':
+            cfgitem = synconfig.LMC30DOR_FILE
+        elif modelname == 'lmcavg':
+            cfgitem = synconfig.LMCAVG_FILE
+        elif modelname == 'mwavg':
+            cfgitem = synconfig.MWAVG_FILE
+        elif modelname == 'mwdense':
+            cfgitem = synconfig.MWDENSE_FILE
+        elif modelname == 'mwrv21':
+            cfgitem = synconfig.MWRV21_FILE
+        elif modelname == 'mwrv40':
+            cfgitem = synconfig.MWRV40_FILE
+        elif modelname == 'smcbar':
+            cfgitem = synconfig.SMCBAR_FILE
+        elif modelname == 'xgalsb':
+            cfgitem = synconfig.XGAL_FILE
+        else:
+            raise synexceptions.SynphotError(
+                'Model name {0} is invalid.'.format(modelname))
+
+        filename = cfgitem()
+
+        if 'flux_unit' not in kwargs:
+            kwargs['flux_unit'] = units.THROUGHPUT
+
+        if ((filename.endswith('fits') or filename.endswith('fit')) and
+                'flux_col' not in kwargs):
+            kwargs['flux_col'] = 'Av/E(B-V)'
+
+        header, wavelengths, rvs = synio.read_remote_spec(filename, **kwargs)
+        header['expr'] = modelname
+        header['filename'] = filename
+        header['descrip'] = cfgitem.description
+
+        return cls(wavelengths, rvs, area=area, header=header)
+
+    def plot(self, **kwargs):  # pragma: no cover
+        """Plot the reddening law.
+
+        .. note:: Uses :mod:`matplotlib`.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Keywords accepted by :func:`synphot.spectrum.BaseSpectrum.plot`,
+            *except* ``ylabel``.
+
+        """
+        if 'ylabel' in kwargs:
+            del kwargs[key]
+
+        spectrum.BaseSpectrum.plot(self, ylabel='R(V)', **kwargs)
 
 
-class RedLaw(CustomRedLaw):
+class ExtinctionCurve(spectrum.BaseUnitlessSpectrum):
+    """Class to handle extinction curve.
+
+    Wavelengths must be monotonic ascending/descending without zeroes
+    or duplicate values.
+
+    Throughput (:math:`A(V)` in linear scale) values must be dimensionless.
+    They are checked for negative values.
+    If found, warning is issued and negative values are set to zeroes.
+
+    Parameters
+    ----------
+    wavelengths : array_like or `astropy.units.quantity.Quantity`
+        Wavelength values. If not a Quantity, assumed to be in
+        Angstrom.
+
+    throughput : array_like or `astropy.units.quantity.Quantity`
+        Throughput values. Must be dimensionless.
+        If not a Quantity, assumed to be in THROUGHPUT.
+
+    kwargs : dict
+        Keywords accepted by `~synphot.spectrum.BaseSpectrum`,
+        except ``flux_unit``.
+
+    Attributes
+    ----------
+    wave, thru : `astropy.units.quantity.Quantity`
+        Wavelength and throughput of the extinction curve.
+
+    primary_area : `astropy.units.quantity.Quantity` or `None`
+        Area that flux covers in cm^2.
+
+    metadata : dict
+        Metadata. ``self.metadata['expr']`` must contain a descriptive string of the object.
+
+    warnings : dict
+        List of warnings related to spectrum object.
+
+    Raises
+    ------
+    synphot.synexceptions.SynphotError
+        If wavelengths and throughput do not match, or if they have
+        invalid units.
+
+    synphot.synexceptions.DuplicateWavelength
+        If wavelength array contains duplicate entries.
+
+    synphot.synexceptions.UnsortedWavelength
+        If wavelength array is not monotonic.
+
+    synphot.synexceptions.ZeroWavelength
+        If negative or zero wavelength occurs in wavelength array.
+
     """
-    Defines a reddening law from a FITS file.
+    @classmethod
+    def from_reddening_law(cls, redlaw, ebv):
+        """Calculate A(V) in linear scale for the given
+        reddening law and E(B-V).
 
-    """
-    def __init__(self, filename):
-        with fits.open(filename) as f:
-            d = f[1].data
-            CustomRedLaw.__init__(self,
-                                  wave=d.field('wavelength'),
-                                  waveunits=f[1].header['tunit1'],
-                                  Avscaled=d.field('Av/E(B-V)'),
-                                  litref=f[0].header['litref'],
-                                  name=f[0].header['shortnm'])
+        .. math::
 
+            A(V) = R(V) * E(B-V)
 
-def print_red_laws():
-    """
-    Print information regarding the extinction laws currently available
-    on CDBS. The printed names may be used with the Extinction function
-    to retrieve available reddening laws.
+            thru = 10^{-0.4 * A(V)}
 
-    """
-    laws = {}
+        Parameters
+        ----------
+        redlaw : `ReddeningLaw`
+            Reddening law.
 
-    # start by converting the Cache.RedLaws file names to RedLaw objects
-    # if they aren't already
-    for k in Cache.RedLaws:
-        if isinstance(Cache.RedLaws[k], str):
-            Cache.RedLaws[k] = RedLaw(Cache.RedLaws[k])
+        ebv : float or `astropy.units.quantity.Quantity`
+            E(B-V) value in magnitude.
 
-        laws[str(k)] = Cache.RedLaws[k].litref
+        Returns
+        -------
+        newspec : obj
+            New extinction curve.
 
-    # get the length of the longest name and litref
-    maxname = max([len(name) for name in laws.keys()])
-    maxref = max([len(ref) for ref in laws.values()])
+        Raises
+        ------
+        synphot.synexceptions.SynphotError
+            Invalid inputs.
 
-    s = '%-' + str(maxname) + 's   %-' + str(maxref) + 's'
+        """
+        if not isinstance(redlaw, ReddeningLaw):
+            raise synexceptions.SynphotError(
+                '{0} is not a ReddeningLaw'.format(redlaw))
 
-    print('name', 'reference')
-    print('-'*maxname, '-'*maxref)
+        if isinstance(ebv, u.Quantity) and ebv.unit.decompose() == u.mag:
+            ebv = ebv.value
+        elif not isinstance(ebv, (int, long, float)):
+            raise synexceptions.SynphotError(
+                'E(B-V)={0} is invalid.'.format(ebv))
 
-    for k in sorted(laws.keys()):
-        print(k, laws[k])
+        thru = 10**(-0.4 * redlaw.thru.value * ebv)
+        hdr = {'expr': '{0} from {1} with E(B-V)={2}'.format(
+                cls.__name__, str(redlaw), ebv)}
 
+        return cls(redlaw.wave, thru, area=redlaw.primary_area, header=hdr)
 
-def Extinction(extval, name=None):
-    """
-    extinction = Extinction(extinction (E(B-V)) in magnitudes,
-                           'reddening law')
+    def plot(self, **kwargs):  # pragma: no cover
+        """Plot the extinction curve.
 
-    If no name is provided, the average Milky Way extinction will
-    be used. Run the print_red_laws function to see available names.
+        .. note:: Uses :mod:`matplotlib`.
 
-    """
-    try:
-        ext = Cache.RedLaws[name].reddening(extval)
-    except AttributeError:
-        # The cache hasn't yet been filled.
-        Cache.RedLaws[name] = RedLaw(Cache.RedLaws[name])
-        ext = Cache.RedLaws[name].reddening(extval)
-    except KeyError:
-        # There's no reddening law by that name. See if we've been
-        # given a filename from which we can read one.
-        try:
-            Cache.RedLaws[name] = RedLaw(name)
-            ext = Cache.RedLaws[name].reddening(extval)
-        except IOError:
-            # If not, see if it's an old extinction law
-            try:
-                ext = extinction.DeprecatedExtinction(extval, name)
-            except KeyError:
-                raise ValueError('No extinction law has been defined for "%s", '
-                                 'and no such file exists' % name)
-    return ext
+        Parameters
+        ----------
+        kwargs : dict
+            Keywords accepted by :func:`synphot.spectrum.BaseSpectrum.plot`,
+            *except* ``ylabel``.
+
+        """
+        if 'ylabel' in kwargs:
+            del kwargs[key]
+
+        spectrum.BaseSpectrum.plot(self, ylabel='10^(-0.4 * A(V))', **kwargs)

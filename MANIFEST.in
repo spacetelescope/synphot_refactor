@@ -1,5 +1,10 @@
-include distribute_setup.py README
-graft data
-graft docs
-include tests/*.py
-graft tests/data
+include README
+include setup.cfg
+include distribute_setup.py
+
+recursive-include docs *
+recursive-include licenses *
+
+exclude *.pyc *.o
+prune docs/_build
+prune build

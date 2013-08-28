@@ -1,13 +1,67 @@
 language: python
+
 python:
   - "2.6"
   - "2.7"
-#  - "3.2"
-#  - "3.3"
-# command to install dependencies
-install:
-  - "pip install . --use-mirrors"
-  - "pip install -r requirements.txt --use-mirrors"
-# command to run tests
-script: nosetests
+  - "3.2"
+  - "3.3"
 
+env:
+    global:
+        - PIP_WHEEL_COMMAND="pip install --find-links http://wheels.astropy.org/ --find-links http://wheels2.astropy.org/ --use-wheel --use-mirrors"
+
+matrix:
+    include:
+        # Try all python versions with the latest numpy
+        - python: 2.6
+          env: NUMPY_VERSION=1.7.1
+        - python: 2.7
+          env: NUMPY_VERSION=1.7.1
+        # There is a bug in pytest-xdist that prevents it from working
+        # on Python 3.x. See:
+        # https://bitbucket.org/hpk42/pytest/issue/301/internal-error-during-test-collecting
+        - python: 3.2
+          env: NUMPY_VERSION=1.7.1
+        - python: 3.3
+          env: NUMPY_VERSION=1.7.1
+
+        # Try alternate numpy versions
+        - python: 2.7
+          env: NUMPY_VERSION=1.6.2
+        - python: 3.2
+          env: NUMPY_VERSION=1.6.2
+        - python: 2.7
+          env: NUMPY_VERSION=1.5.1
+
+before_install:
+
+    # Use utf8 encoding. Should be default, but this is insurance against
+    # future changes
+    - export PYTHONIOENCODING=UTF8
+
+    # Install the pip that supports wheel
+    - pip install setuptools --upgrade
+    - pip install pip --upgrade
+    - pip install wheel
+
+    # We do this to make sure we get dependencies so pip works below
+    # Note that travis does *not* use python packages installed via apt - it
+    # does all the building in an isolated virtualenv
+    - sudo apt-get update
+
+    # CORE DEPENDENCIES
+    - sudo apt-get install python-numpy
+
+install:
+
+    # CORE DEPENDENCIES
+    # These command run pip first trying a wheel, and then falling back on
+    # source build
+    - $PIP_WHEEL_COMMAND --upgrade "numpy==$NUMPY_VERSION"
+    - $PIP_WHEEL_COMMAND "pytest==2.4.0"
+    - $PIP_WHEEL_COMMAND "pytest-xdist==1.8"
+    # Do this until astropy 0.3 is stable
+    - pip install git+git://github.com/astropy/astropy.git@ef19baf695
+
+# command to run tests
+script: pytest

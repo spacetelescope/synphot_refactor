@@ -1,694 +1,230 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""This module handles synphot units that are not in `astropy.units`.
+
+The actual conversions are in `synphot.spectrum` because they require
+spectral information.
 
 """
-Units class hierarchy: is used to manage both wavelength and flux
-unit conversions
-
-.. warning::
-
-  vegamag unit conversions require spectrum and locations modules => circular
-  imports.
-
-"""
-
 from __future__ import division, print_function
 
-import math
+# THIRD-PARTY
 import numpy as np
 
-import spectrum  # Circular import
-from . import binning
-#from . import refs  # needed for PRIMARY_AREA
-# cannot just import the constant because it won't get updated
-# when the setref() function is used to change it.
+# ASTROPY
+from astropy import constants as const
+from astropy import units as u
+
+# LOCAL
+from . import synexceptions
 
 
-C = 2.99792458e18  # speed of light in Angstrom/sec
-H = 6.62620E-27    # Planck's constant in ergs * sec
+__all__ = ['H', 'C', 'HC', 'INVERSE_AA', 'INVERSE_MICRON',
+           'wave_conversion', 'AREA', 'THROUGHPUT', 'PHOTLAM',
+           'PHOTNU', 'FLAM', 'FNU', 'STMAG', 'ABMAG', 'OBMAG',
+           'VEGAMAG', 'ABZERO', 'STZERO', 'flux_conversion_wav',
+           'flux_conversion_freq', 'flux_conversion_vegamag',
+           'flux_conversion_nondensity', 'validate_unit', 'validate_quantity']
 
+
+#-------------------#
+# General constants #
+#-------------------#
+
+H = const.h.cgs  # Planck's constant in erg * sec
+C = const.c.to('AA/s')  # Speed of light in Angstrom/sec
 HC = H * C
-ABZERO = -48.60    # magnitude zero points
-STZERO = -21.10
 
 
-def Units(uname):
-    """
-    This needs to be a factory function in order to return an object
-    of the correct subclass.
+#----------------------------#
+# For wavelength conversions #
+#----------------------------#
 
-    """
-    if isinstance(uname, BaseUnit):
-        return uname
-    else:
-        try:
-            if issubclass(uname, BaseUnit):
-                return uname()
-        except TypeError:
-
-            try:
-                return factory(uname)
-            except KeyError:
-                if uname == str(None):
-                    return None
-                else:
-                    raise ValueError("Unknown units %s" % uname)
+INVERSE_AA = u.def_unit(
+    'inverse_angstrom', 1 / u.AA,
+    format={'generic': '1/angstrom', 'console': '1/angstrom',
+            'latex': r'\frac{1}{\AA}'})
+INVERSE_MICRON = u.def_unit(
+    'inverse_micron', 1 / u.micron,
+    format={'generic': '1/um', 'console': '1/um', 'latex': r'\frac{1}{\mu m}'})
+wave_conversion = u.spectral() + [
+    (u.micron, INVERSE_MICRON, lambda x: 1.0 / x, lambda x: 1.0 / x),
+    (u.Hz, INVERSE_AA, lambda x: x / C.value, lambda x: x * C.value) ]
 
 
-def ismatch(a, b):
-    """
-    Method to allow smart comparisons between classes, instances,
-    and string representations of units and give the right answer.
+#----------------------#
+# For flux conversions #
+#----------------------#
 
-    """
+# Default unit of area covered by flux
+AREA = u.cm * u.cm
 
-    match = False
-    #Try the easy case
-    if a == b:
-        return True
-    else:
-        #Try isinstance in both orders
-        try:
-            if isinstance(a, b):
-                return True
-        except TypeError:
-            try:
-                if isinstance(b, a):
-                    return True
-            except TypeError:
-                #Try isinstance(a, type(b)) in both orders
-                try:
-                    if isinstance(a, type(b)):
-                        return True
-                except TypeError:
-                    try:
-                        if isinstance(b, type(a)):
-                            return True
-                    except TypeError:
-                        #Try the string representation
-                        if str(a).lower() == str(b).lower():
-                            return True
-                        else:
-                            return False
+# synphot unitless unit (using def_unit mess up arithmetic result unit string)
+THROUGHPUT = u.dimensionless_unscaled
 
-#Base classes
+# synphot flux units
+PHOTLAM = u.def_unit(
+    u'photlam', u.photon / (u.cm**2 * u.s * u.AA),
+    format={'generic': 'PHOTLAM', 'console': 'PHOTLAM'})
+PHOTNU = u.def_unit(
+    u'photnu',  u.photon / (u.cm**2 * u.s * u.Hz),
+    format={'generic': 'PHOTNU', 'console': 'PHOTNU'})
+FLAM = u.def_unit(
+    u'flam', u.erg / (u.cm**2 * u.s * u.AA),
+    format={'generic': 'FLAM', 'console': 'FLAM'})
+FNU = u.def_unit(
+    u'fnu',  u.erg / (u.cm**2 * u.s * u.Hz),
+    format={'generic': 'FNU', 'console': 'FNU'})
+STMAG = u.def_unit(
+    u'stmag', u.mag, format={'generic': 'STMAG', 'console': 'STMAG'})
+ABMAG = u.def_unit(
+    u'abmag', u.mag, format={'generic': 'ABMAG', 'console': 'ABMAG'})
+OBMAG = u.def_unit(
+    u'obmag', u.mag, format={'generic': 'OBMAG', 'console': 'OBMAG'})
+VEGAMAG = u.def_unit(
+    u'vegamag', u.mag, format={'generic': 'VEGAMAG', 'console': 'VEGAMAG'})
 
-class BaseUnit(object):
-    """
-    Base class for all units; defines UI
-
-    """
-
-    def __init__(self, uname):
-        self.Dispatch = None
-        self.name = uname
-
-    def __str__(self):
-        return self.name
-
-    def Convert(self, wave, flux, target_units):
-        #This signature is appropriate for fluxes, not waves
-        try:
-            return self.Dispatch[target_units.lower()](wave, flux)
-        except KeyError:
-            raise TypeError("%s cannot be converted to %s" % (self.name,
-                                                              target_units))
+# Magnitude zero points
+ABZERO = u.Quantity(-48.6, unit=u.mag)
+STZERO = u.Quantity(-21.1, unit=u.mag)
 
 
-class WaveUnits(BaseUnit):
-    """
-    All WaveUnits know how to convert themselves to Angstroms
-
-    """
-
-    def __init__(self):
-        self.name = None
-        self.isFlux = False
-        self.Dispatch = {'angstrom': self.ToAngstrom}
-
-    def Convert(self, wave, target_units):
-        """WaveUnits only need a wavelength table to do a conversion."""
-        try:
-            return self.Dispatch[target_units.lower()](wave)
-        except KeyError:
-            raise TypeError("%s cannot be converted to %s" % (self.name,
-                                                              target_units))
-
-    def ToAngstrom(self, wave):
-        raise NotImplementedError(
-            "Required method ToAngstrom not yet implemented")
+def _div_flux(fluxspec):
+    """For PHOTLAM to VEGAMAG conversion."""
+    val = -2.5 * np.log10(fluxspec[0] / fluxspec[1])
+    result = np.zeros(val.shape, dtype=val.dtype) - 99
+    mask = np.isfinite(val)
+    result[mask] = val[mask]
+    return result
 
 
-class FluxUnits(BaseUnit):
-    """
-    All FluxUnits know how to convert themselves to Photlam
+# Flux equivalencies take one of the following:
+#     waveflux = (wave, flux)
+#     fluxspec = (flux, flux_vega)
+#     fluxbinarea = (flux, bin, area)
+#
+# wave and bin in Angstrom, area in cm^2, flux_vega in PHOTLAM
+#
+# astropy cannot distinguish between different types of mags,
+# so the equivalencies are separated here.
+flux_conversion_wav = [
+    (PHOTLAM, FLAM,
+     lambda waveflux: HC.value * waveflux[1] / waveflux[0],
+     lambda waveflux: waveflux[1] * waveflux[0] / HC.value),
+    (PHOTLAM, STMAG,
+     lambda waveflux: -2.5 * np.log10(
+            HC.value * waveflux[1] / waveflux[0]) + STZERO.value,
+     lambda waveflux: waveflux[0] * 10**(
+            -0.4 * (waveflux[1] - STZERO.value)) / HC.value) ]
+flux_conversion_freq = [
+    (PHOTLAM, PHOTNU,
+     lambda waveflux: waveflux[1] * waveflux[0]**2 / C.value,
+     lambda waveflux: C.value * waveflux[1] / waveflux[0]**2),
+    (PHOTLAM, FNU,
+     lambda waveflux: H.value * waveflux[1] * waveflux[0],
+     lambda waveflux: waveflux[1] / (waveflux[0] * H.value)),
+    (PHOTLAM, ABMAG,
+     lambda waveflux: -2.5 * np.log10(
+            H.value * waveflux[1] * waveflux[0]) + ABZERO.value,
+     lambda waveflux:  10**(
+            -0.4 * (waveflux[1] - ABZERO.value)) / (H.value * waveflux[0])) ]
+flux_conversion_vegamag = [
+    (PHOTLAM, VEGAMAG, _div_flux,
+     lambda fluxspec: fluxspec[1] * 10**(-0.4 * fluxspec[0])) ]
+flux_conversion_nondensity = [
+    (PHOTLAM, OBMAG,
+     lambda fluxbinarea: -2.5 * np.log10(
+            fluxbinarea[0] * fluxbinarea[1] * fluxbinarea[2]),
+     lambda fluxbinarea: 10**(
+            -0.4 * fluxbinarea[0]) / (fluxbinarea[1] * fluxbinarea[2])),
+    (PHOTLAM, u.count,
+     lambda fluxbinarea: fluxbinarea[0] * fluxbinarea[1] * fluxbinarea[2],
+     lambda fluxbinarea: fluxbinarea[0] / (fluxbinarea[1] * fluxbinarea[2])) ]
 
-    """
 
-    def __init__(self):
-        self.isFlux = True
-        self.isMag = False
-        self.isDensity = True #False for counts and obmag
-        self.name = None
-        self.Dispatch = {'photlam': self.ToPhotlam}
-        self.nativewave = Angstrom
-        #self.StdSpectrum = None
-        #...StdSpectrum is a placeholder. Actual values for the attributes
-        # be defined in the renorm.py module; they can't be done here
-        # because of a circular import problem. If you add a new fluxunit
-        # in this file, you must define its StdSpectrum in renorm.py.
+#--------------------#
+# Utility functions  #
+#--------------------#
 
-    def Convert(self, wave, flux, target_units, area=None):
-        """
-        FluxUnits need both wavelength and flux tables to do a unit conversion.
+def validate_unit(input_unit):
+    """Validate unit.
 
-        """
+    To be compatible with existing SYNPHOT data files:
 
-        try:
-            return self.Dispatch[target_units](wave, flux, area=area)
-        except KeyError:
-            raise TypeError("%s is not a valid flux unit" % target_units)
+        * 'angstroms' and 'inversemicrons' are accepted although
+          unrecognized by astropy units
+        * 'transmission' and 'extinction' are converted to astropy
+          dimensionless unit
 
-    def ToPhotlam(self, wave, flux, area=None):
-        raise NotImplementedError(
-            "Required method ToPhotlam not yet implemented")
+    Parameters
+    ----------
+    input_unit : str or `astropy.units.core.Unit`
+        Unit to validate.
 
+    Returns
+    -------
+    output_unit : `astropy.units.core.Unit`
+        Validated unit.
 
-class LogFluxUnits(FluxUnits):
-    """
-    Base class for magnitudes, which often require special handling
+    Raises
+    ------
+    synphot.synexceptions.SynphotError
+        If unit is invalid.
 
     """
+    if isinstance(input_unit, basestring):
+        input_unit_lowcase = input_unit.lower()
 
-    def __init__(self):
-        FluxUnits.__init__(self)
-        self.isMag = True
-        self.linunit = None
-        self.zeropoint = None
-
-# Internal wavelength units are Angstroms, so it is smarter than the others
-class Angstrom(WaveUnits):
-    def __init__(self):
-        WaveUnits.__init__(self)
-        self.name = 'angstrom'
-        self.Dispatch = {'angstrom': self.ToAngstrom,
-                         'angstroms': self.ToAngstrom,
-                         'nm': self.ToNm,
-                         'micron': self.ToMicron,
-                         'microns': self.ToMicron,
-                         '1/um': self.ToInverseMicron,
-                         'inversemicron': self.ToInverseMicron,
-                         'inversemicrons': self.ToInverseMicron,
-                         'mm': self.ToMm,
-                         'cm': self.ToCm,
-                         'm': self.ToMeter,
-                         'hz': self.ToHz}
-
-    def ToAngstrom(self, wave):
-        if hasattr(wave, 'copy'):
-            return wave.copy()  # to avoid writing over internal wave objects
+        if input_unit_lowcase == 'angstroms':
+            output_unit = u.AA
+        elif input_unit_lowcase == 'inversemicrons':
+            output_unit = INVERSE_MICRON
+        elif input_unit_lowcase in ('transmission', 'extinction'):
+            output_unit = THROUGHPUT
         else:
-            return wave         # probably a scalar
+            try:  # astropy.units is case-sensitive
+                output_unit = u.Unit(input_unit)
+            except ValueError:  # synphot is case-insensitive
+                output_unit = u.Unit(input_unit_lowcase)
 
-    def ToNm(self, wave):
-        return wave / 10.0
+    elif isinstance(input_unit, u.UnitBase):
+        output_unit = input_unit
 
-    def ToMicron(self, wave):
-        return wave * 1.0e-4
+    else:
+        raise synexceptions.SynphotError(
+            '{0} must be a recognized string or '
+            'astropy.units.core.Unit'.format(input_unit))
 
-    def ToInverseMicron(self, wave):
-        return 1.0e4 / wave
-
-    def ToMm(self, wave):
-        return wave * 1.0e-7
-
-    def ToCm(self, wave):
-        return wave * 1.0e-8
-
-    def ToMeter(self, wave):
-        return wave * 1.0e-10
-
-    def ToHz(self, wave):
-        return C / wave
-
-# Internal flux units = Photlam, so it is smarter than the others
+    return output_unit
 
 
-class Photlam(FluxUnits):
-    """
-    photlam = photons cm^-2 s^-1 Ang^-1)
+def validate_quantity(input_value, output_unit, equivalencies=[]):
+    """Validate quantity (value and unit).
 
-    """
+    Parameters
+    ----------
+    input_value : number, array_like, or `astropy.units.quantity.Quantity`
+        Quantity to validate. If not a Quantity, assumed to be
+        already in output unit.
 
-    def __init__(self):
-        FluxUnits.__init__(self)
-        self.name = 'photlam'
-        self.Dispatch = {'flam': self.ToFlam,
-                         'fnu': self.ToFnu,
-                         'photlam': self.ToPhotlam,
-                         'photnu': self.ToPhotnu,
-                         'jy': self.ToJy,
-                         'mjy': self.TomJy,
-                         'mujy': self.TomuJy,
-                         'microjy': self.TomuJy,
-                         'ujy': self.TomuJy,
-                         'njy': self.TonJy,
-                         'nanojy': self.TonJy,
-                         'abmag': self.ToABMag,
-                         'stmag': self.ToSTMag,
-                         'obmag': self.ToOBMag,
-                         'vegamag': self.ToVegaMag,
-                         'counts': self.ToCounts,
-                         'counts': self.ToCounts}
+    output_unit : str or `astropy.units.core.Unit`
+        Output quantity unit.
 
-        self.nativewave = Angstrom
+    equivalencies : list of equivalence pairs, optional
+        See :func:`astropy.units.core.UnitBase.to`.
+        Does not work for flux conversion
+        (see :func:`synphot.spectrum.convert_fluxes`).
 
-    def unitResponse(self, band):
-        """
-        Put a flat spectrum of 1 photlam through this band, & integrate
-
-        """
-
-        #sumfilt(wave,0,band)
-        # SUMFILT = Sum [ FILT(I) * WAVE(I) ** NPOW * DWAVE(I) ]
-        total = band.trapezoidIntegration(band.wave, band.throughput)
-        return 1.0 / total
-
-    def ToFlam(self, wave, flux, **kwargs):
-        return HC * flux / wave
-
-    def ToFnu(self, wave, flux, **kwargs):
-        return H * flux * wave
-
-    def ToPhotlam(self, wave, flux, **kwargs):
-        if hasattr(flux, 'copy'):
-            return flux.copy()  # No conversion, just copy the array.
-        else:
-            return flux         # probably a scalar
-
-    def ToPhotnu(self, wave, flux, **kwargs):
-        return flux * wave * wave / C
-
-    def ToJy(self, wave, flux, **kwargs):
-        return 1.0e+23 * H * flux * wave
-
-    def TomJy(self, wave, flux, **kwargs):
-        return 1.0e+26 * H * flux * wave
-
-    def TomuJy(self, wave, flux, **kwargs):
-        return 1.0e+29 * H * flux * wave
-
-    def TonJy(self, wave, flux, **kwargs):
-        return 1.0e+32 * H * flux * wave
-
-    def ToABMag(self, wave, flux, **kwargs):
-        arg = H * flux * wave
-        return -1.085736 * np.log(arg) + ABZERO
-
-    def ToSTMag(self, wave, flux, **kwargs):
-        arg = H * C * flux / wave
-        return -1.085736 * np.log(arg) + STZERO
-
-    def ToOBMag(self, wave, flux, area=None):
-        area = area if area else refs.PRIMARY_AREA
-        bin_widths = \
-            binning.calculate_bin_widths(binning.calculate_bin_edges(wave))
-
-        arg = flux * bin_widths * area
-
-        return -1.085736 * np.log(arg)
-
-    def ToVegaMag(self, wave, flux, **kwargs):
-
-        resampled = spectrum.Vega.resample(wave)
-        normalized = flux / resampled._fluxtable
-        return -2.5 * np.log10(normalized)
-
-    def ToCounts(self, wave, flux, area=None):
-        area = area if area else refs.PRIMARY_AREA
-        bin_widths = \
-            binning.calculate_bin_widths(binning.calculate_bin_edges(wave))
-
-        return flux * bin_widths * area
-
-
-#Other wavelength units
-
-class Hz(WaveUnits):
-    def __init__(self):
-        WaveUnits.__init__(self)
-        self.name = 'hz'
-
-    def ToAngstrom(self, wave):
-        return C / wave
-
-
-class InverseMicron(WaveUnits):
-    def __init__(self):
-        WaveUnits.__init__(self)
-        self.name = '1/um'
-
-    def ToAngstrom(self, wave):
-        return 1.0e4 / wave
-
-
-class _MetricWavelength(WaveUnits):
-    """
-    Encapsulates some easy unit-conversion machinery. Angstrom
-    is not subclassed from here because it needs to be especially smart in
-    other ways. (Although multiple inheritence might be possible.)
+    Returns
+    -------
+    output_value : `astropy.units.quantity.Quantity`
+        Validated quantity in given unit.
 
     """
+    output_unit = validate_unit(output_unit)
 
-    def ToAngstrom(self, wave):
-        return wave * self.factor
+    if isinstance(input_value, u.Quantity):
+        output_value = input_value.to(output_unit, equivalencies=equivalencies)
+    else:
+        output_value = u.Quantity(input_value, unit=output_unit)
 
-
-class Nm(_MetricWavelength):
-    def __init__(self):
-        _MetricWavelength.__init__(self)
-        self.name = 'nm'
-        self.factor = 10.0
-
-
-class Micron(_MetricWavelength):
-    def __init__(self):
-        _MetricWavelength.__init__(self)
-        self.name = 'micron'
-        self.factor = 1.0e4
-
-
-class Mm(_MetricWavelength):
-    def __init__(self):
-        _MetricWavelength.__init__(self)
-        self.name = 'mm'
-        self.factor = 1.0e7
-
-
-class Cm(_MetricWavelength):
-    def __init__(self):
-        _MetricWavelength.__init__(self)
-        self.name = 'cm'
-        self.factor = 1.0e8
-
-
-class Meter(_MetricWavelength):
-    def __init__(self):
-        _MetricWavelength.__init__(self)
-        self.name = 'm'
-        self.factor = 1.0e10
-
-
-#Other flux units
-
-class Flam(FluxUnits):
-    """
-    flam = erg cm^-2 s^-1 Ang^-1
-
-    """
-
-    def __init__(self):
-        FluxUnits.__init__(self)
-        self.name = 'flam'
-        self.nativewave = Angstrom
-
-    def ToPhotlam(self, wave, flux, **kwargs):
-        return flux * wave / HC
-
-    def unitResponse(self, band):
-        #sumfilt(wave,1,band)
-        # SUMFILT = Sum [ FILT(I) * WAVE(I) ** NPOW * DWAVE(I) ]
-        wave = band.wave
-        total = band.trapezoidIntegration(wave, band.throughput * wave)
-        modtot = total / (H * C)
-        return 1.0 / modtot
-
-
-class Photnu(FluxUnits):
-    """
-    photnu = photon cm^-2 s^-1 Hz^-1
-
-    """
-
-    def __init__(self):
-        FluxUnits.__init__(self)
-        self.name = 'photnu'
-        self.nativewave = Hz
-
-    def ToPhotlam(self, wave, flux, **kwargs):
-        return C * flux / (wave * wave)
-
-    def unitResponse(self, band):
-        #sumfilt(wave,-2,band)
-        # SUMFILT = Sum [ FILT(I) * WAVE(I) ** NPOW * DWAVE(I) ]
-        wave = band.wave
-        total = band.trapezoidIntegration(wave, band.throughput / (wave * wave))
-        modtot = total / C
-        return 1.0 / modtot
-
-
-class Fnu(FluxUnits):
-    """
-    fnu = erg cm^-2 s^-1 Hz^-1
-
-    """
-
-    def __init__(self):
-        FluxUnits.__init__(self)
-        self.name = 'fnu'
-        self.nativewave = Hz
-
-    def ToPhotlam(self, wave, flux, **kwargs):
-        return flux / wave / H
-
-    def unitResponse(self, band):
-        #sumfilt(wave,-1,band)
-        # SUMFILT = Sum [ FILT(I) * WAVE(I) ** NPOW * DWAVE(I) ]
-        wave = band.wave
-        total = band.trapezoidIntegration(wave, band.throughput / wave)
-        modtot = total / H
-        return 1.0 / modtot
-
-
-class Jy(FluxUnits):
-    """
-    jy = 10^-23 erg cm^-2 s^-1 Hz^-1
-
-    """
-
-    def __init__(self):
-        FluxUnits.__init__(self)
-        self.name = 'jy'
-        self.nativewave = Hz
-
-    def ToPhotlam(self, wave, flux, **kwargs):
-        return flux / wave * (1.0e-23 / H)
-
-    def unitResponse(self, band):
-        #sumfilt(wave,-1,band)
-        # SUMFILT = Sum [ FILT(I) * WAVE(I) ** NPOW * DWAVE(I) ]
-        wave = band.wave
-        total = band.trapezoidIntegration(wave, band.throughput / wave)
-        modtot = total * (1.0e-23 / H)
-        return 1.0 / modtot
-
-
-class mJy(FluxUnits):
-    """
-    mjy = 10^-26 erg cm^-2 s^-1 Hz^-1
-
-    """
-
-    def __init__(self):
-        FluxUnits.__init__(self)
-        self.name = 'mjy'
-        self.nativewave = Hz
-
-    def ToPhotlam(self, wave, flux, **kwargs):
-        return flux / wave * (1.0e-26 / H)
-
-    def unitResponse(self, band):
-        #sumfilt(wave,-1,band)
-        # SUMFILT = Sum [ FILT(I) * WAVE(I) ** NPOW * DWAVE(I) ]
-        wave = band.wave
-        total = band.trapezoidIntegration(wave, band.throughput / wave)
-        modtot = total * (1.0e-26 / H)
-        return 1.0 / modtot
-
-
-class muJy(FluxUnits):    # New
-    """
-    mujy = 10^-29 erg cm^-2 s^-1 Hz^-1
-
-    """
-
-    def __init__(self):
-        FluxUnits.__init__(self)
-        self.name = 'mujy'
-        self.nativewave = Hz
-
-    def ToPhotlam(self, wave, flux, **kwargs):
-        return flux / wave * (1.0e-29 / H)
-
-    def unitResponse(self, band):
-        wave = band.wave
-        total = band.trapezoidIntegration(wave, band.throughput / wave)
-        modtot = total * (1.0e-29 / H)
-        return 1.0 / modtot
-
-
-class nJy(FluxUnits):  # New
-    """
-    njy = 10^-32 erg cm^-2 s^-1 Hz^-1
-
-    """
-
-    def __init__(self):
-        FluxUnits.__init__(self)
-        self.name = 'njy'
-        self.nativewave = Hz
-
-    def ToPhotlam(self, wave, flux, **kwargs):
-        return flux / wave * (1.0e-32 / H)
-
-    def unitResponse(self, band):
-        wave = band.wave
-        total = band.trapezoidIntegration(wave, band.throughput / wave)
-        modtot = total * (1.0e-32 / H)
-        return 1.0 / modtot
-
-
-class ABMag(LogFluxUnits):
-    def __init__(self):
-        LogFluxUnits.__init__(self)
-        self.name = 'abmag'
-        self.linunit = Fnu()
-        self.zeropoint = ABZERO
-
-
-    def ToPhotlam(self, wave, flux, **kwargs):
-        return 1.0 / (H * wave) * 10.0 ** (-0.4 * (flux - ABZERO))
-
-    def unitResponse(self, band):
-        #sumfilt(wave,-1,band)
-        # SUMFILT = Sum [ FILT(I) * WAVE(I) ** NPOW * DWAVE(I) ]
-        wave = band.wave
-        total = band.trapezoidIntegration(wave, band.throughput / wave)
-        modtot = total / H
-        return 2.5 * math.log10(modtot) + ABZERO
-
-
-class STMag(LogFluxUnits):
-    def __init__(self):
-        LogFluxUnits.__init__(self)
-        self.name = 'stmag'
-        self.linunit = Flam()
-        self.zeropoint = STZERO
-
-
-    def ToPhotlam(self, wave, flux, **kwargs):
-        return wave / H / C * 10.0 ** (-0.4 * (flux - STZERO))
-
-    def unitResponse(self, band):
-        #sumfilt(wave,1,band)
-        # SUMFILT = Sum [ FILT(I) * WAVE(I) ** NPOW * DWAVE(I) ]
-        wave = band.wave
-        total = band.trapezoidIntegration(wave, band.throughput * wave)
-        modtot = total / (H * C)
-        return 2.5 * math.log10(modtot) + STZERO
-
-
-class OBMag(LogFluxUnits):
-    def __init__(self):
-        LogFluxUnits.__init__(self)
-        self.name = 'obmag'
-        self.linunit = Counts()
-        self.zeropoint = 0.0
-        self.isDensity = False
-
-    def ToPhotlam(self, wave, flux, area=None):
-        area = area if area else refs.PRIMARY_AREA
-        bin_widths = \
-            binning.calculate_bin_widths(binning.calculate_bin_edges(wave))
-
-        return 10.0 ** (-0.4 * flux) / (bin_widths * area)
-
-    def unitResponse(self, band):
-        #sum = asumr(band,nwave)
-        total = band.throughput.sum()
-        return 2.5 * math.log10(total)
-
-
-class VegaMag(LogFluxUnits):
-    def __init__(self):
-        LogFluxUnits.__init__(self)
-        self.name = 'vegamag'
-        self.vegaspec = spectrum.Vega
-
-    def ToPhotlam(self, wave, flux, **kwargs):
-        resampled = self.vegaspec.resample(wave)
-        return resampled.flux * 10.0 ** (-0.4 * flux)
-
-    def unitResponse(self, band):
-        sp = band * self.vegaspec
-        total = sp.integrate()
-        return 2.5 * math.log10(total)
-
-
-class Counts(FluxUnits):
-    def __init__(self):
-        FluxUnits.__init__(self)
-        self.name = 'counts'
-        self.isDensity = False
-
-    def ToPhotlam(self, wave, flux, area=None):
-        area = area if area else refs.PRIMARY_AREA
-        bin_widths = \
-            binning.calculate_bin_widths(binning.calculate_bin_edges(wave))
-
-        return flux / (bin_widths * area)
-
-    def unitResponse(self, band):
-        #sum = asumr(band,nwave)
-        total = band.throughput.sum()
-        return 1.0 / total
-
-
-################   Factory for Units subclasses.   #####################
-
-
-def factory(uname, *args, **kwargs):
-    unitsClasses = {'flam': Flam,
-                    'fnu': Fnu,
-                    'photlam': Photlam,
-                    'photnu': Photnu,
-                    'jy': Jy,
-                    'mjy': mJy,
-                    'mujy': muJy,
-                    'microjy': muJy,
-                    'ujy': muJy,
-                    'njy': nJy,
-                    'nanojy': nJy,
-                    'abmag': ABMag,
-                    'stmag': STMag,
-                    'obmag': OBMag,
-                    'vegamag': VegaMag,
-                    'counts': Counts,
-                    'count': Counts,
-                    'angstrom': Angstrom,
-                    'angstroms': Angstrom,
-                    'nm': Nm,
-                    'micron': Micron,
-                    'microns': Micron,
-                    'um': Micron,
-                    'inversemicron': InverseMicron,
-                    'inversemicrons': InverseMicron,
-                    '1/um': InverseMicron,
-                    'mm': Mm,
-                    'cm': Cm,
-                    'm': Meter,
-                    'meter': Meter,
-                    'hz': Hz}
-
-    key = uname.lower()
-    ans = unitsClasses[key]()
-    return ans
+    return output_value
