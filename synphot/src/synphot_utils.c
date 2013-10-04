@@ -3,6 +3,7 @@
 #include "Python.h"
 #include <numpy/arrayobject.h>
 
+
 static PyObject * py_calcbinflux(PyObject *self, PyObject *args) {
   /* input variables */
   const int out_arr_len;
@@ -81,6 +82,7 @@ static PyObject * py_calcbinflux(PyObject *self, PyObject *args) {
   return Py_BuildValue("NN", binflux, intwave);
 }
 
+
 static PyMethodDef synphot_utils_methods[] =
 {
   {"calcbinflux", py_calcbinflux, METH_VARARGS, "Calculate binned flux."},
@@ -88,7 +90,38 @@ static PyMethodDef synphot_utils_methods[] =
 
 };
 
-PyMODINIT_FUNC initsynphot_utils(void) {
+
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef moduledef = {
+  PyModuleDef_HEAD_INIT,
+  "synphot_utils",     /* m_name */
+  NULL,  /* m_doc */
+  -1,                  /* m_size */
+  synphot_utils_methods,    /* m_methods */
+  NULL,                /* m_reload */
+  NULL,                /* m_traverse */
+  NULL,                /* m_clear */
+  NULL,                /* m_free */
+};
+#endif
+
+
+PyMODINIT_FUNC
+#if PY_MAJOR_VERSION >= 3
+PyInit_synphot_utils(void)
+#else
+initsynphot_utils(void)
+#endif
+{
+#if PY_MAJOR_VERSION >= 3
+  PyObject *module = PyModule_Create(&moduledef);
+#else
   (void) Py_InitModule("synphot_utils", synphot_utils_methods);
+#endif
+
   import_array(); /* Must be present for NumPy */
+
+#if PY_MAJOR_VERSION >= 3
+  return module;
+#endif
 }

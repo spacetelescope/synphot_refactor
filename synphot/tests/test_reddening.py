@@ -129,7 +129,7 @@ def test_redlaw_from_model(modelname):
     .. note:: No check on data quality as it is dependent on remote file.
 
     """
-    redlaw = ReddeningLaw.from_model(modelname)
+    redlaw = ReddeningLaw.from_model(modelname, encoding='binary')
     wave = redlaw.wave.to(u.AA, equivalencies=units.wave_conversion)
     assert redlaw.thru.unit == units.THROUGHPUT
     assert modelname in redlaw.metadata['expr']

@@ -293,7 +293,7 @@ class TestObsPar(object):
     @remote_data
     def test_effstim_vegamag(self):
         vspec = spectrum.SourceSpectrum.from_vega(
-            cache=False, show_progress=False, area=_area)
+            cache=False, show_progress=False, area=_area, encoding='binary')
         eff_stim = self.obs.effstim(
             flux_unit=units.VEGAMAG, band=self.bp, vegaspec=vspec)
         np.testing.assert_allclose(eff_stim.value, 12.74005, rtol=1e-4)
@@ -394,7 +394,7 @@ class TestFromSpecBandForce(object):
     """Test from_spec_band() method with force."""
     def setup_class(self):
         self.sp = spectrum.SourceSpectrum(
-            np.arange(3000, 4000), np.ones(1000) * 0.75,
+            np.arange(3000, 4000, dtype=np.float64), np.ones(1000) * 0.75,
             header={'expr': 'short flat'})
         self.bp = spectrum.SpectralElement.from_box(4000, 100)
         self.refwave = u.Quantity(4005, u.AA)

@@ -16,7 +16,7 @@ from astropy.utils.data import get_readable_fileobj
 
 # LOCAL
 from . import synexceptions, units
-from .ver import __version__, __vdate__
+from synphot import __version__
 
 
 __all__ = ['read_remote_spec', 'read_spec', 'read_ascii_spec',
@@ -355,8 +355,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
     #   3. User dictionary (can overwrite defaults)
     hdr_hdu = fits.PrimaryHDU()
     hdr_hdu.header['filename'] = (os.path.basename(filename), 'name of file')
-    hdr_hdu.header['origin'] = ('synphot', 'Version {0} ({1})'.format(
-        __version__, __vdate__))
+    hdr_hdu.header['origin'] = ('synphot', 'Version {0}'.format(__version__))
     for key, val in pri_header.items():
         hdr_hdu.header[key] = val
 

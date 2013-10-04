@@ -56,7 +56,7 @@ def test_load_vspec():
     """Load VEGA spectrum once here to be used later."""
     global _vspec
     _vspec = spectrum.SourceSpectrum.from_vega(
-        cache=False, show_progress=False, area=_area)
+        cache=False, show_progress=False, area=_area, encoding='binary')
 
 
 @pytest.mark.parametrize(
@@ -792,7 +792,7 @@ def test_filter(filtername):
         Filter data quality is not checked as it depends on the remote file.
 
     """
-    bp = spectrum.SpectralElement.from_filter(filtername)
+    bp = spectrum.SpectralElement.from_filter(filtername, encoding='binary')
     assert bp.thru is bp.flux
     assert filtername in bp.metadata['expr']
 

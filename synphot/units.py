@@ -63,25 +63,25 @@ THROUGHPUT = u.dimensionless_unscaled
 
 # synphot flux units
 PHOTLAM = u.def_unit(
-    u'photlam', u.photon / (u.cm**2 * u.s * u.AA),
+    'photlam', u.photon / (u.cm**2 * u.s * u.AA),
     format={'generic': 'PHOTLAM', 'console': 'PHOTLAM'})
 PHOTNU = u.def_unit(
-    u'photnu',  u.photon / (u.cm**2 * u.s * u.Hz),
+    'photnu',  u.photon / (u.cm**2 * u.s * u.Hz),
     format={'generic': 'PHOTNU', 'console': 'PHOTNU'})
 FLAM = u.def_unit(
-    u'flam', u.erg / (u.cm**2 * u.s * u.AA),
+    'flam', u.erg / (u.cm**2 * u.s * u.AA),
     format={'generic': 'FLAM', 'console': 'FLAM'})
 FNU = u.def_unit(
-    u'fnu',  u.erg / (u.cm**2 * u.s * u.Hz),
+    'fnu',  u.erg / (u.cm**2 * u.s * u.Hz),
     format={'generic': 'FNU', 'console': 'FNU'})
 STMAG = u.def_unit(
-    u'stmag', u.mag, format={'generic': 'STMAG', 'console': 'STMAG'})
+    'stmag', u.mag, format={'generic': 'STMAG', 'console': 'STMAG'})
 ABMAG = u.def_unit(
-    u'abmag', u.mag, format={'generic': 'ABMAG', 'console': 'ABMAG'})
+    'abmag', u.mag, format={'generic': 'ABMAG', 'console': 'ABMAG'})
 OBMAG = u.def_unit(
-    u'obmag', u.mag, format={'generic': 'OBMAG', 'console': 'OBMAG'})
+    'obmag', u.mag, format={'generic': 'OBMAG', 'console': 'OBMAG'})
 VEGAMAG = u.def_unit(
-    u'vegamag', u.mag, format={'generic': 'VEGAMAG', 'console': 'VEGAMAG'})
+    'vegamag', u.mag, format={'generic': 'VEGAMAG', 'console': 'VEGAMAG'})
 
 # Magnitude zero points
 ABZERO = u.Quantity(-48.6, unit=u.mag)

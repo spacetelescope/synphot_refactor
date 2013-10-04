@@ -4,6 +4,7 @@ from __future__ import division, print_function
 
 # STDLIB
 import os
+import sys
 
 # THIRD PARTY
 import numpy as np
@@ -164,9 +165,20 @@ class TestTrapezoidIntegration(object):
     @pytest.mark.parametrize(
         ('a', 'b'),
         [(np.arange(5), np.arange(3)),
-         (np.array(1), np.array(1)),
          (np.arange(10).reshape(5, 2), np.arange(10).reshape(5, 2))])
     def test_exceptions(self, a, b):
         """Test exceptions for shape mismatch and wrong dimensions."""
         with pytest.raises(ValueError):
             x = synutils.trapezoid_integration(a, b)
+
+    def test_exception_ndim0(self):
+        """Exception for ndim=0 is different between Python 2 and 3."""
+        a = np.array(1)
+
+        if sys.version_info < (3, 0):  # pragma: py2
+            expected_err = ValueError
+        else:  # pragma: py3
+            expected_err = IndexError
+
+        with pytest.raises(expected_err):
+            x = synutils.trapezoid_integration(a, a)

@@ -1,14 +1,13 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Test ver.py module."""
+"""Test synphot version."""
 from __future__ import division, print_function
 
 # LOCAL
-from .. import ver
+from synphot import __version__
 
 
 __doctest_skip__ = ['*']
 
 
 def test_version():
-    assert ver.__version__ == '3.0.0.dev'
-    assert ver.__vdate__ == '2013-08-28'
+    assert '3.0.0.dev' in __version__

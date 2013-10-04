@@ -34,7 +34,7 @@ def test_read_remote_spec():
 
     specfile = synconfig.VEGA_FILE()
     hdr, wave, flux = synio.read_remote_spec(
-        specfile, cache=False, show_progress=False)
+        specfile, cache=False, show_progress=False, encoding='binary')
 
     assert isinstance(wave, u.Quantity)
     assert isinstance(flux, u.Quantity)
