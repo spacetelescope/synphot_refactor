@@ -141,6 +141,14 @@ flux_conversion_nondensity = [
      lambda fluxbinarea: fluxbinarea[0] / (fluxbinarea[1] * fluxbinarea[2])) ]
 
 
+#-----------------------------#
+# Register with astropy units #
+#-----------------------------#
+
+u.add_enabled_units([INVERSE_AA, INVERSE_MICRON, PHOTLAM, PHOTNU, FLAM, FNU,
+                     STMAG, ABMAG, OBMAG, VEGAMAG])
+
+
 #--------------------#
 # Utility functions  #
 #--------------------#
