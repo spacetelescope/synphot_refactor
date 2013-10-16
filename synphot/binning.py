@@ -10,7 +10,7 @@ from astropy import log
 from astropy import units as u
 
 # LOCAL
-from . import synexceptions
+from . import exceptions
 
 
 __all__ = ['calcbinflux', 'calculate_bin_edges', 'calculate_bin_widths',
@@ -93,7 +93,7 @@ def calculate_bin_edges(centers):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If input is invalid.
 
     """
@@ -101,10 +101,10 @@ def calculate_bin_edges(centers):
         centers = u.Quantity(centers, unit=u.AA)
 
     if centers.ndim != 1:
-        raise synexceptions.SynphotError('Bin centers must be 1D array.')
+        raise exceptions.SynphotError('Bin centers must be 1D array.')
 
     if centers.size < 2:
-        raise synexceptions.SynphotError(
+        raise exceptions.SynphotError(
             'Bin centers must have at least two values.')
 
     edges = np.empty(centers.size + 1, dtype=np.float64)
@@ -134,7 +134,7 @@ def calculate_bin_widths(edges):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If input is invalid.
 
     """
@@ -142,10 +142,10 @@ def calculate_bin_widths(edges):
         edges = u.Quantity(edges, unit=u.AA)
 
     if edges.ndim != 1:
-        raise synexceptions.SynphotError('Bin edges must be 1D array.')
+        raise exceptions.SynphotError('Bin edges must be 1D array.')
 
     if edges.size < 2:
-        raise synexceptions.SynphotError(
+        raise exceptions.SynphotError(
             'Bin edges must have at least two values.')
 
     return np.abs(edges[1:] - edges[:-1])
@@ -168,7 +168,7 @@ def calculate_bin_centers(edges):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If input is invalid.
 
     """
@@ -176,10 +176,10 @@ def calculate_bin_centers(edges):
         edges = u.Quantity(edges, unit=u.AA)
 
     if edges.ndim != 1:
-        raise synexceptions.SynphotError('Bin edges must be 1D array.')
+        raise exceptions.SynphotError('Bin edges must be 1D array.')
 
     if edges.size < 2:
-        raise synexceptions.SynphotError(
+        raise exceptions.SynphotError(
             'Bin edges must have at least two values.')
 
     centers = np.empty(edges.size - 1, dtype=np.float64)
@@ -236,23 +236,23 @@ def wave_range(bins, cenwave, npix, mode='round'):
 
     Raises
     ------
-    synphot.synexceptions.OverlapError
+    synphot.exceptions.OverlapError
         If given central wavelength is not within the given bins
         or the wavelength range would exceed the bin limits.
 
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         Invalid inputs or calculation failed.
 
     """
     mode = mode.lower()
 
     if mode not in ('round', 'min', 'max', 'none'):
-        raise synexceptions.SynphotError(
+        raise exceptions.SynphotError(
             'mode={0} is invalid, must be "round", "min", "max", '
             'or "none".'.format(mode))
 
     if not isinstance(npix, (int, long)):
-        raise synexceptions.SynphotError('npix={0} is invalid.'.format(npix))
+        raise exceptions.SynphotError('npix={0} is invalid.'.format(npix))
 
     # Bin values must be in ascending order.
     if bins[0] > bins[-1]:
@@ -260,7 +260,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
 
     # Central wavelength must be within given bins.
     if cenwave < bins[0] or cenwave > bins[-1]:
-        raise synexceptions.OverlapError(
+        raise exceptions.OverlapError(
             'cenwave={0} is not within binset (min={1}, max={2}).'.format(
                 cenwave, bins[0], bins[-1]))
 
@@ -282,10 +282,10 @@ def wave_range(bins, cenwave, npix, mode='round'):
 
     # Calculated edges must not exceed bin edges
     if frac_ind1 < -0.5:
-        raise synexceptions.OverlapError(
+        raise exceptions.OverlapError(
             'Lower limit of wavelength range is out of bounds.')
     if frac_ind2 > (bins.size - 0.5):
-        raise synexceptions.OverlapError(
+        raise exceptions.OverlapError(
             'Upper limit of wavelength range is out of bounds.')
 
     frac1, int1 = np.modf(frac_ind1)
@@ -328,7 +328,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
             # at the lowest possible edge
             wave1 = bins[0] - (bins[0:2].mean() - bins[0])
         else:  # pragma: no cover
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'mode={0} gets unexpected frac1={1}, int1={2}'.format(
                     mode, frac1, int1))
 
@@ -343,7 +343,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
             # at the very end
             wave2 = bins[-1] + (bins[-1] - bins[-2:].mean())
         else:  # pragma: no cover
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'mode={0} gets unexpected frac2={1}, int2={2}'.format(
                     mode, frac2, int2))
 
@@ -359,7 +359,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
             # at the lowest possible edge
             wave1 = bins[0] - (bins[0:2].mean() - bins[0])
         else:  # pragma: no cover
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'mode={0} gets unexpected frac1={1}, int1={2}'.format(
                     mode, frac1, int1))
 
@@ -374,7 +374,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
             # at the very end
             wave2 = bins[-1] + (bins[-1] - bins[-2:].mean())
         else:  # pragma: no cover
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'mode={0} gets unexpected frac2={1}, int2={2}'.format(
                     mode, frac2, int2))
 
@@ -426,17 +426,17 @@ def pixel_range(bins, waverange, mode='round'):
 
     Raises
     ------
-    synphot.synexceptions.OverlapError
+    synphot.exceptions.OverlapError
         If given wavelength range exceeds the bounds of given bins.
 
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         Invalid mode.
 
     """
     mode = mode.lower()
 
     if mode not in ('round', 'min', 'max', 'none'):
-        raise synexceptions.SynphotError(
+        raise exceptions.SynphotError(
             'mode={0} is invalid, must be "round", "min", "max", '
             'or "none".'.format(mode))
 
@@ -455,7 +455,7 @@ def pixel_range(bins, waverange, mode='round'):
     minwave = bins[0] - (bins[0:2].mean() - bins[0])
     maxwave = bins[-1] + (bins[-1] - bins[-2:].mean())
     if wave1 < minwave or wave2 > maxwave:
-        raise synexceptions.OverlapError(
+        raise exceptions.OverlapError(
             'Wavelength range ({0}, {1}) is out of bounds of bins '
             '(min={2}, max={3}).'.format(wave1, wave2, minwave, maxwave))
 

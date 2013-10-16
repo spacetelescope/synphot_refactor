@@ -105,7 +105,7 @@ if not _ASTROPY_SETUP_:
 
     import os
     from warnings import warn
-    from astropy import config
+    from astropy import config as astropy_config
 
     # add these here so we only need to cleanup the namespace at the end
     config_dir = None
@@ -113,11 +113,11 @@ if not _ASTROPY_SETUP_:
     if not os.environ.get('ASTROPY_SKIP_CONFIG_UPDATE', False):
         config_dir = os.path.dirname(__file__)
         try:
-            config.configuration.update_default_config(__package__, config_dir)
-        except config.configuration.ConfigurationDefaultMissingError as e:
+            astropy_config.configuration.update_default_config(__package__, config_dir)
+        except astropy_config.configuration.ConfigurationDefaultMissingError as e:
             wmsg = (e.args[0] + " Cannot install default profile. If you are "
                     "importing from source, this is expected.")
-            warn(config.configuration.ConfigurationDefaultMissingWarning(wmsg))
+            warn(astropy_config.configuration.ConfigurationDefaultMissingWarning(wmsg))
             del e
 
     del os, warn, config_dir  # clean up namespace

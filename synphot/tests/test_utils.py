@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Test synutils.py module."""
+"""Test utils.py module."""
 from __future__ import division, print_function
 
 # STDLIB
@@ -15,7 +15,7 @@ from astropy.tests.helper import pytest
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import synexceptions, synio, synutils, units
+from .. import exceptions, io, utils, units
 
 
 __doctest_skip__ = ['*']
@@ -31,44 +31,44 @@ __doctest_skip__ = ['*']
      (np.arange(3, 6), np.arange(3), 'none')])
 def test_overlap_status(a, b, ans):
     """Test overlap status validation."""
-    assert synutils.overlap_status(a, b) == ans
+    assert utils.overlap_status(a, b) == ans
 
 
 def test_validate_totalflux():
     """Test integrated flux validation."""
     # Valid integrated flux
-    synutils.validate_totalflux(0.01)
+    utils.validate_totalflux(0.01)
 
     # Invalid integrated flux
-    with pytest.raises(synexceptions.SynphotError):
-        synutils.validate_totalflux(-0.01)
-    with pytest.raises(synexceptions.SynphotError):
-        synutils.validate_totalflux(0)
-    with pytest.raises(synexceptions.SynphotError):
-        synutils.validate_totalflux(np.inf)
-    with pytest.raises(synexceptions.SynphotError):
-        synutils.validate_totalflux(np.nan)
+    with pytest.raises(exceptions.SynphotError):
+        utils.validate_totalflux(-0.01)
+    with pytest.raises(exceptions.SynphotError):
+        utils.validate_totalflux(0)
+    with pytest.raises(exceptions.SynphotError):
+        utils.validate_totalflux(np.inf)
+    with pytest.raises(exceptions.SynphotError):
+        utils.validate_totalflux(np.nan)
 
 
 def test_validate_wavelengths():
     """Test wavelengths validation."""
     # Valid wavelengths (ascending)
     a = np.arange(1, 11)
-    synutils.validate_wavelengths(a)
+    utils.validate_wavelengths(a)
 
     # Valid wavelengths (descending)
     a = a[::-1]
-    wave = synutils.validate_wavelengths(u.Quantity(a, unit=u.micron))
+    wave = utils.validate_wavelengths(u.Quantity(a, unit=u.micron))
 
     # Invalid wavelengths
-    with pytest.raises(synexceptions.SynphotError):
-        synutils.validate_wavelengths(u.Quantity(1.0, u.K))
-    with pytest.raises(synexceptions.ZeroWavelength):
-        synutils.validate_wavelengths(np.arange(10))
-    with pytest.raises(synexceptions.UnsortedWavelength):
-        synutils.validate_wavelengths([1000, 1002, 1001, 1003, 1004])
-    with pytest.raises(synexceptions.DuplicateWavelength):
-        synutils.validate_wavelengths([1000, 1001, 1002, 1003, 1003])
+    with pytest.raises(exceptions.SynphotError):
+        utils.validate_wavelengths(u.Quantity(1.0, u.K))
+    with pytest.raises(exceptions.ZeroWavelength):
+        utils.validate_wavelengths(np.arange(10))
+    with pytest.raises(exceptions.UnsortedWavelength):
+        utils.validate_wavelengths([1000, 1002, 1001, 1003, 1004])
+    with pytest.raises(exceptions.DuplicateWavelength):
+        utils.validate_wavelengths([1000, 1001, 1002, 1003, 1003])
 
 
 def test_tolength():
@@ -80,23 +80,23 @@ def test_tolength():
     wn_micron = 1.0 / w_micron
 
     # Length
-    x = synutils.to_length(wave)
+    x = utils.to_length(wave)
     np.testing.assert_array_equal(x.value, wave.value)
     assert x.unit == u.AA
 
     # Frequency
-    x = synutils.to_length(freq, wave_unit=u.micron)
+    x = utils.to_length(freq, wave_unit=u.micron)
     np.testing.assert_allclose(x.value, w_micron.value)
     assert x.unit == u.micron
 
     # Wave number
-    x = synutils.to_length(wn_micron)
+    x = utils.to_length(wn_micron)
     np.testing.assert_allclose(x.value, wave.value)
     assert x.unit == u.AA
 
     # Invalid
     with pytest.raises(u.UnitsError):
-        x = synutils.to_length(u.Quantity(1.0, u.Jy))
+        x = utils.to_length(u.Quantity(1.0, u.Jy))
 
 
 @pytest.mark.parametrize(
@@ -110,7 +110,7 @@ def test_tolength():
      (0, 1.0, False, np.arange(10, 20))])
 def test_genwave(num, delta, log, ans):
     """Test wavelength generation."""
-    wave, wave_str = synutils.generate_wavelengths(
+    wave, wave_str = utils.generate_wavelengths(
         minwave=10, maxwave=20, num=num, delta=delta, log=log,
         wave_unit=u.micron)
     np.testing.assert_allclose(wave.value, ans)
@@ -128,13 +128,13 @@ class TestMergeWave(object):
         w = [5000.005, 5000.02 + self.thres, 5500.0, 6000.0]
         ans = [5000.0, 5000.005, 5000.01, 5000.02, 5000.03, 5000.04, 5500.0,
                6000.0]
-        wave = synutils.merge_wavelengths(self.wave, w, threshold=self.thres)
+        wave = utils.merge_wavelengths(self.wave, w, threshold=self.thres)
         dw = wave[1:] - wave[:-1]
         np.testing.assert_allclose(wave, ans)
         assert np.all(dw > self.thres)
 
     def test_merge_same(self):
-        wave =  synutils.merge_wavelengths(self.wave, self.wave)
+        wave =  utils.merge_wavelengths(self.wave, self.wave)
         np.testing.assert_array_equal(wave, self.wave)
 
 
@@ -144,23 +144,23 @@ class TestTrapezoidIntegration(object):
         # Get bandpass data for integration.
         bandfile = get_pkg_data_filename(
             os.path.join('data', 'hst_acs_hrc_f555w.fits'))
-        hdr, self.wave, self.thru = synio.read_fits_spec(
+        hdr, self.wave, self.thru = io.read_fits_spec(
             bandfile, flux_col='THROUGHPUT', flux_unit=u.dimensionless_unscaled)
 
     def test_avgwave(self):
         """Compare AVGWAVE with old SYNPHOT result."""
-        avg_wave = synutils.avg_wavelength(self.wave.value, self.thru.value)
+        avg_wave = utils.avg_wavelength(self.wave.value, self.thru.value)
         np.testing.assert_allclose(avg_wave, 5367.9, rtol=1e-5)
 
     def test_barlam(self):
         """Test BARLAM (no old SYNPHOT result available)."""
-        bar_lam = synutils.barlam(self.wave.value, self.thru.value)
+        bar_lam = utils.barlam(self.wave.value, self.thru.value)
         np.testing.assert_allclose(bar_lam, 5331.8945)
 
     @pytest.mark.parametrize(('a'), [np.array([]), np.array([1])])
     def test_zero_ans(self, a):
         """Test that empty and single-element arrays return zero."""
-        assert synutils.trapezoid_integration(a, a) == 0
+        assert utils.trapezoid_integration(a, a) == 0
 
     @pytest.mark.parametrize(
         ('a', 'b'),
@@ -169,7 +169,7 @@ class TestTrapezoidIntegration(object):
     def test_exceptions(self, a, b):
         """Test exceptions for shape mismatch and wrong dimensions."""
         with pytest.raises(ValueError):
-            x = synutils.trapezoid_integration(a, b)
+            x = utils.trapezoid_integration(a, b)
 
     def test_exception_ndim0(self):
         """Exception for ndim=0 is different between Python 2 and 3."""
@@ -181,4 +181,4 @@ class TestTrapezoidIntegration(object):
             expected_err = IndexError
 
         with pytest.raises(expected_err):
-            x = synutils.trapezoid_integration(a, a)
+            x = utils.trapezoid_integration(a, a)

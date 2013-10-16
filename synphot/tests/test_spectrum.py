@@ -17,9 +17,9 @@ from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import spectrum, synexceptions, units
+from .. import spectrum, exceptions, units
 from ..observation import Observation
-from ..synutils import generate_wavelengths
+from ..utils import generate_wavelengths
 
 
 __doctest_skip__ = ['*']
@@ -120,15 +120,15 @@ def test_flux_conversion_exceptions():
         x = spectrum.convert_fluxes(_wave, _flux_photlam, u.AA)
 
     # Missing Vega spectrum
-    with pytest.raises(synexceptions.SynphotError):
+    with pytest.raises(exceptions.SynphotError):
         x = spectrum.convert_fluxes(
             _wave, _flux_fnu, units.VEGAMAG, vegaspec=None)
 
     # Missing area
-    with pytest.raises(synexceptions.SynphotError):
+    with pytest.raises(exceptions.SynphotError):
         x = spectrum.convert_fluxes(
             _wave, _flux_photlam, u.count, area=None)
-    with pytest.raises(synexceptions.SynphotError):
+    with pytest.raises(exceptions.SynphotError):
         x = spectrum.convert_fluxes(
             _wave, _flux_obmag, units.PHOTLAM, area=None)
 
@@ -170,11 +170,11 @@ class TestSourceSpectrum(object):
         assert 'NegativeFlux' in sp.warnings
 
         # Invalid flux unit
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             sp = spectrum.SourceSpectrum(_wave, _flux_obmag)
 
         # Shape mismatch
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             sp = spectrum.SourceSpectrum(self.sp.wave, np.arange(10))
 
     def test_merge_wave(self):
@@ -225,7 +225,7 @@ class TestSourceSpectrum(object):
 
         with pytest.raises(u.UnitsError):
             self.sp.convert_wave(u.Jy)
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             self.sp.convert_flux(u.AA)
 
         # Convert back to original units
@@ -312,9 +312,9 @@ class TestSourceSpectrum(object):
         assert sp_zfrq.metadata['expr'] == sp_zlen.metadata['expr']
 
         # Exceptions
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             sp_zlen = sp_z0.apply_redshift([1, 2, 3])
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             sp_zlen = sp_z0.apply_redshift(u.Quantity(2))
 
 
@@ -336,13 +336,13 @@ class TestAddMag(object):
         np.testing.assert_allclose(sp.flux.value, self.bright.flux.value)
 
     def test_exceptions(self):
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             sp = self.bright.add_mag('s')
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             sp = self.bright.add_mag(self.faint.flux.value)
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             sp = self.bright.add_mag(self.faint.flux)
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             sp = self.bright.add_mag(u.Quantity(1.0, units.FLAM))
 
 
@@ -372,7 +372,7 @@ class TestFlatSpectrum(object):
     @pytest.mark.parametrize(('flux_unit'), [u.count, units.OBMAG])
     def test_nondensity(self, flux_unit):
         """This is not supported anymore."""
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             sp = spectrum.SourceSpectrum.from_flat_spectrum(flux_unit)
 
     def test_conversion(self):
@@ -382,7 +382,7 @@ class TestFlatSpectrum(object):
         assert not np.allclose(meanflux, 1, rtol=1e-4)
 
     def test_exceptions(self):
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             sp = spectrum.SourceSpectrum.from_flat_spectrum(units.VEGAMAG)
 
 
@@ -469,11 +469,11 @@ class TestPowerLaw(object):
         np.testing.assert_allclose(flux.value, self.refflux.value)
 
     def test_exceptions(self):
-        with pytest.raises( synexceptions.SynphotError):
+        with pytest.raises( exceptions.SynphotError):
             sp = spectrum.SourceSpectrum.from_powerlaw(6000, [-1, -2])
-        with pytest.raises( synexceptions.SynphotError):
+        with pytest.raises( exceptions.SynphotError):
             sp = spectrum.SourceSpectrum.from_powerlaw(6000, '-1')
-        with pytest.raises( synexceptions.SynphotError):
+        with pytest.raises( exceptions.SynphotError):
             sp = spectrum.SourceSpectrum.from_powerlaw(6000, u.Quantity(1))
 
 
@@ -549,11 +549,11 @@ class TestSpectralElement(object):
         assert 'NegativeFlux' in bp.warnings
 
         # Invalid throughput unit
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             bp = spectrum.SpectralElement(_wave, _flux_flam)
 
         # Shape mismatch
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             bp = spectrum.SpectralElement(self.bp.wave, np.arange(10))
 
     def test_merge_wave(self):
@@ -671,7 +671,7 @@ class TestSpectralElement(object):
 
         # Undefined area must raise exception
         bp = spectrum.SpectralElement(_wave, _flux_flam.value)
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             bp.unit_response()
 
     def test_pivot(self):
@@ -688,11 +688,11 @@ class TestSpectralElement(object):
         np.testing.assert_allclose(rmsw.value, 357.43298216917754, rtol=1e-6)
 
         # Invalid threshold must raise exception
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             rmsw = self.bp.rmswidth(threshold=u.Quantity(0.01))
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             rmsw = self.bp.rmswidth(threshold=[0.01, 0.02])
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             rmsw = self.bp.rmswidth(threshold='foo')
 
     def test_fwhm(self):
@@ -706,11 +706,11 @@ class TestSpectralElement(object):
             fwhmval.value, 836.2879507505378, rtol=2.5e-5)
 
         # Invalid threshold must raise exception
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             fwhmval = self.bp.fwhm(threshold=u.Quantity(0.01))
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             fwhmval = self.bp.fwhm(threshold=[0.01, 0.02])
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             fwhmval = self.bp.fwhm(threshold='foo')
 
     def test_avgwave_tlambda(self):
@@ -799,7 +799,7 @@ def test_filter(filtername):
 
 def test_filter_exception():
     """Test SpectralElement from_filter() exception."""
-    with pytest.raises(synexceptions.SynphotError):
+    with pytest.raises(exceptions.SynphotError):
         sp = spectrum.SpectralElement.from_filter('foo')
 
 
@@ -891,7 +891,7 @@ class TestMathOperators(object):
             obj1 = self.bp_1
             obj2 = self.sp_1
 
-        with pytest.raises(synexceptions.IncompatibleSources):
+        with pytest.raises(exceptions.IncompatibleSources):
             if op_type == '+':
                 sp = obj1 + obj2
             elif op_type == '-':
@@ -900,7 +900,7 @@ class TestMathOperators(object):
     @pytest.mark.parametrize(('op_type'), ['*', '/'])
     def test_mul_div_sp_sp(self, op_type):
         """Multiplication can only be between spectrum and dimensionless."""
-        with pytest.raises(synexceptions.IncompatibleSources):
+        with pytest.raises(exceptions.IncompatibleSources):
             if op_type == '*':
                 sp = self.sp_1 * self.sp_1
             elif op_type == '/':
@@ -973,21 +973,21 @@ class TestMathOperators(object):
              1.5149999998e-11, 0, np.nan])
 
         # Spectrum can only divided by dimensionless value
-        with pytest.raises(synexceptions.IncompatibleSources):
+        with pytest.raises(exceptions.IncompatibleSources):
             sp = self.bp_1 / self.sp_1
 
     def test_misc_exceptions(self):
         """Unsupported operations raise TypeError but are not tested."""
         # other is of wrong data type.
         # Works for all operators but only * tested.
-        with pytest.raises(synexceptions.IncompatibleSources):
+        with pytest.raises(exceptions.IncompatibleSources):
             sp = self.sp_1 * [1, 2, 3]
-        with pytest.raises(synexceptions.IncompatibleSources):
+        with pytest.raises(exceptions.IncompatibleSources):
             sp = self.sp_1 * u.Quantity(1)
 
         # Primary area mismatch.
         # Works for all operators but only + tested.
-        with pytest.raises(synexceptions.IncompatibleSources):
+        with pytest.raises(exceptions.IncompatibleSources):
             sp = self.sp_1 + spectrum.SourceSpectrum(_wave, _flux_jy)
 
 
@@ -1109,20 +1109,20 @@ class TestRenorm(object):
 
     def test_exceptions(self):
         # Invalid passband
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             self.bb.renorm(10, np.ones(10))
 
         # Disjoint passband
-        with pytest.raises(synexceptions.DisjointError):
+        with pytest.raises(exceptions.DisjointError):
             self.bb.renorm(
                 10, spectrum.SpectralElement.from_box(30000, 1, area=_area))
 
         # Partial overlap without force
-        with pytest.raises(synexceptions.OverlapError):
+        with pytest.raises(exceptions.OverlapError):
             rn_sp = self.em.renorm(1, self.acs)
 
         # Missing Vega spectrum
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             rn_sp = self.bb.renorm(u.Quantity(10, units.VEGAMAG), self.abox)
 
 

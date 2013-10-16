@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Test synio.py module."""
+"""Test io.py module."""
 from __future__ import division, print_function
 
 # STDLIB
@@ -17,7 +17,7 @@ from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import synexceptions, synio, units
+from .. import exceptions, io, units
 
 
 __doctest_skip__ = ['*']
@@ -30,10 +30,10 @@ def test_read_remote_spec():
     .. note:: This is just I/O test. No check on data quality.
 
     """
-    from .. import synconfig
+    from .. import config
 
-    specfile = synconfig.VEGA_FILE()
-    hdr, wave, flux = synio.read_remote_spec(
+    specfile = config.VEGA_FILE()
+    hdr, wave, flux = io.read_remote_spec(
         specfile, cache=False, show_progress=False, encoding='binary')
 
     assert isinstance(wave, u.Quantity)
@@ -45,7 +45,7 @@ def test_read_ascii_spec():
     """Test read local ASCII spectrum."""
     specfile = get_pkg_data_filename(
         os.path.join('data', 'dummy_ascii_spec.txt'))
-    hdr, wave, flux = synio.read_spec(specfile)
+    hdr, wave, flux = io.read_spec(specfile)
 
     np.testing.assert_array_equal(
         wave.value, [999.9, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 7000.1])
@@ -75,14 +75,14 @@ class TestReadWriteFITS(object):
         outfile = os.path.join(self.outdir, 'outspec1.fits')
 
         # Write it out
-        synio.write_fits_spec(
+        io.write_fits_spec(
             outfile, self.wave.value, self.flux.value, pri_header=self.prihdr,
             ext_header=self.scihdr, trim_zero=False, pad_zero_ends=False,
             precision='single', wave_unit=self.wave.unit,
             flux_unit=self.flux.unit)
 
         # Read it back in and check values (flux_unit should be ignored)
-        hdr, wave, flux = synio.read_spec(outfile, flux_unit='foo')
+        hdr, wave, flux = io.read_spec(outfile, flux_unit='foo')
 
         # Compare data
         np.testing.assert_allclose(
@@ -103,12 +103,12 @@ class TestReadWriteFITS(object):
         outfile = os.path.join(self.outdir, 'outspec2.fits')
 
         # Write it out (flux_unit should be ignored)
-        synio.write_fits_spec(
+        io.write_fits_spec(
             outfile, self.wave, self.flux, pri_header=self.prihdr,
             ext_header=self.scihdr, precision='double', flux_unit='foo')
 
         # Read it back in and check values (flux_unit should be ignored)
-        hdr, wave, flux = synio.read_spec(outfile, flux_unit='foo')
+        hdr, wave, flux = io.read_spec(outfile, flux_unit='foo')
 
         # Compare data (trim_zero=True, pad_zero_ends=True)
         np.testing.assert_allclose(
@@ -131,23 +131,23 @@ class TestReadWriteFITS(object):
         outfile = os.path.join(self.outdir, 'outspec3.fits')
 
         # Shape mismatch
-        with pytest.raises(synexceptions.SynphotError):
-            synio.write_fits_spec(
+        with pytest.raises(exceptions.SynphotError):
+            io.write_fits_spec(
                 outfile, self.wave, np.arange(3, dtype=np.float64))
 
         # Invalid precision keyword
-        with pytest.raises(synexceptions.SynphotError):
-            synio.write_fits_spec(
+        with pytest.raises(exceptions.SynphotError):
+            io.write_fits_spec(
                 outfile, self.wave, self.flux, precision='foo', clobber=True)
 
         # Invalid wavelength precision
-        with pytest.raises(synexceptions.SynphotError):
-            synio.write_fits_spec(
+        with pytest.raises(exceptions.SynphotError):
+            io.write_fits_spec(
                 outfile, np.arange(6), self.flux, clobber=True)
 
         # Invalid flux precision
-        with pytest.raises(synexceptions.SynphotError):
-            synio.write_fits_spec(
+        with pytest.raises(exceptions.SynphotError):
+            io.write_fits_spec(
                 outfile, self.wave, np.arange(6), clobber=True)
 
     def teardown_class(self):

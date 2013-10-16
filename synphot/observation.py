@@ -16,7 +16,7 @@ from astropy import log
 from astropy import units as u
 
 # LOCAL
-from . import binning, spectrum, synexceptions, synio, synutils, units
+from . import binning, spectrum, exceptions, io, utils, units
 
 
 __all__ = ['Observation']
@@ -80,16 +80,16 @@ class Observation(spectrum.SourceSpectrum):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If wavelengths and fluxes do not match, or if they have invalid units.
 
-    synphot.synexceptions.DuplicateWavelength
+    synphot.exceptions.DuplicateWavelength
         If wavelength array contains duplicate entries.
 
-    synphot.synexceptions.UnsortedWavelength
+    synphot.exceptions.UnsortedWavelength
         If wavelength array is not monotonic.
 
-    synphot.synexceptions.ZeroWavelength
+    synphot.exceptions.ZeroWavelength
         If negative or zero wavelength occurs in wavelength array.
 
     """
@@ -126,7 +126,7 @@ class Observation(spectrum.SourceSpectrum):
         # Convert binwave to native wavelength unit and validate.
         self.binwave = units.validate_quantity(
             binwave, self.wave.unit, equivalencies=units.wave_conversion)
-        synutils.validate_wavelengths(self.binwave)
+        utils.validate_wavelengths(self.binwave)
 
         # binwave must be in ascending order for calcbinflux()
         # to work properly.
@@ -137,7 +137,7 @@ class Observation(spectrum.SourceSpectrum):
         self.bin_edges = binning.calculate_bin_edges(self.binwave)
 
         # Merge bin edges and centers in with the natural waveset
-        spwave = synutils.merge_wavelengths(synutils.merge_wavelengths(
+        spwave = utils.merge_wavelengths(utils.merge_wavelengths(
                 self.wave.value, self.bin_edges.value), self.binwave.value)
 
         # Compute indices associated to each endpoint.
@@ -161,7 +161,7 @@ class Observation(spectrum.SourceSpectrum):
         if binned:
             if (self.binwave is None or self.binflux is None or
                     self.bin_edges is None):
-                raise synexceptions.UndefinedBinset('No binned data.')
+                raise exceptions.UndefinedBinset('No binned data.')
             self._wave = self.binwave
             self._flux = self.binflux
         else:
@@ -233,10 +233,10 @@ class Observation(spectrum.SourceSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.InterpolationNotAllowed
+        synphot.exceptions.InterpolationNotAllowed
             Interpolation of binned data is not allowed.
 
-        synphot.synexceptions.UndefinedBinset
+        synphot.exceptions.UndefinedBinset
             Missing binned data.
 
         """
@@ -245,10 +245,10 @@ class Observation(spectrum.SourceSpectrum):
         # Convert wavelengths to self.binwave unit, and do validation
         wavelengths = units.validate_quantity(
             wavelengths, self._wave.unit, equivalencies=units.wave_conversion)
-        synutils.validate_wavelengths(wavelengths)
+        utils.validate_wavelengths(wavelengths)
 
         if not np.all(np.in1d(wavelengths, self._wave)):
-            raise synexceptions.InterpolationNotAllowed(
+            raise exceptions.InterpolationNotAllowed(
                 'Given wavelengths are not in binwave attribute')
 
         return self._flux[np.searchsorted(self._wave, wavelengths)]
@@ -278,7 +278,7 @@ class Observation(spectrum.SourceSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.UndefinedBinset
+        synphot.exceptions.UndefinedBinset
             Missing binned data.
 
         """
@@ -319,7 +319,7 @@ class Observation(spectrum.SourceSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.UndefinedBinset
+        synphot.exceptions.UndefinedBinset
             Missing binned data.
 
         """
@@ -335,7 +335,7 @@ class Observation(spectrum.SourceSpectrum):
 
     def avgwave(self, binned=False):
         """Calculate the observation average wavelength using
-        :func:`synphot.synutils.avg_wavelength`.
+        :func:`synphot.utils.avg_wavelength`.
 
         Parameters
         ----------
@@ -349,18 +349,18 @@ class Observation(spectrum.SourceSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.UndefinedBinset
+        synphot.exceptions.UndefinedBinset
             Missing binned data.
 
         """
         self._set_data(binned)
-        wave = synutils.to_length(self._wave)
-        avg_wave = synutils.avg_wavelength(wave.value, self._flux.value)
+        wave = utils.to_length(self._wave)
+        avg_wave = utils.avg_wavelength(wave.value, self._flux.value)
         return u.Quantity(avg_wave, unit=wave.unit)
 
     def barlam(self, binned=False):
         """Calculate the observation mean log wavelength using
-        :func:`synphot.synutils.barlam`.
+        :func:`synphot.utils.barlam`.
 
         Parameters
         ----------
@@ -374,13 +374,13 @@ class Observation(spectrum.SourceSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.UndefinedBinset
+        synphot.exceptions.UndefinedBinset
             Missing binned data.
 
         """
         self._set_data(binned)
-        wave = synutils.to_length(self._wave)
-        bar_lam = synutils.barlam(wave.value, self._flux.value)
+        wave = utils.to_length(self._wave)
+        bar_lam = utils.barlam(wave.value, self._flux.value)
         return u.Quantity(bar_lam, unit=wave.unit)
 
     def effective_wavelength(self, binned=False, mode='efflerg'):
@@ -404,10 +404,10 @@ class Observation(spectrum.SourceSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.UndefinedBinset
+        synphot.exceptions.UndefinedBinset
             Missing binned data.
 
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Invalid mode.
 
         """
@@ -422,14 +422,14 @@ class Observation(spectrum.SourceSpectrum):
             flux = spectrum.convert_fluxes(self._wave, self._flux, units.PHOTLAM,
                                            area=self.primary_area)
         else:
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'mode={0} is invalid, must be "efflerg" or "efflphot"'.format(
                     mode))
 
-        wave = synutils.to_length(self._wave)
-        num = synutils.trapezoid_integration(
+        wave = utils.to_length(self._wave)
+        num = utils.trapezoid_integration(
             wave.value, flux.value * wave.value ** 2)
-        den = synutils.trapezoid_integration(
+        den = utils.trapezoid_integration(
             wave.value, flux.value * wave.value)
 
         if den == 0.0:  # pragma: no cover
@@ -481,17 +481,17 @@ class Observation(spectrum.SourceSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.DisjointError
+        synphot.exceptions.DisjointError
             Passband or wavelength range does not overlap with observation.
 
-        synphot.synexceptions.OverlapError
+        synphot.exceptions.OverlapError
             Passband or wavelength range only partially overlaps with
             observation.
 
-        synphot.synexceptions.UndefinedBinset
+        synphot.exceptions.UndefinedBinset
             Missing binned data.
 
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Missing passband, invalid inputs, or calculation failed.
 
         """
@@ -514,13 +514,13 @@ class Observation(spectrum.SourceSpectrum):
             w2 = units.validate_quantity(wave_range[-1], self._wave.unit,
                                          equivalencies=units.wave_conversion)
             if w1 >= w2:
-                raise synexceptions.SynphotError('Invalid wavelength range.')
+                raise exceptions.SynphotError('Invalid wavelength range.')
 
-            stat = synutils.overlap_status(
+            stat = utils.overlap_status(
                 np.array([w1.value, w2.value]), self._wave.value)
 
             if stat == 'none':
-                raise synexceptions.DisjointError(
+                raise exceptions.DisjointError(
                     'Observation and wavelength range are disjoint.')
             elif 'partial' in stat:
                 if force:
@@ -529,12 +529,12 @@ class Observation(spectrum.SourceSpectrum):
                     w1 = max(w1, self._wave.min())
                     w2 = min(w2, self._wave.max())
                 else:
-                    raise synexceptions.OverlapError(
+                    raise exceptions.OverlapError(
                         'Observation and wavelength range do not fully '
                         'overlap. You may use force=True to force this '
                         'calculation anyway.')
             elif stat != 'full':  # pragma: no cover
-                raise synexceptions.SynphotError(
+                raise exceptions.SynphotError(
                     'Overlap result of {0} is unexpected'.format(stat))
 
             if binned:
@@ -544,10 +544,10 @@ class Observation(spectrum.SourceSpectrum):
                 influx = self.sample_binned(inwave)
             else:
                 mask = ((self._wave >= w1) & (self._wave <= w2))
-                inwave = u.Quantity(synutils.merge_wavelengths(
+                inwave = u.Quantity(utils.merge_wavelengths(
                         self._wave[mask].value,
                         np.array([w1.value, w2.value])), unit=self._wave.unit)
-                synutils.validate_wavelengths(inwave)
+                utils.validate_wavelengths(inwave)
                 influx = self.resample(inwave)
 
         flux_unit_name = flux_unit.to_string()
@@ -557,7 +557,7 @@ class Observation(spectrum.SourceSpectrum):
             self_flux = spectrum.convert_fluxes(
                 inwave, influx, u.count, area=self.primary_area)
             val = self_flux.sum()
-            synutils.validate_totalflux(val.value)
+            utils.validate_totalflux(val.value)
 
             if flux_unit.decompose() == u.mag:
                 eff_stim = u.Quantity(
@@ -571,16 +571,16 @@ class Observation(spectrum.SourceSpectrum):
             if isinstance(band, spectrum.SpectralElement):
                 stat = band.check_overlap(self)
                 if stat == 'none':
-                    raise synexceptions.DisjointError(
+                    raise exceptions.DisjointError(
                         'Observation and passband are disjoint.')
                 elif 'partial' in stat:
-                    raise synexceptions.OverlapError(
+                    raise exceptions.OverlapError(
                         'Observation and passband do not fully overlap.')
                 elif stat != 'full':  # pragma: no cover
-                    raise synexceptions.SynphotError(
+                    raise exceptions.SynphotError(
                         'Overlap result of {0} is unexpected'.format(stat))
             else:
-                raise synexceptions.SynphotError('Missing passband data.')
+                raise exceptions.SynphotError('Missing passband data.')
 
             # Convert wavelengths to Angstrom
             band_wave = band.wave.to(u.AA, equivalencies=units.wave_conversion)
@@ -596,7 +596,7 @@ class Observation(spectrum.SourceSpectrum):
             elif flux_unit.decompose() != u.mag:
                 tmp_unit = flux_unit
             else:
-                raise synexceptions.SynphotError(
+                raise exceptions.SynphotError(
                     'Flux unit {0} is invalid'.format(flux_unit))
 
             self_flux = spectrum.convert_fluxes(
@@ -604,7 +604,7 @@ class Observation(spectrum.SourceSpectrum):
 
             if flux_unit_name == units.VEGAMAG.to_string():
                 if not isinstance(vegaspec, spectrum.SourceSpectrum):
-                    raise synexceptions.SynphotError(
+                    raise exceptions.SynphotError(
                         'Vega spectrum is missing.')
                 vega_flux = spectrum.convert_fluxes(
                     self_wave, vegaspec.resample(self_wave), tmp_unit,
@@ -614,12 +614,12 @@ class Observation(spectrum.SourceSpectrum):
                 flux = self_flux.value
 
             # Integrate
-            num = synutils.trapezoid_integration(
+            num = utils.trapezoid_integration(
                 self_wave.value, self_wave.value * flux)
-            den = synutils.trapezoid_integration(
+            den = utils.trapezoid_integration(
                 band_wave.value, band_wave.value * band.thru.value)
-            synutils.validate_totalflux(num)
-            synutils.validate_totalflux(den)
+            utils.validate_totalflux(num)
+            utils.validate_totalflux(den)
             val = num / den
 
             # Convert back to mag, if needed
@@ -665,11 +665,11 @@ class Observation(spectrum.SourceSpectrum):
             Else, write binned data (default).
 
         kwargs : dict
-            Keywords accepted by :func:`synphot.synio.write_fits_spec`.
+            Keywords accepted by :func:`synphot.io.write_fits_spec`.
 
         Raises
         ------
-        synphot.synexceptions.UndefinedBinset
+        synphot.exceptions.UndefinedBinset
             Missing binned data.
 
         """
@@ -688,7 +688,7 @@ class Observation(spectrum.SourceSpectrum):
         else:
             kwargs['ext_header'] = bkeys
 
-        synio.write_fits_spec(filename, self._wave, self._flux, **kwargs)
+        io.write_fits_spec(filename, self._wave, self._flux, **kwargs)
 
     @classmethod
     def from_spec_band(cls, spec, band, binwave=None, force='none', area=None):
@@ -732,22 +732,22 @@ class Observation(spectrum.SourceSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.DisjointError
+        synphot.exceptions.DisjointError
             Passband does not overlap with source spectrum.
 
-        synphot.synexceptions.OverlapError
+        synphot.exceptions.OverlapError
             Passband only partially overlaps with source spectrum
             when they must fully overlap.
 
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Invalid inputs.
 
         """
         if not isinstance(spec, spectrum.SourceSpectrum):
-            raise synexceptions.SynphotError('Invalid source spectrum')
+            raise exceptions.SynphotError('Invalid source spectrum')
 
         if not isinstance(band, spectrum.SpectralElement):
-            raise synexceptions.SynphotError('Invalid passband')
+            raise exceptions.SynphotError('Invalid passband')
 
         if binwave is None:
             binwave = spec.wave
@@ -763,11 +763,11 @@ class Observation(spectrum.SourceSpectrum):
         stat = band.check_overlap(spec)
 
         if stat == 'none':
-            raise synexceptions.DisjointError(
+            raise exceptions.DisjointError(
                 'Source spectrum and passband are disjoint.')
         elif 'partial' in stat:
             if force == 'none':
-                raise synexceptions.OverlapError(
+                raise exceptions.OverlapError(
                     'Source spectrum and passband do not fully overlap. '
                     'You may use force=[extrap|taper] to force this '
                     'Observation anyway.')
@@ -782,11 +782,11 @@ class Observation(spectrum.SourceSpectrum):
                 log.warn(msg)
                 warn['PartialOverlap'] = msg
             else:
-                raise synexceptions.SynphotError(
+                raise exceptions.SynphotError(
                     'force={0} is invalid, must be "none", "taper", '
                     'or "extrap"'.format(force))
         elif stat != 'full':  # pragma: no cover
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'Overlap result of {0} is unexpected'.format(stat))
 
         mulspec = spec * band

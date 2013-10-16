@@ -17,7 +17,7 @@ from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import spectrum, synexceptions, units
+from .. import spectrum, exceptions, units
 from ..observation import Observation
 
 
@@ -129,10 +129,10 @@ class TestObservation(object):
             flux.value, [0.12265425, 0.12098646, 0.11884699], rtol=1e-4)
         assert flux.unit == self.obs.binflux.unit
 
-        with pytest.raises(synexceptions.InterpolationNotAllowed):
+        with pytest.raises(exceptions.InterpolationNotAllowed):
             flux = self.obs.sample_binned([6000, 6004.5, 6009])
 
-        with pytest.raises(synexceptions.UnsortedWavelength):
+        with pytest.raises(exceptions.UnsortedWavelength):
             flux = self.obs.sample_binned([6004, 6000, 6009])
 
     @pytest.mark.parametrize(
@@ -160,13 +160,13 @@ class TestObservation(object):
 
     def test_from_spec_band_exceptions(self):
         # Invalid inputs
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             obs = Observation.from_spec_band(self.bp, self.bp)
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             obs = Observation.from_spec_band(self.flat_sp, self.flat_sp)
 
         # Disjoint passband
-        with pytest.raises(synexceptions.DisjointError):
+        with pytest.raises(exceptions.DisjointError):
             obs = Observation.from_spec_band(
                 spectrum.SourceSpectrum.from_gaussian(1, 40000, 1), self.bp)
 
@@ -261,7 +261,7 @@ class TestObsPar(object):
         assert eff_lam.unit == u.AA
 
     def test_efflam_exceptions(self):
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             eff_lam = self.obs.effective_wavelength(mode='foo')
 
     @pytest.mark.parametrize(
@@ -301,25 +301,25 @@ class TestObsPar(object):
 
     def test_effstim_exceptions(self):
         # Invalid flux unit
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             eff_stim = self.obs.effstim(flux_unit=u.mag, band=self.bp)
 
         # Missing passband
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             eff_stim = self.obs.effstim()
 
         # Disjoint passband
-        with pytest.raises(synexceptions.DisjointError):
+        with pytest.raises(exceptions.DisjointError):
             eff_stim = self.obs.effstim(
                 band=spectrum.SpectralElement.from_box(2000, 1))
 
         # Partial overlap passband
-        with pytest.raises(synexceptions.OverlapError):
+        with pytest.raises(exceptions.OverlapError):
             eff_stim = self.obs.effstim(
                 band=spectrum.SpectralElement.from_box(3500, 500))
 
         # Missing Vega spectrum
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             eff_stim = self.obs.effstim(flux_unit=units.VEGAMAG, band=self.bp)
 
 
@@ -377,16 +377,16 @@ class TestCountRate(object):
         np.testing.assert_allclose(ct_rate.value, ans, rtol=1e-4)
 
         # Must raise error without force
-        with pytest.raises(synexceptions.OverlapError):
+        with pytest.raises(exceptions.OverlapError):
             ct_rate = self.obs.countrate(wave_range=[w1, w2])
 
     def test_waverange_exceptions(self):
         # Invalid wavelength range
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             ct_rate = self.obs.countrate(wave_range=[1016, 1013.2])
 
         # Disjoint wavelength range
-        with pytest.raises(synexceptions.DisjointError):
+        with pytest.raises(exceptions.DisjointError):
             ct_rate = self.obs.countrate(wave_range=[1020, 1030])
 
 
@@ -400,9 +400,9 @@ class TestFromSpecBandForce(object):
         self.refwave = u.Quantity(4005, u.AA)
 
     def test_exceptions(self):
-        with pytest.raises(synexceptions.OverlapError):
+        with pytest.raises(exceptions.OverlapError):
             obs = Observation.from_spec_band(self.sp, self.bp)
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             obs = Observation.from_spec_band(self.sp, self.bp, force='foo')
 
     @pytest.mark.parametrize(
@@ -429,7 +429,7 @@ class TestReadWriteObs(object):
         assert self.obs.binflux is None
         assert self.obs.bin_edges is None
 
-        with pytest.raises(synexceptions.UndefinedBinset):
+        with pytest.raises(exceptions.UndefinedBinset):
             self.obs._set_data(True)
 
     @pytest.mark.parametrize(('ext_hdr'), [None, {'foo': 'foo'}])
