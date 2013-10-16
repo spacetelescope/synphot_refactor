@@ -17,8 +17,6 @@ from astropy.tests.helper import pytest
 from .. import exceptions, units
 
 
-__doctest_skip__ = ['*']
-
 _wave_angstrom = u.Quantity([0.1, 5000.0, 10000.0], unit=u.AA)
 _wavenum_micron = u.Quantity([1e+5, 2.0, 1.0], unit=units.INVERSE_MICRON)
 _freq = u.Quantity([2.99792458e+19, 5.99584916e+14, 2.99792458e+14], unit=u.Hz)

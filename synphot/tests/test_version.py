@@ -6,8 +6,5 @@ from __future__ import division, print_function
 from synphot import __version__
 
 
-__doctest_skip__ = ['*']
-
-
 def test_version():
     assert '3.0.0.dev' in __version__

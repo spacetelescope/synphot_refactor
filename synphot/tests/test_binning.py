@@ -19,9 +19,6 @@ from .. import binning, exceptions, io
 from ..utils import merge_wavelengths, generate_wavelengths
 
 
-__doctest_skip__ = ['*']
-
-
 @pytest.mark.parametrize(
     ('in_arr', 'out_arr'),
     [(np.arange(10, 20, dtype=np.float), np.arange(9.5, 20)),

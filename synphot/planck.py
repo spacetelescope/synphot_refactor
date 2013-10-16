@@ -40,7 +40,7 @@ def bbfunc(wavelengths, temperature):
         wavelengths = u.Quantity(wavelengths, unit=u.AA)
 
     # Calculations must use Hz
-    freq = wavelengths.to(u.Hz, equivalencies=units.wave_conversion)
+    freq = wavelengths.to(u.Hz, equivalencies=u.spectral())
 
     # Calculations must use Kelvin
     temperature = units.validate_quantity(temperature, u.K)
@@ -48,9 +48,8 @@ def bbfunc(wavelengths, temperature):
     # Calculate blackbody radiation in FNU, then convert to PHOTLAM
     factor = np.exp(const.h * freq / (const.k_B * temperature)) - 1
     bb_nu = 2 * const.h * freq * freq * freq / (const.c ** 2 * factor)
-    bb_lam = units.FNU.to(
-        units.PHOTLAM, (wavelengths.value, bb_nu.cgs.value),
-        equivalencies=units.flux_conversion_freq)
+    bb_lam = units.FNU.to(units.PHOTLAM, bb_nu.cgs.value,
+                          equivalencies=u.spectral_density(wavelengths))
 
     return u.Quantity(bb_lam, unit=units.PHOTLAM/u.sr)
 

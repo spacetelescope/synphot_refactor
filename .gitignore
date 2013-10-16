@@ -15,6 +15,7 @@ __pycache__
 
 # Sphinx
 _build
+_generated
 
 # Packages/installer info
 *.egg

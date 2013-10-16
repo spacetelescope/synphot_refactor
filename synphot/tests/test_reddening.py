@@ -22,11 +22,9 @@ from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import spectrum, exceptions, units
+from .. import analytic, spectrum, exceptions, units
 from ..reddening import ReddeningLaw, ExtinctionCurve
 
-
-__doctest_skip__ = ['*']
 
 # HST primary mirror
 _area = u.Quantity(45238.93416, units.AREA)
@@ -84,7 +82,8 @@ class TestExtinction(object):
         Angstrom.
 
         """
-        sp = spectrum.SourceSpectrum.from_flat_spectrum(units.FLAM, area=_area)
+        flat = analytic.flat_spectrum(units.FLAM, area=_area)
+        sp = flat.to_spectrum([1000.0])
         ans = self.extcurve.resample(5.03399992)
 
         if op_type == '*':
