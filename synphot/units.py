@@ -15,7 +15,7 @@ from astropy import constants as const
 from astropy import units as u
 
 # LOCAL
-from . import synexceptions
+from . import exceptions
 
 
 __all__ = ['H', 'C', 'HC', 'INVERSE_AA', 'INVERSE_MICRON',
@@ -141,6 +141,14 @@ flux_conversion_nondensity = [
      lambda fluxbinarea: fluxbinarea[0] / (fluxbinarea[1] * fluxbinarea[2])) ]
 
 
+#-----------------------------#
+# Register with astropy units #
+#-----------------------------#
+
+u.add_enabled_units([INVERSE_AA, INVERSE_MICRON, PHOTLAM, PHOTNU, FLAM, FNU,
+                     STMAG, ABMAG, OBMAG, VEGAMAG])
+
+
 #--------------------#
 # Utility functions  #
 #--------------------#
@@ -167,7 +175,7 @@ def validate_unit(input_unit):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If unit is invalid.
 
     """
@@ -190,7 +198,7 @@ def validate_unit(input_unit):
         output_unit = input_unit
 
     else:
-        raise synexceptions.SynphotError(
+        raise exceptions.SynphotError(
             '{0} must be a recognized string or '
             'astropy.units.core.Unit'.format(input_unit))
 

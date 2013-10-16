@@ -15,8 +15,8 @@ from astropy.tests.helper import pytest
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import binning, synexceptions, synio
-from ..synutils import merge_wavelengths, generate_wavelengths
+from .. import binning, exceptions, io
+from ..utils import merge_wavelengths, generate_wavelengths
 
 
 __doctest_skip__ = ['*']
@@ -68,11 +68,11 @@ def test_center_edge_center_roundtrip():
     ('arr'), [u.Quantity(1, u.AA), u.Quantity(np.array([1]), u.AA)])
 def test_calculate_bin_exceptions(arr):
     """Test binning.py raising appropriate exceptions."""
-    with pytest.raises(synexceptions.SynphotError):
+    with pytest.raises(exceptions.SynphotError):
         x = binning.calculate_bin_edges(arr)
-    with pytest.raises(synexceptions.SynphotError):
+    with pytest.raises(exceptions.SynphotError):
         x = binning.calculate_bin_widths(arr)
-    with pytest.raises(synexceptions.SynphotError):
+    with pytest.raises(exceptions.SynphotError):
         x = binning.calculate_bin_centers(arr)
 
 
@@ -84,15 +84,15 @@ class TestBinRange(object):
 
     def test_wave_range_exceptions(self):
         """Test for appropriate wavelength range exceptions."""
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             x = binning.wave_range(self.bins, 5000, 100, mode='up')
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             x = binning.wave_range(self.bins, 5000, 1.3)
-        with pytest.raises(synexceptions.OverlapError):
+        with pytest.raises(exceptions.OverlapError):
             x = binning.wave_range(self.bins, 1010, 100)
-        with pytest.raises(synexceptions.OverlapError):
+        with pytest.raises(exceptions.OverlapError):
             x = binning.wave_range(self.bins, 11000, 1000)
-        with pytest.raises(synexceptions.OverlapError):
+        with pytest.raises(exceptions.OverlapError):
             x = binning.wave_range(self.bins, 600, 1000)
 
     def test_wave_range_mode_none(self):
@@ -143,11 +143,11 @@ class TestBinRange(object):
 
     def test_pixel_range_exceptions(self):
         """Test for appropriate pixel range exceptions."""
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             x = binning.pixel_range(self.bins, (5000, 5001), mode='up')
-        with pytest.raises(synexceptions.OverlapError):
+        with pytest.raises(exceptions.OverlapError):
             x = binning.pixel_range(self.bins, (500, 5001))
-        with pytest.raises(synexceptions.OverlapError):
+        with pytest.raises(exceptions.OverlapError):
             x = binning.pixel_range(self.bins, (5000,50010))
 
     @pytest.mark.parametrize(
@@ -197,7 +197,7 @@ def test_calcbinflux():
 
     """
     # Get bandpass data for interpolation.
-    hdr, wave, thru = synio.read_fits_spec(
+    hdr, wave, thru = io.read_fits_spec(
         get_pkg_data_filename(os.path.join('data', 'hst_acs_hrc_f555w.fits')),
         flux_col='THROUGHPUT', flux_unit=u.dimensionless_unscaled)
 

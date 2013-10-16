@@ -14,7 +14,7 @@ from astropy import units as u
 from astropy.tests.helper import pytest
 
 # LOCAL
-from .. import synexceptions, units
+from .. import exceptions, units
 
 
 __doctest_skip__ = ['*']
@@ -61,7 +61,7 @@ def test_validate_unit(in_u, out_u):
 
 def test_validate_unit_exceptions():
     """Test that unit validation raises appropriate exceptions."""
-    with pytest.raises(synexceptions.SynphotError):
+    with pytest.raises(exceptions.SynphotError):
         x = units.validate_unit(10)
     with pytest.raises(ValueError):
         x = units.validate_unit('foo')

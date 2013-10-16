@@ -22,7 +22,7 @@ from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import spectrum, synexceptions, units
+from .. import spectrum, exceptions, units
 from ..reddening import ReddeningLaw, ExtinctionCurve
 
 
@@ -98,22 +98,22 @@ class TestExtinction(object):
 
     def test_redlaw_exceptions(self):
         # Invalid R(V)
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             redlaw = ReddeningLaw([1000, 2000], u.Quantity([1, 1], units.FLAM))
 
         # Invalid reddening law model
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             redlaw = ReddeningLaw.from_model('foo')
 
     def test_extcurve_exceptions(self):
         # Invalid reddening law
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             extcurve = ExtinctionCurve.from_reddening_law(np.ones(10), self.ebv)
 
         # Invalid E(B-V)
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             extcurve = ExtinctionCurve.from_reddening_law(self.redlaw, [1,2])
-        with pytest.raises(synexceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError):
             extcurve = ExtinctionCurve.from_reddening_law(
                 self.redlaw, u.Quantity(1, units.FLAM))
 

@@ -22,7 +22,7 @@ from astropy import log
 from astropy import units as u
 
 # LOCAL
-from . import binning, planck, synexceptions, synconfig, synio, synutils, units
+from . import binning, planck, exceptions, config, io, utils, units
 
 
 __all__ = ['convert_fluxes', 'BaseSpectrum', 'BaseUnitlessSpectrum',
@@ -69,7 +69,7 @@ def convert_fluxes(wavelengths, fluxes, out_flux_unit, **kwargs):
     astropy.units.core.UnitsError
         Conversion failed.
 
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         Area or Vega spectrum is not given when needed.
 
     """
@@ -131,7 +131,7 @@ def _convert_fluxes(wavelengths, fluxes, out_flux_unit, area=None,
     # VEGAMAG
     if units.VEGAMAG.to_string() in flux_unit_names:
         if not isinstance(vegaspec, SourceSpectrum):
-            raise synexceptions.SynphotError('Vega spectrum is missing.')
+            raise exceptions.SynphotError('Vega spectrum is missing.')
 
         flux_vega = convert_fluxes(
             wavelengths, vegaspec.resample(wavelengths), units.PHOTLAM,
@@ -144,7 +144,7 @@ def _convert_fluxes(wavelengths, fluxes, out_flux_unit, area=None,
     elif (u.count.to_string() in flux_unit_names or
           units.OBMAG.to_string() in flux_unit_names):
         if area is None:
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'Area must be provided for conversion involving count or OBMAG.')
 
         area = units.validate_quantity(area, units.AREA)
@@ -228,16 +228,16 @@ class BaseSpectrum(object):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If wavelengths and fluxes do not match, or if they have invalid units.
 
-    synphot.synexceptions.DuplicateWavelength
+    synphot.exceptions.DuplicateWavelength
         If wavelength array contains duplicate entries.
 
-    synphot.synexceptions.UnsortedWavelength
+    synphot.exceptions.UnsortedWavelength
         If wavelength array is not monotonic.
 
-    synphot.synexceptions.ZeroWavelength
+    synphot.exceptions.ZeroWavelength
         If negative or zero wavelength occurs in wavelength array.
 
     """
@@ -258,10 +258,10 @@ class BaseSpectrum(object):
         else:
             self.wave = wavelengths.copy()
 
-        synutils.validate_wavelengths(self.wave)
+        utils.validate_wavelengths(self.wave)
 
         if self.wave.value.shape != self.flux.value.shape:
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'Fluxes expected to have shape of {0} but has shape of '
                 '{1}'.format(self.wave.value.shape, self.flux.value.shape))
 
@@ -308,7 +308,7 @@ class BaseSpectrum(object):
             Another spectrum object.
 
         kwargs : dict
-            Keywords accepted by :func:`synphot.synutils.merge_wavelengths`.
+            Keywords accepted by :func:`synphot.utils.merge_wavelengths`.
 
         Returns
         -------
@@ -320,7 +320,7 @@ class BaseSpectrum(object):
         other_wave = units.validate_quantity(
             other.wave, self.wave.unit, equivalencies=units.wave_conversion)
 
-        out_wavelengths = synutils.merge_wavelengths(
+        out_wavelengths = utils.merge_wavelengths(
             self.wave.value, other_wave.value, **kwargs)
 
         return u.Quantity(out_wavelengths, unit=self.wave.unit)
@@ -330,7 +330,7 @@ class BaseSpectrum(object):
         wavelengths, using :func:`numpy.interp`.
 
         Given wavelengths must satisfy
-        :func:`synphot.synutils.validate_wavelengths`.
+        :func:`synphot.utils.validate_wavelengths`.
 
         The result is returned as a separate variable instead of
         overwriting attribute because this method is called by
@@ -360,7 +360,7 @@ class BaseSpectrum(object):
         if not isinstance(wavelengths, u.Quantity):
             wavelengths = u.Quantity(wavelengths, unit=self.wave.unit)
 
-        synutils.validate_wavelengths(wavelengths)
+        utils.validate_wavelengths(wavelengths)
 
         # Interpolation will be done in given wavelength unit, not self
         self_wave = units.validate_quantity(
@@ -427,10 +427,10 @@ class BaseSpectrum(object):
 
         Raises
         ------
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             If operation type not supported.
 
-        synphot.synexceptions.IncompatibleSources
+        synphot.exceptions.IncompatibleSources
             If self and other are not compatible.
 
         """
@@ -451,26 +451,26 @@ class BaseSpectrum(object):
             is_scalar_op = False
 
             if self.primary_area != other.primary_area:
-                raise synexceptions.IncompatibleSources(
+                raise exceptions.IncompatibleSources(
                     'Areas covered by flux are not the same: {0}, {1}'.format(
                         self.primary_area, other.primary_area))
 
             # Spectrum can only divided by dimensionless value
             if op_type == '/' and other.flux.unit != u.dimensionless_unscaled:
-                raise synexceptions.IncompatibleSources(
+                raise exceptions.IncompatibleSources(
                     'The other spectrum must be dimensionless in / op')
 
             # Multiplication can only be between spectrum and dimensionless
             if (op_type == '*' and
                   self.flux.unit != u.dimensionless_unscaled and
                   other.flux.unit != u.dimensionless_unscaled):
-                raise synexceptions.IncompatibleSources(
+                raise exceptions.IncompatibleSources(
                     'One of the spectra must be dimensionless in * op')
 
             # Addition and subtraction cannot mix SourceSpectrum and
             # SpectralElement
             if op_type in ('+', '-') and not isinstance(other, self.__class__):
-                raise synexceptions.IncompatibleSources(
+                raise exceptions.IncompatibleSources(
                     'Cannot perform {0} between {1} and {2}'.format(
                         op_type, self.__class__.__name__,
                         other.__class__.__name__))
@@ -481,7 +481,7 @@ class BaseSpectrum(object):
                    (u.dimensionless_unscaled, u.mag)) or
                   (self.flux.unit.decompose() != u.mag and
                    other.flux.unit.decompose() == u.mag)):  # pragma: no cover
-                raise synexceptions.IncompatibleSources(
+                raise exceptions.IncompatibleSources(
                     'Operation between mag and linear flux is not allowed')
 
             # Merged wavelengths in self.wave.unit
@@ -500,7 +500,7 @@ class BaseSpectrum(object):
                 resamp_flux_2 = other.resample(new_wave)
 
         else:
-            raise synexceptions.IncompatibleSources(
+            raise exceptions.IncompatibleSources(
                 'other is not a number or a spectrum object')
 
         # Perform operation on the flux quantities
@@ -513,7 +513,7 @@ class BaseSpectrum(object):
         elif op_type == '/':
             result = resamp_flux_1 / resamp_flux_2
         else:  # pragma: no cover
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'Operation type {0} not supported'.format(op_type))
 
         # Merge metadata (self overwrites other if duplicate exists)
@@ -592,7 +592,7 @@ class BaseSpectrum(object):
             else:
                 x = wavelengths
 
-        result = synutils.trapezoid_integration(x, y)
+        result = utils.trapezoid_integration(x, y)
 
         return u.Quantity(result, unit=self.flux.unit)
 
@@ -636,7 +636,7 @@ class BaseSpectrum(object):
             waves[1], waves[0].unit, equivalencies=units.wave_conversion).value
 
         # Do the comparison
-        result = synutils.overlap_status(a, b)
+        result = utils.overlap_status(a, b)
 
         if result == 'partial':
             lorange = sorted([a.min(), b.min()])
@@ -644,7 +644,7 @@ class BaseSpectrum(object):
 
             # Get the full throughput
             totalflux = self.integrate().value
-            synutils.validate_totalflux(totalflux)
+            utils.validate_totalflux(totalflux)
 
             # Now get the other two pieces
             idxs = [np.searchsorted(self.wave.value, lorange, 'left'),
@@ -768,7 +768,7 @@ class BaseSpectrum(object):
 
         Raises
         ------
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Invalid inputs.
 
         """
@@ -782,28 +782,28 @@ class BaseSpectrum(object):
         if left is None:
             left = self.wave.value.min()
         elif not isinstance(left, (int, long, float)):
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 '{0} must be a number'.format(left))
 
         # Upper wavelength limit
         if right is None:
             right = self.wave.value.max()
         elif not isinstance(right, (int, long, float)):
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 '{0} must be a number'.format(right))
 
         # Lower flux/throughput limit
         if bottom is None:
             bottom = self.flux.value.min()
         elif not isinstance(bottom, (int, long, float)):
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 '{0} must be a number'.format(bottom))
 
         # Upper flux/throughput limit
         if top is None:
             top = self.flux.value.max()
         elif not isinstance(top, (int, long, float)):
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 '{0} must be a number'.format(top))
 
         fig, ax = plt.subplots()
@@ -886,17 +886,17 @@ class BaseUnitlessSpectrum(BaseSpectrum):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If wavelengths and throughput do not match, or if they have
         invalid units.
 
-    synphot.synexceptions.DuplicateWavelength
+    synphot.exceptions.DuplicateWavelength
         If wavelength array contains duplicate entries.
 
-    synphot.synexceptions.UnsortedWavelength
+    synphot.exceptions.UnsortedWavelength
         If wavelength array is not monotonic.
 
-    synphot.synexceptions.ZeroWavelength
+    synphot.exceptions.ZeroWavelength
         If negative or zero wavelength occurs in wavelength array.
 
     """
@@ -911,7 +911,7 @@ class BaseUnitlessSpectrum(BaseSpectrum):
         """Check throughput unit, which must be dimensionless."""
         new_unit = units.validate_unit(new_unit)
         if new_unit.decompose() != u.dimensionless_unscaled:
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'Throughput unit {0} is not dimensionless'.format(new_unit))
 
     def __mul__(self, other):
@@ -979,16 +979,16 @@ class SourceSpectrum(BaseSpectrum):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If wavelengths and fluxes do not match, or if they have invalid units.
 
-    synphot.synexceptions.DuplicateWavelength
+    synphot.exceptions.DuplicateWavelength
         If wavelength array contains duplicate entries.
 
-    synphot.synexceptions.UnsortedWavelength
+    synphot.exceptions.UnsortedWavelength
         If wavelength array is not monotonic.
 
-    synphot.synexceptions.ZeroWavelength
+    synphot.exceptions.ZeroWavelength
         If negative or zero wavelength occurs in wavelength array.
 
     """
@@ -1009,7 +1009,7 @@ class SourceSpectrum(BaseSpectrum):
 
         if (unit_name not in acceptable_unknown_units and
                 unit_type != 'spectral flux density'):
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 '{0} cannot operate in {1}, use '
                 'synphot.spectrum.convert_fluxes() to convert flux to '
                 'PHOTLAM, PHOTNU, FLAM, FNU, or Jy first.'.format(
@@ -1036,7 +1036,7 @@ class SourceSpectrum(BaseSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Magnitude is invalid.
 
         """
@@ -1048,7 +1048,7 @@ class SourceSpectrum(BaseSpectrum):
             is_mag = True
 
         if not isinstance(magval, (int, long, float)) or not is_mag:
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 '{0} cannot be added to spectrum'.format(mag))
 
         if self.flux.unit.decompose() == u.mag:  # pragma: no cover
@@ -1100,12 +1100,12 @@ class SourceSpectrum(BaseSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Invalid redshift value.
 
         """
         if not isinstance(z, (int, long, float)):
-            raise synexceptions.SynphotError('Redshift must be a number.')
+            raise exceptions.SynphotError('Redshift must be a number.')
 
         wave_type = self.wave.unit.physical_type
         fac = 1.0 + z
@@ -1140,8 +1140,8 @@ class SourceSpectrum(BaseSpectrum):
 
         kwargs : dict
             Keywords acceptable by
-            :func:`synphot.synio.read_fits_spec` (if FITS) or
-            :func:`synphot.synio.read_ascii_spec` (if ASCII).
+            :func:`synphot.io.read_fits_spec` (if FITS) or
+            :func:`synphot.io.read_ascii_spec` (if ASCII).
 
         Returns
         -------
@@ -1149,7 +1149,7 @@ class SourceSpectrum(BaseSpectrum):
             New spectrum object.
 
         """
-        header, wavelengths, fluxes = synio.read_spec(filename, **kwargs)
+        header, wavelengths, fluxes = io.read_spec(filename, **kwargs)
         return cls(wavelengths, fluxes, area=area, header=header)
 
     def to_fits(self, filename, **kwargs):
@@ -1161,7 +1161,7 @@ class SourceSpectrum(BaseSpectrum):
             Output filename.
 
         kwargs : dict
-            Keywords accepted by :func:`synphot.synio.write_fits_spec`.
+            Keywords accepted by :func:`synphot.io.write_fits_spec`.
 
         """
         # There are some standard keywords that should be added
@@ -1176,7 +1176,7 @@ class SourceSpectrum(BaseSpectrum):
         else:
             kwargs['ext_header'] = bkeys
 
-        synio.write_fits_spec(filename, self.wave, self.flux, **kwargs)
+        io.write_fits_spec(filename, self.wave, self.flux, **kwargs)
 
     @classmethod
     def from_vega(cls, area=None, **kwargs):
@@ -1190,7 +1190,7 @@ class SourceSpectrum(BaseSpectrum):
             If not a Quantity, assumed to be in cm^2.
 
         kwargs : dict
-            Keywords acceptable by :func:`synphot.synio.read_remote_spec`.
+            Keywords acceptable by :func:`synphot.io.read_remote_spec`.
 
         Returns
         -------
@@ -1198,8 +1198,8 @@ class SourceSpectrum(BaseSpectrum):
             Vega spectrum.
 
         """
-        filename = synconfig.VEGA_FILE()
-        header, wavelengths, fluxes = synio.read_remote_spec(filename, **kwargs)
+        filename = config.VEGA_FILE()
+        header, wavelengths, fluxes = io.read_remote_spec(filename, **kwargs)
         header['expr'] = 'Vega from {0}'.format(os.path.basename(filename))
         header['filename'] = filename
         return cls(wavelengths, fluxes, area=area, header=header)
@@ -1209,7 +1209,7 @@ class SourceSpectrum(BaseSpectrum):
         """Create a :ref:`flat spectrum <synphot-flat-spec>`.
 
         Wavelengths are automatically generated by
-        :func:`synphot.synutils.generate_wavelengths` and
+        :func:`synphot.utils.generate_wavelengths` and
         converted to Angstrom.
 
         Parameters
@@ -1229,13 +1229,13 @@ class SourceSpectrum(BaseSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Flat spectrum is not defined for given flux unit.
 
         """
         flux_unit = units.validate_unit(flux_unit)
         flux_unit_name = flux_unit.to_string()
-        wavelengths = synutils.generate_wavelengths(wave_unit=u.AA)[0]
+        wavelengths = utils.generate_wavelengths(wave_unit=u.AA)[0]
         flux_value = np.empty(wavelengths.size)
 
         # Magnitude flux-density units
@@ -1258,7 +1258,7 @@ class SourceSpectrum(BaseSpectrum):
             fluxes = u.Quantity(flux_value, unit=flux_unit)
 
         else:
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'No standard spectrum available for {0}'.format(flux_unit_name))
 
         header = {
@@ -1296,19 +1296,19 @@ class SourceSpectrum(BaseSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.DisjointError
+        synphot.exceptions.DisjointError
             Renormalization band does not overlap with ``self``.
 
-        synphot.synexceptions.OverlapError
+        synphot.exceptions.OverlapError
             Renormalization band only partially overlaps with ``self``
             and significant amount of flux falls outside the overlap.
 
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Invalid inputs or calculation failed.
 
         """
         if not isinstance(band, SpectralElement):
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'Renormalization passband must be a SpectralElement.')
 
         # Validate the overlap.
@@ -1316,7 +1316,7 @@ class SourceSpectrum(BaseSpectrum):
         warnings = {}
 
         if stat == 'none':
-            raise synexceptions.DisjointError(
+            raise exceptions.DisjointError(
                 'Spectrum and renormalization band are disjoint.')
 
         elif stat == 'partial_most':
@@ -1336,13 +1336,13 @@ class SourceSpectrum(BaseSpectrum):
                 warnings['PartialRenorm'] = warn_str
                 log.warn(warn_str)
             else:
-                raise synexceptions.OverlapError(
+                raise exceptions.OverlapError(
                     'Spectrum and renormalization band do not fully overlap.'
                     'You may use force=True to force the renormalization to '
                     'proceed.')
 
         elif stat != 'full':  # pragma: no cover
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'Overlap result of {0} is unexpected'.format(stat))
 
         if not isinstance(renorm_val, u.Quantity):
@@ -1367,7 +1367,7 @@ class SourceSpectrum(BaseSpectrum):
             # Get the standard unit spectrum in the renormalization units.
             if renorm_unit_name == units.VEGAMAG.to_string():
                 if not isinstance(vegaspec, SourceSpectrum):
-                    raise synexceptions.SynphotError(
+                    raise exceptions.SynphotError(
                         'Vega spectrum is missing.')
                 stdspec = vegaspec
             else:
@@ -1378,7 +1378,7 @@ class SourceSpectrum(BaseSpectrum):
             up.convert_flux(totalflux.unit)
             stdflux = up.integrate().value
 
-        synutils.validate_totalflux(totalflux.value)
+        utils.validate_totalflux(totalflux.value)
 
         # Renormalize in magnitudes
         if renorm_val.unit.decompose() == u.mag:
@@ -1469,7 +1469,7 @@ class SourceSpectrum(BaseSpectrum):
         Flux is normalized to 1 in ``flux_units`` at ``refwave``.
 
         Wavelengths are generated using
-        :func:`synphot.synutils.generate_wavelengths` in the unit
+        :func:`synphot.utils.generate_wavelengths` in the unit
         of ``refwave``.
 
         Parameters
@@ -1496,21 +1496,21 @@ class SourceSpectrum(BaseSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Index is invalid.
 
         """
         flux_unit = units.validate_unit(flux_unit)
 
         if not isinstance(index, (int, long, float)):
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'Index {0} must be a number.'.format(index))
 
         if not isinstance(refwave, u.Quantity):
             refwave = u.Quantity(refwave, unit=u.AA)
 
         # Generate wavelengths
-        tmp_wave = synutils.generate_wavelengths(wave_unit=u.AA)[0]
+        tmp_wave = utils.generate_wavelengths(wave_unit=u.AA)[0]
         wavelengths = tmp_wave.to(
             refwave.unit, equivalencies=units.wave_conversion)
 
@@ -1533,7 +1533,7 @@ class SourceSpectrum(BaseSpectrum):
         distance of 1 kpc.
 
         Wavelengths are generated using
-        :func:`synphot.synutils.generate_wavelengths` in Angstrom.
+        :func:`synphot.utils.generate_wavelengths` in Angstrom.
 
         Parameters
         ----------
@@ -1556,7 +1556,7 @@ class SourceSpectrum(BaseSpectrum):
             temperature = u.Quantity(temperature, unit=u.K)
 
         # Generate wavelengths
-        wavelengths = synutils.generate_wavelengths(wave_unit=u.AA)[0]
+        wavelengths = utils.generate_wavelengths(wave_unit=u.AA)[0]
 
         # Calculate flux and renormalize to 1 R_sun at 1 kpc
         bbflux = planck.bb_photlam(wavelengths, temperature)
@@ -1609,17 +1609,17 @@ class SpectralElement(BaseUnitlessSpectrum):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If wavelengths and throughput do not match, or if they have
         invalid units.
 
-    synphot.synexceptions.DuplicateWavelength
+    synphot.exceptions.DuplicateWavelength
         If wavelength array contains duplicate entries.
 
-    synphot.synexceptions.UnsortedWavelength
+    synphot.exceptions.UnsortedWavelength
         If wavelength array is not monotonic.
 
-    synphot.synexceptions.ZeroWavelength
+    synphot.exceptions.ZeroWavelength
         If negative or zero wavelength occurs in wavelength array.
 
     """
@@ -1635,18 +1635,18 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             If ``self.primary_area``, which is compulsory for this
             calculation, is undefined.
 
         """
         if self.primary_area is None:
-            raise synexceptions.SynphotError('Area is undefined.')
+            raise exceptions.SynphotError('Area is undefined.')
 
         # Only correct if wavelengths are in Angstrom.
         wave = self.wave.to(u.AA, equivalencies=units.wave_conversion)
 
-        int_val = synutils.trapezoid_integration(
+        int_val = utils.trapezoid_integration(
             wave.value, (self.thru * wave).value)
         uresp = units.HC / (self.primary_area.cgs * int_val)
 
@@ -1661,10 +1661,10 @@ class SpectralElement(BaseUnitlessSpectrum):
             Passband pivot wavelength.
 
         """
-        wave = synutils.to_length(self.wave)
-        num = synutils.trapezoid_integration(
+        wave = utils.to_length(self.wave)
+        num = utils.trapezoid_integration(
             wave.value, self.thru.value * wave.value)
-        den = synutils.trapezoid_integration(
+        den = utils.trapezoid_integration(
             wave.value, self.thru.value / wave.value)
 
         if den == 0:  # pragma: no cover
@@ -1698,11 +1698,11 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Threshold is invalid.
 
         """
-        wave = synutils.to_length(self.wave)
+        wave = utils.to_length(self.wave)
 
         if threshold is None:
             wave = wave
@@ -1712,10 +1712,10 @@ class SpectralElement(BaseUnitlessSpectrum):
             wave = wave[mask]
             thru = self.thru[mask]
         else:
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 '{0} is not a valid threshold'.format(threshold))
 
-        num = synutils.trapezoid_integration(
+        num = utils.trapezoid_integration(
             wave.value, ((wave - self.avgwave())**2 * thru).value)
         den = self.integrate(wavelengths=wave).value
 
@@ -1751,12 +1751,12 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Threshold is invalid.
 
         """
-        wv = synutils.to_length(self.wave)
-        avg_wave = synutils.barlam(wv.value, self.thru.value)
+        wv = utils.to_length(self.wave)
+        avg_wave = utils.barlam(wv.value, self.thru.value)
 
         if threshold is None:
             wave = wv.value
@@ -1766,13 +1766,13 @@ class SpectralElement(BaseUnitlessSpectrum):
             wave = wv[mask].value
             thru = self.thru[mask].value
         else:
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 '{0} is not a valid threshold'.format(threshold))
 
         # calculate the rms width
-        num = synutils.trapezoid_integration(
+        num = utils.trapezoid_integration(
             wave, thru * np.log(wave / avg_wave) ** 2 / wave)
-        den = synutils.trapezoid_integration(wave, thru / wave)
+        den = utils.trapezoid_integration(wave, thru / wave)
 
         if den == 0:  # pragma: no cover
             bandw = 0.0
@@ -1805,7 +1805,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
     def avgwave(self):
         """Calculate the passband average wavelength using
-        :func:`synphot.synutils.avg_wavelength`.
+        :func:`synphot.utils.avg_wavelength`.
 
         Returns
         -------
@@ -1813,8 +1813,8 @@ class SpectralElement(BaseUnitlessSpectrum):
             Passband average wavelength.
 
         """
-        wave = synutils.to_length(self.wave)
-        avg_wave = synutils.avg_wavelength(wave.value, self.thru.value)
+        wave = utils.to_length(self.wave)
+        avg_wave = utils.avg_wavelength(wave.value, self.thru.value)
         return u.Quantity(avg_wave, unit=wave.unit)
 
     def tlambda(self):
@@ -1853,7 +1853,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             Wavelength at peak throughput.
 
         """
-        wave = synutils.to_length(self.wave)
+        wave = utils.to_length(self.wave)
         return wave[self.thru == self.tpeak()][0]
 
     def equivwidth(self):
@@ -1865,8 +1865,8 @@ class SpectralElement(BaseUnitlessSpectrum):
             Passband equivalent width.
 
         """
-        wave = synutils.to_length(self.wave)
-        equvw = synutils.trapezoid_integration(wave.value, self.thru.value)
+        wave = utils.to_length(self.wave)
+        equvw = utils.trapezoid_integration(wave.value, self.thru.value)
         return u.Quantity(equvw, unit=wave.unit)
 
     def rectwidth(self):
@@ -1897,8 +1897,8 @@ class SpectralElement(BaseUnitlessSpectrum):
             Dimensionless efficiency.
 
         """
-        wave = synutils.to_length(self.wave)
-        qtlam = synutils.trapezoid_integration(
+        wave = utils.to_length(self.wave)
+        qtlam = utils.trapezoid_integration(
             wave.value, self.thru.value / wave.value)
         return u.Quantity(qtlam, unit=u.dimensionless_unscaled)
 
@@ -1941,8 +1941,8 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         kwargs : dict
             Keywords acceptable by
-            :func:`synphot.synio.read_fits_spec` (if FITS) or
-            :func:`synphot.synio.read_ascii_spec` (if ASCII).
+            :func:`synphot.io.read_fits_spec` (if FITS) or
+            :func:`synphot.io.read_ascii_spec` (if ASCII).
 
         Returns
         -------
@@ -1957,7 +1957,7 @@ class SpectralElement(BaseUnitlessSpectrum):
                 'flux_col' not in kwargs):
             kwargs['flux_col'] = 'THROUGHPUT'
 
-        header, wavelengths, throughput = synio.read_spec(filename, **kwargs)
+        header, wavelengths, throughput = io.read_spec(filename, **kwargs)
         return cls(wavelengths, throughput, area=area, header=header)
 
     def to_fits(self, filename, **kwargs):
@@ -1971,7 +1971,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             Output filename.
 
         kwargs : dict
-            Keywords accepted by :func:`synphot.synio.write_fits_spec`.
+            Keywords accepted by :func:`synphot.io.write_fits_spec`.
 
         """
         kwargs['flux_col'] = 'THROUGHPUT'
@@ -1988,7 +1988,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         else:
             kwargs['ext_header'] = bkeys
 
-        synio.write_fits_spec(filename, self.wave, self.thru, **kwargs)
+        io.write_fits_spec(filename, self.wave, self.thru, **kwargs)
 
     @classmethod
     def from_box(cls, center, width, step=0.05, area=None):
@@ -2063,7 +2063,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             If not a Quantity, assumed to be in cm^2.
 
         kwargs : dict
-            Keywords acceptable by :func:`synphot.synio.read_remote_spec`.
+            Keywords acceptable by :func:`synphot.io.read_remote_spec`.
 
         Returns
         -------
@@ -2072,7 +2072,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Invalid filter name.
 
         """
@@ -2080,31 +2080,31 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         # Select filename based on filter name
         if filtername == 'bessel_j':
-            cfgitem = synconfig.BESSEL_J_FILE
+            cfgitem = config.BESSEL_J_FILE
         elif filtername == 'bessel_h':
-            cfgitem = synconfig.BESSEL_H_FILE
+            cfgitem = config.BESSEL_H_FILE
         elif filtername == 'bessel_k':
-            cfgitem = synconfig.BESSEL_K_FILE
+            cfgitem = config.BESSEL_K_FILE
         elif filtername == 'cousins_r':
-            cfgitem = synconfig.COUSINS_R_FILE
+            cfgitem = config.COUSINS_R_FILE
         elif filtername == 'cousins_i':
-            cfgitem = synconfig.COUSINS_I_FILE
+            cfgitem = config.COUSINS_I_FILE
         elif filtername == 'johnson_u':
-            cfgitem = synconfig.JOHNSON_U_FILE
+            cfgitem = config.JOHNSON_U_FILE
         elif filtername == 'johnson_b':
-            cfgitem = synconfig.JOHNSON_B_FILE
+            cfgitem = config.JOHNSON_B_FILE
         elif filtername == 'johnson_v':
-            cfgitem = synconfig.JOHNSON_V_FILE
+            cfgitem = config.JOHNSON_V_FILE
         elif filtername == 'johnson_r':
-            cfgitem = synconfig.JOHNSON_R_FILE
+            cfgitem = config.JOHNSON_R_FILE
         elif filtername == 'johnson_i':
-            cfgitem = synconfig.JOHNSON_I_FILE
+            cfgitem = config.JOHNSON_I_FILE
         elif filtername == 'johnson_j':
-            cfgitem = synconfig.JOHNSON_J_FILE
+            cfgitem = config.JOHNSON_J_FILE
         elif filtername == 'johnson_k':
-            cfgitem = synconfig.JOHNSON_K_FILE
+            cfgitem = config.JOHNSON_K_FILE
         else:
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'Filter name {0} is invalid.'.format(filtername))
 
         filename = cfgitem()
@@ -2116,7 +2116,7 @@ class SpectralElement(BaseUnitlessSpectrum):
                 'flux_col' not in kwargs):
             kwargs['flux_col'] = 'THROUGHPUT'
 
-        header, wavelengths, throughput = synio.read_remote_spec(filename,
+        header, wavelengths, throughput = io.read_remote_spec(filename,
                                                                   **kwargs)
         header['expr'] = filtername
         header['filename'] = filename
