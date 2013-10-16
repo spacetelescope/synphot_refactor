@@ -15,7 +15,7 @@ from astropy import constants as const
 from astropy import units as u
 
 # LOCAL
-from . import synexceptions
+from . import exceptions
 
 
 __all__ = ['H', 'C', 'HC', 'INVERSE_AA', 'INVERSE_MICRON',
@@ -167,7 +167,7 @@ def validate_unit(input_unit):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If unit is invalid.
 
     """
@@ -190,7 +190,7 @@ def validate_unit(input_unit):
         output_unit = input_unit
 
     else:
-        raise synexceptions.SynphotError(
+        raise exceptions.SynphotError(
             '{0} must be a recognized string or '
             'astropy.units.core.Unit'.format(input_unit))
 

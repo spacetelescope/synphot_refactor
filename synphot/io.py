@@ -15,7 +15,7 @@ from astropy.io import ascii, fits
 from astropy.utils.data import get_readable_fileobj
 
 # LOCAL
-from . import synexceptions, units
+from . import exceptions, units
 from synphot import __version__
 
 
@@ -80,14 +80,14 @@ def read_spec(filename, fname='', **kwargs):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         Read failed.
 
     """
     if isinstance(filename, basestring):
         fname = filename
     elif not fname:  # pragma: no cover
-        raise synexceptions.SynphotError('Cannot determine filename.')
+        raise exceptions.SynphotError('Cannot determine filename.')
 
     if fname.endswith('fits') or fname.endswith('fit'):
         read_func = read_fits_spec
@@ -259,7 +259,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If wavelengths and fluxes have difference shapes or value precision
         is not supported.
 
@@ -280,7 +280,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
     flux_unit = units.validate_unit(flux_unit).to_string().upper()
 
     if wave_value.shape != flux_value.shape:
-        raise synexceptions.SynphotError(
+        raise exceptions.SynphotError(
             'Wavelengths have shape {0} but fluxes have shape {1}'.format(
                 wave_value.shape, flux_value.shape))
 
@@ -304,7 +304,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
     if precision is None:
         precision = flux_value.dtype.char
         if precision not in pcodes:
-            raise synexceptions.SynphotError('flux is not float32 or float64')
+            raise exceptions.SynphotError('flux is not float32 or float64')
 
     # Use user specified precision
     else:
@@ -314,13 +314,13 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
         elif precision == 'double':
             precision = 'd'
         else:
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'precision must be single or double')
 
     # Now check wavelength precision
     wave_precision = wave_value.dtype.char
     if wave_precision not in pcodes:
-        raise synexceptions.SynphotError(
+        raise exceptions.SynphotError(
             'wavelength is not float32 or float64')
 
     # If wavelength is double-precision but data is written out as

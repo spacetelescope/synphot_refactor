@@ -9,7 +9,7 @@ import numpy as np
 from astropy import units as u
 
 # LOCAL
-from . import synexceptions, units
+from . import exceptions, units
 
 
 __all__ = ['overlap_status', 'validate_totalflux', 'validate_wavelengths',
@@ -58,16 +58,16 @@ def validate_totalflux(totalflux):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         Input is zero, negative, or not a number.
 
     """
     if totalflux <= 0.0:
-        raise synexceptions.SynphotError('Integrated flux is <= 0')
+        raise exceptions.SynphotError('Integrated flux is <= 0')
     elif np.isnan(totalflux):
-        raise synexceptions.SynphotError('Integrated flux is NaN')
+        raise exceptions.SynphotError('Integrated flux is NaN')
     elif np.isinf(totalflux):
-        raise synexceptions.SynphotError('Integrated flux is infinite')
+        raise exceptions.SynphotError('Integrated flux is infinite')
 
 
 def validate_wavelengths(wavelengths):
@@ -87,16 +87,16 @@ def validate_wavelengths(wavelengths):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If wavelengths unit type is invalid.
 
-    synphot.synexceptions.DuplicateWavelength
+    synphot.exceptions.DuplicateWavelength
         If wavelength array contains duplicate entries.
 
-    synphot.synexceptions.UnsortedWavelength
+    synphot.exceptions.UnsortedWavelength
         If wavelength array is not monotonic.
 
-    synphot.synexceptions.ZeroWavelength
+    synphot.exceptions.ZeroWavelength
         If negative or zero wavelength occurs in wavelength array.
 
     """
@@ -107,13 +107,13 @@ def validate_wavelengths(wavelengths):
     wave = wavelengths.value
 
     if unit_type not in ('length', 'wavenumber', 'frequency'):
-        raise synexceptions.SynphotError(
+        raise exceptions.SynphotError(
             'wavelength physical type is not length, wave number, or '
             'frequency: {0}'.format(unit_type))
 
     # Check for zeroes
     if np.any(wave <= 0):
-        raise synexceptions.ZeroWavelength(
+        raise exceptions.ZeroWavelength(
             'Negative or zero wavelength occurs in wavelength array',
             rows=np.where(wave <= 0)[0])
 
@@ -123,7 +123,7 @@ def validate_wavelengths(wavelengths):
         if np.alltrue(sorted_wave[::-1] == wave):
             pass  # Monotonic descending is allowed
         else:
-            raise synexceptions.UnsortedWavelength(
+            raise exceptions.UnsortedWavelength(
                 'Wavelength array is not monotonic',
                 rows=np.where(sorted_wave != wave)[0])
 
@@ -131,7 +131,7 @@ def validate_wavelengths(wavelengths):
     if not np.isscalar(wave):
         dw = sorted_wave[1:] - sorted_wave[:-1]
         if np.any(dw == 0):
-            raise synexceptions.DuplicateWavelength(
+            raise exceptions.DuplicateWavelength(
                 'Wavelength array contains duplicate entries',
                 rows=np.where(dw == 0)[0])
 

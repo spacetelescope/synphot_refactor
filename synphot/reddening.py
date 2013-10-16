@@ -6,7 +6,7 @@ from __future__ import division, print_function
 from astropy import units as u
 
 # LOCAL
-from . import spectrum, synconfig, synexceptions, synio, units
+from . import spectrum, config, exceptions, io, units
 
 
 __all__ = ['ReddeningLaw', 'ExtinctionCurve']
@@ -52,16 +52,16 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If wavelengths and R(V) do not match, or if they have invalid units.
 
-    synphot.synexceptions.DuplicateWavelength
+    synphot.exceptions.DuplicateWavelength
         If wavelength array contains duplicate entries.
 
-    synphot.synexceptions.UnsortedWavelength
+    synphot.exceptions.UnsortedWavelength
         If wavelength array is not monotonic.
 
-    synphot.synexceptions.ZeroWavelength
+    synphot.exceptions.ZeroWavelength
         If negative or zero wavelength occurs in wavelength array.
 
     """
@@ -84,8 +84,8 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
 
         kwargs : dict
             Keywords acceptable by
-            :func:`synphot.synio.read_fits_spec` (if FITS) or
-            :func:`synphot.synio.read_ascii_spec` (if ASCII).
+            :func:`synphot.io.read_fits_spec` (if FITS) or
+            :func:`synphot.io.read_ascii_spec` (if ASCII).
 
         Returns
         -------
@@ -100,7 +100,7 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
                 'flux_col' not in kwargs):
             kwargs['flux_col'] = 'Av/E(B-V)'
 
-        header, wavelengths, rvs = synio.read_spec(filename, **kwargs)
+        header, wavelengths, rvs = io.read_spec(filename, **kwargs)
         return cls(wavelengths, rvs, area=area, header=header)
 
     def to_fits(self, filename, **kwargs):
@@ -114,7 +114,7 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
             Output filename.
 
         kwargs : dict
-            Keywords accepted by :func:`synphot.synio.write_fits_spec`.
+            Keywords accepted by :func:`synphot.io.write_fits_spec`.
 
         """
         kwargs['flux_col'] = 'Av/E(B-V)'
@@ -137,7 +137,7 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
         else:
             kwargs['ext_header'] = bkeys
 
-        synio.write_fits_spec(filename, self.wave, self.thru, **kwargs)
+        io.write_fits_spec(filename, self.wave, self.thru, **kwargs)
 
     @classmethod
     def from_model(cls, modelname, area=None, **kwargs):
@@ -154,7 +154,7 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
             If not a Quantity, assumed to be in cm^2.
 
         kwargs : dict
-            Keywords acceptable by :func:`synphot.synio.read_remote_spec`.
+            Keywords acceptable by :func:`synphot.io.read_remote_spec`.
 
         Returns
         -------
@@ -163,7 +163,7 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Invalid model name.
 
         """
@@ -171,23 +171,23 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
 
         # Select filename based on model name
         if modelname == 'lmc30dor':
-            cfgitem = synconfig.LMC30DOR_FILE
+            cfgitem = config.LMC30DOR_FILE
         elif modelname == 'lmcavg':
-            cfgitem = synconfig.LMCAVG_FILE
+            cfgitem = config.LMCAVG_FILE
         elif modelname == 'mwavg':
-            cfgitem = synconfig.MWAVG_FILE
+            cfgitem = config.MWAVG_FILE
         elif modelname == 'mwdense':
-            cfgitem = synconfig.MWDENSE_FILE
+            cfgitem = config.MWDENSE_FILE
         elif modelname == 'mwrv21':
-            cfgitem = synconfig.MWRV21_FILE
+            cfgitem = config.MWRV21_FILE
         elif modelname == 'mwrv40':
-            cfgitem = synconfig.MWRV40_FILE
+            cfgitem = config.MWRV40_FILE
         elif modelname == 'smcbar':
-            cfgitem = synconfig.SMCBAR_FILE
+            cfgitem = config.SMCBAR_FILE
         elif modelname == 'xgalsb':
-            cfgitem = synconfig.XGAL_FILE
+            cfgitem = config.XGAL_FILE
         else:
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'Model name {0} is invalid.'.format(modelname))
 
         filename = cfgitem()
@@ -199,7 +199,7 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
                 'flux_col' not in kwargs):
             kwargs['flux_col'] = 'Av/E(B-V)'
 
-        header, wavelengths, rvs = synio.read_remote_spec(filename, **kwargs)
+        header, wavelengths, rvs = io.read_remote_spec(filename, **kwargs)
         header['expr'] = modelname
         header['filename'] = filename
         header['descrip'] = cfgitem.description
@@ -264,17 +264,17 @@ class ExtinctionCurve(spectrum.BaseUnitlessSpectrum):
 
     Raises
     ------
-    synphot.synexceptions.SynphotError
+    synphot.exceptions.SynphotError
         If wavelengths and throughput do not match, or if they have
         invalid units.
 
-    synphot.synexceptions.DuplicateWavelength
+    synphot.exceptions.DuplicateWavelength
         If wavelength array contains duplicate entries.
 
-    synphot.synexceptions.UnsortedWavelength
+    synphot.exceptions.UnsortedWavelength
         If wavelength array is not monotonic.
 
-    synphot.synexceptions.ZeroWavelength
+    synphot.exceptions.ZeroWavelength
         If negative or zero wavelength occurs in wavelength array.
 
     """
@@ -304,18 +304,18 @@ class ExtinctionCurve(spectrum.BaseUnitlessSpectrum):
 
         Raises
         ------
-        synphot.synexceptions.SynphotError
+        synphot.exceptions.SynphotError
             Invalid inputs.
 
         """
         if not isinstance(redlaw, ReddeningLaw):
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 '{0} is not a ReddeningLaw'.format(redlaw))
 
         if isinstance(ebv, u.Quantity) and ebv.unit.decompose() == u.mag:
             ebv = ebv.value
         elif not isinstance(ebv, (int, long, float)):
-            raise synexceptions.SynphotError(
+            raise exceptions.SynphotError(
                 'E(B-V)={0} is invalid.'.format(ebv))
 
         thru = 10**(-0.4 * redlaw.thru.value * ebv)
