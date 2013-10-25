@@ -273,10 +273,16 @@ class BlackBody1DModel(modeling.Parametric1DModel):
         Blackbody temperature in Kelvin.
 
     """
-    param_names = ['temperature']
+    temperature = modeling.Parameter('temperature')
 
     def __init__(self, temperature, **constraints):
-        super(BlackBody1DModel, self).__init__(locals())
+        try:
+            param_dim = len(temperature)
+        except TypeError:
+            param_dim = 1
+
+        super(BlackBody1DModel, self).__init__(
+            param_dim=param_dim, temperature=temperature, **constraints)
 
     def eval(self, x, temperature):
         """Evaluate the model.
@@ -295,7 +301,7 @@ class BlackBody1DModel(modeling.Parametric1DModel):
             Blackbody radiation in FLAM.
 
         """
-        wave = u.Quantity(x, unit=u.AA)
+        wave = u.Quantity(np.ascontiguousarray(x), unit=u.AA)
         t = u.Quantity(temperature, unit=u.K)
         bbflux = planck.bb_photlam(wave, t)
         fluxes = bbflux.to(units.FLAM, equivalencies=u.spectral_density(wave))
