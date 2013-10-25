@@ -49,8 +49,8 @@ These is a special dimensionless unit:
 Wavelength Conversion
 ---------------------
 
-``synphot.units.wave_conversion`` equivalencies are used for wavelength
-conversion between length, wave number, and frequency, as shown in
+:func:`astropy.units.equivalencies.spectral` equivalencies are used for
+wavelength conversion between length, wave number, and frequency, as shown in
 examples below:
 
 >>> Insert examples here

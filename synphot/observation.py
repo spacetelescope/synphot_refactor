@@ -125,7 +125,7 @@ class Observation(spectrum.SourceSpectrum):
         """
         # Convert binwave to native wavelength unit and validate.
         self.binwave = units.validate_quantity(
-            binwave, self.wave.unit, equivalencies=units.wave_conversion)
+            binwave, self.wave.unit, equivalencies=u.spectral())
         utils.validate_wavelengths(self.binwave)
 
         # binwave must be in ascending order for calcbinflux()
@@ -244,7 +244,7 @@ class Observation(spectrum.SourceSpectrum):
 
         # Convert wavelengths to self.binwave unit, and do validation
         wavelengths = units.validate_quantity(
-            wavelengths, self._wave.unit, equivalencies=units.wave_conversion)
+            wavelengths, self._wave.unit, equivalencies=u.spectral())
         utils.validate_wavelengths(wavelengths)
 
         if not np.all(np.in1d(wavelengths, self._wave)):
@@ -286,7 +286,7 @@ class Observation(spectrum.SourceSpectrum):
 
         if isinstance(cenwave, u.Quantity):
             bin_wave = units.validate_quantity(
-                self._wave, cenwave.unit, equivalencies=units.wave_conversion)
+                self._wave, cenwave.unit, equivalencies=u.spectral())
         else:
             cenwave = u.Quantity(cenwave, unit=self._wave.unit)
             bin_wave = self._wave
@@ -326,9 +326,9 @@ class Observation(spectrum.SourceSpectrum):
         self._set_data(True)  # Use binned data
 
         w1 = units.validate_quantity(
-            waverange[0], self._wave.unit, equivalencies=units.wave_conversion)
+            waverange[0], self._wave.unit, equivalencies=u.spectral())
         w2 = units.validate_quantity(
-            waverange[-1], self._wave.unit, equivalencies=units.wave_conversion)
+            waverange[-1], self._wave.unit, equivalencies=u.spectral())
 
         return binning.pixel_range(
             self._wave.value, (w1.value, w2.value), **kwargs)
@@ -510,9 +510,9 @@ class Observation(spectrum.SourceSpectrum):
         # Use given wavelength range
         else:
             w1 = units.validate_quantity(wave_range[0], self._wave.unit,
-                                         equivalencies=units.wave_conversion)
+                                         equivalencies=u.spectral())
             w2 = units.validate_quantity(wave_range[-1], self._wave.unit,
-                                         equivalencies=units.wave_conversion)
+                                         equivalencies=u.spectral())
             if w1 >= w2:
                 raise exceptions.SynphotError('Invalid wavelength range.')
 
@@ -589,8 +589,8 @@ class Observation(spectrum.SourceSpectrum):
                 raise exceptions.SynphotError('Missing passband data.')
 
             # Convert wavelengths to Angstrom
-            band_wave = band.wave.to(u.AA, equivalencies=units.wave_conversion)
-            self_wave = inwave.to(u.AA, equivalencies=units.wave_conversion)
+            band_wave = band.wave.to(u.AA, equivalencies=u.spectral())
+            self_wave = inwave.to(u.AA, equivalencies=u.spectral())
 
             # Convert observation to given flux unit.
             # For mag, convert to corresponding linear flux unit.

@@ -117,7 +117,7 @@ class BaseMixinAnalytic(object):
             wavelengths = u.Quantity(wavelengths, unit=self.wave_unit)
         else:
             wavelengths = wavelengths.to(
-                self.wave_unit, equivalencies=units.wave_conversion)
+                self.wave_unit, equivalencies=u.spectral())
 
         utils.validate_wavelengths(wavelengths)
         resampled_result = self(wavelengths.value)
@@ -499,7 +499,7 @@ def gaussian_spectrum(total_flux, center, fwhm, area=None):
         fwhm = u.Quantity(fwhm, unit=center.unit)
 
     center = utils.to_length(center)  # Convert to length
-    fwhm = fwhm.to(center.unit, equivalencies=units.wave_conversion)
+    fwhm = fwhm.to(center.unit, equivalencies=u.spectral())
     sigma = fwhm.value / np.sqrt(8.0 * np.log(2.0))
     factor = total_flux.value / (np.sqrt(2.0 * np.pi) * sigma)
 

@@ -92,7 +92,7 @@ def convert_fluxes(wavelengths, fluxes, out_flux_unit, **kwargs):
 
     # Wavelengths must be in Angstrom
     wavelengths = units.validate_quantity(
-        wavelengths, u.AA, equivalencies=units.wave_conversion)
+        wavelengths, u.AA, equivalencies=u.spectral())
 
     # Convert input unit to PHOTLAM
     if in_flux_unit_name == units.PHOTLAM.to_string():
@@ -320,7 +320,7 @@ class BaseSpectrum(object):
         """
         # Convert to self.wave unit
         other_wave = units.validate_quantity(
-            other.wave, self.wave.unit, equivalencies=units.wave_conversion)
+            other.wave, self.wave.unit, equivalencies=u.spectral())
 
         out_wavelengths = utils.merge_wavelengths(
             self.wave.value, other_wave.value, **kwargs)
@@ -366,7 +366,7 @@ class BaseSpectrum(object):
 
         # Interpolation will be done in given wavelength unit, not self
         self_wave = units.validate_quantity(
-            self.wave, wavelengths.unit, equivalencies=units.wave_conversion)
+            self.wave, wavelengths.unit, equivalencies=u.spectral())
         old_wave = self_wave.value
         new_wave = wavelengths.value
 
@@ -561,7 +561,7 @@ class BaseSpectrum(object):
 
         """
         self.wave = units.validate_quantity(
-            self.wave, out_wave_unit, equivalencies=units.wave_conversion)
+            self.wave, out_wave_unit, equivalencies=u.spectral())
 
     def integrate(self, wavelengths=None):
         """Perform trapezoid integration.
@@ -633,7 +633,7 @@ class BaseSpectrum(object):
         # Convert other wave unit to self wave unit, and extract values
         a = waves[0].value
         b = units.validate_quantity(
-            waves[1], waves[0].unit, equivalencies=units.wave_conversion).value
+            waves[1], waves[0].unit, equivalencies=u.spectral()).value
 
         # Do the comparison
         result = utils.overlap_status(a, b)
@@ -678,7 +678,7 @@ class BaseSpectrum(object):
 
         """
         wave_limits = [units.validate_quantity(
-                w, self.wave.unit, equivalencies=units.wave_conversion)
+                w, self.wave.unit, equivalencies=u.spectral())
                        for w in (min_wave, max_wave)]
         minw = wave_limits[0].value
         maxw = wave_limits[1].value
@@ -1424,7 +1424,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             raise exceptions.SynphotError('Area is undefined.')
 
         # Only correct if wavelengths are in Angstrom.
-        wave = self.wave.to(u.AA, equivalencies=units.wave_conversion)
+        wave = self.wave.to(u.AA, equivalencies=u.spectral())
 
         int_val = utils.trapezoid_integration(
             wave.value, (self.thru * wave).value)

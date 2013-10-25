@@ -18,15 +18,13 @@ from .. import exceptions, units
 
 
 _wave_angstrom = u.Quantity([0.1, 5000.0, 10000.0], unit=u.AA)
-_wavenum_micron = u.Quantity([1e+5, 2.0, 1.0], unit=units.INVERSE_MICRON)
+_wavenum_micron = u.Quantity([1e+5, 2.0, 1.0], u.micron ** -1)
 _freq = u.Quantity([2.99792458e+19, 5.99584916e+14, 2.99792458e+14], unit=u.Hz)
 
 
 def test_implicit_assumptions():
     """These assumptions must be valid for proper conversions."""
     assert units.HC.unit == u.AA * u.erg
-    assert units.INVERSE_AA.physical_type == 'wavenumber'
-    assert units.INVERSE_MICRON.physical_type == 'wavenumber'
     assert units.AREA.physical_type == 'area'
     assert units.THROUGHPUT.physical_type == 'dimensionless'
     assert units.ABZERO.unit.decompose() == u.mag
@@ -36,12 +34,10 @@ def test_implicit_assumptions():
 @pytest.mark.parametrize(
     ('in_u', 'out_u'),
     [('angstroms', u.AA),
-     ('inversemicrons', units.INVERSE_MICRON),
+     ('inversemicrons', u.micron ** -1),
      ('transmission', units.THROUGHPUT),
      ('TRANSMISSION', units.THROUGHPUT),
      ('extinction', units.THROUGHPUT),
-     ('inverse_angstrom', units.INVERSE_AA),
-     ('inverse_micron', units.INVERSE_MICRON),
      ('photlam', units.PHOTLAM),
      ('photnu', units.PHOTNU),
      ('flam', units.FLAM),
@@ -69,8 +65,7 @@ def test_validate_unit_exceptions():
     ('in_val', 'out_u', 'eqv', 'ans'),
     [(100.0, units.AREA, [], 100.0),
      (u.Quantity(100.0, unit=units.AREA), u.m * u.m, [], 0.01),
-     (_wave_angstrom, units.INVERSE_MICRON, units.wave_conversion,
-      _wavenum_micron)])
+     (_wave_angstrom, u.micron ** -1, u.spectral(), _wavenum_micron)])
 def test_validate_quantity(in_val, out_u, eqv, ans):
     """Test quantity validation."""
     result = units.validate_quantity(in_val, out_u, equivalencies=eqv)
@@ -82,12 +77,12 @@ def test_validate_quantity(in_val, out_u, eqv, ans):
     ('in_q', 'out_u', 'ans'),
     [(_wave_angstrom, u.Hz, _freq),
      (_freq, u.AA, _wave_angstrom),
-     (_wave_angstrom, units.INVERSE_MICRON, _wavenum_micron),
+     (_wave_angstrom, u.micron ** -1, _wavenum_micron),
      (_wavenum_micron, u.AA, _wave_angstrom),
-     (_freq, units.INVERSE_MICRON, _wavenum_micron),
+     (_freq, u.micron ** -1, _wavenum_micron),
      (_wavenum_micron, u.Hz, _freq)])
 def test_wave_conversion(in_q, out_u, ans):
     """Full equivalencies test with direct conversion."""
-    result = in_q.to(out_u, equivalencies=units.wave_conversion)
+    result = in_q.to(out_u, equivalencies=u.spectral())
     np.testing.assert_allclose(result.value, ans.value)
     assert result.unit == ans.unit

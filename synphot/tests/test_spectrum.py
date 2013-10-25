@@ -213,12 +213,12 @@ class TestSourceSpectrum(object):
         old_wave = self.sp.wave.copy()
         old_flux = self.sp.flux.copy()
 
-        self.sp.convert_wave(units.INVERSE_MICRON)
+        self.sp.convert_wave(u.micron ** -1)
         self.sp.convert_flux(units.FNU)
         np.testing.assert_allclose(self.sp.wave.value[5000], 1.6542148230571696)
         np.testing.assert_allclose(
             self.sp.flux.value[5000], 2.282950185743497e-26)
-        assert self.sp.wave.unit == units.INVERSE_MICRON
+        assert self.sp.wave.unit == u.micron ** -1
         assert self.sp.flux.unit == units.FNU
 
         with pytest.raises(u.UnitsError):
@@ -426,9 +426,9 @@ class TestSpectralElement(object):
 
     def test_conversion(self):
         old_wave = self.bp.wave.copy()
-        self.bp.convert_wave(units.INVERSE_MICRON)
+        self.bp.convert_wave(u.micron ** -1)
         np.testing.assert_allclose(self.bp.wave.value[5000], 1.6542149)
-        assert self.bp.wave.unit == units.INVERSE_MICRON
+        assert self.bp.wave.unit == u.micron ** -1
 
         with pytest.raises(u.UnitsError):
             self.bp.convert_wave(u.Jy)

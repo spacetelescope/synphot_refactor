@@ -18,8 +18,7 @@ from astropy import units as u
 from . import exceptions
 
 
-__all__ = ['H', 'C', 'HC', 'INVERSE_AA', 'INVERSE_MICRON',
-           'wave_conversion', 'AREA', 'THROUGHPUT', 'PHOTLAM',
+__all__ = ['H', 'C', 'HC', 'AREA', 'THROUGHPUT', 'PHOTLAM',
            'PHOTNU', 'FLAM', 'FNU', 'STMAG', 'ABMAG', 'OBMAG',
            'VEGAMAG', 'ABZERO', 'STZERO', 'flux_conversion_wav',
            'flux_conversion_freq', 'flux_conversion_vegamag',
@@ -33,23 +32,6 @@ __all__ = ['H', 'C', 'HC', 'INVERSE_AA', 'INVERSE_MICRON',
 H = const.h.cgs  # Planck's constant in erg * sec
 C = const.c.to('AA/s')  # Speed of light in Angstrom/sec
 HC = H * C
-
-
-#----------------------------#
-# For wavelength conversions #
-#----------------------------#
-
-INVERSE_AA = u.def_unit(
-    'inverse_angstrom', 1 / u.AA,
-    format={'generic': '1/angstrom', 'console': '1/angstrom',
-            'latex': r'\frac{1}{\AA}'})
-INVERSE_MICRON = u.def_unit(
-    'inverse_micron', 1 / u.micron,
-    format={'generic': '1/um', 'console': '1/um', 'latex': r'\frac{1}{\mu m}'})
-wave_conversion = u.spectral() + [
-    (u.micron, INVERSE_MICRON, lambda x: 1.0 / x, lambda x: 1.0 / x),
-    (u.Hz, INVERSE_AA, lambda x: x / C.value, lambda x: x * C.value) ]
-
 
 #----------------------#
 # For flux conversions #
@@ -145,8 +127,7 @@ flux_conversion_nondensity = [
 # Register with astropy units #
 #-----------------------------#
 
-u.add_enabled_units([INVERSE_AA, INVERSE_MICRON, PHOTLAM, PHOTNU, FLAM, FNU,
-                     STMAG, ABMAG, OBMAG, VEGAMAG])
+u.add_enabled_units([PHOTLAM, PHOTNU, FLAM, FNU, STMAG, ABMAG, OBMAG, VEGAMAG])
 
 
 #--------------------#
@@ -185,7 +166,7 @@ def validate_unit(input_unit):
         if input_unit_lowcase == 'angstroms':
             output_unit = u.AA
         elif input_unit_lowcase == 'inversemicrons':
-            output_unit = INVERSE_MICRON
+            output_unit = u.micron ** -1
         elif input_unit_lowcase in ('transmission', 'extinction'):
             output_unit = THROUGHPUT
         else:
