@@ -484,7 +484,7 @@ class Observation(spectrum.SourceSpectrum):
         synphot.exceptions.DisjointError
             Passband or wavelength range does not overlap with observation.
 
-        synphot.exceptions.OverlapError
+        synphot.exceptions.PartialOverlap
             Passband or wavelength range only partially overlaps with
             observation.
 
@@ -529,7 +529,7 @@ class Observation(spectrum.SourceSpectrum):
                     w1 = max(w1, self._wave.min())
                     w2 = min(w2, self._wave.max())
                 else:
-                    raise exceptions.OverlapError(
+                    raise exceptions.PartialOverlap(
                         'Observation and wavelength range do not fully '
                         'overlap. You may use force=True to force this '
                         'calculation anyway.')
@@ -574,7 +574,7 @@ class Observation(spectrum.SourceSpectrum):
                     raise exceptions.DisjointError(
                         'Observation and passband are disjoint.')
                 elif 'partial' in stat:
-                    raise exceptions.OverlapError(
+                    raise exceptions.PartialOverlap(
                         'Observation and passband do not fully overlap.')
                 elif stat != 'full':  # pragma: no cover
                     raise exceptions.SynphotError(
@@ -754,7 +754,7 @@ class Observation(spectrum.SourceSpectrum):
         synphot.exceptions.DisjointError
             Passband does not overlap with source spectrum.
 
-        synphot.exceptions.OverlapError
+        synphot.exceptions.PartialOverlap
             Passband only partially overlaps with source spectrum
             when they must fully overlap.
 
@@ -827,7 +827,7 @@ class Observation(spectrum.SourceSpectrum):
                     'Source spectrum and passband are disjoint.')
             elif 'partial' in stat:
                 if force == 'none':
-                    raise exceptions.OverlapError(
+                    raise exceptions.PartialOverlap(
                         'Source spectrum and passband do not fully overlap. '
                         'You may use force=[extrap|taper] to force this '
                         'Observation anyway.')

@@ -356,7 +356,7 @@ class TestObsPar(object):
                     [1998.9, 1999, 2000, 2000.1], [0, 1.0, 1.0, 0]))
 
         # Partial overlap passband
-        with pytest.raises(exceptions.OverlapError):
+        with pytest.raises(exceptions.PartialOverlap):
             eff_stim = self.obs.effstim(
                 band=spectrum.SpectralElement(
                     [3249.9, 3250, 3750, 3750.1], [0, 1.0, 1.0, 0]))
@@ -425,7 +425,7 @@ class TestCountRate(object):
         np.testing.assert_allclose(ct_rate.value, ans, rtol=1e-4)
 
         # Must raise error without force
-        with pytest.raises(exceptions.OverlapError):
+        with pytest.raises(exceptions.PartialOverlap):
             ct_rate = self.obs.countrate(wave_range=[w1, w2])
 
     def test_waverange_exceptions(self):
@@ -449,7 +449,7 @@ class TestFromSpecBandForce(object):
         self.refwave = u.Quantity(4005, u.AA)
 
     def test_exceptions(self):
-        with pytest.raises(exceptions.OverlapError):
+        with pytest.raises(exceptions.PartialOverlap):
             obs = Observation.from_spec_band(self.sp, self.bp)
         with pytest.raises(exceptions.SynphotError):
             obs = Observation.from_spec_band(self.sp, self.bp, force='foo')

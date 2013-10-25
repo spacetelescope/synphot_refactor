@@ -934,7 +934,7 @@ class TestRenorm(object):
                     [0, 1.0, 1.0, 0], area=_area))
 
         # Partial overlap without force
-        with pytest.raises(exceptions.OverlapError):
+        with pytest.raises(exceptions.PartialOverlap):
             rn_sp = self.em.renorm(1, self.acs)
 
         # Missing Vega spectrum

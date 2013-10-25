@@ -1251,7 +1251,7 @@ class SourceSpectrum(BaseSpectrum):
         synphot.exceptions.DisjointError
             Renormalization band does not overlap with ``self``.
 
-        synphot.exceptions.OverlapError
+        synphot.exceptions.PartialOverlap
             Renormalization band only partially overlaps with ``self``
             and significant amount of flux falls outside the overlap.
 
@@ -1288,7 +1288,7 @@ class SourceSpectrum(BaseSpectrum):
                 warnings['PartialRenorm'] = warn_str
                 log.warn(warn_str)
             else:
-                raise exceptions.OverlapError(
+                raise exceptions.PartialOverlap(
                     'Spectrum and renormalization band do not fully overlap.'
                     'You may use force=True to force the renormalization to '
                     'proceed.')
