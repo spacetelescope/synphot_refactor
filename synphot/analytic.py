@@ -435,10 +435,10 @@ def flat_spectrum(flux_unit, wave_unit=u.AA, area=None):
 
     # Magnitude flux-density units
     if flux_unit_name == units.STMAG.to_string():
-        x = spectrum.convert_fluxes(1, u.Quantity(0, units.STMAG), units.FLAM)
+        x = units.convert_flux(1, u.Quantity(0, units.STMAG), units.FLAM)
 
     elif flux_unit_name == units.ABMAG.to_string():
-        x = spectrum.convert_fluxes(1, u.Quantity(0, units.ABMAG), units.FNU)
+        x = units.convert_flux(1, u.Quantity(0, units.ABMAG), units.FNU)
 
     # Linear flux-density units
     elif (flux_unit.physical_type == 'spectral flux density' or

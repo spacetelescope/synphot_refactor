@@ -26,155 +26,9 @@ from astropy import units as u
 from . import binning, planck, exceptions, config, io, utils, units
 
 
-__all__ = ['convert_fluxes', 'BaseSpectrum', 'BaseUnitlessSpectrum',
-           'SourceSpectrum', 'SpectralElement']
+__all__ = ['BaseSpectrum', 'BaseUnitlessSpectrum', 'SourceSpectrum',
+           'SpectralElement']
 
-
-#-------------------------------------------------------------------------#
-# Flux conversion function.                                               #
-# It is here instead of units.py because it relies on source spectrum.    #
-# Having this in units.py would cause circular import.                    #
-#-------------------------------------------------------------------------#
-
-def convert_fluxes(wavelengths, fluxes, out_flux_unit, **kwargs):
-    """Perform :ref:`flux conversion <synphot-flux-conversion>`.
-
-    Parameters
-    ----------
-    wavelengths : array_like or `astropy.units.quantity.Quantity`
-        Wavelength values. If not a Quantity, assumed to be in
-        Angstrom.
-
-    fluxes : array_like or `astropy.units.quantity.Quantity`
-        Flux values. If not a Quantity, assumed to be in PHOTLAM.
-
-    out_flux_unit : str or `astropy.units.core.Unit`
-        Output flux unit.
-
-    area : float or `astropy.units.quantity.Quantity`
-        Area that fluxes cover. If not a Quantity, assumed to be in cm^2.
-        This value *must* be provided for conversions involving
-        OBMAG and count, otherwise it is not needed.
-
-    vegaspec : `synphot.spectrum.SourceSpectrum`
-        Vega spectrum from :func:`SourceSpectrum.from_vega`.
-        This is *only* used for conversions involving VEGAMAG.
-
-    Returns
-    -------
-    out_flux : `astropy.units.quantity.Quantity`
-        Converted flux values.
-
-    Raises
-    ------
-    astropy.units.core.UnitsError
-        Conversion failed.
-
-    synphot.exceptions.SynphotError
-        Area or Vega spectrum is not given when needed.
-
-    """
-    if not isinstance(fluxes, u.Quantity):
-        fluxes = u.Quantity(fluxes, unit=units.PHOTLAM)
-
-    out_flux_unit = units.validate_unit(out_flux_unit)
-    out_flux_unit_name = out_flux_unit.to_string()
-    in_flux_unit_name = fluxes.unit.to_string()
-
-    # No conversion necessary
-    if in_flux_unit_name == out_flux_unit_name:
-        return fluxes
-
-    in_flux_type = fluxes.unit.physical_type
-    out_flux_type = out_flux_unit.physical_type
-
-    # Wavelengths must Quantity
-    if not isinstance(wavelengths, u.Quantity):
-        wavelengths = u.Quantity(wavelengths, unit=u.AA)
-
-    # Use built-in astropy equivalencies
-    if in_flux_type != 'unknown' and out_flux_type != 'unknown':
-        return fluxes.to(
-            out_flux_unit, equivalencies=u.spectral_density(wavelengths))
-
-    # Convert input unit to PHOTLAM
-    if fluxes.unit == units.PHOTLAM:
-        flux_photlam = fluxes
-    elif in_flux_type != 'unknown':
-        flux_photlam = fluxes.to(
-            units.PHOTLAM, equivalencies=u.spectral_density(wavelengths))
-    else:
-        flux_photlam = _convert_fluxes(
-            wavelengths, fluxes, units.PHOTLAM, **kwargs)
-
-    # Convert PHOTLAM to output unit
-    if out_flux_unit == units.PHOTLAM:
-        out_flux = flux_photlam
-    elif out_flux_type != 'unknown':
-        out_flux = flux_photlam.to(
-            out_flux_unit, equivalencies=u.spectral_density(wavelengths))
-    else:
-        out_flux = _convert_fluxes(
-            wavelengths, flux_photlam, out_flux_unit, **kwargs)
-
-    return out_flux
-
-
-def _convert_fluxes(wavelengths, fluxes, out_flux_unit, area=None,
-                    vegaspec=None):
-    """Flux conversion for PHOTLAM <-> X."""
-    flux_unit_names = (fluxes.unit.to_string(), out_flux_unit.to_string())
-
-    if units.PHOTLAM.to_string() not in flux_unit_names:
-        raise exceptions.SynphotError(
-            'PHOTLAM must be one of the conversion units but get '
-            '{0}.'.format(flux_unit_names))
-
-    # VEGAMAG
-    if units.VEGAMAG.to_string() in flux_unit_names:
-        if not isinstance(vegaspec, SourceSpectrum):
-            raise exceptions.SynphotError('Vega spectrum is missing.')
-
-        flux_vega = vegaspec.resample(wavelengths)
-        out_flux = fluxes.to(
-            out_flux_unit,
-            equivalencies=units.spectral_density_vega(wavelengths, flux_vega))
-
-    # OBMAG or count
-    elif (u.count.to_string() in flux_unit_names or
-          units.OBMAG.to_string() in flux_unit_names):
-        if area is None:
-            raise exceptions.SynphotError(
-                'Area is compulsory for conversion involving count or OBMAG.')
-        elif not isinstance(area, u.Quantity):
-            area = u.Quantity(area, unit=units.AREA)
-
-        out_flux = fluxes.to(
-            out_flux_unit,
-            equivalencies=units.spectral_density_count(wavelengths, area))
-
-    # STMAG
-    elif units.STMAG.to_string() in flux_unit_names:
-        out_flux = fluxes.to(
-            out_flux_unit,
-            equivalencies=units.spectral_density_mag(wavelengths, 'stmag'))
-
-    # ABMAG
-    elif units.ABMAG.to_string() in flux_unit_names:
-        out_flux = fluxes.to(
-            out_flux_unit,
-            equivalencies=units.spectral_density_mag(wavelengths, 'abmag'))
-
-    else:
-        raise u.UnitsError('{0} and {1} are not convertible'.format(
-                fluxes.unit, out_flux_unit))
-
-    return u.Quantity(out_flux, unit=out_flux_unit)
-
-
-#-------------------------------------------------------------------------#
-# Spectrum classes.                                                       #
-#-------------------------------------------------------------------------#
 
 class BaseSpectrum(object):
     """Base class for generic spectrum that should not be used directly.
@@ -812,7 +666,7 @@ class BaseSpectrum(object):
         # Convert other data to self units.
         # Does not work for VEGAMAG flux unit.
         if overplot_data is not None:
-            other_flux = convert_fluxes(
+            other_flux = units.convert_flux(
                 other_wave, other_flux, self.flux.unit, area=other_area)
             other_wave = other_wave.to(
                 self.wave.unit, equivalencies=u.spectral())
@@ -1019,7 +873,7 @@ class SourceSpectrum(BaseSpectrum):
                 unit_type != 'spectral flux density'):
             raise exceptions.SynphotError(
                 'Source spectrum cannot operate in {0}, use '
-                'synphot.spectrum.convert_fluxes() to convert flux to '
+                'synphot.units.convert_flux() to convert flux to '
                 'PHOTLAM, PHOTNU, FLAM, FNU, or Jy first.'.format(unit_name))
 
     def add_mag(self, mag):
@@ -1069,7 +923,7 @@ class SourceSpectrum(BaseSpectrum):
         """Convert ``self.flux`` to a different unit.
         The attribute is updated in-place.
 
-        See :func:`convert_fluxes` for more details.
+        See :func:`synphot.units.convert_flux` for more details.
 
         Parameters
         ----------
@@ -1078,8 +932,8 @@ class SourceSpectrum(BaseSpectrum):
 
         """
         self._validate_flux_unit(out_flux_unit)
-        self.flux = convert_fluxes(self.wave, self.flux, out_flux_unit,
-                                   area=self.primary_area, vegaspec=None)
+        self.flux = units.convert_flux(self.wave, self.flux, out_flux_unit,
+                                       area=self.primary_area, vegaspec=None)
 
     def apply_redshift(self, z):
         """Return a new spectrum with redshifted wavelengths.
@@ -1301,7 +1155,7 @@ class SourceSpectrum(BaseSpectrum):
         # Special handling for non-density units
         if renorm_unit_name in (u.count.to_string(), units.OBMAG.to_string()):
             stdflux = 1.0
-            flux_tmp = convert_fluxes(
+            flux_tmp = units.convert_flux(
                 sp.wave, sp.flux, u.count, area=sp.primary_area)
             totalflux = flux_tmp.sum()
 

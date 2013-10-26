@@ -1,10 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""This module handles synphot units that are not in `astropy.units`.
-
-The actual conversions are in `synphot.spectrum` because they require
-spectral information.
-
-"""
+"""This module handles synphot units that are not in `astropy.units`."""
 from __future__ import division, print_function
 
 # THIRD-PARTY
@@ -21,7 +16,8 @@ from . import exceptions
 __all__ = ['H', 'C', 'HC', 'AREA', 'THROUGHPUT', 'PHOTLAM', 'PHOTNU', 'FLAM',
            'FNU', 'STMAG', 'ABMAG', 'OBMAG', 'VEGAMAG', 'ABZERO', 'STZERO',
            'spectral_density_mag', 'spectral_density_vega',
-           'spectral_density_count', 'validate_unit', 'validate_quantity']
+           'spectral_density_count', 'convert_flux', 'validate_unit',
+           'validate_quantity']
 
 
 #-------------------#
@@ -195,6 +191,142 @@ def spectral_density_count(wav, area):
             (PHOTLAM, OBMAG, converter_obmag, iconverter_obmag)]
 
 
+def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
+    """Perform :ref:`flux conversion <synphot-flux-conversion>`.
+
+    Parameters
+    ----------
+    wavelengths : array_like or `astropy.units.quantity.Quantity`
+        Wavelength values. If not a Quantity, assumed to be in
+        Angstrom.
+
+    fluxes : array_like or `astropy.units.quantity.Quantity`
+        Flux values. If not a Quantity, assumed to be in PHOTLAM.
+
+    out_flux_unit : str or `astropy.units.core.Unit`
+        Output flux unit.
+
+    area : float or `astropy.units.quantity.Quantity`
+        Area that fluxes cover. If not a Quantity, assumed to be in cm^2.
+        This value *must* be provided for conversions involving
+        OBMAG and count, otherwise it is not needed.
+
+    vegaspec : `synphot.spectrum.SourceSpectrum`
+        Vega spectrum from :func:`synphot.spectrum.SourceSpectrum.from_vega`.
+        This is *only* used for conversions involving VEGAMAG.
+
+    Returns
+    -------
+    out_flux : `astropy.units.quantity.Quantity`
+        Converted flux values.
+
+    Raises
+    ------
+    astropy.units.core.UnitsError
+        Conversion failed.
+
+    synphot.exceptions.SynphotError
+        Area or Vega spectrum is not given when needed.
+
+    """
+    if not isinstance(fluxes, u.Quantity):
+        fluxes = u.Quantity(fluxes, unit=PHOTLAM)
+
+    out_flux_unit = validate_unit(out_flux_unit)
+    out_flux_unit_name = out_flux_unit.to_string()
+    in_flux_unit_name = fluxes.unit.to_string()
+
+    # No conversion necessary
+    if in_flux_unit_name == out_flux_unit_name:
+        return fluxes
+
+    in_flux_type = fluxes.unit.physical_type
+    out_flux_type = out_flux_unit.physical_type
+
+    # Wavelengths must Quantity
+    if not isinstance(wavelengths, u.Quantity):
+        wavelengths = u.Quantity(wavelengths, unit=u.AA)
+
+    # Use built-in astropy equivalencies
+    if in_flux_type != 'unknown' and out_flux_type != 'unknown':
+        return fluxes.to(
+            out_flux_unit, equivalencies=u.spectral_density(wavelengths))
+
+    # Convert input unit to PHOTLAM
+    if fluxes.unit == PHOTLAM:
+        flux_photlam = fluxes
+    elif in_flux_type != 'unknown':
+        flux_photlam = fluxes.to(
+            PHOTLAM, equivalencies=u.spectral_density(wavelengths))
+    else:
+        flux_photlam = _convert_flux(wavelengths, fluxes, PHOTLAM, **kwargs)
+
+    # Convert PHOTLAM to output unit
+    if out_flux_unit == PHOTLAM:
+        out_flux = flux_photlam
+    elif out_flux_type != 'unknown':
+        out_flux = flux_photlam.to(
+            out_flux_unit, equivalencies=u.spectral_density(wavelengths))
+    else:
+        out_flux = _convert_flux(
+            wavelengths, flux_photlam, out_flux_unit, **kwargs)
+
+    return out_flux
+
+
+def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None, vegaspec=None):
+    """Flux conversion for PHOTLAM <-> X."""
+    flux_unit_names = (fluxes.unit.to_string(), out_flux_unit.to_string())
+
+    if PHOTLAM.to_string() not in flux_unit_names:
+        raise exceptions.SynphotError(
+            'PHOTLAM must be one of the conversion units but get '
+            '{0}.'.format(flux_unit_names))
+
+    # VEGAMAG
+    if VEGAMAG.to_string() in flux_unit_names:
+        from .spectrum import SourceSpectrum
+
+        if not isinstance(vegaspec, SourceSpectrum):
+            raise exceptions.SynphotError('Vega spectrum is missing.')
+
+        flux_vega = vegaspec.resample(wavelengths)
+        out_flux = fluxes.to(
+            out_flux_unit,
+            equivalencies=spectral_density_vega(wavelengths, flux_vega))
+
+    # OBMAG or count
+    elif (u.count.to_string() in flux_unit_names or
+          OBMAG.to_string() in flux_unit_names):
+        if area is None:
+            raise exceptions.SynphotError(
+                'Area is compulsory for conversion involving count or OBMAG.')
+        elif not isinstance(area, u.Quantity):
+            area = u.Quantity(area, unit=AREA)
+
+        out_flux = fluxes.to(
+            out_flux_unit,
+            equivalencies=spectral_density_count(wavelengths, area))
+
+    # STMAG
+    elif STMAG.to_string() in flux_unit_names:
+        out_flux = fluxes.to(
+            out_flux_unit,
+            equivalencies=spectral_density_mag(wavelengths, 'stmag'))
+
+    # ABMAG
+    elif ABMAG.to_string() in flux_unit_names:
+        out_flux = fluxes.to(
+            out_flux_unit,
+            equivalencies=spectral_density_mag(wavelengths, 'abmag'))
+
+    else:
+        raise u.UnitsError('{0} and {1} are not convertible'.format(
+                fluxes.unit, out_flux_unit))
+
+    return u.Quantity(out_flux, unit=out_flux_unit)
+
+
 #--------------------#
 # Utility functions  #
 #--------------------#
@@ -266,7 +398,7 @@ def validate_quantity(input_value, output_unit, equivalencies=[]):
     equivalencies : list of equivalence pairs, optional
         See :func:`astropy.units.core.UnitBase.to`.
         Does not work for flux conversion
-        (see :func:`synphot.spectrum.convert_fluxes`).
+        (see :func:`convert_flux`).
 
     Returns
     -------

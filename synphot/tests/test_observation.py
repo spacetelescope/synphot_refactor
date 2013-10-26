@@ -379,7 +379,7 @@ class TestCountRate(object):
     """
     def setup_class(self):
         wave = np.arange(1000, 1100, 0.5)
-        flux_flam = spectrum.convert_fluxes(
+        flux_flam = units.convert_flux(
             wave, u.Quantity(wave - 1000, u.count), units.FLAM, area=_area)
         sp = spectrum.SourceSpectrum(
             wave, flux_flam, area=_area, header={'expr': 'slope1'})

@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Test spectrum.py module."""
+"""Test spectrum.py module and flux conversion."""
 from __future__ import division, print_function
 
 # STDLIB
@@ -89,7 +89,7 @@ def test_load_vspec():
       u.Quantity(np.zeros(3), units.FLAM))])
 def test_flux_conversion(in_q, out_u, ans):
     """Test flux conversion, except VEGAMAG."""
-    result = spectrum.convert_fluxes(_wave, in_q, out_u, area=_area)
+    result = units.convert_flux(_wave, in_q, out_u, area=_area)
     np.testing.assert_allclose(result.value, ans.value, rtol=1e-6)
     assert result.unit == ans.unit
 
@@ -103,8 +103,7 @@ def test_flux_conversion(in_q, out_u, ans):
      (_flux_vegamag, u.Jy, _flux_jy)])
 def test_flux_conversion_vega(in_q, out_u, ans):
     """Test Vega spectrum object and flux conversion with VEGAMAG."""
-    result = spectrum.convert_fluxes(
-        _wave, in_q, out_u, area=_area, vegaspec=_vspec)
+    result = units.convert_flux(_wave, in_q, out_u, area=_area, vegaspec=_vspec)
     np.testing.assert_allclose(result.value, ans.value, rtol=1e-6)
     assert result.unit == ans.unit
 
@@ -113,22 +112,19 @@ def test_flux_conversion_exceptions():
     """Test for appropriate exceptions."""
     # Invalid flux unit
     with pytest.raises(u.UnitsError):
-        x = spectrum.convert_fluxes(_wave, _wave, units.PHOTLAM)
+        x = units.convert_flux(_wave, _wave, units.PHOTLAM)
     with pytest.raises(u.UnitsError):
-        x = spectrum.convert_fluxes(_wave, _flux_photlam, u.AA)
+        x = units.convert_flux(_wave, _flux_photlam, u.AA)
 
     # Missing Vega spectrum
     with pytest.raises(exceptions.SynphotError):
-        x = spectrum.convert_fluxes(
-            _wave, _flux_fnu, units.VEGAMAG, vegaspec=None)
+        x = units.convert_flux(_wave, _flux_fnu, units.VEGAMAG, vegaspec=None)
 
     # Missing area
     with pytest.raises(exceptions.SynphotError):
-        x = spectrum.convert_fluxes(
-            _wave, _flux_photlam, u.count, area=None)
+        x = units.convert_flux(_wave, _flux_photlam, u.count, area=None)
     with pytest.raises(exceptions.SynphotError):
-        x = spectrum.convert_fluxes(
-            _wave, _flux_obmag, units.PHOTLAM, area=None)
+        x = units.convert_flux(_wave, _flux_obmag, units.PHOTLAM, area=None)
 
 
 class TestSourceSpectrum(object):
@@ -319,9 +315,9 @@ class TestSourceSpectrum(object):
 class TestAddMag(object):
     """Test SourceSpectrum add_mag() method."""
     def setup_class(self):
-        self.bright = spectrum.SourceSpectrum(_wave, spectrum.convert_fluxes(
+        self.bright = spectrum.SourceSpectrum(_wave, units.convert_flux(
                 _wave, u.Quantity([18.0] * 3, units.ABMAG), units.PHOTLAM))
-        self.faint = spectrum.SourceSpectrum(_wave, spectrum.convert_fluxes(
+        self.faint = spectrum.SourceSpectrum(_wave, units.convert_flux(
                 _wave, u.Quantity([21.0] * 3, units.ABMAG), units.PHOTLAM))
         self.dmag = u.Quantity(3.0, u.mag)
 

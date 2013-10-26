@@ -193,7 +193,7 @@ class Observation(spectrum.SourceSpectrum):
         """Convert ``self.flux`` and ``self.binflux`` to a different unit.
         The attribute is updated in-place.
 
-        See :func:`synphot.spectrum.convert_fluxes` for more details.
+        See :func:`synphot.units.convert_flux` for more details.
 
         Parameters
         ----------
@@ -202,12 +202,11 @@ class Observation(spectrum.SourceSpectrum):
 
         """
         self._validate_flux_unit(out_flux_unit)
-        self.flux = spectrum.convert_fluxes(
-            self.wave, self.flux, out_flux_unit, area=self.primary_area,
-            vegaspec=None)
+        self.flux = units.convert_flux(self.wave, self.flux, out_flux_unit,
+                                       area=self.primary_area, vegaspec=None)
 
         if self.binwave is not None and self.binflux is not None:
-            self.binflux = spectrum.convert_fluxes(
+            self.binflux = units.convert_flux(
                 self.binwave, self.binflux, out_flux_unit,
                 area=self.primary_area, vegaspec=None)
 
@@ -416,15 +415,15 @@ class Observation(spectrum.SourceSpectrum):
         # Convert flux to appropriate unit
         mode = mode.lower()
         if mode == 'efflerg':
-            flux = spectrum.convert_fluxes(self._wave, self._flux, units.FLAM,
-                                           area=self.primary_area)
+            flux = units.convert_flux(
+                self._wave, self._flux, units.FLAM, area=self.primary_area)
         elif mode == 'efflphot':
-            flux = spectrum.convert_fluxes(self._wave, self._flux, units.PHOTLAM,
-                                           area=self.primary_area)
+            flux = units.convert_flux(
+                self._wave, self._flux, units.PHOTLAM, area=self.primary_area)
         else:
             raise exceptions.SynphotError(
-                'mode={0} is invalid, must be "efflerg" or "efflphot"'.format(
-                    mode))
+                'mode={0} is invalid, must be "efflerg" or '
+                '"efflphot"'.format(mode))
 
         wave = utils.to_length(self._wave)
         num = utils.trapezoid_integration(
@@ -554,7 +553,7 @@ class Observation(spectrum.SourceSpectrum):
 
         # Special handling for non-density units
         if flux_unit_name in (u.count.to_string(), units.OBMAG.to_string()):
-            self_flux = spectrum.convert_fluxes(
+            self_flux = units.convert_flux(
                 inwave, influx, u.count, area=self.primary_area)
             val = self_flux.sum()
             utils.validate_totalflux(val.value)
@@ -605,14 +604,14 @@ class Observation(spectrum.SourceSpectrum):
                 raise exceptions.SynphotError(
                     'Flux unit {0} is invalid'.format(flux_unit))
 
-            self_flux = spectrum.convert_fluxes(
+            self_flux = units.convert_flux(
                 self_wave, influx, tmp_unit, area=self.primary_area)
 
             if flux_unit_name == units.VEGAMAG.to_string():
                 if not isinstance(vegaspec, spectrum.SourceSpectrum):
                     raise exceptions.SynphotError(
                         'Vega spectrum is missing.')
-                vega_flux = spectrum.convert_fluxes(
+                vega_flux = units.convert_flux(
                     self_wave, vegaspec.resample(self_wave), tmp_unit,
                     area=self.primary_area, vegaspec=None)
                 flux = self_flux.value / vega_flux.value
@@ -631,7 +630,7 @@ class Observation(spectrum.SourceSpectrum):
             # Convert back to mag, if needed
             if flux_unit_name in (units.STMAG.to_string(),
                                   units.ABMAG.to_string()):
-                eff_stim = spectrum.convert_fluxes(
+                eff_stim = units.convert_flux(
                     1, u.Quantity(val, unit=tmp_unit), flux_unit)
             elif flux_unit_name == units.VEGAMAG.to_string():
                 eff_stim = u.Quantity(-2.5 * np.log10(val), unit=flux_unit)
