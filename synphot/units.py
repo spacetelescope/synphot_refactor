@@ -18,11 +18,10 @@ from astropy import units as u
 from . import exceptions
 
 
-__all__ = ['H', 'C', 'HC', 'AREA', 'THROUGHPUT', 'PHOTLAM',
-           'PHOTNU', 'FLAM', 'FNU', 'STMAG', 'ABMAG', 'OBMAG',
-           'VEGAMAG', 'ABZERO', 'STZERO', 'flux_conversion_wav',
-           'flux_conversion_freq', 'flux_conversion_vegamag',
-           'flux_conversion_nondensity', 'validate_unit', 'validate_quantity']
+__all__ = ['H', 'C', 'HC', 'AREA', 'THROUGHPUT', 'PHOTLAM', 'PHOTNU', 'FLAM',
+           'FNU', 'STMAG', 'ABMAG', 'OBMAG', 'VEGAMAG', 'ABZERO', 'STZERO',
+           'spectral_density_mag', 'spectral_density_vega',
+           'spectral_density_count', 'validate_unit', 'validate_quantity']
 
 
 #-------------------#
@@ -33,9 +32,9 @@ H = const.h.cgs  # Planck's constant in erg * sec
 C = const.c.to('AA/s')  # Speed of light in Angstrom/sec
 HC = H * C
 
-#----------------------#
-# For flux conversions #
-#----------------------#
+#---------------#
+# synphot units #
+#---------------#
 
 # Default unit of area covered by flux
 AREA = u.cm * u.cm
@@ -65,69 +64,135 @@ OBMAG = u.def_unit(
 VEGAMAG = u.def_unit(
     'vegamag', u.mag, format={'generic': 'VEGAMAG', 'console': 'VEGAMAG'})
 
-# Magnitude zero points
+# Register with astropy units
+u.add_enabled_units([PHOTLAM, PHOTNU, FLAM, FNU, STMAG, ABMAG, OBMAG, VEGAMAG])
+
+#-----------------#
+# Flux conversion #
+#-----------------#
+
 ABZERO = u.Quantity(-48.6, unit=u.mag)
 STZERO = u.Quantity(-21.1, unit=u.mag)
 
 
-def _div_flux(fluxspec):
-    """For PHOTLAM to VEGAMAG conversion."""
-    val = -2.5 * np.log10(fluxspec[0] / fluxspec[1])
-    result = np.zeros(val.shape, dtype=val.dtype) - 99
-    mask = np.isfinite(val)
-    result[mask] = val[mask]
-    return result
+def spectral_density_mag(wav, magname):
+    """Flux equivalencies between PHOTLAM and ABMAG/STMAG.
+
+    Parameters
+    ----------
+    wav : `astropy.units.quantity.Quantity`
+        Quantity associated with values being converted
+        (e.g., wavelength or frequency).
+
+    magname : {'abmag', 'stmag'}
+        Indicates ABMAG or STMAG. Case-insensitive.
+        This is needed because `astropy.units` cannot distinguish
+        between different types of magnitudes.
+
+    Returns
+    -------
+    eqv : list
+        List of equivalencies.
+
+    Raises
+    ------
+    astropy.units.core.UnitsError
+        Invalid magnitude system.
+
+    """
+    magname = magname.lower()
+    wav = wav.to(u.AA, equivalencies=u.spectral()).value
+
+    if magname == 'abmag':
+        eqv = [
+            (PHOTLAM, ABMAG,
+             lambda x: -2.5 * np.log10(H.value * x * wav) + ABZERO.value,
+             lambda x: 10**(-0.4 * (x - ABZERO.value)) / (H.value * wav))]
+    elif magname == 'stmag':
+        eqv = [
+            (PHOTLAM, STMAG,
+             lambda x: -2.5 * np.log10(HC.value * x / wav) + STZERO.value,
+             lambda x: wav * 10**(-0.4 * (x - STZERO.value)) / HC.value)]
+    else:
+        raise u.UnitsError('{0} is not supported.'.format(magname))
+
+    return eqv
 
 
-# Flux equivalencies take one of the following:
-#     waveflux = (wave, flux)
-#     fluxspec = (flux, flux_vega)
-#     fluxbinarea = (flux, bin, area)
-#
-# wave and bin in Angstrom, area in cm^2, flux_vega in PHOTLAM
-#
-# astropy cannot distinguish between different types of mags,
-# so the equivalencies are separated here.
-flux_conversion_wav = [
-    (PHOTLAM, FLAM,
-     lambda waveflux: HC.value * waveflux[1] / waveflux[0],
-     lambda waveflux: waveflux[1] * waveflux[0] / HC.value),
-    (PHOTLAM, STMAG,
-     lambda waveflux: -2.5 * np.log10(
-            HC.value * waveflux[1] / waveflux[0]) + STZERO.value,
-     lambda waveflux: waveflux[0] * 10**(
-            -0.4 * (waveflux[1] - STZERO.value)) / HC.value) ]
-flux_conversion_freq = [
-    (PHOTLAM, PHOTNU,
-     lambda waveflux: waveflux[1] * waveflux[0]**2 / C.value,
-     lambda waveflux: C.value * waveflux[1] / waveflux[0]**2),
-    (PHOTLAM, FNU,
-     lambda waveflux: H.value * waveflux[1] * waveflux[0],
-     lambda waveflux: waveflux[1] / (waveflux[0] * H.value)),
-    (PHOTLAM, ABMAG,
-     lambda waveflux: -2.5 * np.log10(
-            H.value * waveflux[1] * waveflux[0]) + ABZERO.value,
-     lambda waveflux:  10**(
-            -0.4 * (waveflux[1] - ABZERO.value)) / (H.value * waveflux[0])) ]
-flux_conversion_vegamag = [
-    (PHOTLAM, VEGAMAG, _div_flux,
-     lambda fluxspec: fluxspec[1] * 10**(-0.4 * fluxspec[0])) ]
-flux_conversion_nondensity = [
-    (PHOTLAM, OBMAG,
-     lambda fluxbinarea: -2.5 * np.log10(
-            fluxbinarea[0] * fluxbinarea[1] * fluxbinarea[2]),
-     lambda fluxbinarea: 10**(
-            -0.4 * fluxbinarea[0]) / (fluxbinarea[1] * fluxbinarea[2])),
-    (PHOTLAM, u.count,
-     lambda fluxbinarea: fluxbinarea[0] * fluxbinarea[1] * fluxbinarea[2],
-     lambda fluxbinarea: fluxbinarea[0] / (fluxbinarea[1] * fluxbinarea[2])) ]
+def spectral_density_vega(wav, vegaflux):
+    """Flux equivalencies between PHOTLAM and VEGAMAG.
+
+    Parameters
+    ----------
+    wav : `astropy.units.quantity.Quantity`
+        Quantity associated with values being converted
+        (e.g., wavelength or frequency).
+
+    vegaflux : `astropy.units.quantity.Quantity`
+        Flux of Vega at ``wav``.
+
+    Returns
+    -------
+    eqv : list
+        List of equivalencies.
+
+    """
+    vega_photlam = vegaflux.to(
+        PHOTLAM, equivalencies=u.spectral_density(wav)).value
+
+    def converter(x):
+        """Set nan/inf to -99 mag."""
+        val = -2.5 * np.log10(x / vega_photlam)
+        result = np.zeros(val.shape, dtype=np.float64) - 99
+        mask = np.isfinite(val)
+        result[mask] = val[mask]
+        return result
+
+    def iconverter(x):
+        return vega_photlam * 10**(-0.4 * x)
+
+    return [(PHOTLAM, VEGAMAG, converter, iconverter)]
 
 
-#-----------------------------#
-# Register with astropy units #
-#-----------------------------#
+def spectral_density_count(wav, area):
+    """Flux equivalencies between PHOTLAM and count/OBMAG.
 
-u.add_enabled_units([PHOTLAM, PHOTNU, FLAM, FNU, STMAG, ABMAG, OBMAG, VEGAMAG])
+    Parameters
+    ----------
+    wav : `astropy.units.quantity.Quantity`
+        Quantity associated with values being converted
+        (e.g., wavelength or frequency).
+
+    area : `astropy.units.quantity.Quantity`
+        Telescope collecting area.
+
+    Returns
+    -------
+    eqv : list
+        List of equivalencies.
+
+    """
+    from .binning import calculate_bin_widths, calculate_bin_edges
+
+    wav = wav.to(u.AA, equivalencies=u.spectral())
+    area = area.to(AREA)
+    bin_widths = calculate_bin_widths(calculate_bin_edges(wav))
+    factor = bin_widths.value * area.value
+
+    def converter_count(x):
+        return x * factor
+
+    def iconverter_count(x):
+        return x / factor
+
+    def converter_obmag(x):
+        return -2.5 * np.log10(x * factor)
+
+    def iconverter_obmag(x):
+        return 10**(-0.4 * x) / factor
+
+    return [(PHOTLAM, u.count, converter_count, iconverter_count),
+            (PHOTLAM, OBMAG, converter_obmag, iconverter_obmag)]
 
 
 #--------------------#

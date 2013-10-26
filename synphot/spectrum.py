@@ -85,38 +85,34 @@ def convert_fluxes(wavelengths, fluxes, out_flux_unit, **kwargs):
     if in_flux_unit_name == out_flux_unit_name:
         return fluxes
 
-    # Use built-in astropy.units conversion
-    if (fluxes.unit.physical_type != 'unknown' and
-            fluxes.unit.physical_type == out_flux_unit.physical_type):
-        return fluxes.to(out_flux_unit)
+    in_flux_type = fluxes.unit.physical_type
+    out_flux_type = out_flux_unit.physical_type
 
-    # Wavelengths must be in Angstrom
-    wavelengths = units.validate_quantity(
-        wavelengths, u.AA, equivalencies=u.spectral())
+    # Wavelengths must Quantity
+    if not isinstance(wavelengths, u.Quantity):
+        wavelengths = u.Quantity(wavelengths, unit=u.AA)
+
+    # Use built-in astropy equivalencies
+    if in_flux_type != 'unknown' and out_flux_type != 'unknown':
+        return fluxes.to(
+            out_flux_unit, equivalencies=u.spectral_density(wavelengths))
 
     # Convert input unit to PHOTLAM
-    if in_flux_unit_name == units.PHOTLAM.to_string():
+    if fluxes.unit == units.PHOTLAM:
         flux_photlam = fluxes
+    elif in_flux_type != 'unknown':
+        flux_photlam = fluxes.to(
+            units.PHOTLAM, equivalencies=u.spectral_density(wavelengths))
     else:
-        # Handles different prefixes of Jy by converting it to FNU
-        # so the equivalencies can understand.
-        if (fluxes.unit.physical_type == 'spectral flux density' and
-                in_flux_unit_name != units.FNU.to_string()):
-            flux_tmp = fluxes.to(units.FNU)
-        else:
-            flux_tmp = fluxes
-
         flux_photlam = _convert_fluxes(
-            wavelengths, flux_tmp, units.PHOTLAM, **kwargs)
+            wavelengths, fluxes, units.PHOTLAM, **kwargs)
 
     # Convert PHOTLAM to output unit
-    if out_flux_unit_name == units.PHOTLAM.to_string():
+    if out_flux_unit == units.PHOTLAM:
         out_flux = flux_photlam
-    elif (out_flux_unit.physical_type == 'spectral flux density' and
-          out_flux_unit_name != units.FNU.to_string()):  # xJy
-        flux_tmp = _convert_fluxes(
-            wavelengths, flux_photlam, units.FNU, **kwargs)
-        out_flux = flux_tmp.to(out_flux_unit)
+    elif out_flux_type != 'unknown':
+        out_flux = flux_photlam.to(
+            out_flux_unit, equivalencies=u.spectral_density(wavelengths))
     else:
         out_flux = _convert_fluxes(
             wavelengths, flux_photlam, out_flux_unit, **kwargs)
@@ -126,51 +122,48 @@ def convert_fluxes(wavelengths, fluxes, out_flux_unit, **kwargs):
 
 def _convert_fluxes(wavelengths, fluxes, out_flux_unit, area=None,
                     vegaspec=None):
-    """Flux conversion worker."""
+    """Flux conversion for PHOTLAM <-> X."""
     flux_unit_names = (fluxes.unit.to_string(), out_flux_unit.to_string())
+
+    if units.PHOTLAM.to_string() not in flux_unit_names:
+        raise exceptions.SynphotError(
+            'PHOTLAM must be one of the conversion units but get '
+            '{0}.'.format(flux_unit_names))
 
     # VEGAMAG
     if units.VEGAMAG.to_string() in flux_unit_names:
         if not isinstance(vegaspec, SourceSpectrum):
             raise exceptions.SynphotError('Vega spectrum is missing.')
 
-        flux_vega = convert_fluxes(
-            wavelengths, vegaspec.resample(wavelengths), units.PHOTLAM,
-            area=area, vegaspec=None)
-        out_flux = fluxes.unit.to(
-            out_flux_unit, (fluxes.value, flux_vega.value),
-            equivalencies=units.flux_conversion_vegamag)
+        flux_vega = vegaspec.resample(wavelengths)
+        out_flux = fluxes.to(
+            out_flux_unit,
+            equivalencies=units.spectral_density_vega(wavelengths, flux_vega))
 
     # OBMAG or count
     elif (u.count.to_string() in flux_unit_names or
           units.OBMAG.to_string() in flux_unit_names):
         if area is None:
             raise exceptions.SynphotError(
-                'Area must be provided for conversion involving count or OBMAG.')
+                'Area is compulsory for conversion involving count or OBMAG.')
+        elif not isinstance(area, u.Quantity):
+            area = u.Quantity(area, unit=units.AREA)
 
-        area = units.validate_quantity(area, units.AREA)
-        area_arr = np.empty(fluxes.shape, dtype=fluxes.dtype)
-        area_arr.fill(area.value)
-        bin_widths = binning.calculate_bin_widths(
-            binning.calculate_bin_edges(wavelengths))
-        out_flux = fluxes.unit.to(
-            out_flux_unit, (fluxes.value, bin_widths.value, area_arr),
-            equivalencies=units.flux_conversion_nondensity)
+        out_flux = fluxes.to(
+            out_flux_unit,
+            equivalencies=units.spectral_density_count(wavelengths, area))
 
-    # FLAM or STMAG
-    elif (units.FLAM.to_string() in flux_unit_names or
-          units.STMAG.to_string() in flux_unit_names):
-        out_flux = fluxes.unit.to(
-            out_flux_unit, (wavelengths.value, fluxes.value),
-            equivalencies=units.flux_conversion_wav)
+    # STMAG
+    elif units.STMAG.to_string() in flux_unit_names:
+        out_flux = fluxes.to(
+            out_flux_unit,
+            equivalencies=units.spectral_density_mag(wavelengths, 'stmag'))
 
-    # PHOTNU, FNU, or ABMAG
-    elif (units.PHOTNU.to_string() in flux_unit_names or
-          units.FNU.to_string() in flux_unit_names or
-          units.ABMAG.to_string() in flux_unit_names):
-        out_flux = fluxes.unit.to(
-            out_flux_unit, (wavelengths.value, fluxes.value),
-            equivalencies=units.flux_conversion_freq)
+    # ABMAG
+    elif units.ABMAG.to_string() in flux_unit_names:
+        out_flux = fluxes.to(
+            out_flux_unit,
+            equivalencies=units.spectral_density_mag(wavelengths, 'abmag'))
 
     else:
         raise u.UnitsError('{0} and {1} are not convertible'.format(

@@ -61,52 +61,8 @@ examples below:
 Flux Conversion
 ---------------
 
-Table below shows the supported flux conversions using equivalencies in
-`synphot.units`. For simplicity, PHOTLAM is assigned the primary flux unit.
-
-:func:`synphot.spectrum.convert_fluxes` can convert from one arbitrary flux unit
-to another by first converting the input flux to PHOTLAM, and then to the
-desired unit. The exception is conversion between two units with the same known
-physical types (FNU and Jy), which is done directly via
-:func:`astropy.units.core.Unit.to`. Different prefixes of Jy are also supported
-by the function but not the equivalencies.
-
-+------------+------------------------------------------+
-| Input unit | Allowed output unit                      |
-+============+==========================================+
-| PHOTLAM    | PHOTNU, FLAM, FNU, STMAG, ABMAG, OBMAG,  |
-|            | VEGAMAG, count, Jy                       |
-+------------+------------------------------------------+
-| PHOTNU     | PHOTLAM                                  |
-+------------+------------------------------------------+
-| FLAM       | PHOTLAM                                  |
-+------------+------------------------------------------+
-| FNU        | PHOTLAM, Jy                              |
-+------------+------------------------------------------+
-| STMAG      | PHOTLAM                                  |
-+------------+------------------------------------------+
-| ABMAG      | PHOTLAM                                  |
-+------------+------------------------------------------+
-| OBMAG      | PHOTLAM                                  |
-+------------+------------------------------------------+
-| VEGAMAG    | PHOTLAM                                  |
-+------------+------------------------------------------+
-| Jy         | PHOTLAM, FNU                             |
-+------------+------------------------------------------+
-| count      | PHOTLAM                                  |
-+------------+------------------------------------------+
-
-These are the constants used in some conversions:
-
-+--------------------+--------------------------------------+
-| Constant           | Descriptions                         |
-+====================+======================================+
-|``synphot.units.H`` | Planck's constant in CGS units       |
-+--------------------+--------------------------------------+
-|``synphot.units.C`` | Speed of light in :math:`\AA s^{-1}` |
-+--------------------+--------------------------------------+
-|``synphot.units.HC``| :math:`H \times C`                   |
-+--------------------+--------------------------------------+
+When possible :func:`astropy.units.equivalencies.spectral_density` is used for
+flux conversion. Otherwise, equivalencies in `synphot.units` are used.
 
 Examples:
 
