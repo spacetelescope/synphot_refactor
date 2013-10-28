@@ -1,6 +1,12 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Utilities related to wavelength bin calculations."""
-from __future__ import division, print_function
+"""Utilities related to wavelength bin calculations.
+
+Also imports this C-extension to local namespace:
+
+    - :ref:`calcbinflux(len_binwave, i_beg, i_end, avflux, deltaw) <synphot-c-ext>`
+
+"""
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # THIRD-PARTY
 import numpy as np
@@ -18,33 +24,12 @@ __all__ = ['calcbinflux', 'calculate_bin_edges', 'calculate_bin_widths',
 
 
 def _slow_calcbinflux(len_binwave, i_beg, i_end, avflux, deltaw):
-    """Sum over each bin.
+    """Python implementation of ``calcbinflux``.
 
     This is only used if ``synphot.synphot_utils`` C-extension
     import fails.
 
-    Parameters
-    ----------
-    len_binwave : int
-        Number of wavelength bin centers.
-
-    i_beg, i_end : array_like
-        Locations of bin edges in ``deltaw``.
-
-    avflux : array_like
-        Average flux associated with ``deltaw``.
-
-    deltaw : array_like
-        Delta of merge wavelengths (native + centers + edges).
-        Values are in ascending order.
-
-    Returns
-    -------
-    binflux : array_like
-        Integrated flux associated with given bins in ascending order.
-
-    intwave : array_like
-        Integrated delta wavelength associated with ``binflux``.
+    See docstrings.py
 
     """
     binflux = np.empty(shape=(len_binwave, ), dtype=np.float64)
