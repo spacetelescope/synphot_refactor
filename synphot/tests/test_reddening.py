@@ -22,11 +22,9 @@ from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import spectrum, exceptions, units
+from .. import analytic, spectrum, exceptions, units
 from ..reddening import ReddeningLaw, ExtinctionCurve
 
-
-__doctest_skip__ = ['*']
 
 # HST primary mirror
 _area = u.Quantity(45238.93416, units.AREA)
@@ -55,7 +53,7 @@ class TestExtinction(object):
         np.testing.assert_allclose(
             self.redlaw.thru.value[48:53],
             [8.69231796, 8.40150452, 8.17892265, 8.01734924, 7.90572977])
-        assert self.redlaw.wave.unit == units.INVERSE_MICRON
+        assert self.redlaw.wave.unit == u.micron ** -1
         assert self.redlaw.thru.unit == units.THROUGHPUT
         assert self.redlaw.thru is self.redlaw.flux
         assert self.redlaw.metadata['SHORTNM'] == 'MWAvg'
@@ -84,7 +82,8 @@ class TestExtinction(object):
         Angstrom.
 
         """
-        sp = spectrum.SourceSpectrum.from_flat_spectrum(units.FLAM, area=_area)
+        flat = analytic.flat_spectrum(units.FLAM, area=_area)
+        sp = flat.to_spectrum([1000.0])
         ans = self.extcurve.resample(5.03399992)
 
         if op_type == '*':
@@ -130,7 +129,7 @@ def test_redlaw_from_model(modelname):
 
     """
     redlaw = ReddeningLaw.from_model(modelname, encoding='binary')
-    wave = redlaw.wave.to(u.AA, equivalencies=units.wave_conversion)
+    wave = redlaw.wave.to(u.AA, equivalencies=u.spectral())
     assert redlaw.thru.unit == units.THROUGHPUT
     assert modelname in redlaw.metadata['expr']
     assert 'filename' in redlaw.metadata

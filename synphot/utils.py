@@ -161,7 +161,7 @@ def to_length(wavelengths, wave_unit=u.AA):
         outwave = wavelengths
     else:
         wave_unit = units.validate_unit(wave_unit)
-        outwave = wavelengths.to(wave_unit, equivalencies=units.wave_conversion)
+        outwave = wavelengths.to(wave_unit, equivalencies=u.spectral())
 
     return outwave
 

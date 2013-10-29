@@ -18,9 +18,6 @@ from astropy.utils.data import get_pkg_data_filename
 from .. import exceptions, io, utils, units
 
 
-__doctest_skip__ = ['*']
-
-
 @pytest.mark.parametrize(
     ('a', 'b', 'ans'),
     [(np.arange(5, 8), np.arange(10), 'full'),

@@ -16,7 +16,7 @@ from astropy import log
 from astropy import units as u
 
 # LOCAL
-from . import binning, spectrum, exceptions, io, utils, units
+from . import analytic, binning, spectrum, exceptions, io, utils, units
 
 
 __all__ = ['Observation']
@@ -125,7 +125,7 @@ class Observation(spectrum.SourceSpectrum):
         """
         # Convert binwave to native wavelength unit and validate.
         self.binwave = units.validate_quantity(
-            binwave, self.wave.unit, equivalencies=units.wave_conversion)
+            binwave, self.wave.unit, equivalencies=u.spectral())
         utils.validate_wavelengths(self.binwave)
 
         # binwave must be in ascending order for calcbinflux()
@@ -193,7 +193,7 @@ class Observation(spectrum.SourceSpectrum):
         """Convert ``self.flux`` and ``self.binflux`` to a different unit.
         The attribute is updated in-place.
 
-        See :func:`synphot.spectrum.convert_fluxes` for more details.
+        See :func:`synphot.units.convert_flux` for more details.
 
         Parameters
         ----------
@@ -202,12 +202,11 @@ class Observation(spectrum.SourceSpectrum):
 
         """
         self._validate_flux_unit(out_flux_unit)
-        self.flux = spectrum.convert_fluxes(
-            self.wave, self.flux, out_flux_unit, area=self.primary_area,
-            vegaspec=None)
+        self.flux = units.convert_flux(self.wave, self.flux, out_flux_unit,
+                                       area=self.primary_area, vegaspec=None)
 
         if self.binwave is not None and self.binflux is not None:
-            self.binflux = spectrum.convert_fluxes(
+            self.binflux = units.convert_flux(
                 self.binwave, self.binflux, out_flux_unit,
                 area=self.primary_area, vegaspec=None)
 
@@ -244,7 +243,7 @@ class Observation(spectrum.SourceSpectrum):
 
         # Convert wavelengths to self.binwave unit, and do validation
         wavelengths = units.validate_quantity(
-            wavelengths, self._wave.unit, equivalencies=units.wave_conversion)
+            wavelengths, self._wave.unit, equivalencies=u.spectral())
         utils.validate_wavelengths(wavelengths)
 
         if not np.all(np.in1d(wavelengths, self._wave)):
@@ -286,7 +285,7 @@ class Observation(spectrum.SourceSpectrum):
 
         if isinstance(cenwave, u.Quantity):
             bin_wave = units.validate_quantity(
-                self._wave, cenwave.unit, equivalencies=units.wave_conversion)
+                self._wave, cenwave.unit, equivalencies=u.spectral())
         else:
             cenwave = u.Quantity(cenwave, unit=self._wave.unit)
             bin_wave = self._wave
@@ -326,9 +325,9 @@ class Observation(spectrum.SourceSpectrum):
         self._set_data(True)  # Use binned data
 
         w1 = units.validate_quantity(
-            waverange[0], self._wave.unit, equivalencies=units.wave_conversion)
+            waverange[0], self._wave.unit, equivalencies=u.spectral())
         w2 = units.validate_quantity(
-            waverange[-1], self._wave.unit, equivalencies=units.wave_conversion)
+            waverange[-1], self._wave.unit, equivalencies=u.spectral())
 
         return binning.pixel_range(
             self._wave.value, (w1.value, w2.value), **kwargs)
@@ -416,15 +415,15 @@ class Observation(spectrum.SourceSpectrum):
         # Convert flux to appropriate unit
         mode = mode.lower()
         if mode == 'efflerg':
-            flux = spectrum.convert_fluxes(self._wave, self._flux, units.FLAM,
-                                           area=self.primary_area)
+            flux = units.convert_flux(
+                self._wave, self._flux, units.FLAM, area=self.primary_area)
         elif mode == 'efflphot':
-            flux = spectrum.convert_fluxes(self._wave, self._flux, units.PHOTLAM,
-                                           area=self.primary_area)
+            flux = units.convert_flux(
+                self._wave, self._flux, units.PHOTLAM, area=self.primary_area)
         else:
             raise exceptions.SynphotError(
-                'mode={0} is invalid, must be "efflerg" or "efflphot"'.format(
-                    mode))
+                'mode={0} is invalid, must be "efflerg" or '
+                '"efflphot"'.format(mode))
 
         wave = utils.to_length(self._wave)
         num = utils.trapezoid_integration(
@@ -454,7 +453,7 @@ class Observation(spectrum.SourceSpectrum):
         flux_unit : `None`, str, or `astropy.units.core.Unit`
             The unit of effective stimulus. If `None`, uses ``self`` flux unit.
 
-        band : `~synphot.spectrum.SpectralElement`
+        band : `~synphot.spectrum.SpectralElement` or `~synphot.analytic.MixinAnalyticPassband`
             Passband that went into the observation. This is needed
             unless flux unit is count or OBMAG.
 
@@ -484,7 +483,7 @@ class Observation(spectrum.SourceSpectrum):
         synphot.exceptions.DisjointError
             Passband or wavelength range does not overlap with observation.
 
-        synphot.exceptions.OverlapError
+        synphot.exceptions.PartialOverlap
             Passband or wavelength range only partially overlaps with
             observation.
 
@@ -510,9 +509,9 @@ class Observation(spectrum.SourceSpectrum):
         # Use given wavelength range
         else:
             w1 = units.validate_quantity(wave_range[0], self._wave.unit,
-                                         equivalencies=units.wave_conversion)
+                                         equivalencies=u.spectral())
             w2 = units.validate_quantity(wave_range[-1], self._wave.unit,
-                                         equivalencies=units.wave_conversion)
+                                         equivalencies=u.spectral())
             if w1 >= w2:
                 raise exceptions.SynphotError('Invalid wavelength range.')
 
@@ -529,7 +528,7 @@ class Observation(spectrum.SourceSpectrum):
                     w1 = max(w1, self._wave.min())
                     w2 = min(w2, self._wave.max())
                 else:
-                    raise exceptions.OverlapError(
+                    raise exceptions.PartialOverlap(
                         'Observation and wavelength range do not fully '
                         'overlap. You may use force=True to force this '
                         'calculation anyway.')
@@ -554,7 +553,7 @@ class Observation(spectrum.SourceSpectrum):
 
         # Special handling for non-density units
         if flux_unit_name in (u.count.to_string(), units.OBMAG.to_string()):
-            self_flux = spectrum.convert_fluxes(
+            self_flux = units.convert_flux(
                 inwave, influx, u.count, area=self.primary_area)
             val = self_flux.sum()
             utils.validate_totalflux(val.value)
@@ -574,17 +573,23 @@ class Observation(spectrum.SourceSpectrum):
                     raise exceptions.DisjointError(
                         'Observation and passband are disjoint.')
                 elif 'partial' in stat:
-                    raise exceptions.OverlapError(
+                    raise exceptions.PartialOverlap(
                         'Observation and passband do not fully overlap.')
                 elif stat != 'full':  # pragma: no cover
                     raise exceptions.SynphotError(
                         'Overlap result of {0} is unexpected'.format(stat))
+            elif isinstance(band, analytic.MixinAnalyticPassband):
+                if band.param_dim > 1:
+                    raise exceptions.SynphotError(
+                        'Ambiguous analytic passband with {0} parameter '
+                        'sets.'.format(band.param_dim))
+                band = band.to_spectrum(self.wave)
             else:
                 raise exceptions.SynphotError('Missing passband data.')
 
             # Convert wavelengths to Angstrom
-            band_wave = band.wave.to(u.AA, equivalencies=units.wave_conversion)
-            self_wave = inwave.to(u.AA, equivalencies=units.wave_conversion)
+            band_wave = band.wave.to(u.AA, equivalencies=u.spectral())
+            self_wave = inwave.to(u.AA, equivalencies=u.spectral())
 
             # Convert observation to given flux unit.
             # For mag, convert to corresponding linear flux unit.
@@ -599,14 +604,14 @@ class Observation(spectrum.SourceSpectrum):
                 raise exceptions.SynphotError(
                     'Flux unit {0} is invalid'.format(flux_unit))
 
-            self_flux = spectrum.convert_fluxes(
+            self_flux = units.convert_flux(
                 self_wave, influx, tmp_unit, area=self.primary_area)
 
             if flux_unit_name == units.VEGAMAG.to_string():
                 if not isinstance(vegaspec, spectrum.SourceSpectrum):
                     raise exceptions.SynphotError(
                         'Vega spectrum is missing.')
-                vega_flux = spectrum.convert_fluxes(
+                vega_flux = units.convert_flux(
                     self_wave, vegaspec.resample(self_wave), tmp_unit,
                     area=self.primary_area, vegaspec=None)
                 flux = self_flux.value / vega_flux.value
@@ -625,7 +630,7 @@ class Observation(spectrum.SourceSpectrum):
             # Convert back to mag, if needed
             if flux_unit_name in (units.STMAG.to_string(),
                                   units.ABMAG.to_string()):
-                eff_stim = spectrum.convert_fluxes(
+                eff_stim = units.convert_flux(
                     1, u.Quantity(val, unit=tmp_unit), flux_unit)
             elif flux_unit_name == units.VEGAMAG.to_string():
                 eff_stim = u.Quantity(-2.5 * np.log10(val), unit=flux_unit)
@@ -691,7 +696,7 @@ class Observation(spectrum.SourceSpectrum):
         io.write_fits_spec(filename, self._wave, self._flux, **kwargs)
 
     @classmethod
-    def from_spec_band(cls, spec, band, binwave=None, force='none', area=None):
+    def from_spec_band(cls, spec, band, binwave=None, force='none'):
         """Create an Observation from given source spectrum and passband.
 
         By default, it is required that the spectrum and passband fully
@@ -699,18 +704,36 @@ class Observation(spectrum.SourceSpectrum):
         ``force`` keyword. If they do not overlap at all, an error
         is raised regardless.
 
+        **Handling of Analytic Spectrum**
+
+        If one of the input spectra is analytic, it is sampled at the
+        wavelengths of the non-analytic component. If both are analytic,
+        they are sampled at ``binwave`` and raise an exception if
+        ``binwave`` is undefined.
+
+        To create a purely analytic "observation", one can use
+        composite analytic spectrum in `synphot.analytic`, which will
+        be implemented when `astropy.modeling` has the adequate
+        composite model(s). From there, one can convert it to
+        Observation at the time of sampling.
+
+        Observation currently does not support analytic spectra with
+        multiple parameter sets.
+
         Parameters
         ----------
-        spec : `~synphot.spectrum.SourceSpectrum`
+        spec : `~synphot.spectrum.SourceSpectrum`, `~synphot.analytic.MixinAnalyticFlamSource`, or `~synphot.analytic.MixinAnalyticSource`
             Source spectrum.
 
-        band : `~synphot.spectrum.SpectralElement`
+        band : `~synphot.spectrum.SpectralElement` or `~synphot.analytic.MixinAnalyticPassband`
             Passband.
 
         binwave : `None`, array_like, or `astropy.units.quantity.Quantity`
-            Center of binned wavelengths. If array is given but not
-            a Quantity, assumed to have the same unit as ``spec.wave``.
-            If `None`, ``spec.wave`` is used.
+            Center of binned wavelengths. If `None`, ``spec.wave`` is used
+            (or ``band.wave`` if source spectrum is analytic).
+            If array is given but not a Quantity, assumed to have the same
+            unit as source spectrum (or passband if source spectrum is
+            analytic).
 
         force : {'none', 'extrap', 'taper'}
             Force creation of an Observation even when source spectrum
@@ -719,11 +742,6 @@ class Observation(spectrum.SourceSpectrum):
                 * 'none' - Source must encompass passband (default)
                 * 'extrap' - Extrapolate source spectrum
                 * 'taper' - Taper source spectrum
-
-        area : float or `astropy.units.quantity.Quantity`, optional
-            Area that fluxes cover. Usually, this is the area of
-            the primary mirror of the observatory of interest.
-            If not a Quantity, assumed to be in cm^2.
 
         Returns
         -------
@@ -735,7 +753,7 @@ class Observation(spectrum.SourceSpectrum):
         synphot.exceptions.DisjointError
             Passband does not overlap with source spectrum.
 
-        synphot.exceptions.OverlapError
+        synphot.exceptions.PartialOverlap
             Passband only partially overlaps with source spectrum
             when they must fully overlap.
 
@@ -743,59 +761,100 @@ class Observation(spectrum.SourceSpectrum):
             Invalid inputs.
 
         """
-        if not isinstance(spec, spectrum.SourceSpectrum):
+        if isinstance(spec, (analytic.MixinAnalyticFlamSource,
+                             analytic.MixinAnalyticSource)):
+            if spec.param_dim > 1:
+                raise exceptions.SynphotError(
+                    'Ambiguous analytic source spectrum with {0} parameter '
+                    'sets.'.format(spec.param_dim))
+        elif not isinstance(spec, spectrum.SourceSpectrum):
             raise exceptions.SynphotError('Invalid source spectrum')
 
-        if not isinstance(band, spectrum.SpectralElement):
+        if isinstance(band, analytic.MixinAnalyticPassband):
+            if band.param_dim > 1:
+                raise exceptions.SynphotError(
+                    'Ambiguous analytic passband with {0} parameter '
+                    'sets.'.format(band.param_dim))
+        elif not isinstance(band, spectrum.SpectralElement):
             raise exceptions.SynphotError('Invalid passband')
 
-        if binwave is None:
-            binwave = spec.wave
-            log.info('Observation binned wavelength centers will be '
-                     'taken from source spectrum wavelengths.')
+        # Both spectra are analytic
+        if (isinstance(spec, analytic.BaseMixinAnalytic) and
+                isinstance(band, analytic.BaseMixinAnalytic)):
+            if binwave is None:
+                raise exceptions.SynphotError('No wavelengths for sampling.')
+            spec = spec.to_spectrum(binwave)
+            band = band.to_spectrum(binwave)
+            warn = {}
+            log.info('Observation wavelengths are taken from binwave.')
 
-        # Inherit warnings, with source spectrum having higher priority
-        warn = deepcopy(band.warnings)
-        warn.update(spec.warnings)
+        # Source spectrum is analytic
+        elif isinstance(spec, analytic.BaseMixinAnalytic):
+            spec = spec.to_spectrum(band.wave)
+            warn = deepcopy(band.warnings)
+            if binwave is None:
+                binwave = band.wave
+                log.info('Observation binned wavelength centers will be '
+                         'taken from passband wavelengths.')
 
-        # Validate overlap
-        force = force.lower()
-        stat = band.check_overlap(spec)
+        # Passband is analytic
+        elif isinstance(band, analytic.BaseMixinAnalytic):
+            band = band.to_spectrum(spec.wave)
+            warn = deepcopy(spec.warnings)
+            if binwave is None:
+                binwave = spec.wave
+                log.info('Observation binned wavelength centers will be '
+                         'taken from source spectrum wavelengths.')
 
-        if stat == 'none':
-            raise exceptions.DisjointError(
-                'Source spectrum and passband are disjoint.')
-        elif 'partial' in stat:
-            if force == 'none':
-                raise exceptions.OverlapError(
-                    'Source spectrum and passband do not fully overlap. '
-                    'You may use force=[extrap|taper] to force this '
-                    'Observation anyway.')
-            elif force == 'taper':
-                spec = deepcopy(spec)  # Avoid modifying input
-                spec.taper()
-                msg = 'Source spectrum is tapered.'
-                log.warn(msg)
-                warn['PartialOverlap'] = msg
-            elif force.startswith('extrap'):
-                msg = 'Source spectrum will be extrapolated at constant value.'
-                log.warn(msg)
-                warn['PartialOverlap'] = msg
-            else:
+        # No analytic
+        else:
+            if binwave is None:
+                binwave = spec.wave
+                log.info('Observation binned wavelength centers will be '
+                         'taken from source spectrum wavelengths.')
+
+            # Inherit warnings, with source spectrum having higher priority
+            warn = deepcopy(band.warnings)
+            warn.update(spec.warnings)
+
+            # Validate overlap
+            force = force.lower()
+            stat = band.check_overlap(spec)
+
+            if stat == 'none':
+                raise exceptions.DisjointError(
+                    'Source spectrum and passband are disjoint.')
+            elif 'partial' in stat:
+                if force == 'none':
+                    raise exceptions.PartialOverlap(
+                        'Source spectrum and passband do not fully overlap. '
+                        'You may use force=[extrap|taper] to force this '
+                        'Observation anyway.')
+                elif force == 'taper':
+                    spec = deepcopy(spec)  # Avoid modifying input
+                    spec.taper()
+                    msg = 'Source spectrum is tapered.'
+                    log.warn(msg)
+                    warn['PartialOverlap'] = msg
+                elif force.startswith('extrap'):
+                    msg = ('Source spectrum will be extrapolated at ' +
+                           'constant value.')
+                    log.warn(msg)
+                    warn['PartialOverlap'] = msg
+                else:
+                    raise exceptions.SynphotError(
+                        'force={0} is invalid, must be "none", "taper", '
+                        'or "extrap"'.format(force))
+            elif stat != 'full':  # pragma: no cover
                 raise exceptions.SynphotError(
-                    'force={0} is invalid, must be "none", "taper", '
-                    'or "extrap"'.format(force))
-        elif stat != 'full':  # pragma: no cover
-            raise exceptions.SynphotError(
-                'Overlap result of {0} is unexpected'.format(stat))
+                    'Overlap result of {0} is unexpected'.format(stat))
 
         mulspec = spec * band
         header = {'expr': '{0} * {1}'.format(str(spec), str(band))}
 
         # Inherit primary area and set warning
-        obspec = cls(mulspec.wave, mulspec.flux, binwave=binwave, area=area,
-                     header=header)
-        obspec.primary_area = spec.primary_area
+        obspec = cls(mulspec.wave, mulspec.flux, binwave=binwave,
+                     area=mulspec.primary_area, header=header)
         obspec.warnings.update(warn)
 
         return obspec

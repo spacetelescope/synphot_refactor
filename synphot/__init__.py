@@ -127,5 +127,6 @@ if not _ASTROPY_SETUP_:
 # SYNPHOT UI #
 #------------#
 from .spectrum import *
+from .analytic import Box1DSpectrum, Const1DSpectrum, Gaussian1DSpectrum, PowerLaw1DSpectrum, BlackBody1DSpectrum, flat_spectrum, gaussian_spectrum
 from .observation import *
 from .reddening import *

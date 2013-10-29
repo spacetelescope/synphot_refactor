@@ -3,6 +3,8 @@
 #include "Python.h"
 #include <numpy/arrayobject.h>
 
+#include "docstrings.h"
+
 
 static PyObject * py_calcbinflux(PyObject *self, PyObject *args) {
   /* input variables */
@@ -85,9 +87,8 @@ static PyObject * py_calcbinflux(PyObject *self, PyObject *args) {
 
 static PyMethodDef synphot_utils_methods[] =
 {
-  {"calcbinflux", py_calcbinflux, METH_VARARGS, "Calculate binned flux."},
-  {NULL, NULL, 0, NULL} /* sentinel */
-
+  {"calcbinflux", (PyCFunction)py_calcbinflux, METH_VARARGS, doc_calcbinflux},
+  {NULL}  /* sentinel */
 };
 
 

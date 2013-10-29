@@ -16,9 +16,6 @@ from astropy import units as u
 from .. import planck, utils, units
 
 
-__doctest_skip__ = ['*']
-
-
 def test_bb_photlam_arsec():
     """Test ``bb_photlam_arsec()``.
 

@@ -1,7 +1,4 @@
-.. Astropy documentation master file, created by
-   sphinx-quickstart on Tue Jul 26 02:59:34 2011.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. _synphot-top-level:
 
 #####################
 synphot Documentation

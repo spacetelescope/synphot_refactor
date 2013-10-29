@@ -20,9 +20,6 @@ from astropy.utils.data import get_pkg_data_filename
 from .. import exceptions, io, units
 
 
-__doctest_skip__ = ['*']
-
-
 @remote_data
 def test_read_remote_spec():
     """Test read remote spectrum.
