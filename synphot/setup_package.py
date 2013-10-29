@@ -91,7 +91,7 @@ MSVC, do not support string literals greater than 256 characters.
         val = docs[key]
         # For portability across various compilers, we need to fill the
         # docstrings in 256-character chunks
-        for i in xrange(0, len(val), 256):
+        for i in six.moves.range(0, len(val), 256):
             chunk = string_escape(val[i:i + 256]).replace('"', '\\"')
             c_file.write('   strncpy(doc_{0} + {1}, "{2}", {3});\n'.format(
                 key, i, chunk, min(len(val) - i, 256)))
