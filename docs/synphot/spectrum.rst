@@ -200,8 +200,6 @@ Box
     throughput = \left \{
             \begin{array}{ll}
                 A   & : x_0 - w/2 \geq x \geq x_0 + w/2 \\
-                A/2 & : x = x_0 + w/2 \\
-                A/2 & : x = x_0 - w/2 \\
                 0   & : \textnormal{else}
             \end{array}
         \right.
