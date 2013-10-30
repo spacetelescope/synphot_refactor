@@ -276,13 +276,8 @@ class BlackBody1DModel(modeling.Parametric1DModel):
     temperature = modeling.Parameter('temperature')
 
     def __init__(self, temperature, **constraints):
-        try:
-            param_dim = len(temperature)
-        except TypeError:
-            param_dim = 1
-
         super(BlackBody1DModel, self).__init__(
-            param_dim=param_dim, temperature=temperature, **constraints)
+            temperature=temperature, **constraints)
 
     def eval(self, x, temperature):
         """Evaluate the model.
@@ -364,6 +359,15 @@ def class_factory(mixinclass, modelclass):
             for key in ('flux_unit', 'wave_unit', 'area'):
                 if key in kwargs:
                     del kwargs[key]
+
+            # Explicitly set param_dim, except for Gaussian1D
+            if 'Gaussian1D' not in modelname and 'param_dim' not in kwargs:
+                a = args[0]
+                if np.isscalar(a):
+                    n = 1
+                else:
+                    n = len(a)
+                kwargs.update({'param_dim': n})
 
             modelclass.__init__(self, *args, **kwargs)
 
