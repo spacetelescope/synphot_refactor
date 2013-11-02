@@ -360,14 +360,19 @@ def class_factory(mixinclass, modelclass):
                 if key in kwargs:
                     del kwargs[key]
 
-            # Explicitly set param_dim, except for Gaussian1D
-            if 'Gaussian1D' not in modelname and 'param_dim' not in kwargs:
-                a = args[0]
-                if np.isscalar(a):
-                    n = 1
-                else:
-                    n = len(a)
-                kwargs.update({'param_dim': n})
+            #---------------------------------------------------------------
+            # Explicitly set param_dim, except for Gaussian1D.
+            # Not needed after astropy#1680 merged but not deleted in case
+            # it is needed again in a future modeling API change.
+            #---------------------------------------------------------------
+            #if 'Gaussian1D' not in modelname and 'param_dim' not in kwargs:
+            #    a = args[0]
+            #    if np.isscalar(a):
+            #        n = 1
+            #    else:
+            #        n = len(a)
+            #    kwargs.update({'param_dim': n})
+            #---------------------------------------------------------------
 
             modelclass.__init__(self, *args, **kwargs)
 
