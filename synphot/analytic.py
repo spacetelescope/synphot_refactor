@@ -23,7 +23,7 @@ from . import exceptions, planck, spectrum, units, utils
 
 __all__ = ['BaseMixinAnalytic', 'MixinAnalyticPassband',
            'MixinAnalyticFlamSource', 'MixinAnalyticSource',
-           'BlackBody1DModel', 'class_factory', 'Box1DSpectrum',
+           'BlackBody1D', 'class_factory', 'Box1DSpectrum',
            'Const1DSpectrum', 'Gaussian1DSpectrum', 'PowerLaw1DSpectrum',
            'BlackBody1DSpectrum', 'flat_spectrum', 'gaussian_spectrum']
 
@@ -263,7 +263,7 @@ class MixinAnalyticSource(BaseMixinAnalytic):
         self._flux_unit = new_unit
 
 
-class BlackBody1DModel(modeling.Parametric1DModel):
+class BlackBody1D(modeling.Parametric1DModel):
     """Create a :ref:`blackbody spectrum <synphot-planck-law>`
     model with given temperature.
 
@@ -276,7 +276,7 @@ class BlackBody1DModel(modeling.Parametric1DModel):
     temperature = modeling.Parameter('temperature')
 
     def __init__(self, temperature, **constraints):
-        super(BlackBody1DModel, self).__init__(
+        super(BlackBody1D, self).__init__(
             temperature=temperature, **constraints)
 
     def eval(self, x, temperature):
@@ -339,7 +339,7 @@ def class_factory(mixinclass, modelclass):
     modelname = modelclass.__name__
 
     if (not issubclass(modelclass, modeling.Model) or
-            ('CompositeModel' not in modelname and '1DModel' not in modelname)):
+            ('Composite' not in modelname and '1D' not in modelname)):
         raise exceptions.SynphotError(
             '{0} is not supported'.format(modelname))
 
@@ -376,7 +376,7 @@ def class_factory(mixinclass, modelclass):
 
             modelclass.__init__(self, *args, **kwargs)
 
-    cls.__name__ = modelname.replace('Model', 'Spectrum')
+    cls.__name__ = modelname + 'Spectrum'
     cls.__doc__ = 'Class to handle analytic {0} using {1}.'.format(
         sp_str, modelname)
 
@@ -384,20 +384,19 @@ def class_factory(mixinclass, modelclass):
 
 
 # Generate analytic passband with modeling behavior
-Box1DSpectrum = class_factory(MixinAnalyticPassband, modeling.models.Box1DModel)
+Box1DSpectrum = class_factory(MixinAnalyticPassband, modeling.models.Box1D)
 Box1DSpectrum.__doc__ += 'See :ref:`box-shaped passband <synphot-box-passband>`.'
 
 # Generate analytic source spectrum with modeling behavior
-BlackBody1DSpectrum = class_factory(MixinAnalyticFlamSource, BlackBody1DModel)
+BlackBody1DSpectrum = class_factory(MixinAnalyticFlamSource, BlackBody1D)
 BlackBody1DSpectrum.__doc__ += 'See :ref:`blackbody spectrum <synphot-planck-law>`.'
-Const1DSpectrum = class_factory(
-    MixinAnalyticSource, modeling.models.Const1DModel)
+Const1DSpectrum = class_factory(MixinAnalyticSource, modeling.models.Const1D)
 Const1DSpectrum.__doc__ += 'Also see :func:`flat_spectrum`.'
 Gaussian1DSpectrum = class_factory(
-    MixinAnalyticSource, modeling.models.Gaussian1DModel)
+    MixinAnalyticSource, modeling.models.Gaussian1D)
 Gaussian1DSpectrum.__doc__ += 'Also see :func:`gaussian_spectrum`.'
 PowerLaw1DSpectrum = class_factory(
-    MixinAnalyticSource, modeling.models.PowerLaw1DModel)
+    MixinAnalyticSource, modeling.models.PowerLaw1D)
 PowerLaw1DSpectrum.__doc__ += 'See :ref:`power-law spectrum <synphot-powerlaw>`.'
 
 #-----------------------------------------------------------------------------#
@@ -406,7 +405,7 @@ PowerLaw1DSpectrum.__doc__ += 'See :ref:`power-law spectrum <synphot-powerlaw>`.
 # These are not exactly what synphot wants. They do x + model1(x) + model2(x) #
 # and not model1(x) + model2(x). Nadia will implement something else.         #
 #-----------------------------------------------------------------------------#
-#ParallelCompositeSpectrum = class_factory(MixinAnalyticSource, modeling.ParallelCompositeModel)
+#SummedCompositeSpectrum = class_factory(MixinAnalyticSource, modeling.SummedCompositeModel)
 #SerialCompositeSpectrum = class_factory(MixinAnalyticSource, modeling.SerialCompositeModel)
 
 
