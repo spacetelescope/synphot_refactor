@@ -20,7 +20,7 @@ def test_factory_exceptions():
     # Wrong mixin class
     with pytest.raises(exceptions.SynphotError):
         cls = analytic.class_factory(
-            spectrum.SourceSpectrum, modeling.models.Const1DModel)
+            spectrum.SourceSpectrum, modeling.models.Const1D)
 
     # Wrong modeling class
     with pytest.raises(exceptions.SynphotError):
@@ -116,7 +116,7 @@ class TextBox(object):
 
 
 class TestBlackBody(object):
-    """Test BlackBody1DSpectrum class, that uses BlackBody1DModel."""
+    """Test BlackBody1DSpectrum class, that uses BlackBody1D."""
     def setup_class(self):
         bb = analytic.BlackBody1DSpectrum(5500)
         refwave = generate_wavelengths(
