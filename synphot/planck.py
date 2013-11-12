@@ -46,7 +46,7 @@ def bbfunc(wavelengths, temperature):
     temperature = units.validate_quantity(temperature, u.K)
 
     # Calculate blackbody radiation in FNU, then convert to PHOTLAM
-    factor = np.exp(const.h * freq / (const.k_B * temperature)) - 1
+    factor = np.expm1(const.h * freq / (const.k_B * temperature))
     bb_nu = 2 * const.h * freq * freq * freq / (const.c ** 2 * factor)
     bb_lam = units.FNU.to(units.PHOTLAM, bb_nu.cgs.value,
                           equivalencies=u.spectral_density(wavelengths))
