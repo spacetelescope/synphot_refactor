@@ -52,7 +52,33 @@ class BaseMixinAnalytic(object):
     """
     @abc.abstractmethod
     def __init__(self, *args, **kwargs):
-        raise NotImplementedError('Subclasses should implement this.')
+        # self._spec_cls and self._flux_unit should be set
+        # by child classes before calling this init
+
+        self._set_wave_unit(kwargs.get('wave_unit', u.AA))
+        self.primary_area = kwargs.get('area', None)
+
+        # These are not used by astropy.modeling
+        for key in ('flux_unit', 'wave_unit', 'area'):
+            if key in kwargs:
+                del kwargs[key]
+
+        #---------------------------------------------------------------
+        # Explicitly set param_dim, except for Gaussian1D.
+        # Not needed after astropy#1680 merged but not deleted in case
+        # it is needed again in a future modeling API change.
+        #---------------------------------------------------------------
+        #if 'Gaussian1D' not in modelname and 'param_dim' not in kwargs:
+        #    a = args[0]
+        #    if np.isscalar(a):
+        #        n = 1
+        #    else:
+        #        n = len(a)
+        #    kwargs.update({'param_dim': n})
+        #---------------------------------------------------------------
+
+        # This calls modeling init
+        super(BaseMixinAnalytic, self).__init__(*args, **kwargs)
 
     @property
     def flux_unit(self):
@@ -203,8 +229,8 @@ class MixinAnalyticPassband(BaseMixinAnalytic):
     def __init__(self, *args, **kwargs):
         self._spec_cls = spectrum.SpectralElement
         self._flux_unit = units.THROUGHPUT
-        self._set_wave_unit(kwargs.get('wave_unit', u.AA))
-        self.primary_area = kwargs.get('area', None)
+
+        super(MixinAnalyticPassband, self).__init__(*args, **kwargs)
 
 
 class MixinAnalyticFlamSource(BaseMixinAnalytic):
@@ -215,8 +241,8 @@ class MixinAnalyticFlamSource(BaseMixinAnalytic):
     def __init__(self, *args, **kwargs):
         self._spec_cls = spectrum.SourceSpectrum
         self._flux_unit = units.FLAM
-        self._set_wave_unit(kwargs.get('wave_unit', u.AA))
-        self.primary_area = kwargs.get('area', None)
+
+        super(MixinAnalyticFlamSource, self).__init__(*args, **kwargs)
 
 
 class MixinAnalyticSource(BaseMixinAnalytic):
@@ -233,8 +259,8 @@ class MixinAnalyticSource(BaseMixinAnalytic):
     def __init__(self, *args, **kwargs):
         self._spec_cls = spectrum.SourceSpectrum
         self.flux_unit = kwargs.get('flux_unit', units.FLAM)
-        self._set_wave_unit(kwargs.get('wave_unit', u.AA))
-        self.primary_area = kwargs.get('area', None)
+
+        super(MixinAnalyticSource, self).__init__(*args, **kwargs)
 
     # Need to put this here so setter will work
     @property
@@ -353,28 +379,7 @@ def class_factory(mixinclass, modelclass):
 
     class cls(mixinclass, modelclass):
         def __init__(self, *args, **kwargs):
-            mixinclass.__init__(self, *args, **kwargs)
-
-            # These are not used by astropy.modeling
-            for key in ('flux_unit', 'wave_unit', 'area'):
-                if key in kwargs:
-                    del kwargs[key]
-
-            #---------------------------------------------------------------
-            # Explicitly set param_dim, except for Gaussian1D.
-            # Not needed after astropy#1680 merged but not deleted in case
-            # it is needed again in a future modeling API change.
-            #---------------------------------------------------------------
-            #if 'Gaussian1D' not in modelname and 'param_dim' not in kwargs:
-            #    a = args[0]
-            #    if np.isscalar(a):
-            #        n = 1
-            #    else:
-            #        n = len(a)
-            #    kwargs.update({'param_dim': n})
-            #---------------------------------------------------------------
-
-            modelclass.__init__(self, *args, **kwargs)
+            super(cls, self).__init__(*args, **kwargs)
 
     cls.__name__ = modelname + 'Spectrum'
     cls.__doc__ = 'Class to handle analytic {0} using {1}.'.format(
