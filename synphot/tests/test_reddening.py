@@ -5,7 +5,7 @@ Inherited methods from BaseUnitlessSpectrum are already tested in
 test_spectrum.py under SpectralElement, so not tested here.
 
 """
-from __future__ import division, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # STDLIB
 import os

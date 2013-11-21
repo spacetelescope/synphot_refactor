@@ -4,7 +4,7 @@
 .. note:: ``bb_photlam()`` is tested in test_spectrum.py
 
 """
-from __future__ import division, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # THIRD-PARTY
 import numpy as np

@@ -3,7 +3,7 @@
 that has gone through a passband.
 
 """
-from __future__ import division, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # STDLIB
 from copy import deepcopy

@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module handles synphot units that are not in `astropy.units`."""
-from __future__ import division, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # THIRD-PARTY
 import numpy as np

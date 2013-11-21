@@ -3,7 +3,7 @@
 or passband.
 
 """
-from __future__ import division, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # STDLIB
 import abc
@@ -381,7 +381,7 @@ def class_factory(mixinclass, modelclass):
         def __init__(self, *args, **kwargs):
             super(cls, self).__init__(*args, **kwargs)
 
-    cls.__name__ = modelname + 'Spectrum'
+    cls.__name__ = modelname + str('Spectrum')
     cls.__doc__ = 'Class to handle analytic {0} using {1}.'.format(
         sp_str, modelname)
 

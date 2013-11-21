@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Test spectrum.py module and flux conversion."""
-from __future__ import division, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # STDLIB
 import os
@@ -102,9 +102,13 @@ def test_flux_conversion(in_q, out_u, ans):
      (_flux_jy, units.VEGAMAG, _flux_vegamag),
      (_flux_vegamag, u.Jy, _flux_jy)])
 def test_flux_conversion_vega(in_q, out_u, ans):
-    """Test Vega spectrum object and flux conversion with VEGAMAG."""
+    """Test Vega spectrum object and flux conversion with VEGAMAG.
+
+    .. note:: 0.5% is good enough given Vega gets updated from time to time.
+
+    """
     result = units.convert_flux(_wave, in_q, out_u, area=_area, vegaspec=_vspec)
-    np.testing.assert_allclose(result.value, ans.value, rtol=1e-6)
+    np.testing.assert_allclose(result.value, ans.value, rtol=5e-3)
     assert result.unit == ans.unit
 
 

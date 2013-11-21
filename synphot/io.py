@@ -1,8 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This modules handles pysynphot data formats."""
-from __future__ import division, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # STDLIB
+import fnmatch
 import os
 
 # THIRD-PARTY
@@ -19,8 +20,70 @@ from . import exceptions, units
 from synphot import __version__
 
 
-__all__ = ['read_remote_spec', 'read_spec', 'read_ascii_spec',
-           'read_fits_spec', 'write_fits_spec']
+__all__ = ['get_latest_file', 'read_remote_spec', 'read_spec',
+           'read_ascii_spec', 'read_fits_spec', 'write_fits_spec']
+
+
+def get_latest_file(template, raise_error=False, err_msg=''):
+    """Find the filename that appears last in sorted order
+    based on given template.
+
+    Parameters
+    ----------
+    template : str
+        Search template in the form of ``path/pattern``
+        where pattern is acceptable by :py:mod:`fnmatch`.
+
+    raise_error : bool, optional
+        Raise an error when no files found.
+        Otherwise, will issue warning only.
+
+    err_msg : str
+        Alternate message for when no files found.
+        If not given, generic message is used.
+
+    Returns
+    -------
+    filename : str
+        Latest filename.
+
+    Raises
+    ------
+    IOError
+        No files found.
+
+    """
+    path, pattern = os.path.split(template)
+
+    # Remote FTP directory
+    if path.lower().startswith('ftp:'):
+        import urllib2
+
+        response = urllib2.urlopen(path).read().decode('utf-8').splitlines()
+        allfiles = list(set([x.split()[-1] for x in response]))  # Rid symlink
+
+    # Local directory
+    else:
+        allfiles = os.listdir(path)
+
+    matched_files = sorted(fnmatch.filter(allfiles, pattern))
+
+    # Last file in sorted listing
+    if matched_files:
+        filename = os.path.join(path, matched_files[-1])
+
+    # No files found
+    else:
+        if not err_msg:
+            err_msg = 'No files found for {0}'.format(template)
+
+        if raise_error:
+            raise IOError(err_msg)
+        else:
+            log.warn(err_msg)
+            filename = ''
+
+    return filename
 
 
 def read_remote_spec(filename, encoding=None, cache=True, show_progress=True,
@@ -179,7 +242,7 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
 
     """
     fs = fits.open(filename)
-    header = dict(fs['PRIMARY'].header)
+    header = dict(fs[str('PRIMARY')].header)
     wave_dat = fs[ext].data.field(wave_col)
     flux_dat = fs[ext].data.field(flux_col)
     fits_wave_unit = fs[ext].header.get('TUNIT1', '')
