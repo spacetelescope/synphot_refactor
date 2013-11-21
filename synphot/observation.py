@@ -16,7 +16,7 @@ from astropy import log
 from astropy import units as u
 
 # LOCAL
-from . import analytic, binning, spectrum, exceptions, io, utils, units
+from . import analytic, binning, spectrum, exceptions, specio, utils, units
 
 
 __all__ = ['Observation']
@@ -670,7 +670,7 @@ class Observation(spectrum.SourceSpectrum):
             Else, write binned data (default).
 
         kwargs : dict
-            Keywords accepted by :func:`synphot.io.write_fits_spec`.
+            Keywords accepted by :func:`synphot.specio.write_fits_spec`.
 
         Raises
         ------
@@ -693,7 +693,7 @@ class Observation(spectrum.SourceSpectrum):
         else:
             kwargs['ext_header'] = bkeys
 
-        io.write_fits_spec(filename, self._wave, self._flux, **kwargs)
+        specio.write_fits_spec(filename, self._wave, self._flux, **kwargs)
 
     @classmethod
     def from_spec_band(cls, spec, band, binwave=None, force='none'):

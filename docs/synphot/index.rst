@@ -80,15 +80,15 @@ Reference/API
 
 .. automodapi:: synphot.exceptions
 
-.. automodapi:: synphot.io
-   :no-inheritance-diagram:
-
 .. automodapi:: synphot.observation
 
 .. automodapi:: synphot.planck
    :no-inheritance-diagram:
 
 .. automodapi:: synphot.reddening
+
+.. automodapi:: synphot.specio
+   :no-inheritance-diagram:
 
 .. automodapi:: synphot.spectrum
 

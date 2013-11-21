@@ -8,7 +8,7 @@ Spectra Manipulation
 I/O
 ---
 
-These are the supported ``synphot`` file types via `synphot.io`:
+These are the supported ``synphot`` file types via `synphot.specio`:
 
 =========  ====  =====
 File type  Read  Write

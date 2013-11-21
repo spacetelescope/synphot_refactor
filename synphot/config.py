@@ -11,14 +11,8 @@ available based on their respective templates.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-# STDLIB
-import os
-
 # ASTROPY
 from astropy.config.configuration import ConfigurationItem
-
-# LOCAL
-from . import io
 
 
 __all__ = ['STDSTAR_DIR', 'VEGA_FILE', 'EXTINCTION_DIR', 'LMC30DOR_FILE',
@@ -81,52 +75,55 @@ def set_files():
     (see `stsynphot.config`).
 
     """
+    import os
+    from .specio import get_latest_file
+
     std_dir = STDSTAR_DIR()
-    VEGA_FILE.set(io.get_latest_file(
+    VEGA_FILE.set(get_latest_file(
         os.path.join(std_dir, 'alpha_lyr_stis_*.fits')))
 
     ext_dir = EXTINCTION_DIR()
-    LMC30DOR_FILE.set(io.get_latest_file(
+    LMC30DOR_FILE.set(get_latest_file(
         os.path.join(ext_dir, 'lmc_30dorshell_*.fits')))
-    LMCAVG_FILE.set(io.get_latest_file(
+    LMCAVG_FILE.set(get_latest_file(
         os.path.join(ext_dir, 'lmc_diffuse_*.fits')))
-    MWAVG_FILE.set(io.get_latest_file(
+    MWAVG_FILE.set(get_latest_file(
         os.path.join(ext_dir, 'milkyway_diffuse_*.fits')))
-    MWDENSE_FILE.set(io.get_latest_file(
+    MWDENSE_FILE.set(get_latest_file(
         os.path.join(ext_dir, 'milkyway_dense_*.fits')))
-    MWRV21_FILE.set(io.get_latest_file(
+    MWRV21_FILE.set(get_latest_file(
         os.path.join(ext_dir, 'milkyway_rv21_*.fits')))
-    MWRV40_FILE.set(io.get_latest_file(
+    MWRV40_FILE.set(get_latest_file(
         os.path.join(ext_dir, 'milkyway_rv4_*.fits')))
-    SMCBAR_FILE.set(io.get_latest_file(
+    SMCBAR_FILE.set(get_latest_file(
         os.path.join(ext_dir, 'smc_bar_*.fits')))
-    XGAL_FILE.set(io.get_latest_file(
+    XGAL_FILE.set(get_latest_file(
         os.path.join(ext_dir, 'xgal_starburst_*.fits')))
 
     pb_dir = PASSBAND_DIR()
-    BESSEL_H_FILE.set(io.get_latest_file(
+    BESSEL_H_FILE.set(get_latest_file(
         os.path.join(pb_dir, 'bessell_h_*_syn.fits')))
-    BESSEL_J_FILE.set(io.get_latest_file(
+    BESSEL_J_FILE.set(get_latest_file(
         os.path.join(pb_dir, 'bessell_j_*_syn.fits')))
-    BESSEL_K_FILE.set(io.get_latest_file(
+    BESSEL_K_FILE.set(get_latest_file(
         os.path.join(pb_dir, 'bessell_k_*_syn.fits')))
-    COUSINS_I_FILE.set(io.get_latest_file(
+    COUSINS_I_FILE.set(get_latest_file(
         os.path.join(pb_dir, 'cousins_i_*_syn.fits')))
-    COUSINS_R_FILE.set(io.get_latest_file(
+    COUSINS_R_FILE.set(get_latest_file(
         os.path.join(pb_dir, 'cousins_r_*_syn.fits')))
-    JOHNSON_B_FILE.set(io.get_latest_file(
+    JOHNSON_B_FILE.set(get_latest_file(
         os.path.join(pb_dir, 'johnson_b_*_syn.fits')))
-    JOHNSON_I_FILE.set(io.get_latest_file(
+    JOHNSON_I_FILE.set(get_latest_file(
         os.path.join(pb_dir, 'johnson_i_*_syn.fits')))
-    JOHNSON_J_FILE.set(io.get_latest_file(
+    JOHNSON_J_FILE.set(get_latest_file(
         os.path.join(pb_dir, 'johnson_j_*_syn.fits')))
-    JOHNSON_K_FILE.set(io.get_latest_file(
+    JOHNSON_K_FILE.set(get_latest_file(
         os.path.join(pb_dir, 'johnson_k_*_syn.fits')))
-    JOHNSON_R_FILE.set(io.get_latest_file(
+    JOHNSON_R_FILE.set(get_latest_file(
         os.path.join(pb_dir, 'johnson_r_*_syn.fits')))
-    JOHNSON_U_FILE.set(io.get_latest_file(
+    JOHNSON_U_FILE.set(get_latest_file(
         os.path.join(pb_dir, 'johnson_u_*_syn.fits')))
-    JOHNSON_V_FILE.set(io.get_latest_file(
+    JOHNSON_V_FILE.set(get_latest_file(
         os.path.join(pb_dir, 'johnson_v_*_syn.fits')))
 
 

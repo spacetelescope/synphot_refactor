@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from astropy import units as u
 
 # LOCAL
-from . import spectrum, config, exceptions, io, units
+from . import spectrum, config, exceptions, specio, units
 
 
 __all__ = ['ReddeningLaw', 'ExtinctionCurve']
@@ -84,8 +84,8 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
 
         kwargs : dict
             Keywords acceptable by
-            :func:`synphot.io.read_fits_spec` (if FITS) or
-            :func:`synphot.io.read_ascii_spec` (if ASCII).
+            :func:`synphot.specio.read_fits_spec` (if FITS) or
+            :func:`synphot.specio.read_ascii_spec` (if ASCII).
 
         Returns
         -------
@@ -100,7 +100,7 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
                 'flux_col' not in kwargs):
             kwargs['flux_col'] = 'Av/E(B-V)'
 
-        header, wavelengths, rvs = io.read_spec(filename, **kwargs)
+        header, wavelengths, rvs = specio.read_spec(filename, **kwargs)
         return cls(wavelengths, rvs, area=area, header=header)
 
     def to_fits(self, filename, **kwargs):
@@ -114,7 +114,7 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
             Output filename.
 
         kwargs : dict
-            Keywords accepted by :func:`synphot.io.write_fits_spec`.
+            Keywords accepted by :func:`synphot.specio.write_fits_spec`.
 
         """
         kwargs['flux_col'] = 'Av/E(B-V)'
@@ -137,7 +137,7 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
         else:
             kwargs['ext_header'] = bkeys
 
-        io.write_fits_spec(filename, self.wave, self.thru, **kwargs)
+        specio.write_fits_spec(filename, self.wave, self.thru, **kwargs)
 
     @classmethod
     def from_model(cls, modelname, area=None, **kwargs):
@@ -154,7 +154,7 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
             If not a Quantity, assumed to be in cm^2.
 
         kwargs : dict
-            Keywords acceptable by :func:`synphot.io.read_remote_spec`.
+            Keywords acceptable by :func:`synphot.specio.read_remote_spec`.
 
         Returns
         -------
@@ -199,7 +199,7 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
                 'flux_col' not in kwargs):
             kwargs['flux_col'] = 'Av/E(B-V)'
 
-        header, wavelengths, rvs = io.read_remote_spec(filename, **kwargs)
+        header, wavelengths, rvs = specio.read_remote_spec(filename, **kwargs)
         header['expr'] = modelname
         header['filename'] = filename
         header['descrip'] = cfgitem.description

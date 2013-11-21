@@ -15,7 +15,7 @@ from astropy.tests.helper import pytest
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import binning, exceptions, io
+from .. import binning, exceptions, specio
 from ..utils import merge_wavelengths, generate_wavelengths
 
 
@@ -194,7 +194,7 @@ def test_calcbinflux():
 
     """
     # Get bandpass data for interpolation.
-    hdr, wave, thru = io.read_fits_spec(
+    hdr, wave, thru = specio.read_fits_spec(
         get_pkg_data_filename(os.path.join('data', 'hst_acs_hrc_f555w.fits')),
         flux_col='THROUGHPUT', flux_unit=u.dimensionless_unscaled)
 

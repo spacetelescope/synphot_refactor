@@ -23,7 +23,7 @@ from astropy import log
 from astropy import units as u
 
 # LOCAL
-from . import binning, planck, exceptions, config, io, utils, units
+from . import binning, planck, exceptions, config, specio, utils, units
 
 
 __all__ = ['BaseSpectrum', 'BaseUnitlessSpectrum', 'SourceSpectrum',
@@ -1001,8 +1001,8 @@ class SourceSpectrum(BaseSpectrum):
 
         kwargs : dict
             Keywords acceptable by
-            :func:`synphot.io.read_fits_spec` (if FITS) or
-            :func:`synphot.io.read_ascii_spec` (if ASCII).
+            :func:`synphot.specio.read_fits_spec` (if FITS) or
+            :func:`synphot.specio.read_ascii_spec` (if ASCII).
 
         Returns
         -------
@@ -1010,7 +1010,7 @@ class SourceSpectrum(BaseSpectrum):
             New spectrum object.
 
         """
-        header, wavelengths, fluxes = io.read_spec(filename, **kwargs)
+        header, wavelengths, fluxes = specio.read_spec(filename, **kwargs)
         return cls(wavelengths, fluxes, area=area, header=header)
 
     def to_fits(self, filename, **kwargs):
@@ -1022,7 +1022,7 @@ class SourceSpectrum(BaseSpectrum):
             Output filename.
 
         kwargs : dict
-            Keywords accepted by :func:`synphot.io.write_fits_spec`.
+            Keywords accepted by :func:`synphot.specio.write_fits_spec`.
 
         """
         # There are some standard keywords that should be added
@@ -1037,7 +1037,7 @@ class SourceSpectrum(BaseSpectrum):
         else:
             kwargs['ext_header'] = bkeys
 
-        io.write_fits_spec(filename, self.wave, self.flux, **kwargs)
+        specio.write_fits_spec(filename, self.wave, self.flux, **kwargs)
 
     @classmethod
     def from_vega(cls, area=None, **kwargs):
@@ -1051,7 +1051,7 @@ class SourceSpectrum(BaseSpectrum):
             If not a Quantity, assumed to be in cm^2.
 
         kwargs : dict
-            Keywords acceptable by :func:`synphot.io.read_remote_spec`.
+            Keywords acceptable by :func:`synphot.specio.read_remote_spec`.
 
         Returns
         -------
@@ -1060,7 +1060,8 @@ class SourceSpectrum(BaseSpectrum):
 
         """
         filename = config.VEGA_FILE()
-        header, wavelengths, fluxes = io.read_remote_spec(filename, **kwargs)
+        header, wavelengths, fluxes = specio.read_remote_spec(
+            filename, **kwargs)
         header['expr'] = 'Vega from {0}'.format(os.path.basename(filename))
         header['filename'] = filename
         return cls(wavelengths, fluxes, area=area, header=header)
@@ -1568,8 +1569,8 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         kwargs : dict
             Keywords acceptable by
-            :func:`synphot.io.read_fits_spec` (if FITS) or
-            :func:`synphot.io.read_ascii_spec` (if ASCII).
+            :func:`synphot.specio.read_fits_spec` (if FITS) or
+            :func:`synphot.specio.read_ascii_spec` (if ASCII).
 
         Returns
         -------
@@ -1584,7 +1585,7 @@ class SpectralElement(BaseUnitlessSpectrum):
                 'flux_col' not in kwargs):
             kwargs['flux_col'] = 'THROUGHPUT'
 
-        header, wavelengths, throughput = io.read_spec(filename, **kwargs)
+        header, wavelengths, throughput = specio.read_spec(filename, **kwargs)
         return cls(wavelengths, throughput, area=area, header=header)
 
     def to_fits(self, filename, **kwargs):
@@ -1598,7 +1599,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             Output filename.
 
         kwargs : dict
-            Keywords accepted by :func:`synphot.io.write_fits_spec`.
+            Keywords accepted by :func:`synphot.specio.write_fits_spec`.
 
         """
         kwargs['flux_col'] = 'THROUGHPUT'
@@ -1615,7 +1616,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         else:
             kwargs['ext_header'] = bkeys
 
-        io.write_fits_spec(filename, self.wave, self.thru, **kwargs)
+        specio.write_fits_spec(filename, self.wave, self.thru, **kwargs)
 
     @classmethod
     def from_filter(cls, filtername, area=None, **kwargs):
@@ -1632,7 +1633,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             If not a Quantity, assumed to be in cm^2.
 
         kwargs : dict
-            Keywords acceptable by :func:`synphot.io.read_remote_spec`.
+            Keywords acceptable by :func:`synphot.specio.read_remote_spec`.
 
         Returns
         -------
@@ -1685,8 +1686,8 @@ class SpectralElement(BaseUnitlessSpectrum):
                 'flux_col' not in kwargs):
             kwargs['flux_col'] = 'THROUGHPUT'
 
-        header, wavelengths, throughput = io.read_remote_spec(filename,
-                                                                  **kwargs)
+        header, wavelengths, throughput = specio.read_remote_spec(
+            filename, **kwargs)
         header['expr'] = filtername
         header['filename'] = filename
         header['descrip'] = cfgitem.description

@@ -15,7 +15,7 @@ from astropy.tests.helper import pytest
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import exceptions, io, utils, units
+from .. import exceptions, specio, utils, units
 
 
 @pytest.mark.parametrize(
@@ -141,7 +141,7 @@ class TestTrapezoidIntegration(object):
         # Get bandpass data for integration.
         bandfile = get_pkg_data_filename(
             os.path.join('data', 'hst_acs_hrc_f555w.fits'))
-        hdr, self.wave, self.thru = io.read_fits_spec(
+        hdr, self.wave, self.thru = specio.read_fits_spec(
             bandfile, flux_col='THROUGHPUT', flux_unit=u.dimensionless_unscaled)
 
     def test_avgwave(self):
