@@ -57,9 +57,9 @@ def get_latest_file(template, raise_error=False, err_msg=''):
 
     # Remote FTP directory
     if path.lower().startswith('ftp:'):
-        from astropy.extern.six.moves.urllib.request import urlopen
+        from astropy.extern.six.moves.urllib import request
 
-        response = urlopen(path).read().decode('utf-8').splitlines()
+        response = request.urlopen(path).read().decode('utf-8').splitlines()
         allfiles = list(set([x.split()[-1] for x in response]))  # Rid symlink
 
     # Local directory
