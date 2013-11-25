@@ -941,6 +941,11 @@ class TestRenorm(object):
         with pytest.raises(exceptions.SynphotError):
             rn_sp = self.bb.renorm(u.Quantity(10, units.VEGAMAG), self.abox)
 
+        # Zero flux
+        with pytest.raises(ValueError):
+            sp = self.em * 0.0
+            rn_sp = sp.renorm(u.Quantity(10, units.VEGAMAG), self.abox)
+
 
 class TestWriteSpec(object):
     """Test spectrum to_fits() method."""
