@@ -452,6 +452,7 @@ class Observation(spectrum.SourceSpectrum):
 
         flux_unit : `None`, str, or `astropy.units.core.Unit`
             The unit of effective stimulus. If `None`, uses ``self`` flux unit.
+            COUNT gives result in count/s/area.
 
         band : `~synphot.spectrum.SpectralElement` or `~synphot.analytic.MixinAnalyticPassband`
             Passband that went into the observation. This is needed
@@ -476,7 +477,7 @@ class Observation(spectrum.SourceSpectrum):
         Returns
         -------
         eff_stim : `astropy.units.quantity.Quantity`
-            Observation effective stimulus in given flux unit.
+            Observation effective stimulus based on given flux unit.
 
         Raises
         ------
@@ -562,7 +563,7 @@ class Observation(spectrum.SourceSpectrum):
                 eff_stim = u.Quantity(
                     -2.5 * np.log10(val.value), unit=flux_unit)
             else:
-                eff_stim = val
+                eff_stim = u.Quantity(val.value, u.count / (u.s * units.AREA))
 
         # Density flux units and VEGAMAG
         else:
@@ -651,7 +652,7 @@ class Observation(spectrum.SourceSpectrum):
         Returns
         -------
         eff_stim : `astropy.units.quantity.Quantity`
-            Effective stimulus in counts.
+            Effective stimulus in count/s/area.
 
         """
         return self.effstim(binned=binned, flux_unit=u.count, band=None,

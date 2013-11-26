@@ -869,7 +869,7 @@ class TestRenorm(object):
 
         # 0.025% agreement with IRAF SYNPHOT COUNTRATE
         np.testing.assert_allclose(ct_rate.value, ans_countrate, rtol=2.5e-4)
-        assert ct_rate.unit == u.count
+        assert ct_rate.unit == u.count / (u.s * units.AREA)
 
     @pytest.mark.parametrize(
         ('sp_type', 'rn_val', 'ans_countrate'),
