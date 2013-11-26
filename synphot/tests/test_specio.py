@@ -40,7 +40,14 @@ class TestGetLatestFile(object):
         filename = specio.get_latest_file(template, raise_error=True)
         assert filename == ans
 
-    def test_not_found(self):
+    def test_bogus(self):
+        """Bogus data path."""
+        filename = specio.get_latest_file(
+            os.path.join('foo', 'foo', 'hst_acs_hrc_*.fits'))
+        assert filename == ''
+
+    def test_no_files(self):
+        """Real path with no files."""
         template = os.path.join(self.datadir, '*dummy')
 
         # Warning only
