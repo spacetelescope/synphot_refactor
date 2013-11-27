@@ -26,3 +26,9 @@ def test_bb_photlam_arsec():
     flux = planck.bb_photlam_arcsec(wave, 1000.0)
     np.testing.assert_allclose(flux.value[5000], 3.89141e-08, rtol=2.5e-3)
     assert flux.unit == units.PHOTLAM / u.arcsec ** 2
+
+
+def test_overflow():
+    flux = planck.bbfunc([0, 1000.0, 100000.0, 1e55], 10000.0)
+    np.testing.assert_allclose(
+        flux.value, [0, 3.38131732e+16, 3.87451317e+15, 0], rtol=1e-3)

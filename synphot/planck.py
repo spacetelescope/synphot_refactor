@@ -18,9 +18,18 @@ from . import units
 
 __all__ = ['bbfunc', 'bb_photlam_arcsec', 'bb_photlam']
 
+# Underflow and overflow limits taken from IRAF SYNPHOT
+_VERY_SMALL = 1e-4
+_VERY_LARGE = 85.0
+
 
 def bbfunc(wavelengths, temperature):
     """Planck law for blackbody radiation in PHOTLAM per steradian.
+
+    .. warning::
+
+        Data points where overflow or underflow occurs will be set
+        to zeroes.
 
     Parameters
     ----------
@@ -36,20 +45,37 @@ def bbfunc(wavelengths, temperature):
         Blackbody radiation in PHOTLAM per steradian.
 
     """
-    if not isinstance(wavelengths, u.Quantity):
-        wavelengths = u.Quantity(wavelengths, unit=u.AA)
+    # Silence Numpy
+    old_np_err_cfg = np.seterr(all='ignore')
 
-    # Calculations must use Hz
-    freq = wavelengths.to(u.Hz, equivalencies=u.spectral())
+    # Calculations must use Angstrom
+    wavelengths = units.validate_quantity(
+        wavelengths, u.AA, equivalencies=u.spectral())
 
     # Calculations must use Kelvin
     temperature = units.validate_quantity(temperature, u.K)
 
-    # Calculate blackbody radiation in FNU, then convert to PHOTLAM
-    factor = np.expm1(const.h * freq / (const.k_B * temperature))
-    bb_nu = 2 * const.h * freq * freq * freq / (const.c ** 2 * factor)
-    bb_lam = units.FNU.to(units.PHOTLAM, bb_nu.cgs.value,
-                          equivalencies=u.spectral_density(wavelengths))
+    x = wavelengths * temperature
+
+    # Catch division by zero
+    mask = x > 0
+    x = np.where(mask, units.HC / (const.k_B.cgs * x), 0.0)
+
+    # Catch overflow/underflow
+    mask = (x >= _VERY_SMALL) & (x < _VERY_LARGE)
+    factor = np.where(mask, 1.0 / np.expm1(x), 0.0)
+    
+    # Convert FNU to PHOTLAM
+    freq = u.Quantity(np.where(
+        factor, wavelengths.to(u.Hz, equivalencies=u.spectral()), 0.0), u.Hz)
+    bb_nu = 2.0 * const.h * factor * freq * freq * freq / const.c ** 2
+    bb_lam = np.where(
+        factor, units.FNU.to(units.PHOTLAM, bb_nu.cgs.value,
+                             equivalencies=u.spectral_density(wavelengths)),
+        0.0)
+
+    # Restore Numpy settings
+    dummy = np.seterr(**old_np_err_cfg)
 
     return u.Quantity(bb_lam, unit=units.PHOTLAM/u.sr)
 

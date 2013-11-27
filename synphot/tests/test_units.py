@@ -38,6 +38,7 @@ def test_implicit_assumptions():
      ('transmission', units.THROUGHPUT),
      ('TRANSMISSION', units.THROUGHPUT),
      ('extinction', units.THROUGHPUT),
+     ('emissivity', units.THROUGHPUT),
      ('photlam', units.PHOTLAM),
      ('photnu', units.PHOTNU),
      ('flam', units.FLAM),
