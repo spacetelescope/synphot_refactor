@@ -50,10 +50,10 @@ def bbfunc(wavelengths, temperature):
 
     # Calculations must use Angstrom
     wavelengths = units.validate_quantity(
-        wavelengths, u.AA, equivalencies=u.spectral())
+        wavelengths, u.AA, equivalencies=u.spectral()).astype(np.float64)
 
     # Calculations must use Kelvin
-    temperature = units.validate_quantity(temperature, u.K)
+    temperature = units.validate_quantity(temperature, u.K).astype(np.float64)
 
     x = wavelengths * temperature
 
@@ -64,7 +64,7 @@ def bbfunc(wavelengths, temperature):
     # Catch overflow/underflow
     mask = (x >= _VERY_SMALL) & (x < _VERY_LARGE)
     factor = np.where(mask, 1.0 / np.expm1(x), 0.0)
-    
+
     # Convert FNU to PHOTLAM
     freq = u.Quantity(np.where(
         factor, wavelengths.to(u.Hz, equivalencies=u.spectral()), 0.0), u.Hz)
