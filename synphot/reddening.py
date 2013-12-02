@@ -221,7 +221,7 @@ class ReddeningLaw(spectrum.BaseUnitlessSpectrum):
         if 'ylabel' in kwargs:
             del kwargs[key]
 
-        spectrum.BaseSpectrum.plot(self, ylabel='R(V)', **kwargs)
+        super(ReddeningLaw, self).plot(ylabel='R(V)', **kwargs)
 
 
 class ExtinctionCurve(spectrum.BaseUnitlessSpectrum):
@@ -339,4 +339,4 @@ class ExtinctionCurve(spectrum.BaseUnitlessSpectrum):
         if 'ylabel' in kwargs:
             del kwargs[key]
 
-        spectrum.BaseSpectrum.plot(self, ylabel='10^(-0.4 * A(V))', **kwargs)
+        super(ExtinctionCurve, self).plot(ylabel='10^(-0.4 * A(V))', **kwargs)

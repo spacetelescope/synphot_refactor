@@ -94,7 +94,7 @@ class Observation(spectrum.SourceSpectrum):
 
     """
     def __init__(self, wavelengths, fluxes, binwave=None, **kwargs):
-        spectrum.SourceSpectrum.__init__(self, wavelengths, fluxes, **kwargs)
+        super(Observation, self).__init__(wavelengths, fluxes, **kwargs)
 
         if binwave is None:
             self.binwave = None
@@ -176,13 +176,13 @@ class Observation(spectrum.SourceSpectrum):
 
     def __mul__(self, other):
         """Extends base class mul to handle binned data."""
-        new_obs = spectrum.BaseSpectrum.__mul__(self, other)
+        new_obs = super(Observation, self).__mul__(other)
         new_obs.binspec(self.binwave)
         return new_obs
 
     def __truediv__(self, other):
         """Extends base class truediv to handle binned data."""
-        new_obs = spectrum.BaseSpectrum.__truediv__(self, other)
+        new_obs = super(Observation, self).__truediv__(other)
         new_obs.binspec(self.binwave)
         return new_obs
 
@@ -876,6 +876,6 @@ class Observation(spectrum.SourceSpectrum):
             if key in kwargs:
                 del kwargs[key]
 
-        spectrum.BaseSpectrum.plot(
-            self, overplot_data=(self.binwave.value, self.binflux.value),
+        super(Observation, self).plot(
+            overplot_data=(self.binwave.value, self.binflux.value),
             data_labels=('Native dataset', 'Binned dataset'), **kwargs)
