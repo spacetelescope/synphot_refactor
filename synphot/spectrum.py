@@ -624,7 +624,12 @@ class BaseSpectrum(object):
             Invalid inputs.
 
         """
-        import matplotlib.pyplot as plt
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError:
+            log.error('No matplotlib installation found; plotting disabled '
+                      'as a result.')
+            return
 
         if not isinstance(data_labels, Iterable) or len(data_labels) < 2:
             raise exceptions.SynphotError('data_labels must be (str, str).')
