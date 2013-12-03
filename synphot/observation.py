@@ -292,10 +292,8 @@ class Observation(spectrum.SourceSpectrum):
 
         w1, w2 = binning.wave_range(
             bin_wave.value, cenwave.value, npix, **kwargs)
-        wave1 = u.Quantity(w1, unit=cenwave.unit)
-        wave2 = u.Quantity(w2, unit=cenwave.unit)
 
-        return wave1, wave2
+        return u.Quantity([w1, w2], unit=cenwave.unit)
 
     def pixel_range(self, waverange, **kwargs):
         """Calculate the number of pixels within the given wavelength
