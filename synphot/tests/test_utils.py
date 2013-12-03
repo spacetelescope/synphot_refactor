@@ -11,6 +11,7 @@ import numpy as np
 
 # ASTROPY
 from astropy import units as u
+from astropy.extern import six
 from astropy.tests.helper import pytest
 from astropy.utils.data import get_pkg_data_filename
 
@@ -112,7 +113,7 @@ def test_genwave(num, delta, log, ans):
         wave_unit=u.micron)
     np.testing.assert_allclose(wave.value, ans)
     assert wave.unit == u.micron
-    assert isinstance(wave_str, basestring)
+    assert isinstance(wave_str, six.string_types)
 
 
 class TestMergeWave(object):

@@ -8,6 +8,7 @@ import numpy as np
 # ASTROPY
 from astropy import constants as const
 from astropy import units as u
+from astropy.extern import six
 
 # LOCAL
 from . import exceptions
@@ -357,7 +358,7 @@ def validate_unit(input_unit):
         If unit is invalid.
 
     """
-    if isinstance(input_unit, basestring):
+    if isinstance(input_unit, six.string_types):
         input_unit_lowcase = input_unit.lower()
 
         if input_unit_lowcase == 'angstroms':
