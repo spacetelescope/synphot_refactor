@@ -124,10 +124,17 @@ if not _ASTROPY_SETUP_:
     del os, warn, config_dir  # clean up namespace
 
 
+#-------------#
+# SYNPHOT CFG #
+#-------------#
+from astropy import log
+log.info('synphot config is searching for the most current spectra files. Please be patient...')
+from . import config
+del log
+
 #------------#
 # SYNPHOT UI #
 #------------#
-from . import config
 from .spectrum import *
 from .analytic import Box1DSpectrum, Const1DSpectrum, Gaussian1DSpectrum, PowerLaw1DSpectrum, BlackBody1DSpectrum, flat_spectrum, gaussian_spectrum
 from .observation import *

@@ -228,6 +228,12 @@ Write a Passband
 TODO
 
 
+Thermal Passband
+----------------
+
+TODO
+
+
 Create an Observation
 ---------------------
 

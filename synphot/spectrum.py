@@ -762,7 +762,8 @@ class BaseUnitlessSpectrum(BaseSpectrum):
     """
     def __init__(self, wavelengths, throughput, **kwargs):
         kwargs['flux_unit'] = units.THROUGHPUT
-        BaseSpectrum.__init__(self, wavelengths, throughput, **kwargs)
+        super(BaseUnitlessSpectrum, self).__init__(
+            wavelengths, throughput, **kwargs)
 
         # Rename attribute to avoid confusion. They are interchangable.
         self.thru = self.flux
@@ -783,7 +784,7 @@ class BaseUnitlessSpectrum(BaseSpectrum):
         if isinstance(other, SourceSpectrum):
             return other.__mul__(self)
         else:
-            return BaseSpectrum.__mul__(self, other)
+            return super(BaseUnitlessSpectrum, self).__mul__(other)
 
     def convert_flux(self, out_flux_unit):
         """This merely returns ``self.thru``."""
@@ -799,7 +800,7 @@ class BaseUnitlessSpectrum(BaseSpectrum):
         Skipped if ends are already zeros. Attributes are updated in-place.
 
         """
-        BaseSpectrum.taper(self)
+        super(BaseUnitlessSpectrum, self).taper()
         self.thru = self.flux
 
 
@@ -854,7 +855,7 @@ class SourceSpectrum(BaseSpectrum):
 
     """
     def __init__(self, wavelengths, fluxes, **kwargs):
-        BaseSpectrum.__init__(self, wavelengths, fluxes, **kwargs)
+        super(SourceSpectrum, self).__init__(wavelengths, fluxes, **kwargs)
 
     @staticmethod
     def _validate_flux_unit(new_unit):

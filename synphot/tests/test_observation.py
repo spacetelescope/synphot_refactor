@@ -320,6 +320,8 @@ class TestObsPar(object):
 
         if flux_unit is None:
             assert eff_stim.unit == units.FLAM
+        elif flux_unit == u.count:
+            assert eff_stim.unit == u.count / (u.s * units.AREA)
         else:
             assert eff_stim.unit == flux_unit
 
@@ -393,7 +395,7 @@ class TestCountRate(object):
         """Use all bins."""
         ct_rate = self.obs.countrate()
         np.testing.assert_allclose(ct_rate.value, 280.75, rtol=1e-4)
-        assert ct_rate.unit == u.count
+        assert ct_rate.unit == u.count / (u.s * units.AREA)
 
     @pytest.mark.parametrize(
         ('w1', 'w2', 'ans'),

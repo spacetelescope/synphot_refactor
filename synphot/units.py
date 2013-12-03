@@ -338,8 +338,8 @@ def validate_unit(input_unit):
 
         * 'angstroms' and 'inversemicrons' are accepted although
           unrecognized by astropy units
-        * 'transmission' and 'extinction' are converted to astropy
-          dimensionless unit
+        * 'transmission', 'extinction', and 'emissivity' are
+          converted to astropy dimensionless unit
 
     Parameters
     ----------
@@ -364,7 +364,7 @@ def validate_unit(input_unit):
             output_unit = u.AA
         elif input_unit_lowcase == 'inversemicrons':
             output_unit = u.micron ** -1
-        elif input_unit_lowcase in ('transmission', 'extinction'):
+        elif input_unit_lowcase in ('transmission', 'extinction', 'emissivity'):
             output_unit = THROUGHPUT
         else:
             try:  # astropy.units is case-sensitive

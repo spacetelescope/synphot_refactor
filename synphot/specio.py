@@ -63,8 +63,12 @@ def get_latest_file(template, raise_error=False, err_msg=''):
         allfiles = list(set([x.split()[-1] for x in response]))  # Rid symlink
 
     # Local directory
-    else:
+    elif os.path.isdir(path):
         allfiles = os.listdir(path)
+
+    # Bogus directory
+    else:
+        allfiles = []
 
     matched_files = sorted(fnmatch.filter(allfiles, pattern))
 

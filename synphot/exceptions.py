@@ -11,16 +11,8 @@ __all__ = ['SynphotError', 'TableFormatError', 'DuplicateWavelength',
 
 
 class SynphotError(Exception):
-    """Base class for synphot exceptions.
-
-    Parameters
-    ----------
-    msg : str
-        Error message.
-
-    """
-    def __init__(self, msg):
-        Exception.__init__(self, msg)
+    """Base class for synphot exceptions."""
+    pass
 
 
 class TableFormatError(SynphotError):
@@ -36,7 +28,7 @@ class TableFormatError(SynphotError):
 
     """
     def __init__(self, msg, rows=None):
-        SynphotError.__init__(self, msg)
+        super(TableFormatError, self).__init__(msg)
 
         # Save rows with wrong values as an attribute so calling code
         # can access it directly
