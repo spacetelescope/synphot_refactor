@@ -12,6 +12,7 @@ import numpy as np
 # ASTROPY
 from astropy import log
 from astropy import units as u
+from astropy.extern import six
 from astropy.io import ascii, fits
 from astropy.utils.data import get_readable_fileobj
 
@@ -151,7 +152,7 @@ def read_spec(filename, fname='', **kwargs):
         Read failed.
 
     """
-    if isinstance(filename, basestring):
+    if isinstance(filename, six.string_types):
         fname = filename
     elif not fname:  # pragma: no cover
         raise exceptions.SynphotError('Cannot determine filename.')
@@ -249,14 +250,22 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
     header = dict(fs[str('PRIMARY')].header)
     wave_dat = fs[ext].data.field(wave_col)
     flux_dat = fs[ext].data.field(flux_col)
-    fits_wave_unit = fs[ext].header.get('TUNIT1', '')
-    fits_flux_unit = fs[ext].header.get('TUNIT2', '')
+    fits_wave_unit = fs[ext].header.get('TUNIT1')
+    fits_flux_unit = fs[ext].header.get('TUNIT2')
 
-    if fits_wave_unit:
-        wave_unit = fits_wave_unit
+    if fits_wave_unit is not None:
+        try:
+            wave_unit = units.validate_unit(fits_wave_unit)
+        except (exceptions.SynphotError, ValueError) as e:  # pragma: no cover
+            log.warn('{0} from FITS header is not valid wavelength unit, using '
+                     '{1}: {2}'.format(fits_wave_unit, wave_unit, e))
 
-    if fits_flux_unit:
-        flux_unit = fits_flux_unit
+    if fits_flux_unit is not None:
+        try:
+            flux_unit = units.validate_unit(fits_flux_unit)
+        except (exceptions.SynphotError, ValueError) as e:  # pragma: no cover
+            log.warn('{0} from FITS header is not valid flux unit, using '
+                     '{1}: {2}'.format(fits_flux_unit, flux_unit, e))
 
     wave_unit = units.validate_unit(wave_unit)
     flux_unit = units.validate_unit(flux_unit)
@@ -264,7 +273,7 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
     wavelengths = u.Quantity(wave_dat, unit=wave_unit)
     fluxes = u.Quantity(flux_dat, unit=flux_unit)
 
-    if isinstance(filename, basestring):
+    if isinstance(filename, six.string_types):
         fs.close()
 
     return header, wavelengths, fluxes
