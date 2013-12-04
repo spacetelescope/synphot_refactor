@@ -126,7 +126,8 @@ def get_extensions():
 
 
 def get_package_data():
-    return {str('synphot.tests'): [str('data/*.txt'), str('data/*.fits')]}
+    return {str('synphot.tests'): [str('data/*.txt'), str('data/*.fits'),
+                                   str('data/*.dat')]}
 
 
 def requires_2to3():

@@ -80,13 +80,18 @@ def test_read_remote_spec():
 def test_read_ascii_spec():
     """Test read local ASCII spectrum."""
     specfile = get_pkg_data_filename(
-        os.path.join('data', 'dummy_ascii_spec.txt'))
+        os.path.join('data', 'qso_fos_001.dat'))
     hdr, wave, flux = specio.read_spec(specfile)
 
     np.testing.assert_array_equal(
-        wave.value, [999.9, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 7000.1])
+        wave.value[::1000],
+        [150, 611.1, 911.1, 1211.1, 1511.1, 1811.1, 2111.1, 2411.1, 2711.1,
+         3011.1, 3311.1])
     np.testing.assert_array_equal(
-        flux.value, [0.0, 0.5, 1.1, 2.3, 4.5, 3.2, 1.6, 0.4, 0.0])
+        flux.value[::1000],
+        [1.50000000e-13, 2.38796000e-13, 2.17000000e-13, 7.61000000e-13,
+         1.97000000e-13, 1.40000000e-13, 1.18000000e-13, 1.06000000e-13,
+         9.15000000e-14, 8.65889000e-14, 8.36539000e-14])
     assert wave.unit == u.AA
     assert flux.unit == units.FLAM
     assert hdr == {}
