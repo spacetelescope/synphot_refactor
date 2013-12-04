@@ -65,8 +65,11 @@ def test_validate_wavelengths():
         utils.validate_wavelengths(np.arange(10))
     with pytest.raises(exceptions.UnsortedWavelength):
         utils.validate_wavelengths([1000, 1002, 1001, 1003, 1004])
-    with pytest.raises(exceptions.DuplicateWavelength):
+
+    try:
         utils.validate_wavelengths([1000, 1001, 1002, 1003, 1003])
+    except exceptions.DuplicateWavelength as e:
+        np.testing.assert_array_equal(e.rows, 3)
 
 
 def test_tolength():

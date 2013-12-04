@@ -137,7 +137,9 @@ class TestReadWriteFITS(object):
         assert hdr['PEDIGREE'] == 'DUMMY'
 
         # Compare science header
-        assert fits.getval(outfile, 'SPEC_SRC', ext=1) == 'RANDOM'
+        sci_hdr = fits.getheader(outfile, 1)
+        assert sci_hdr['SPEC_SRC'] == 'RANDOM'
+        assert sci_hdr['TFORM2'].lower() == 'e'
 
     def test_quantity_data(self):
         """Data as Quantity."""
@@ -165,7 +167,9 @@ class TestReadWriteFITS(object):
         assert hdr['PEDIGREE'] == 'DUMMY'
 
         # Compare science header
-        assert fits.getval(outfile, 'SPEC_SRC', ext=1) == 'RANDOM'
+        sci_hdr = fits.getheader(outfile, 1)
+        assert sci_hdr['SPEC_SRC'] == 'RANDOM'
+        assert sci_hdr['TFORM2'].lower() == 'd'
 
     def test_exceptions(self):
         """Test for appropriate exceptions."""

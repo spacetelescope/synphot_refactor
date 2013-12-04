@@ -661,6 +661,12 @@ class TestMathOperators(object):
         if not other_scalar:
             assert self.sp_2.flux.unit == u.Jy
 
+    def test_add_same_sp(self):
+        """sp = sp + sp - sp"""
+        sp1 = self.sp_1 + self.sp_1
+        sp2 = sp1 - self.sp_1
+        np.testing.assert_array_equal(sp2.flux.value, self.sp_1.flux.value)
+
     @pytest.mark.parametrize(
         ('op_type', 'other_scalar', 'ans_flux'),
         [('+', False, [0, 0.2, 0.4, 0.6, 0]),
