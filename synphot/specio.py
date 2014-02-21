@@ -252,8 +252,8 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
     """
     fs = fits.open(filename)
     header = dict(fs[str('PRIMARY')].header)
-    wave_dat = fs[ext].data.field(wave_col)
-    flux_dat = fs[ext].data.field(flux_col)
+    wave_dat = fs[ext].data.field(wave_col).copy()
+    flux_dat = fs[ext].data.field(flux_col).copy()
     fits_wave_unit = fs[ext].header.get('TUNIT1')
     fits_flux_unit = fs[ext].header.get('TUNIT2')
 
