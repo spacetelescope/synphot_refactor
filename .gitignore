@@ -12,6 +12,8 @@ __pycache__
 # Other generated files
 */synphot.cfg
 */version.py
+htmlcov
+.coverage
 
 # Sphinx
 _build

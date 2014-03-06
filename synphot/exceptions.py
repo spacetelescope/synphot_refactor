@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Custom exceptions for synphot to raise."""
+"""Exceptions specific to synthetic photometry."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 

@@ -14,49 +14,10 @@ import numpy as np
 from astropy import units as u
 from astropy.io import fits
 from astropy.tests.helper import pytest, remote_data
-from astropy.utils.data import get_pkg_data_filename, _find_pkg_data_path
+from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
 from .. import exceptions, specio, units
-
-
-class TestGetLatestFile(object):
-    """Test getting latest file."""
-    def setup_class(self):
-        self.datadir = _find_pkg_data_path('data')
-
-    @remote_data
-    def test_ftp(self):
-        """Remote FTP path."""
-        template = 'ftp://ftp.stsci.edu/cdbs/mtab/n*tmg.fits'
-        ans = 'ftp://ftp.stsci.edu/cdbs/mtab/n9i1408hm_tmg.fits'
-        filename = specio.get_latest_file(template, raise_error=True)
-        assert filename == ans
-
-    def test_local(self):
-        """Local data path."""
-        template = os.path.join(self.datadir, 'hst_acs_hrc_*.fits')
-        ans = os.path.join(self.datadir, 'hst_acs_hrc_f555w_x_grw70d5824.fits')
-        filename = specio.get_latest_file(template, raise_error=True)
-        assert filename == ans
-
-    def test_bogus(self):
-        """Bogus data path."""
-        filename = specio.get_latest_file(
-            os.path.join('foo', 'foo', 'hst_acs_hrc_*.fits'))
-        assert filename == ''
-
-    def test_no_files(self):
-        """Real path with no files."""
-        template = os.path.join(self.datadir, '*dummy')
-
-        # Warning only
-        filename = specio.get_latest_file(template)
-        assert filename == ''
-
-        # Raise error
-        with pytest.raises(IOError):
-            filename = specio.get_latest_file(template, raise_error=True)
 
 
 @remote_data

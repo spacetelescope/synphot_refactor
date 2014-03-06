@@ -1,10 +1,10 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Test utils.py module."""
-from __future__ import absolute_import, division, print_function, unicode_literals
+"""Test utils.py module.
 
-# STDLIB
-import os
-import sys
+.. note:: ``get_waveset()`` is tested in test_spectrum.py.
+
+"""
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 # THIRD PARTY
 import numpy as np
@@ -13,10 +13,9 @@ import numpy as np
 from astropy import units as u
 from astropy.extern import six
 from astropy.tests.helper import pytest
-from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import exceptions, specio, utils, units
+from .. import exceptions, utils
 
 
 @pytest.mark.parametrize(
@@ -56,7 +55,7 @@ def test_validate_wavelengths():
 
     # Valid wavelengths (descending)
     a = a[::-1]
-    wave = utils.validate_wavelengths(u.Quantity(a, unit=u.micron))
+    wave = utils.validate_wavelengths(u.Quantity(a, u.micron))
 
     # Invalid wavelengths
     with pytest.raises(exceptions.SynphotError):
@@ -70,34 +69,6 @@ def test_validate_wavelengths():
         utils.validate_wavelengths([1000, 1001, 1002, 1003, 1003])
     except exceptions.DuplicateWavelength as e:
         np.testing.assert_array_equal(e.rows, 3)
-
-
-def test_tolength():
-    """Test wavelength conversion to type length."""
-    # Expected values
-    wave = u.Quantity([5000.0, 6000.0, 7000.0], unit=u.AA)
-    freq = units.C / wave
-    w_micron = wave.to(u.micron)
-    wn_micron = 1.0 / w_micron
-
-    # Length
-    x = utils.to_length(wave)
-    np.testing.assert_array_equal(x.value, wave.value)
-    assert x.unit == u.AA
-
-    # Frequency
-    x = utils.to_length(freq, wave_unit=u.micron)
-    np.testing.assert_allclose(x.value, w_micron.value)
-    assert x.unit == u.micron
-
-    # Wave number
-    x = utils.to_length(wn_micron)
-    np.testing.assert_allclose(x.value, wave.value)
-    assert x.unit == u.AA
-
-    # Invalid
-    with pytest.raises(u.UnitsError):
-        x = utils.to_length(u.Quantity(1.0, u.Jy))
 
 
 @pytest.mark.parametrize(
@@ -125,6 +96,13 @@ class TestMergeWave(object):
         self.thres = 1e-12
         self.wave = [5000.0, 5000.01, 5000.02, 5000.03, 5000.04, 6000.0]
 
+    def test_merge_none(self):
+        assert utils.merge_wavelengths(None, None) is None
+        np.testing.assert_array_equal(
+            utils.merge_wavelengths(None, self.wave), self.wave)
+        np.testing.assert_array_equal(utils.merge_wavelengths(
+                self.wave, None), self.wave)
+
     def test_merge_thres(self):
         w = [5000.005, 5000.02 + self.thres, 5500.0, 6000.0]
         ans = [5000.0, 5000.005, 5000.01, 5000.02, 5000.03, 5000.04, 5500.0,
@@ -135,51 +113,5 @@ class TestMergeWave(object):
         assert np.all(dw > self.thres)
 
     def test_merge_same(self):
-        wave =  utils.merge_wavelengths(self.wave, self.wave)
+        wave = utils.merge_wavelengths(self.wave, self.wave)
         np.testing.assert_array_equal(wave, self.wave)
-
-
-class TestTrapezoidIntegration(object):
-    """Test integrator and utility functions that use it."""
-    def setup_class(self):
-        # Get bandpass data for integration.
-        bandfile = get_pkg_data_filename(
-            os.path.join('data', 'hst_acs_hrc_f555w.fits'))
-        hdr, self.wave, self.thru = specio.read_fits_spec(
-            bandfile, flux_col='THROUGHPUT', flux_unit=u.dimensionless_unscaled)
-
-    def test_avgwave(self):
-        """Compare AVGWAVE with old SYNPHOT result."""
-        avg_wave = utils.avg_wavelength(self.wave.value, self.thru.value)
-        np.testing.assert_allclose(avg_wave, 5367.9, rtol=1e-5)
-
-    def test_barlam(self):
-        """Test BARLAM (no old SYNPHOT result available)."""
-        bar_lam = utils.barlam(self.wave.value, self.thru.value)
-        np.testing.assert_allclose(bar_lam, 5331.8945)
-
-    @pytest.mark.parametrize(('a'), [np.array([]), np.array([1])])
-    def test_zero_ans(self, a):
-        """Test that empty and single-element arrays return zero."""
-        assert utils.trapezoid_integration(a, a) == 0
-
-    @pytest.mark.parametrize(
-        ('a', 'b'),
-        [(np.arange(5), np.arange(3)),
-         (np.arange(10).reshape(5, 2), np.arange(10).reshape(5, 2))])
-    def test_exceptions(self, a, b):
-        """Test exceptions for shape mismatch and wrong dimensions."""
-        with pytest.raises(ValueError):
-            x = utils.trapezoid_integration(a, b)
-
-    def test_exception_ndim0(self):
-        """Exception for ndim=0 is different between Python 2 and 3."""
-        a = np.array(1)
-
-        if sys.version_info < (3, 0):  # pragma: py2
-            expected_err = ValueError
-        else:  # pragma: py3
-            expected_err = IndexError
-
-        with pytest.raises(expected_err):
-            x = utils.trapezoid_integration(a, a)

@@ -6,15 +6,68 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import numpy as np
 
 # ASTROPY
+#from astropy import modeling
 from astropy import units as u
+
+# STSCI
+import modeling
 
 # LOCAL
 from . import exceptions, units
 
 
-__all__ = ['overlap_status', 'validate_totalflux', 'validate_wavelengths',
-           'to_length', 'generate_wavelengths', 'merge_wavelengths',
-           'trapezoid_integration', 'avg_wavelength', 'barlam']
+__all__ = ['get_waveset', 'overlap_status', 'validate_totalflux',
+           'validate_wavelengths', 'generate_wavelengths', 'merge_wavelengths']
+
+
+def get_waveset(model):
+    """Get optimal wavelengths for sampling a given model.
+
+    Parameters
+    ----------
+    model : `~astropy.modeling.core.Model`
+        Model.
+
+    Returns
+    -------
+    waveset : array_like or `None`
+        Optimal wavelengths. `None` if undefined.
+
+    Raises
+    ------
+    synphot.exceptions.SynphotError
+        Invalid model.
+
+    """
+    if not isinstance(model, modeling.Model):
+        raise exceptions.SynphotError('{0} is not a model.'.format(model))
+
+    if (isinstance(model, modeling.core.SerialCompositeModel) and
+            model._transforms[0].__class__.__name__ == 'Redshift'):
+        z = model._transforms[0].inverse()
+        w = get_waveset(model._transforms[1])
+        if w is None:
+            waveset = None
+        else:
+            waveset = z(w)
+
+    elif isinstance(model, modeling.core._CompositeModel):
+        w_list = [get_waveset(m) for m in model._transforms]
+        waveset = merge_wavelengths(w_list[0], w_list[1])
+        for cur_w in w_list[2:]:
+            waveset = merge_wavelengths(waveset, cur_w)
+
+    elif hasattr(model, 'sampleset'):
+        waveset = model.sampleset
+
+        # Hack Box1D waveset so its bandpar results are consistent with IRAF
+        if model.__class__.__name__ == 'Box1D':
+            waveset = np.arange(waveset[0], waveset[-1], 0.01)
+
+    else:
+        waveset = None
+
+    return waveset
 
 
 def overlap_status(a, b):
@@ -71,45 +124,40 @@ def validate_totalflux(totalflux):
 
 
 def validate_wavelengths(wavelengths):
-    """Check wavelengths for synphot compatibility.
+    """Check wavelengths for ``synphot`` compatibility.
 
     Wavelengths must satisfy these conditions:
 
-        * valid unit type
+        * valid unit type, if given
         * no zeroes
         * monotonic ascending or descending
         * no duplicate values
 
     Parameters
     ----------
-    wavelengths : array_like or `astropy.units.quantity.Quantity`
-        Wavelength values. If not a Quantity, assumed to be in Angstrom.
+    wavelengths : array_like or `~astropy.units.quantity.Quantity`
+        Wavelength values.
 
     Raises
     ------
     synphot.exceptions.SynphotError
-        If wavelengths unit type is invalid.
+        Wavelengths unit type is invalid.
 
     synphot.exceptions.DuplicateWavelength
-        If wavelength array contains duplicate entries.
+        Wavelength array contains duplicate entries.
 
     synphot.exceptions.UnsortedWavelength
-        If wavelength array is not monotonic.
+        Wavelength array is not monotonic.
 
     synphot.exceptions.ZeroWavelength
-        If negative or zero wavelength occurs in wavelength array.
+        Negative or zero wavelength occurs in wavelength array.
 
     """
-    if not isinstance(wavelengths, u.Quantity):
-        wavelengths = u.Quantity(wavelengths, unit=u.AA)
-
-    unit_type = wavelengths.unit.physical_type
-    wave = wavelengths.value
-
-    if unit_type not in ('length', 'wavenumber', 'frequency'):
-        raise exceptions.SynphotError(
-            'wavelength physical type is not length, wave number, or '
-            'frequency: {0}'.format(unit_type))
+    if isinstance(wavelengths, u.Quantity):
+        units.validate_wave_unit(wavelengths.unit)
+        wave = wavelengths.value
+    else:
+        wave = np.array(wavelengths)
 
     # Check for zeroes
     if np.any(wave <= 0):
@@ -128,7 +176,7 @@ def validate_wavelengths(wavelengths):
                 rows=np.where(sorted_wave != wave)[0])
 
     # Check for duplicate values
-    if not np.isscalar(wave):
+    if wave.size > 1:
         dw = sorted_wave[1:] - sorted_wave[:-1]
         if np.any(dw == 0):
             raise exceptions.DuplicateWavelength(
@@ -136,39 +184,9 @@ def validate_wavelengths(wavelengths):
                 rows=np.where(dw == 0)[0])
 
 
-def to_length(wavelengths, wave_unit=u.AA):
-    """Ensure wavelengths are of length type.
-
-    If input is frequency or wave number, it is converted
-    to given default unit. Otherwise, no conversion is done.
-
-    Parameters
-    ----------
-    wavelengths : `astropy.units.quantity.Quantity`
-        Wavelength values.
-
-    wave_unit : str or `astropy.units.core.Unit`
-        Wavelength unit to convert to if input is not of
-        type length. Default is Angstrom.
-
-    Returns
-    -------
-    outwave : `astropy.units.quantity.Quantity`
-        Wavelengths converted to type length.
-
-    """
-    if wavelengths.unit.physical_type == 'length':
-        outwave = wavelengths
-    else:
-        wave_unit = units.validate_unit(wave_unit)
-        outwave = wavelengths.to(wave_unit, equivalencies=u.spectral())
-
-    return outwave
-
-
 def generate_wavelengths(minwave=500, maxwave=26000, num=10000, delta=None,
                          log=True, wave_unit=u.AA):
-    """Generate wavelengths to be used for some synphot spectral types.
+    """Generate wavelength array to be used for spectrum sampling.
 
     .. math::
 
@@ -192,12 +210,12 @@ def generate_wavelengths(minwave=500, maxwave=26000, num=10000, delta=None,
         If `True`, the wavelength values are evenly spaced in log scale.
         Otherwise, spacing is linear.
 
-    wave_unit : str or `astropy.units.core.Unit`
+    wave_unit : str or `~astropy.units.core.Unit`
         Wavelength unit. Default is Angstrom.
 
     Returns
     -------
-    waveset : `astropy.units.quantity.Quantity`
+    waveset : `~astropy.units.quantity.Quantity`
         Generated wavelength set.
 
     waveset_str : str
@@ -245,8 +263,9 @@ def merge_wavelengths(waveset1, waveset2, threshold=1e-12):
 
     Parameters
     ----------
-    waveset1, waveset2 : array_like
+    waveset1, waveset2 : array_like or `None`
         Wavelength values, assumed to be in the same unit already.
+        Also see :func:`get_waveset`.
 
     threshold : float, optional
         Merged wavelength values are considered "too close together"
@@ -255,96 +274,24 @@ def merge_wavelengths(waveset1, waveset2, threshold=1e-12):
 
     Returns
     -------
-    out_wavelengths : array_like
-        Merged wavelengths.
+    out_wavelengths : array_like or `None`
+        Merged wavelengths. `None` if undefined.
 
     """
-    out_wavelengths = np.union1d(waveset1, waveset2)
-    delta = out_wavelengths[1:] - out_wavelengths[:-1]
-    i_good = np.where(delta > threshold)
+    if waveset1 is None and waveset2 is None:
+        out_wavelengths = None
+    elif waveset1 is not None and waveset2 is None:
+        out_wavelengths = waveset1
+    elif waveset1 is None and waveset2 is not None:
+        out_wavelengths = waveset2
+    else:
+        out_wavelengths = np.union1d(waveset1, waveset2)
+        delta = out_wavelengths[1:] - out_wavelengths[:-1]
+        i_good = np.where(delta > threshold)
 
-    # Remove "too close together" duplicates
-    if len(i_good[0]) < delta.size:
-        out_wavelengths = np.append(out_wavelengths[i_good],
-                                    out_wavelengths[-1])
+        # Remove "too close together" duplicates
+        if len(i_good[0]) < delta.size:
+            out_wavelengths = np.append(
+                out_wavelengths[i_good], out_wavelengths[-1])
 
     return out_wavelengths
-
-
-def trapezoid_integration(x, y):
-    """Perform trapezoid integration for spectrum data.
-
-    Parameters
-    ----------
-    x : array_like
-        Wavelength values.
-
-    y : array_like
-        Flux or throughput values.
-
-    Returns
-    -------
-    result : array_like
-        Integrated result. It is zero if wavelengths are invalid.
-
-    """
-    npoints = x.size
-
-    if npoints > 0:
-        result = np.sum(0.5 * (y[1:] + y[:-1]) * (x[1:] - x[:-1]))
-        if x[-1] < x[0]:
-            result *= -1.0
-    else:
-        result = 0.0
-
-    return result
-
-
-def avg_wavelength(wave, flux):
-    """Calculate the :ref:`average wavelength <synphot-formula-avgwv>`.
-
-    Parameters
-    ----------
-    wave, flux : array_like
-        Wavelength and flux values.
-
-    Returns
-    -------
-    avg_wave : float
-        Passband average wavelength in the unit of ``wave``.
-
-    """
-    num = trapezoid_integration(wave, flux * wave)
-    den = trapezoid_integration(wave, flux)
-
-    if den == 0:  # pragma: no cover
-        avg_wave = 0.0
-    else:
-        avg_wave = num / den
-
-    return avg_wave
-
-
-def barlam(wave, flux):
-    """Calculate :ref:`mean log wavelength <synphot-formula-barlam>`.
-
-    Parameters
-    ----------
-    wave, flux : array_like
-        Wavelength and flux values.
-
-    Returns
-    -------
-    bar_lam : float
-        Mean log wavelength in the unit of ``wave``.
-
-    """
-    num = trapezoid_integration(wave, flux * np.log(wave) / wave)
-    den = trapezoid_integration(wave, flux / wave)
-
-    if num == 0 or den == 0:  # pragma: no cover
-        bar_lam = 0.0
-    else:
-        bar_lam = np.exp(num / den)
-
-    return bar_lam

@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Test spectrum.py module and flux conversion."""
+"""Test spectrum.py module and related functionalities."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 # STDLIB
@@ -13,39 +13,22 @@ import numpy as np
 # ASTROPY
 from astropy import units as u
 from astropy.io import fits
+#from astropy.modeling import models
 from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
+# STSCI
+from modeling import models
+
 # LOCAL
-from .. import analytic, spectrum, exceptions, units
+from .test_units import _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
+from .. import exceptions, units, utils
+from ..models import ConstFlux1D, Empirical1D, GaussianAbsorption1D, PowerLawFlux1D, Redshift
 from ..observation import Observation
-from ..utils import generate_wavelengths
+from ..spectrum import SourceSpectrum, SpectralElement
 
 
-# HST primary mirror
-_area = u.Quantity(45238.93416, units.AREA)
-
-# ftp://ftp.stsci.edu/cdbs/supplemental_calspec/grw_70d5824_stisnic_002.ascii
-_wave = u.Quantity([4956.8, 4959.55, 4962.3], u.AA)
-_flux_photlam = u.Quantity([9.7654e-3, 1.003896e-2, 9.78473e-3], units.PHOTLAM)
-_flux_photnu = u.Quantity(
-    [8.00335589e-14, 8.23668949e-14, 8.03700310e-14], units.PHOTNU)
-_flux_flam = u.Quantity([3.9135e-14, 4.0209e-14, 3.9169e-14], units.FLAM)
-_flux_fnu = u.Quantity(
-    [3.20735792e-25, 3.29903646e-25, 3.21727226e-25], units.FNU)
-_flux_jy = u.Quantity([3.20735792e-2, 3.29903646e-2, 3.21727226e-2], u.Jy)
-_flux_count = u.Quantity([1214.88479883, 1248.91795446, 1217.28946691], u.count)
-_flux_stmag = u.Quantity([12.41858665, 12.38919182, 12.41764379], units.STMAG)
-_flux_abmag = u.Quantity([12.63463143, 12.60403221, 12.63128047], units.ABMAG)
-_flux_obmag = u.Quantity([-7.71133775, -7.74133477, -7.71348466], units.OBMAG)
-_flux_vegamag = u.Quantity(
-    [12.72810665, 12.69861694, 12.72605148], units.VEGAMAG)
-
-# Test data files
-_bandfile = get_pkg_data_filename(
-    os.path.join('data', 'hst_acs_hrc_f555w.fits'))
-_specfile = get_pkg_data_filename(
-    os.path.join('data', 'hst_acs_hrc_f555w_x_grw70d5824.fits'))
+# GLOBAL VARIABLES
 _vspec = None  # Loaded in test_load_vspec()
 
 
@@ -53,45 +36,7 @@ _vspec = None  # Loaded in test_load_vspec()
 def test_load_vspec():
     """Load VEGA spectrum once here to be used later."""
     global _vspec
-    _vspec = spectrum.SourceSpectrum.from_vega(
-        cache=False, show_progress=False, area=_area, encoding='binary')
-
-
-@pytest.mark.parametrize(
-    ('in_q', 'out_u', 'ans'),
-    [(_flux_photlam.value, units.PHOTLAM, _flux_photlam),
-     (_flux_photlam, u.count, _flux_count),
-     (_flux_count, units.PHOTLAM, _flux_photlam),
-     (_flux_photlam, units.OBMAG, _flux_obmag),
-     (_flux_obmag, units.PHOTLAM, _flux_photlam),
-     (_flux_count, units.OBMAG, _flux_obmag),
-     (_flux_obmag, u.count, _flux_count),
-     (_flux_photlam, units.FLAM, _flux_flam),
-     (_flux_flam, units.PHOTLAM, _flux_photlam),
-     (_flux_photlam, units.STMAG, _flux_stmag),
-     (_flux_stmag, units.PHOTLAM, _flux_photlam),
-     (_flux_flam, units.STMAG, _flux_stmag),
-     (_flux_stmag, units.FLAM, _flux_flam),
-     (_flux_photlam, units.PHOTNU, _flux_photnu),
-     (_flux_photnu, units.PHOTLAM, _flux_photlam),
-     (_flux_photlam, units.FNU, _flux_fnu),
-     (_flux_fnu, units.PHOTLAM, _flux_photlam),
-     (_flux_photlam, units.ABMAG, _flux_abmag),
-     (_flux_abmag, units.PHOTLAM, _flux_photlam),
-     (_flux_fnu, units.ABMAG, _flux_abmag),
-     (_flux_abmag, units.FNU, _flux_fnu),
-     (_flux_fnu, units.STMAG, _flux_stmag),
-     (_flux_fnu, u.mJy, _flux_jy.to(u.mJy)),
-     (_flux_photlam, u.Jy, _flux_jy),
-     (_flux_jy, units.PHOTLAM, _flux_photlam),
-     (_flux_flam, u.Jy, _flux_jy),
-     (u.Quantity(np.zeros(3), units.FNU), units.FLAM,
-      u.Quantity(np.zeros(3), units.FLAM))])
-def test_flux_conversion(in_q, out_u, ans):
-    """Test flux conversion, except VEGAMAG."""
-    result = units.convert_flux(_wave, in_q, out_u, area=_area)
-    np.testing.assert_allclose(result.value, ans.value, rtol=1e-6)
-    assert result.unit == ans.unit
+    _vspec = SourceSpectrum.from_vega(encoding='binary')
 
 
 @remote_data
@@ -107,756 +52,430 @@ def test_flux_conversion_vega(in_q, out_u, ans):
     .. note:: 0.5% is good enough given Vega gets updated from time to time.
 
     """
-    result = units.convert_flux(_wave, in_q, out_u, area=_area, vegaspec=_vspec)
+    result = units.convert_flux(_wave, in_q, out_u, vegaspec=_vspec)
     np.testing.assert_allclose(result.value, ans.value, rtol=5e-3)
     assert result.unit == ans.unit
 
 
-def test_flux_conversion_exceptions():
-    """Test for appropriate exceptions."""
-    # Invalid flux unit
-    with pytest.raises(u.UnitsError):
-        x = units.convert_flux(_wave, _wave, units.PHOTLAM)
-    with pytest.raises(u.UnitsError):
-        x = units.convert_flux(_wave, _flux_photlam, u.AA)
-
-    # Missing Vega spectrum
-    with pytest.raises(exceptions.SynphotError):
-        x = units.convert_flux(_wave, _flux_fnu, units.VEGAMAG, vegaspec=None)
-
-    # Missing area
-    with pytest.raises(exceptions.SynphotError):
-        x = units.convert_flux(_wave, _flux_photlam, u.count, area=None)
-    with pytest.raises(exceptions.SynphotError):
-        x = units.convert_flux(_wave, _flux_obmag, units.PHOTLAM, area=None)
-
-
-class TestSourceSpectrum(object):
-    """Test SourceSpectrum object (most methods)."""
-    def setup_class(self):
-        self.sp = spectrum.SourceSpectrum.from_file(_specfile, area=_area)
-
-    def test_attributes(self):
-        np.testing.assert_allclose(
-            self.sp.wave.value[5000:5004],
-            [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
-        np.testing.assert_allclose(
-            self.sp.flux.value[5000:5004],
-            [1.87284130e-15, 1.85656811e-15, 1.84030867e-15, 1.82404183e-15])
-        np.testing.assert_allclose(self.sp.primary_area.value, _area.value)
-        assert self.sp.wave.unit == u.AA
-        assert self.sp.flux.unit == units.FLAM
-        assert self.sp.primary_area.unit == _area.unit
-        assert self.sp.metadata['expr'] == str(self.sp)
-        assert self.sp.metadata['SIMPLE']  # From FITS header
-        assert self.sp.warnings == {}
-
-    def test_init(self):
-        # Direct initialization with flipped arrays
-        sp = spectrum.SourceSpectrum(
-            self.sp.wave.value[::-1], self.sp.flux.value[::-1],
-            flux_unit=self.sp.flux.unit, header={'FOO': 'foo'})
-        np.testing.assert_array_equal(sp.wave.value, self.sp.wave.value[::-1])
-        np.testing.assert_array_equal(sp.flux.value, self.sp.flux.value[::-1])
-        assert sp.wave.unit == self.sp.wave.unit
-        assert sp.flux.unit == self.sp.flux.unit
-        assert sp.primary_area is None
-        assert sp.metadata['FOO'] == 'foo'
-
-        # Negative flux warning
-        sp = spectrum.SourceSpectrum(_wave, [100.0, -45, 5e-17])
-        assert 'NegativeFlux' in sp.warnings
-
-        # Invalid flux unit
-        with pytest.raises(exceptions.SynphotError):
-            sp = spectrum.SourceSpectrum(_wave, _flux_obmag)
-
-        # Shape mismatch
-        with pytest.raises(exceptions.SynphotError):
-            sp = spectrum.SourceSpectrum(self.sp.wave, np.arange(10))
-
-    def test_merge_wave(self):
-        sp = spectrum.SourceSpectrum(_wave.to(u.micron), _flux_flam)
-        wave = self.sp.merge_wave(sp)
-        np.testing.assert_allclose(
-            wave.value[3202:3218],
-            [4956.39111328, 4956.8, 4956.93847656, 4957.48583984,
-             4958.03320312, 4958.58105469, 4959.12890625, 4959.55,
-             4959.67626953, 4960.22412109, 4960.77197266, 4961.3203125,
-             4961.86816406, 4962.3, 4962.41601562, 4962.96435547])
-        assert wave.unit == self.sp.wave.unit
-
-    def test_resample(self):
-        # Sample at existing wavelength (no interpolation)
-        flux = self.sp.resample(self.sp.wave[5000])
-        np.testing.assert_array_equal(flux.value, self.sp.flux.value[5000])
-        assert flux.unit == self.sp.flux.unit
-
-        # Sampling with interpolation
-        flux = self.sp.resample(_wave.value)
-        np.testing.assert_allclose(
-            flux.value, [8.57166622e-15, 8.86174843e-15, 8.68707743e-15])
-
-        # Descending order
-        flux = self.sp.resample(_wave.value[::-1])
-        np.testing.assert_allclose(
-            flux.value, [8.68707743e-15, 8.86174843e-15, 8.57166622e-15])
-
-        # Spectrum with descending order
-        sp = spectrum.SourceSpectrum(
-            self.sp.wave.value[::-1], self.sp.flux.value[::-1])
-        flux = sp.resample(_wave)
-        np.testing.assert_allclose(
-            flux.value, [8.57166622e-15, 8.86174843e-15, 8.68707743e-15])
-
-    def test_conversion(self):
-        old_wave = self.sp.wave.copy()
-        old_flux = self.sp.flux.copy()
-
-        self.sp.convert_wave(u.micron ** -1)
-        self.sp.convert_flux(units.FNU)
-        np.testing.assert_allclose(self.sp.wave.value[5000], 1.6542148230571696)
-        np.testing.assert_allclose(
-            self.sp.flux.value[5000], 2.282950185743497e-26)
-        assert self.sp.wave.unit == u.micron ** -1
-        assert self.sp.flux.unit == units.FNU
-
-        with pytest.raises(u.UnitsError):
-            self.sp.convert_wave(u.Jy)
-        with pytest.raises(exceptions.SynphotError):
-            self.sp.convert_flux(u.AA)
-
-        # Convert back to original units
-        self.sp.convert_wave(old_wave.unit)
-        self.sp.convert_flux(old_flux.unit)
-        np.testing.assert_allclose(
-            self.sp.wave.value, old_wave.value, rtol=1e-6)
-        np.testing.assert_allclose(
-            self.sp.flux.value, old_flux.value, rtol=1e-6)
-
-    def test_integrate(self):
-        # Whole range
-        totalflux = self.sp.integrate()
-        np.testing.assert_allclose(
-            totalflux.value, 8.460125829057308e-12, rtol=1e-6)
-        assert totalflux.unit == self.sp.flux.unit
-
-        # Given range
-        totalflux = self.sp.integrate(wavelengths=_wave)
-        totalflux2 = self.sp.integrate(wavelengths=_wave.value)
-        np.testing.assert_allclose(
-            totalflux.value, 4.810058069909525e-14, rtol=2.5e-6)
-        np.testing.assert_allclose(totalflux2.value, totalflux.value)
-
-    def test_trim(self):
-        sp = self.sp.trim_spectrum(6045.15, 6047.84)
-        np.testing.assert_array_equal(
-            sp.wave.value, self.sp.wave.value[5000:5005])
-        np.testing.assert_array_equal(
-            sp.flux.value, self.sp.flux.value[5000:5005])
-        assert sp.wave.unit == self.sp.wave.unit
-        assert sp.flux.unit == self.sp.flux.unit
-
-        with pytest.raises(ValueError):
-            sp = self.sp.trim_spectrum(6045.15, 6045.15)
-
-        with pytest.raises(ValueError):
-            sp = self.sp.trim_spectrum(6047.84, 6045.15)
-
-    def test_taper(self):
-        # Original spectrum already tapered -- nothing done
-        old_wave = self.sp.wave.copy()
-        old_flux = self.sp.flux.copy()
-        self.sp.taper()
-        np.testing.assert_array_equal(self.sp.wave.value, old_wave.value)
-        np.testing.assert_array_equal(self.sp.flux.value, old_flux.value)
-
-        # Tapering is done
-        sp = spectrum.SourceSpectrum(_wave, _flux_flam)
-        sp.taper()
-        np.testing.assert_allclose(
-            sp.wave.value,
-            [4954.05152484, 4956.8, 4959.55, 4962.3, 4965.05152484])
-        np.testing.assert_allclose(
-            sp.flux.value, [0, 3.9135e-14, 4.0209e-14, 3.9169e-14, 0])
-        assert sp.wave.unit == _wave.unit
-        assert sp.flux.unit == _flux_flam.unit
-
-    def test_redshift(self):
-        """Test SourceSpectrum apply_redshift() method."""
-        # Zero redshift should return the same spectrum.
-        sp_z0 = self.sp.apply_redshift(0)
-        np.testing.assert_array_equal(sp_z0.wave.value, self.sp.wave.value)
-        np.testing.assert_array_equal(sp_z0.flux.value, self.sp.flux.value)
-        assert sp_z0.wave.unit == self.sp.wave.unit
-        assert sp_z0.flux.unit == self.sp.flux.unit
-        assert sp_z0.metadata['expr'] != self.sp.metadata['expr']
-        assert sp_z0.metadata['FILENAME'] == self.sp.metadata['FILENAME']
-
-        # Non-zero redshift (length)
-        sp_zlen = sp_z0.apply_redshift(1.65)
-        np.testing.assert_array_equal(
-            sp_zlen.wave.value, sp_z0.wave.value * 2.65)
-        np.testing.assert_array_equal(sp_zlen.flux.value, sp_z0.flux.value)
-
-        # Non-zero redshift (frequency).
-        # Should give same result as length after conversion.
-        sp_z0.convert_wave(u.Hz)
-        sp_zfrq = sp_z0.apply_redshift(1.65)
-        np.testing.assert_array_equal(sp_zfrq.flux.value, sp_z0.flux.value)
-        sp_zfrq.convert_wave(sp_zlen.wave.unit)
-        np.testing.assert_allclose(
-            sp_zfrq.wave.value, sp_zlen.wave.value, rtol=1e-6)
-        assert sp_zfrq.metadata['expr'] == sp_zlen.metadata['expr']
-
-        # Exceptions
-        with pytest.raises(exceptions.SynphotError):
-            sp_zlen = sp_z0.apply_redshift([1, 2, 3])
-        with pytest.raises(exceptions.SynphotError):
-            sp_zlen = sp_z0.apply_redshift(u.Quantity(2))
-
-
-class TestAddMag(object):
-    """Test SourceSpectrum add_mag() method."""
-    def setup_class(self):
-        self.bright = spectrum.SourceSpectrum(_wave, units.convert_flux(
-                _wave, u.Quantity([18.0] * 3, units.ABMAG), units.PHOTLAM))
-        self.faint = spectrum.SourceSpectrum(_wave, units.convert_flux(
-                _wave, u.Quantity([21.0] * 3, units.ABMAG), units.PHOTLAM))
-        self.dmag = u.Quantity(3.0, u.mag)
-
-    def test_add(self):
-        sp = self.bright.add_mag(self.dmag)
-        np.testing.assert_allclose(sp.flux.value, self.faint.flux.value)
-
-    def test_subtract(self):
-        sp = self.faint.add_mag(self.dmag.value * -1)
-        np.testing.assert_allclose(sp.flux.value, self.bright.flux.value)
-
-    def test_exceptions(self):
-        with pytest.raises(exceptions.SynphotError):
-            sp = self.bright.add_mag('s')
-        with pytest.raises(exceptions.SynphotError):
-            sp = self.bright.add_mag(self.faint.flux.value)
-        with pytest.raises(exceptions.SynphotError):
-            sp = self.bright.add_mag(self.faint.flux)
-        with pytest.raises(exceptions.SynphotError):
-            sp = self.bright.add_mag(u.Quantity(1.0, units.FLAM))
-
-
-class TestSpectralElement(object):
-    """Test SpectralElement object (most methods)."""
-    def setup_class(self):
-        self.bp = spectrum.SpectralElement.from_file(_bandfile, area=_area)
-        self.exthdr = fits.getheader(_bandfile, 1)
-
-    def test_attributes(self):
-        np.testing.assert_allclose(
-            self.bp.wave.value[5000:5004],
-            [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
-        np.testing.assert_allclose(
-            self.bp.thru.value[5000:5004],
-            [0.0920415, 0.09125588, 0.09047068, 0.08968487])
-        np.testing.assert_allclose(self.bp.primary_area.value, _area.value)
-        assert self.bp.wave.unit == u.AA
-        assert self.bp.thru.unit == units.THROUGHPUT
-        assert self.bp.thru is self.bp.flux
-        assert self.bp.primary_area.unit == _area.unit
-        assert self.bp.metadata['expr'] == str(self.bp)
-        assert self.bp.metadata['SIMPLE']  # From FITS header
-        assert self.bp.warnings == {}
-
-    def test_init(self):
-        # Direct initialization with flipped arrays
-        bp = spectrum.SpectralElement(
-            self.bp.wave.value[::-1], self.bp.thru.value[::-1],
-            header={'FOO': 'foo'})
-        np.testing.assert_array_equal(bp.wave.value, self.bp.wave.value[::-1])
-        np.testing.assert_array_equal(bp.thru.value, self.bp.thru.value[::-1])
-        assert bp.wave.unit == self.bp.wave.unit
-        assert bp.thru.unit == self.bp.thru.unit
-        assert bp.primary_area is None
-        assert bp.metadata['FOO'] == 'foo'
-
-        # Negative throughput warning
-        bp = spectrum.SpectralElement(_wave, [100.0, -45, 5e-17])
-        assert 'NegativeFlux' in bp.warnings
-
-        # Invalid throughput unit
-        with pytest.raises(exceptions.SynphotError):
-            bp = spectrum.SpectralElement(_wave, _flux_flam)
-
-        # Shape mismatch
-        with pytest.raises(exceptions.SynphotError):
-            bp = spectrum.SpectralElement(self.bp.wave, np.arange(10))
-
-    def test_merge_wave(self):
-        bp = spectrum.SpectralElement(_wave.to(u.micron), _flux_flam.value)
-        wave = self.bp.merge_wave(bp)
-        np.testing.assert_allclose(
-            wave.value[3202:3218],
-            [4956.39111328, 4956.8, 4956.93847656, 4957.48583984,
-             4958.03320312, 4958.58105469, 4959.12890625, 4959.55,
-             4959.67626953, 4960.22412109, 4960.77197266, 4961.3203125,
-             4961.86816406, 4962.3, 4962.41601562, 4962.96435547])
-        assert wave.unit == self.bp.wave.unit
-
-    def test_resample(self):
-        # Sample at existing wavelength (no interpolation)
-        thru = self.bp.resample(self.bp.wave[5000])
-        np.testing.assert_array_equal(thru.value, self.bp.thru.value[5000])
-        assert thru.unit == self.bp.thru.unit
-
-        # Sampling with interpolation
-        thru = self.bp.resample(_wave.value)
-        np.testing.assert_allclose(
-            thru.value, [0.21766723, 0.21963299, 0.22037384])
-
-        # Descending order
-        thru = self.bp.resample(_wave.value[::-1])
-        np.testing.assert_allclose(
-            thru.value, [0.22037384, 0.21963299, 0.21766723])
-
-        # Passband with descending order
-        bp = spectrum.SpectralElement(
-            self.bp.wave.value[::-1], self.bp.thru.value[::-1])
-        thru = bp.resample(_wave)
-        np.testing.assert_allclose(
-            thru.value, [0.21766723, 0.21963299, 0.22037384])
-
-    def test_conversion(self):
-        old_wave = self.bp.wave.copy()
-        self.bp.convert_wave(u.micron ** -1)
-        np.testing.assert_allclose(self.bp.wave.value[5000], 1.6542149)
-        assert self.bp.wave.unit == u.micron ** -1
-
-        with pytest.raises(u.UnitsError):
-            self.bp.convert_wave(u.Jy)
-
-        # Throughput cannot be converted, so convert_flux() does nothing
-        thru = self.bp.convert_flux(units.FNU)
-        assert thru is self.bp.thru
-        assert thru is self.bp.flux
-
-        with pytest.raises(AttributeError):
-            self.bp.convert_thru(units.FNU)
-
-        # Convert back to original units
-        self.bp.convert_wave(old_wave.unit)
-        np.testing.assert_allclose(
-            self.bp.wave.value, old_wave.value, rtol=1e-6)
-
-    def test_integrate(self):
-        """For passband, value=EQUVW when all wavelengths are used."""
-        # Whole range (EQUVW)
-        totalthru = self.bp.integrate()
-        equvw = self.bp.equivwidth()
-        np.testing.assert_allclose(equvw.value, self.exthdr['EQUVW'], rtol=1e-5)
-        np.testing.assert_equal(totalthru.value, equvw.value)
-        assert totalthru.unit == self.bp.thru.unit
-        assert equvw.unit == self.bp.wave.unit
-
-        # Given range
-        totalthru = self.bp.integrate(wavelengths=_wave)
-        totalthru2 = self.bp.integrate(wavelengths=_wave.value)
-        np.testing.assert_allclose(
-            totalthru.value, 1.2062975715374322, rtol=2.5e-6)
-        np.testing.assert_allclose(totalthru2.value, totalthru.value)
-
-    def test_trim(self):
-        bp = self.bp.trim_spectrum(6045.15, 6047.84)
-        np.testing.assert_array_equal(
-            bp.wave.value, self.bp.wave.value[5000:5005])
-        np.testing.assert_array_equal(
-            bp.thru.value, self.bp.thru.value[5000:5005])
-        assert bp.wave.unit == self.bp.wave.unit
-        assert bp.thru.unit == self.bp.thru.unit
-
-        with pytest.raises(ValueError):
-            bp = self.bp.trim_spectrum(6045.15, 6045.15)
-
-        with pytest.raises(ValueError):
-            bp = self.bp.trim_spectrum(6047.84, 6045.15)
-
-    def test_taper(self):
-        # Original spectrum already tapered -- nothing done
-        old_wave = self.bp.wave.copy()
-        old_thru = self.bp.thru.copy()
-        self.bp.taper()
-        np.testing.assert_array_equal(self.bp.wave.value, old_wave.value)
-        np.testing.assert_array_equal(self.bp.thru.value, old_thru.value)
-
-        # Tapering is done
-        bp = spectrum.SpectralElement(_wave, _flux_flam.value)
-        bp.taper()
-        np.testing.assert_allclose(
-            bp.wave.value,
-            [4954.05152484, 4956.8, 4959.55, 4962.3, 4965.05152484])
-        np.testing.assert_allclose(
-            bp.thru.value, [0, 3.9135e-14, 4.0209e-14, 3.9169e-14, 0])
-        assert bp.wave.unit == _wave.unit
-        assert bp.thru.unit == self.bp.thru.unit
-        assert bp.thru is bp.flux
-
-    def test_uresp(self):
-        uresp = self.bp.unit_response()
-        np.testing.assert_allclose(
-            uresp.value, self.exthdr['URESP'], rtol=2.5e-5)
-        assert uresp.unit == units.FLAM
-
-        # Undefined area must raise exception
-        bp = spectrum.SpectralElement(_wave, _flux_flam.value)
-        with pytest.raises(exceptions.SynphotError):
-            bp.unit_response()
-
-    def test_pivot(self):
-        pivwv = self.bp.pivot()
-        np.testing.assert_allclose(pivwv.value, self.exthdr['PIVWV'], rtol=1e-6)
-        assert pivwv.unit == u.AA
-
-    def test_rmswidth(self):
-        rmsw = self.bp.rmswidth()
-        np.testing.assert_allclose(rmsw.value, 359.55954282883687, rtol=1e-6)
-        assert rmsw.unit == u.AA
-
-        rmsw = self.bp.rmswidth(threshold=0.01)
-        np.testing.assert_allclose(rmsw.value, 357.43298216917754, rtol=1e-6)
-
-        # Invalid threshold must raise exception
-        with pytest.raises(exceptions.SynphotError):
-            rmsw = self.bp.rmswidth(threshold=u.Quantity(0.01))
-        with pytest.raises(exceptions.SynphotError):
-            rmsw = self.bp.rmswidth(threshold=[0.01, 0.02])
-        with pytest.raises(exceptions.SynphotError):
-            rmsw = self.bp.rmswidth(threshold='foo')
-
-    def test_fwhm(self):
-        """This also calls PHOTBW."""
-        fwhmval = self.bp.fwhm()
-        np.testing.assert_allclose(fwhmval.value, 841.09, rtol=2.5e-5)
-        assert fwhmval.unit == u.AA
-
-        fwhmval = self.bp.fwhm(threshold=0.01)
-        np.testing.assert_allclose(
-            fwhmval.value, 836.2879507505378, rtol=2.5e-5)
-
-        # Invalid threshold must raise exception
-        with pytest.raises(exceptions.SynphotError):
-            fwhmval = self.bp.fwhm(threshold=u.Quantity(0.01))
-        with pytest.raises(exceptions.SynphotError):
-            fwhmval = self.bp.fwhm(threshold=[0.01, 0.02])
-        with pytest.raises(exceptions.SynphotError):
-            fwhmval = self.bp.fwhm(threshold='foo')
-
-    def test_avgwave_tlambda(self):
-        avgwv = self.bp.avgwave()
-        np.testing.assert_allclose(avgwv.value, 5367.9, rtol=1e-5)
-        assert avgwv.unit == u.AA
-
-        tlam = self.bp.tlambda()
-        np.testing.assert_allclose(tlam.value, 0.22808, rtol=1e-5)
-        assert tlam.unit == u.dimensionless_unscaled
-
-    def test_wpeak_tpeak(self):
-        tpk = self.bp.tpeak()
-        np.testing.assert_allclose(tpk.value, self.exthdr['TPEAK'])
-        assert tpk.unit == u.dimensionless_unscaled
-
-        wpk = self.bp.wpeak()
-        np.testing.assert_allclose(wpk.value, 5059.8, rtol=1e-5)
-        assert wpk.unit == u.AA
-
-    def test_rectw(self):
-        rectw = self.bp.rectwidth()
-        np.testing.assert_allclose(rectw.value, self.exthdr['RECTW'], rtol=1e-6)
-        assert rectw.unit == u.AA
-
-    def test_qtlam(self):
-        qtlam = self.bp.efficiency()
-        np.testing.assert_allclose(qtlam.value, 0.050901, rtol=1e-5)
-        assert qtlam.unit == u.dimensionless_unscaled
-
-    def test_emflx(self):
-        flx = self.bp.emflx()
-        np.testing.assert_allclose(flx.value, self.exthdr['EMFLX'], rtol=2.5e-5)
-        assert flx.unit == units.FLAM
-
-
 @remote_data
 @pytest.mark.parametrize(
-    ('filtername'),
+    'filtername',
     ['bessel_j', 'bessel_h', 'bessel_k', 'cousins_r', 'cousins_i',
      'johnson_u', 'johnson_b', 'johnson_v', 'johnson_r', 'johnson_i',
      'johnson_j', 'johnson_k'])
 def test_filter(filtername):
-    """Test SpectralElement from_filter() class method.
+    """Test loading pre-defined bandpass.
 
     .. note::
 
-        Filter data quality is not checked as it depends on the remote file.
+        Filter data quality is not checked as it depends on the file.
 
     """
-    bp = spectrum.SpectralElement.from_filter(filtername, encoding='binary')
-    assert bp.thru is bp.flux
+    bp = SpectralElement.from_filter(filtername, encoding='binary')
+    assert isinstance(bp.model, Empirical1D)
     assert filtername in bp.metadata['expr']
 
 
 def test_filter_exception():
     """Test SpectralElement from_filter() exception."""
     with pytest.raises(exceptions.SynphotError):
-        sp = spectrum.SpectralElement.from_filter('foo')
+        bp = SpectralElement.from_filter('foo')
 
 
-class TestMathOperators(object):
-    """Test spectrum math operators."""
+class TestEmpiricalSourceFromFile(object):
+    """This is the most common model used in ASTROLIB PYSYNPHOT."""
     def setup_class(self):
-        self.sp_1 = spectrum.SourceSpectrum(
-            [3999.9, 4000.0, 5000.0, 6000.0, 6000.1],
-            [0, 3.5e-14, 4e-14, 4.5e-14, 0], area=_area)
+        specfile = get_pkg_data_filename(
+            os.path.join('data', 'hst_acs_hrc_f555w_x_grw70d5824.fits'))
+        self.sp = SourceSpectrum.from_file(specfile)
 
-        # FLAM: 3.9135e-14, 4.0209e-14, 3.9169e-14
-        self.sp_2 = spectrum.SourceSpectrum(_wave, _flux_jy, area=_area)
+    def test_invalid_flux_unit(self):
+        with pytest.raises(exceptions.SynphotError):
+            sp = SourceSpectrum(Empirical1D, x=_wave, y=_flux_vegamag)
 
-        self.bp_1 = spectrum.SpectralElement(
-            u.Quantity([399.99, 400.01, 500.0, 590.0, 600.1], u.nm),
-            [0, 0.1, 0.2, 0.3, 0], area=_area)
+    def test_metadata(self):
+        assert 'SourceSpectrum' in str(self.sp)
+        assert self.sp.metadata['SIMPLE']  # From FITS header
+        assert self.sp.warnings == {}
+        assert self.sp.z == 0
+        np.testing.assert_allclose(
+            self.sp.waverange.value, [3479.99902344, 10500.00097656])
 
-    def _check_sp(self, sp, ans_wave, ans_flux):
-        np.testing.assert_allclose(sp.wave.value, ans_wave)
-        np.testing.assert_allclose(sp.flux.value, ans_flux)
-        assert sp.wave.unit == u.AA
-        assert sp.flux.unit == units.FLAM
-        assert isinstance(sp, spectrum.SourceSpectrum)
+    def test_call(self):
+        w = self.sp.model.x.value[5000:5004]
+        y = units.convert_flux(w, self.sp(w), units.FLAM)
+        np.testing.assert_allclose(
+            w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
+        np.testing.assert_allclose(
+            y.value,
+            [1.87284130e-15, 1.85656811e-15, 1.84030867e-15, 1.82404183e-15])
 
-    def _check_bp(self, bp, ans_flux):
-        np.testing.assert_array_equal(bp.wave.value, self.bp_1.wave.value)
-        np.testing.assert_allclose(bp.thru.value, ans_flux)
-        assert bp.thru is bp.flux
-        assert bp.wave.unit == u.nm
-        assert bp.thru.unit == u.dimensionless_unscaled
-        assert isinstance(bp, spectrum.SpectralElement)
+    def test_neg_flux(self):
+        """Warning is issued but not tested."""
+        w = [1000, 5000, 9000]
+        sp = SourceSpectrum(Empirical1D, x=w, y=[100, -45, 5e-17])
+        np.testing.assert_array_equal(sp(w).value, [100, 0, 5e-17])
 
-    @pytest.mark.parametrize(
-        ('op_type', 'other_scalar', 'ans_flux'),
-        [('+', False, [3.9135e-14, 7.4135e-14, 7.8919e-14, 8.000675e-14,
-                       7.89805001e-14, 7.9169e-14, 8.4169e-14, 3.9169e-14]),
-         ('-', False, [0, 0, 6.49e-16, 0, 6.425e-16, 8.31e-16, 5.831e-15, 0]),
-         ('+', True, [5e-15, 4e-14, 4.5e-14, 5e-14, 5e-15]),
-         ('-', True, [0, 3e-14, 3.5e-14, 4e-14, 0])])
-    def test_add_sub_sp(self, op_type, other_scalar, ans_flux):
-        if other_scalar:
-            other = 5e-15
-            ans_wave = self.sp_1.wave.value
-        else:
-            other = self.sp_2
-            ans_wave = [3999.9, 4000, 4956.8, 4959.55, 4962.3, 5000,
-                        6000, 6000.1]
+    def test_conversion(self):
+        x = u.Quantity(0.60451641, u.micron)
+        w, y = self.sp._get_arrays(x, units.FNU)
+        np.testing.assert_allclose(x.value, w.value)
+        np.testing.assert_allclose(y.value, 2.282950185743497e-26, rtol=1e-6)
 
-        if op_type == '+':
-            sp = self.sp_1 + other
-        elif op_type == '-':
-            sp = self.sp_1 - other
+    def test_integrate(self):
+        # Whole range
+        f = self.sp.integrate(flux_unit=units.FLAM)
+        np.testing.assert_allclose(f.value, 8.460125829057308e-12, rtol=1e-5)
 
-        self._check_sp(sp, ans_wave, ans_flux)
-        if not other_scalar:
-            assert self.sp_2.flux.unit == u.Jy
+        # Given range
+        f = self.sp.integrate(wavelengths=_wave, flux_unit=units.FLAM)
+        np.testing.assert_allclose(f.value, 4.810058069909525e-14, rtol=1e-5)
 
-    def test_add_same_sp(self):
-        """sp = sp + sp - sp"""
-        sp1 = self.sp_1 + self.sp_1
-        sp2 = sp1 - self.sp_1
-        np.testing.assert_array_equal(sp2.flux.value, self.sp_1.flux.value)
+    def test_taper(self):
+        # Original spectrum already tapered -- nothing done
+        sp = self.sp.taper()
+        assert sp is self.sp
 
-    @pytest.mark.parametrize(
-        ('op_type', 'other_scalar', 'ans_flux'),
-        [('+', False, [0, 0.2, 0.4, 0.6, 0]),
-         ('-', False, 0),
-         ('+', True, [0.1, 0.2, 0.3, 0.4, 0.1]),
-         ('-', True, [0, 0, 0.1, 0.2, 0])])
-    def test_add_sub_bp(self, op_type, other_scalar, ans_flux):
-        if other_scalar:
-            other = 0.1
-        else:
-            other = self.bp_1
+        # Tapering is done
+        sp2 = SourceSpectrum(Empirical1D, x=_wave, y=_flux_photlam)
+        sp = sp2.taper()
+        x, y = sp._get_arrays(None, units.FLAM)
+        np.testing.assert_allclose(
+            x.value, [4954.05152484, 4956.8, 4959.55, 4962.3, 4965.05152484])
+        np.testing.assert_allclose(
+            y.value, [0, 3.9135e-14, 4.0209e-14, 3.9169e-14, 0], rtol=1e-6)
 
-        if op_type == '+':
-            bp1 = self.bp_1 + other
-        elif op_type == '-':
-            bp1 = self.bp_1 - other
 
-        self._check_bp(bp1, ans_flux)
+class TestEmpiricalBandpassFromFile(object):
+    """This is the most common model used in ASTROLIB PYSYNPHOT."""
+    def setup_class(self):
+        bandfile = get_pkg_data_filename(
+            os.path.join('data', 'hst_acs_hrc_f555w.fits'))
+        self.bp = SpectralElement.from_file(bandfile)
 
-    @pytest.mark.parametrize(
-        ('op_type', 'sp_first'),
-        [('+', True),
-         ('+', False),
-         ('-', True),
-         ('-', False)])
-    def test_add_sub_sp_bp(self, op_type, sp_first):
-        """Cannot add/subtract SourceSpectrum and SpectralElement."""
-        if sp_first:
-            obj1 = self.sp_1
-            obj2 = self.bp_1
-        else:
-            obj1 = self.bp_1
-            obj2 = self.sp_1
+    def test_invalid_flux_unit(self):
+        with pytest.raises(u.UnitsError):
+            bp = SpectralElement(Empirical1D, x=_wave, y=_flux_photlam)
 
-        with pytest.raises(exceptions.IncompatibleSources):
-            if op_type == '+':
-                sp = obj1 + obj2
-            elif op_type == '-':
-                sp = obj1 - obj2
+    def test_call(self):
+        w = self.bp.model.x.value[5000:5004]
+        y = self.bp(w)
+        np.testing.assert_allclose(
+            w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
+        np.testing.assert_allclose(
+            y.value, [0.0920415, 0.09125588, 0.09047068, 0.08968487])
 
-    @pytest.mark.parametrize(('op_type'), ['*', '/'])
-    def test_mul_div_sp_sp(self, op_type):
-        """Multiplication can only be between spectrum and dimensionless."""
-        with pytest.raises(exceptions.IncompatibleSources):
-            if op_type == '*':
-                sp = self.sp_1 * self.sp_1
-            elif op_type == '/':
-                sp = self.sp_1 / self.sp_1
+    def test_integrate(self):
+        # Whole range (same as EQUVW)
+        f = self.bp.integrate()
+        np.testing.assert_equal(f.value, 272.01081629459344)
 
-    @pytest.mark.parametrize(
-        ('op_type', 'is_rmul', 'ans_flux'),
-        [('*', False, [0, 7e-14, 8e-14, 9e-14, 0]),
-         ('*', True, [0, 7e-14, 8e-14, 9e-14, 0]),
-         ('/', False, [0, 1.75e-14, 2e-14, 2.25e-14, 0])])
-    def test_mul_div_sp_scalar(self, op_type, is_rmul, ans_flux):
-        if is_rmul:
-            obj1 = 2
-            obj2 = self.sp_1
-        else:
-            obj1 = self.sp_1
-            obj2 = 2
+        # Given range
+        f = self.bp.integrate(wavelengths=_wave)
+        np.testing.assert_allclose(f.value, 1.2062975715374322, rtol=2.5e-6)
 
-        if op_type == '*':
-            sp = obj1 * obj2
-        elif op_type == '/':
-            sp = obj1 / obj2
+    def test_avgwave(self):
+        """Compare AVGWAVE with old SYNPHOT result."""
+        w = self.bp.avgwave()
+        np.testing.assert_allclose(w.value, 5367.9, rtol=1e-5)
 
-        self._check_sp(sp, self.sp_1.wave.value, ans_flux)
+    def test_barlam(self):
+        """Test BARLAM (no old SYNPHOT result available)."""
+        w = self.bp.barlam()
+        np.testing.assert_allclose(w.value, 5331.8945, rtol=1e-5)
 
-    @pytest.mark.parametrize(
-        ('op_type', 'is_scalar', 'is_rmul', 'ans_flux'),
-        [('*', True, False, [0, 0.2, 0.4, 0.6, 0]),
-         ('*', True, True, [0, 0.2, 0.4, 0.6, 0]),
-         ('*', False, False, [0, 0.01, 0.04, 0.09, 0]),
-         ('/', True, False, [0, 0.05, 0.1, 0.15, 0]),
-         ('/', False, False, [np.nan, 1, 1, 1, np.nan])])
-    def test_mul_div_bp(self, op_type, is_scalar, is_rmul, ans_flux):
-        if is_scalar:
-            other = 2
-        else:
-            other = self.bp_1
+    def test_pivot(self):
+        """Compare PIVWV with ASTROLIB PYSYNPHOT result."""
+        w = self.bp.pivot()
+        np.testing.assert_allclose(w.value, 5355.863596422962, rtol=1e-6)
 
-        if is_rmul:
-            obj1 = other
-            obj2 = self.bp_1
-        else:
-            obj1 = self.bp_1
-            obj2 = other
+    def test_uresp(self):
+        """Compare URESP with old SYNPHOT result."""
+        uresp = self.bp.unit_response(area=_area)
+        np.testing.assert_allclose(uresp.value, 3.00737e-19, rtol=1e-4)
+        assert uresp.unit == units.FLAM
 
-        if op_type == '*':
-            bp = obj1 * obj2
-        elif op_type == '/':
-            bp = obj1 / obj2
+    def test_rmswidth(self):
+        w = self.bp.rmswidth()
+        np.testing.assert_allclose(w.value, 359.55954282883687, rtol=1e-4)
 
-        self._check_bp(bp, ans_flux)
+        w = self.bp.rmswidth(threshold=u.Quantity(0.01))
+        np.testing.assert_allclose(w.value, 357.43298216917754, rtol=1e-4)
 
-    @pytest.mark.parametrize(('is_rmul'), [False, True])
-    def test_mul_sp_bp(self, is_rmul):
-        """SpectralElement * SourceSpectrum = SourceSpectrum"""
-        if is_rmul:
-            sp = self.bp_1 * self.sp_1
-        else:
-            sp = self.sp_1 * self.bp_1
+        # Invalid threshold must raise exception
+        with pytest.raises(exceptions.SynphotError):
+            w = self.bp.rmswidth(threshold=u.Quantity(0.01, u.AA))
+        with pytest.raises(exceptions.SynphotError):
+            w = self.bp.rmswidth(threshold=[0.01, 0.02])
+        with pytest.raises(exceptions.SynphotError):
+            w = self.bp.rmswidth(threshold='foo')
 
-        self._check_sp(
-            sp, [3999.9, 4000, 4000.1, 5000, 5900, 6000, 6000.1, 6001],
-            [0, 1.75e-15, 3.50005e-15, 8e-15, 1.335e-14, 1.33663366e-16, 0, 0])
+    def test_fwhm(self):
+        """This also calls PHOTBW."""
+        w = self.bp.fwhm()
+        np.testing.assert_allclose(w.value, 841.09, rtol=2.5e-5)
 
-    def test_div_sp_bp(self):
-        sp = self.sp_1 / self.bp_1
-        self._check_sp(
-            sp, [3999.9, 4000, 4000.1, 5000, 5900, 6000, 6000.1, 6001],
-            [0, 7e-13, 3.50005e-13, 2e-13, 1.483333333333e-13,
-             1.5149999998e-11, 0, np.nan])
+        w = self.bp.fwhm(threshold=u.Quantity(0.01))
+        np.testing.assert_allclose(w.value, 836.2879507505378, rtol=2.5e-5)
 
-        # Spectrum can only divided by dimensionless value
-        with pytest.raises(exceptions.IncompatibleSources):
-            sp = self.bp_1 / self.sp_1
+        # Zero value
+        w = self.bp.fwhm(wavelengths=[2e6, 2.1e6])
+        assert w.value == 0
 
-    def test_misc_exceptions(self):
-        """Unsupported operations raise TypeError but are not tested."""
-        # other is of wrong data type.
-        # Works for all operators but only * tested.
-        with pytest.raises(exceptions.IncompatibleSources):
-            sp = self.sp_1 * [1, 2, 3]
-        with pytest.raises(exceptions.IncompatibleSources):
-            sp = self.sp_1 * u.Quantity(1)
+        # Invalid threshold must raise exception
+        with pytest.raises(exceptions.SynphotError):
+            w = self.bp.fwhm(threshold=u.Quantity(0.01, u.AA))
+        with pytest.raises(exceptions.SynphotError):
+            w = self.bp.fwhm(threshold=[0.01, 0.02])
+        with pytest.raises(exceptions.SynphotError):
+            w = self.bp.fwhm(threshold='foo')
 
-        # Primary area mismatch.
-        # Works for all operators but only + tested.
-        with pytest.raises(exceptions.IncompatibleSources):
-            sp = self.sp_1 + spectrum.SourceSpectrum(_wave, _flux_jy)
+    def test_tlambda(self):
+        f = self.bp.tlambda()
+        np.testing.assert_allclose(f.value, 0.22808, rtol=1e-4)
+
+    def test_tpeak(self):
+        """Compare TPEAK with old SYNPHOT result."""
+        f = self.bp.tpeak()
+        np.testing.assert_allclose(f.value, 0.241445)
+
+    def test_wpeak(self):
+        w = self.bp.wpeak()
+        np.testing.assert_allclose(w.value, 5059.8, rtol=1e-5)
+
+    def test_equivwidth(self):
+        """Compare EQUVW with ASTROLIB PYSYNPHOT result."""
+        w = self.bp.equivwidth()
+        np.testing.assert_allclose(w.value, 272.01081629459344, rtol=1e-6)
+
+    def test_rectw(self):
+        """Compare RECTW with old SYNPHOT result."""
+        w = self.bp.rectwidth()
+        np.testing.assert_allclose(w.value, 1126.588, rtol=1e-5)
+
+    def test_qtlam(self):
+        qtlam = self.bp.efficiency()
+        np.testing.assert_allclose(qtlam.value, 0.050901, rtol=1e-4)
+        assert qtlam.unit == u.dimensionless_unscaled
+
+    def test_emflx(self):
+        """Compare EMFLX with old SYNPHOT result."""
+        f = self.bp.emflx(area=_area)
+        np.testing.assert_allclose(f.value, 3.586622e-16, rtol=2.5e-5)
+        assert f.unit == units.FLAM
+
+
+class TestBoxBandpass(object):
+    """Test bandpass with Box1D model."""
+    def setup_class(self):
+        self.bp = SpectralElement(
+            models.Box1D, amplitude=1, x_0=5000, width=100)
+
+    def test_eval(self):
+        # Box: Outside, boundary, inside
+        y = self.bp([4000, 4949.95, 5000])
+        np.testing.assert_array_equal(y.value, [0, 0, 1])
+
+    def test_conversion(self):
+        bp2 = SpectralElement(
+            models.Box1D, amplitude=1, x_0=u.Quantity(500, u.nm),
+            width=u.Quantity(10, u.nm))
+        y = bp2([4000, 4949.95, 5000])
+        np.testing.assert_array_equal(y.value, [0, 0, 1])
+
+    def test_multi_param_dim(self):
+        """This is not allowed."""
+        with pytest.raises(exceptions.SynphotError):
+            bp = SpectralElement(
+                models.Box1D, amplitude=[1,1], x_0=[5000,6000], width=[100,1])
+
+
+class TestBlackBodySource(object):
+    """Test source spectrum with BlackBody1D model."""
+    def setup_class(self):
+        self.sp = SourceSpectrum.from_blackbody(5500)
+
+    def test_eval(self):
+        w = np.arange(3000, 3100, 10)
+        y = self.sp(w)
+        np.testing.assert_allclose(
+            y.value,
+            [0.00019318, 0.00019623, 0.0001993, 0.00020238, 0.00020549,
+             0.00020861, 0.00021175, 0.00021491, 0.00021809, 0.00022128],
+            rtol=2.5e-3)
+
+
+class TestGaussianSource(object):
+    """Test source spectrum with Gaussian1D model."""
+    def setup_class(self):
+        self.sp = SourceSpectrum.from_gaussian(
+            u.Quantity(1, units.PHOTLAM), 4000, 100)
+
+    def test_eval(self):
+        y = self.sp([3900, 4000, 4060])
+        np.testing.assert_allclose(
+            y.value, [0.00058715, 0.00939437, 0.00346246], rtol=1e-5)
+
+    def test_totalflux(self):
+        # PHOTLAM
+        np.testing.assert_allclose(self.sp.integrate(), 1, rtol=1e-5)
+
+        # FLAM
+        sp2 = SourceSpectrum.from_gaussian(1, 400 * u.nm, 10 * u.nm)
+        np.testing.assert_allclose(
+            sp2.integrate(flux_unit=units.FLAM), 1, rtol=1e-3)
+
+    def test_symmetry(self):
+        np.testing.assert_allclose(self.sp(3950), self.sp(4050))
+
+
+class TestPowerLawSource(object):
+    """Test source spectrum with PowerLawFlux1D model."""
+    def setup_class(self):
+        self.sp = SourceSpectrum(PowerLawFlux1D, amplitude=1, x_0=6000, alpha=4)
+
+    def test_eval(self):
+        w = np.arange(3000, 3100, 10)
+        y = self.sp(w)
+        np.testing.assert_allclose(
+            y.value,
+            [16, 15.78843266, 15.58035072, 15.37568551, 15.17436992,
+             14.97633838, 14.78152682, 14.5898726, 14.40131453, 14.21579277],
+            rtol=1e-6)
+
+    def test_normalization(self):
+        np.testing.assert_allclose(self.sp(600 * u.nm), 1, rtol=1e-6)
+
+
+class TestBuildModels(object):
+    """Test compatiblity with other models not tested above."""
+    def test_BrokenPowerLaw1D(self):
+        sp = SourceSpectrum(
+            models.BrokenPowerLaw1D, amplitude=1, x_break=6000, alpha_1=1,
+            alpha_2=4)
+        y = sp([5000, 6000, 7000])
+        np.testing.assert_allclose(y.value, [1.2, 1, 0.53977509])
+
+    def test_Const1D(self):
+        sp = SourceSpectrum(models.Const1D, amplitude=1)
+        y = sp([1, 1000, 1e6])
+        np.testing.assert_array_equal(y.value, 1)
+
+    def test_ConstFlux1D(self):
+        sp = SourceSpectrum(ConstFlux1D, amplitude=u.Quantity(1, u.Jy))
+        w = [1, 1000, 1e6]
+        y = units.convert_flux(w, sp(w), u.Jy)
+        np.testing.assert_allclose(y.value, 1)
+
+    def test_ExponentialCutoffPowerLaw1D(self):
+        sp = SourceSpectrum(
+            models.ExponentialCutoffPowerLaw1D, amplitude=1, x_0=6000,
+            x_cutoff=10000, alpha=4)
+        y = sp([5000, 6000, 10000])
+        np.testing.assert_allclose(
+            y.value, [1.25770198, 0.54881164, 0.04767718])
+
+    def test_GaussianAbsorption1D(self):
+        """This should be unitless, not a source spectrum."""
+        bp = SpectralElement(
+            GaussianAbsorption1D, amplitude=0.8, mean=5500, stddev=50)
+        y = bp([5300, 5500, 5700])
+        np.testing.assert_allclose(y.value, [0.99973163, 0.2, 0.99973163])
+
+    def test_LogParabola1D(self):
+        sp = SourceSpectrum(
+            models.LogParabola1D, amplitude=1, x_0=6000, alpha=1, beta=4)
+        y = sp([5000, 6000, 7000])
+        np.testing.assert_allclose(y.value, [1.0505953, 1, 0.77942375])
+
+    def test_Lorentz1D(self):
+        sp = SourceSpectrum(models.Lorentz1D, amplitude=1, x_0=6000, fwhm=100)
+        y = sp([5000, 6000, 7000])
+        np.testing.assert_allclose(
+            y.value, [0.00249377, 1, 0.00249377], rtol=1e-5)
+
+    def test_MexicanHat1D(self):
+        sp = SourceSpectrum(
+            models.MexicanHat1D, amplitude=1, x_0=6000, sigma=100)
+        y = sp([5000, 6000, 7000])
+        np.testing.assert_allclose(y.value, [0, 1, 0])
+
+    def test_PowerLaw1D(self):
+        sp = SourceSpectrum(models.PowerLaw1D, amplitude=1, x_0=6000, alpha=4)
+        y = sp([5000, 6000, 7000])
+        np.testing.assert_allclose(y.value, [2.0736, 1, 0.53977509])
 
 
 class TestCheckOverlap(object):
     """Test spectrum overlap check."""
     def setup_class(self):
-        self.sp = spectrum.SourceSpectrum(
-            [2999.9, 3000.0, 6000.0, 6000.1], [0, 1.0, 1.0, 0])
+        self.sp = SourceSpectrum(
+            Empirical1D, x=[2999.9, 3000, 6000, 6000.1], y=[0, 1, 1, 0])
 
     def test_full(self):
-        bp = spectrum.SpectralElement(
-            [999.9, 1000.0, 9000.0, 9000.1], [0, 1.0, 1.0, 0])
+        bp = SpectralElement(
+            Empirical1D, x=[999.9, 1000, 9000, 9000.1], y=[0, 1, 1, 0])
         assert self.sp.check_overlap(bp) == 'full'
 
     def test_partial_most(self):
-        bp = spectrum.SpectralElement(
-            [3000.0, 3001.0, 6000.1, 6000.2], [0, 1.0, 1.0, 0])
+        bp = SpectralElement(
+            Empirical1D, x=[3000, 3001, 6000.1, 6000.2], y=[0, 1, 1, 0])
         assert self.sp.check_overlap(bp) == 'partial_most'
 
     def test_partial_notmost(self):
-        bp = spectrum.SpectralElement(
-            [3999.9, 4000.0, 4500.0, 4500.1], [0, 1.0, 1.0, 0])
+        bp = SpectralElement(
+            Empirical1D, x=[3999.9, 4000, 4500, 4500.1], y=[0, 1, 1, 0])
         assert self.sp.check_overlap(bp) == 'partial_notmost'
 
         # Ensure zeroes in passband are not taken into account
-        bp2 = spectrum.SpectralElement(
-            [3000.0, 3001.0, 6000.1, 6000.2], [0, 1.0, 1.0, 0])
+        bp2 = SpectralElement(
+            Empirical1D, x=[3000, 3001, 6000.1, 6000.2], y=[0, 1, 1, 0])
         bp3 = bp2 * bp
         assert self.sp.check_overlap(bp2) == 'partial_most'
         assert self.sp.check_overlap(bp3) == 'partial_notmost'
 
     def test_none(self):
-        bp = spectrum.SpectralElement(
-            [99.9, 100.0, 2999.9, 3000.0], [0, 1.0, 1.0, 0])
+        bp = SpectralElement(
+            Empirical1D, x=[99.9, 100, 2999.9, 3000], y=[0, 1, 1, 0])
         assert self.sp.check_overlap(bp) == 'none'
 
+    def test_special_cases(self):
+        # Other has no waveset
+        bp = SpectralElement(models.Const1D, amplitude=1)
+        assert self.sp.check_overlap(bp) == 'full'
 
-class TestRenorm(object):
-    """Test SourceSpectrum renorm() method."""
+        # Self has no waveset
+        bp = SpectralElement(models.Box1D, amplitude=1, x_0=5000, width=10)
+        sp = SourceSpectrum(models.Const1D, amplitude=1)
+        assert sp.check_overlap(bp) == 'partial_notmost'
+
+    def test_exceptions(self):
+        with pytest.raises(exceptions.SynphotError):
+            self.sp.check_overlap(1)
+
+
+class TestNormalize(object):
+    """Test source spectrum normalization."""
     def setup_class(self):
         """``expr`` stores the equivalent IRAF SYNPHOT command."""
         # Blackbody
-        wave = generate_wavelengths(wave_unit=u.AA)[0]
-        tmp = analytic.BlackBody1DSpectrum(5000, area=_area)
-        self.bb = tmp.to_spectrum(wave)
+        self.bb = SourceSpectrum.from_blackbody(5000)
         self.bb.metadata['expr'] = 'bb(5000)'
 
         # Gaussian emission line
-        wave = np.arange(4900, 6100, 0.1)
-        tmp = analytic.gaussian_spectrum(1e-13, 5500, 250, area=_area)
-        self.em = tmp.to_spectrum(wave)
+        self.em = SourceSpectrum.from_gaussian(1e-13, 5500, 250)
         self.em.metadata['expr'] = 'em(5500, 250, 1e-13, flam)'
 
-        # Passbands
-        self.acs = spectrum.SpectralElement.from_file(_bandfile, area=_area)
+        # ACS bandpass
+        bandfile = get_pkg_data_filename(
+            os.path.join('data', 'hst_acs_hrc_f555w.fits'))
+        self.acs = SpectralElement.from_file(bandfile)
         self.acs.metadata['expr'] = 'band(acs,hrc,f555w)'
-        self.abox = spectrum.SpectralElement(
-            [5499.4, 5499.5, 5500.5, 5500.6], [0, 1.0, 1.0, 0], area=_area)
-        self.abox.metadata['expr'] = 'box(5500,1)'
+
+        # Box bandpass
+        self.abox = SpectralElement(
+            models.Box1D, amplitude=1, x_0=5500, width=1,
+            metadata={'expr': 'box(5500,1)'})
 
     def _select_sp(self, sp_type):
         if sp_type == 'bb':
@@ -870,26 +489,25 @@ class TestRenorm(object):
     def _compare_countrate(self, rn_sp, ans_countrate):
         # Observation is needed to compare with expected count rate
         # although it is tested in test_observation.py
-        obs = Observation.from_spec_band(rn_sp, self.acs, force='extrap')
-        ct_rate = obs.countrate()
+        obs = Observation(rn_sp, self.acs, force='extrap')
+        ct_rate = obs.countrate(_area)
 
-        # 0.025% agreement with IRAF SYNPHOT COUNTRATE
-        np.testing.assert_allclose(ct_rate.value, ans_countrate, rtol=2.5e-4)
-        assert ct_rate.unit == u.count / (u.s * units.AREA)
+        # 0.1% agreement with IRAF SYNPHOT COUNTRATE
+        np.testing.assert_allclose(ct_rate.value, ans_countrate, rtol=1e-3)
 
     @pytest.mark.parametrize(
         ('sp_type', 'rn_val', 'ans_countrate'),
-        [('bb', u.Quantity(1e-5, units.PHOTLAM), 117.9167),
+        [('bb', 1e-5, 117.9167),
          ('bb', u.Quantity(1e-16, units.PHOTNU), 116.8613),
-         ('bb', 1e-16, 326.4773),
+         ('bb', u.Quantity(1e-16, units.FLAM), 326.4773),
          ('bb', u.Quantity(20, units.STMAG), 118.5366),
          ('bb', u.Quantity(1e-27, units.FNU), 323.5549),
          ('bb', u.Quantity(20, units.ABMAG), 117.4757),
          ('bb', u.Quantity(1e-4, u.Jy), 323.5547),
          ('bb', u.Quantity(0.1, u.mJy), 323.5548),
-         ('em', u.Quantity(1e-4, units.PHOTLAM), 277.4368),
+         ('em', 1e-4, 277.4368),
          ('em', u.Quantity(1e-15, units.PHOTNU), 274.9537),
-         ('em', 1e-16, 76.81425),
+         ('em', u.Quantity(1e-16, units.FLAM), 76.81425),
          ('em', u.Quantity(18, units.STMAG), 175.9712),
          ('em', u.Quantity(1e-27, units.FNU), 76.12671),
          ('em', u.Quantity(18, units.ABMAG), 174.3967),
@@ -897,7 +515,7 @@ class TestRenorm(object):
          ('em', u.Quantity(1, u.mJy), 761.2666)])
     def test_renorm_density(self, sp_type, rn_val, ans_countrate):
         sp = self._select_sp(sp_type)
-        rn_sp = sp.renorm(rn_val, self.abox)
+        rn_sp = sp.normalize(rn_val, band=self.abox)
         self._compare_countrate(rn_sp, ans_countrate)
 
     @pytest.mark.parametrize(
@@ -909,7 +527,7 @@ class TestRenorm(object):
     def test_renorm_nondensity(self, sp_type, rn_val, ans_countrate):
         """This also tests force=True for 'partial_notmost' overlap."""
         sp = self._select_sp(sp_type)
-        rn_sp = sp.renorm(rn_val, self.acs, force=True)
+        rn_sp = sp.normalize(rn_val, band=self.acs, force=True, area=_area)
         self._compare_countrate(rn_sp, ans_countrate)
 
         if sp_type == 'em':
@@ -919,44 +537,256 @@ class TestRenorm(object):
     @remote_data
     @pytest.mark.parametrize(
         ('sp_type', 'ans_countrate'),
-        [('bb', 116.4746),
-         ('em', 27.40439)])
+        [('bb', 115.9126),
+         ('em', 27.2856)])
     def test_renorm_vegamag(self, sp_type, ans_countrate):
         sp = self._select_sp(sp_type)
-        rn_sp = sp.renorm(
-            u.Quantity(20, unit=units.VEGAMAG), self.abox, vegaspec=_vspec)
+        rn_sp = sp.normalize(
+            u.Quantity(20, units.VEGAMAG), band=self.abox, vegaspec=_vspec)
         self._compare_countrate(rn_sp, ans_countrate)
+
+    def test_renorm_noband(self):
+        """No bandpass. This option is not offered by ASTROLIB PYSYNPHOT
+        but can be indirectly calculated using a very large box as bandpass.
+
+        """
+        rn_sp = self.em.normalize(u.Quantity(1, u.ct), area=_area)
+        x = rn_sp.integrate(flux_unit=u.ct, area=_area)
+        ans = 10.615454634451927
+        np.testing.assert_allclose(x.value, ans, rtol=1e-3)
 
     def test_exceptions(self):
         # Invalid passband
         with pytest.raises(exceptions.SynphotError):
-            self.bb.renorm(10, np.ones(10))
+            rn_sp = self.bb.normalize(10, band=np.ones(10))
 
         # Disjoint passband
+        bp = SpectralElement(models.Box1D, amplitude=1, x_0=30000, width=1)
         with pytest.raises(exceptions.DisjointError):
-            self.bb.renorm(
-                10, spectrum.SpectralElement(
-                    [29999.9, 30000, 30001, 30001.1],
-                    [0, 1.0, 1.0, 0], area=_area))
+            rn_sp = self.em.normalize(10, band=bp)
 
         # Partial overlap without force
         with pytest.raises(exceptions.PartialOverlap):
-            rn_sp = self.em.renorm(1, self.acs)
+            rn_sp = self.em.normalize(1, band=self.acs)
 
         # Missing Vega spectrum
         with pytest.raises(exceptions.SynphotError):
-            rn_sp = self.bb.renorm(u.Quantity(10, units.VEGAMAG), self.abox)
+            rn_sp = self.bb.normalize(
+                u.Quantity(10, units.VEGAMAG), band=self.abox)
 
         # Zero flux
-        with pytest.raises(ValueError):
-            sp = self.em * 0.0
-            rn_sp = sp.renorm(u.Quantity(10, units.VEGAMAG), self.abox)
+        sp = SourceSpectrum(models.Const1D, amplitude=0)
+        with pytest.raises(exceptions.SynphotError):
+            rn_sp = sp.normalize(
+                u.Quantity(100, u.ct), band=self.abox, area=_area)
+
+
+class TestWaveset(object):
+    """Tests related to spectrum waveset."""
+    def test_none(self):
+        sp = SourceSpectrum(models.Const1D, amplitude=1)
+        assert sp.waveset is None
+
+    def test_sampleset(self):
+        sp = SourceSpectrum.from_gaussian(1, 5000, 10)
+        np.testing.assert_array_equal(sp.waveset.value, sp.model.sampleset)
+
+    def test_box1d_hack(self):
+        bp = SpectralElement(models.Box1D, amplitude=1, x_0=5000, width=10)
+        w1 = bp.waveset.value
+        w2 = bp.model.sampleset
+        np.testing.assert_allclose(w1[::w1.size-1], w2[::w2.size-1])
+        np.testing.assert_allclose(w1[1:] - w1[:-1], 0.01)
+
+    def test_composite(self):
+        sp = (SpectralElement(models.Box1D, amplitude=1, x_0=1000, width=1) *
+              (SourceSpectrum.from_gaussian(1, 5000, 10) +
+               SourceSpectrum.from_gaussian(1, 6500, 100) +
+               SourceSpectrum.from_gaussian(1, 7500, 5)))
+        np.testing.assert_allclose(
+            sp.waveset.value[::100],
+            [999.49, 1000.49, 5020.38372321, 6703.83723207, 7509.97953115])
+
+    def test_redshift(self):
+        sp = SourceSpectrum.from_gaussian(1, 5000, 10)
+        sp.z = 1.3
+        m = Redshift(z=1.3)
+        w_step25_z0 = [4978.76695499, 4989.3834775, 5000, 5010.6165225]
+        np.testing.assert_allclose(sp.waveset.value[::25], m(w_step25_z0))
+
+    def test_redshift_none(self):
+        sp = SourceSpectrum(models.Const1D, amplitude=1, z=1.3)
+        assert sp.waveset is None
+
+    def test_exceptions(self):
+        with pytest.raises(exceptions.SynphotError):
+            utils.get_waveset('foo')
+
+
+class TestRedShift(object):
+    """Test redshifted source spectrum.
+
+    ``waveset`` already tested in `TestWaveset`.
+
+    """
+    def setup_class(self):
+        self.sp_z0 = SourceSpectrum.from_gaussian(1 * u.Jy, 5000, 100)
+        self.sp = SourceSpectrum.from_gaussian(1 * u.Jy, 5000, 100, z=1.3)
+
+    def test_property(self):
+        with pytest.raises(exceptions.SynphotError):
+            self.sp.z = 1 * u.AA
+
+        assert self.sp_z0.z == 0
+        assert self.sp.z == 1.3
+
+        assert isinstance(self.sp_z0.model, models.Gaussian1D)
+        assert isinstance(self.sp.model, models.SerialCompositeModel)
+
+    def test_composite_redshift(self):
+        sp2 = self.sp_z0 + self.sp  # centers: 5000, 11500
+        sp2.z = 0.5  # centers: 7500, 17250
+        np.testing.assert_allclose(sp2([7500, 17250]), self.sp_z0(5000))
+
+    def test_const_flux_redshift(self):
+        """Constant flux in Jy is not constant in PHOTLAM."""
+        sp_z0 = SourceSpectrum(ConstFlux1D, amplitude=1 * u.Jy)
+        sp = SourceSpectrum(ConstFlux1D, amplitude=1 * u.Jy, z=1.3)
+        np.testing.assert_allclose(sp_z0(3000), sp(6900))
+
+
+class TestMathOperators(object):
+    """Test spectrum math operators."""
+    def setup_class(self):
+        self.sp_1 = SourceSpectrum(
+            Empirical1D,
+            x=[3999.9, 4000.0, 5000.0, 6000.0, 6000.1],
+            y=u.Quantity([0, 3.5e-14, 4e-14, 4.5e-14, 0], units.FLAM))
+        self.sp_2 = SourceSpectrum(
+            Empirical1D, x=_wave, y=_flux_jy,
+            metadata={'PHOTLAM': [9.7654e-3, 1.003896e-2, 9.78473e-3]})
+        self.bp_1 = SpectralElement(
+            Empirical1D,
+            x=u.Quantity([399.99, 400.01, 500.0, 590.0, 600.1], u.nm),
+            y=[0, 0.1, 0.2, 0.3, 0])
+
+    def test_source_add(self):
+        """Compare with ASTROLIB PYSYNPHOT."""
+        ans = self.sp_1 + self.sp_2
+        np.testing.assert_allclose(
+            ans(ans.waveset).value,
+            [0.00976521, 0.01681283, 0.01970276, 0.01998463, 0.0197387,
+             0.01985257, 0.02337638, 0.00978454], rtol=1e-4)
+
+    def test_source_sub(self):
+        """Compare with ASTROLIB PYSYNPHOT, except negative flux set to 0."""
+        ans = self.sp_1 - self.sp_2
+        np.testing.assert_allclose(
+            ans(ans.waveset).value,
+            [0, 0, 1.72346256e-04, 0, 1.69629843e-04, 2.83499328e-04,
+             3.80731187e-03, 0], rtol=1e-4)
+
+    def test_source_addsub_circular(self):
+        """sp = sp + sp - sp"""
+        ans = self.sp_1 + self.sp_1 - self.sp_1
+        np.testing.assert_array_equal(ans(ans.waveset), self.sp_1(ans.waveset))
+
+    def test_source_addsub_exception(self):
+        with pytest.raises(exceptions.IncompatibleSources):
+            ans = self.sp_1 + self.bp_1
+
+    @pytest.mark.parametrize('x', [2, u.Quantity(2)])
+    def test_source_mul_scalar(self, x):
+        w = self.sp_1.waveset.value
+        ans1 = self.sp_1 * x
+        np.testing.assert_allclose(
+            ans1(w).value, [0, 0.01409552, 0.02013646, 0.02718424, 0],
+            rtol=1e-6)
+
+        # rmul does not work with Quantity
+        if not isinstance(x, u.Quantity):
+            ans2 = x * self.sp_1
+            np.testing.assert_array_equal(ans1(w), ans2(w))
+
+    def test_source_mul_spec(self):
+        """Compare with ASTROLIB PYSYNPHOT. Also test bp * sp."""
+        ans1 = self.sp_1 * self.bp_1
+        ans2 = self.bp_1 * self.sp_1
+        w = ans1.waveset
+        np.testing.assert_allclose(
+            ans1(w).value,
+            [0, 3.52381254e-04, 7.04792712e-04, 2.01360717e-03, 3.97184014e-03,
+             4.03718269e-05, 0, 0], rtol=1e-4)
+        np.testing.assert_array_equal(ans1(w), ans2(w))
+
+    def test_source_mul_exceptions(self):
+        with pytest.raises(exceptions.IncompatibleSources):
+            ans = self.sp_1 * self.sp_2
+        with pytest.raises(exceptions.IncompatibleSources):
+            ans = self.sp_1 * [1, 2]
+        with pytest.raises(exceptions.IncompatibleSources):
+            ans = self.sp_1 * (1 - 1j)
+        with pytest.raises(exceptions.IncompatibleSources):
+            ans = self.sp_1 * u.Quantity(1, u.AA)
+
+    def test_source_div(self):
+        """Put real tests here when ``__truediv__`` is implemented."""
+        with pytest.raises(NotImplementedError):
+            ans = self.sp_1 / 2.0
+        with pytest.raises(NotImplementedError):
+            ans = self.sp_1 / self.bp_1
+
+    def test_bandpass_addsub(self):
+        """Not supported."""
+        with pytest.raises(TypeError):
+            ans = self.bp_1 + self.bp_1
+        with pytest.raises(TypeError):
+            ans = self.bp_1 + 2.0
+        with pytest.raises(TypeError):
+            ans = self.bp_1 - self.bp_1
+        with pytest.raises(TypeError):
+            ans = self.bp_1 - 2.0
+
+    @pytest.mark.parametrize('x', [2.0, u.Quantity(2.0)])
+    def test_bandpass_mul_scalar(self, x):
+        w = self.bp_1.waveset.value
+        ans1 = self.bp_1 * x
+        np.testing.assert_allclose(ans1(w).value, [0, 0.2, 0.4, 0.6, 0])
+
+        # rmul does not work with Quantity
+        if not isinstance(x, u.Quantity):
+            ans2 = x * self.bp_1
+            np.testing.assert_array_equal(ans1(w), ans2(w))
+
+    def test_bandpass_mul_bandpass(self):
+        ans = self.bp_1 * self.bp_1
+        np.testing.assert_allclose(
+            ans(ans.waveset).value, [0, 0.01, 0.04, 0.09, 0])
+
+    def test_bandpass_mul_exceptions(self):
+        with pytest.raises(exceptions.IncompatibleSources):
+            ans = self.bp_1 * [1, 2]
+        with pytest.raises(exceptions.IncompatibleSources):
+            ans = self.bp_1 * (1 - 1j)
+        with pytest.raises(exceptions.IncompatibleSources):
+            ans = self.bp_1 * u.Quantity(1, u.AA)
+
+    def test_bandpass_div(self):
+        """Put real tests here when ``__truediv__`` is implemented."""
+        with pytest.raises(NotImplementedError):
+            ans = self.bp_1 / 2.0
+        with pytest.raises(NotImplementedError):
+            ans = self.bp_1 / self.bp_1
 
 
 class TestWriteSpec(object):
     """Test spectrum to_fits() method."""
     def setup_class(self):
         self.outdir = tempfile.mkdtemp()
+        self.sp = SourceSpectrum(Empirical1D, x=_wave, y=_flux_photlam,
+                                 metadata={'expr': 'Test source'})
+        self.bp = SpectralElement(Empirical1D, x=_wave, y=np.ones(_wave.shape),
+                                  metadata={'expr': 'Test bandpass'})
 
     @pytest.mark.parametrize(
         ('is_sp', 'ext_hdr'),
@@ -968,9 +798,9 @@ class TestWriteSpec(object):
         outfile = os.path.join(self.outdir, 'outspec.fits')
 
         if is_sp:
-            sp1 = spectrum.SourceSpectrum(_wave, _flux_flam)
+            sp1 = self.sp
         else:
-            sp1 = spectrum.SpectralElement(_wave, np.ones(_wave.shape))
+            sp1 = self.bp
 
         if ext_hdr is None:
             sp1.to_fits(outfile, clobber=True, trim_zero=False,
@@ -980,17 +810,8 @@ class TestWriteSpec(object):
                         pad_zero_ends=False, ext_header=ext_hdr)
 
         # Read it back in and check
-        if is_sp:
-            sp2 = spectrum.SourceSpectrum.from_file(outfile)
-        else:
-            sp2 = spectrum.SpectralElement.from_file(outfile)
-            assert sp2.flux is sp2.thru
-
-        np.testing.assert_allclose(sp2.wave.value, sp1.wave.value)
-        np.testing.assert_allclose(sp2.flux.value, sp1.flux.value)
-        assert sp2.wave.unit == sp1.wave.unit
-        assert sp2.flux.unit == sp1.flux.unit
-
+        sp2 = sp1.__class__.from_file(outfile)
+        np.testing.assert_allclose(sp2(sp2.waveset), sp1(sp1.waveset))
         hdr = fits.getheader(outfile, 1)
         assert 'expr' in hdr
         if ext_hdr is not None:
