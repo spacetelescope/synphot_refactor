@@ -1,11 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Utilities related to wavelength bin calculations.
-
-Also imports this C-extension to local namespace:
-
-    - :ref:`calcbinflux(len_binwave, i_beg, i_end, avflux, deltaw) <synphot-c-ext>`
-
-"""
+"""Utilities related to wavelength bin calculations."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 # THIRD-PARTY
@@ -14,6 +8,7 @@ import numpy as np
 # ASTROPY
 from astropy import log
 from astropy import units as u
+from astropy.extern import six
 
 # LOCAL
 from . import exceptions
@@ -37,7 +32,7 @@ def _slow_calcbinflux(len_binwave, i_beg, i_end, avflux, deltaw):
 
     # Note that, like all Python striding, the range over which
     # we integrate is [first:last).
-    for i in xrange(len(i_beg)):
+    for i in six.moves.range(len(i_beg)):
         first = i_beg[i]
         last = i_end[i]
         cur_dw = deltaw[first:last]
@@ -53,7 +48,6 @@ try:
     from . import synphot_utils
 except ImportError:
     calcbinflux = _slow_calcbinflux
-    log.warn('synphot_utils import failed, using Python implementation')
 else:
     calcbinflux = synphot_utils.calcbinflux
 
@@ -66,20 +60,20 @@ def calculate_bin_edges(centers):
 
     Parameters
     ----------
-    centers : array_like or `astropy.units.quantity.Quantity`
+    centers : array_like or `~astropy.units.quantity.Quantity`
         Sequence of bin centers. Must be 1D and have at least two values.
         If not a Quantity, assumed to be in Angstrom.
 
     Returns
     -------
-    edges : `astropy.units.quantity.Quantity`
+    edges : `~astropy.units.quantity.Quantity`
         Array of bin edges. Will be 1D, have one more value
         than ``centers``, and also the same unit.
 
     Raises
     ------
     synphot.exceptions.SynphotError
-        If input is invalid.
+        Invalid input.
 
     """
     if not isinstance(centers, u.Quantity):
@@ -107,20 +101,20 @@ def calculate_bin_widths(edges):
 
     Parameters
     ----------
-    edges : array_like or `astropy.units.quantity.Quantity`
+    edges : array_like or `~astropy.units.quantity.Quantity`
         Sequence of bin edges. Must be 1D and have at least two values.
         If not a Quantity, assumed to be in Angstrom.
 
     Returns
     -------
-    widths : `astropy.units.quantity.Quantity`
+    widths : `~astropy.units.quantity.Quantity`
         Array of bin widths. Will be 1D, have one less value
         than ``edges``, and also the same unit.
 
     Raises
     ------
     synphot.exceptions.SynphotError
-        If input is invalid.
+        Invalid input.
 
     """
     if not isinstance(edges, u.Quantity):
@@ -141,20 +135,20 @@ def calculate_bin_centers(edges):
 
     Parameters
     ----------
-    edges : array_like or `astropy.units.quantity.Quantity`
+    edges : array_like or `~astropy.units.quantity.Quantity`
         Sequence of bin edges. Must be 1D and have at least two values.
         If not a Quantity, assumed to be in Angstrom.
 
     Returns
     -------
-    centers : `astropy.units.quantity.Quantity`
+    centers : `~astropy.units.quantity.Quantity`
         Array of bin centers. Will be 1D, have one less value
         than ``edges``, and also the same unit.
 
     Raises
     ------
     synphot.exceptions.SynphotError
-        If input is invalid.
+        Invalid input.
 
     """
     if not isinstance(edges, u.Quantity):
@@ -170,7 +164,7 @@ def calculate_bin_centers(edges):
     centers = np.empty(edges.size - 1, dtype=np.float64)
     centers[0] = edges.value[:2].mean()
 
-    for i in xrange(1, centers.size):
+    for i in six.moves.range(1, centers.size):
         centers[i] = 2.0 * edges.value[i] - centers[i - 1]
 
     return u.Quantity(centers, unit=edges.unit)
@@ -222,7 +216,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
     Raises
     ------
     synphot.exceptions.OverlapError
-        If given central wavelength is not within the given bins
+        Given central wavelength is not within the given bins
         or the wavelength range would exceed the bin limits.
 
     synphot.exceptions.SynphotError
@@ -236,7 +230,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
             'mode={0} is invalid, must be "round", "min", "max", '
             'or "none".'.format(mode))
 
-    if not isinstance(npix, (int, long)):
+    if not isinstance(npix, six.integer_types):
         raise exceptions.SynphotError('npix={0} is invalid.'.format(npix))
 
     # Bin values must be in ascending order.
@@ -275,10 +269,8 @@ def wave_range(bins, cenwave, npix, mode='round'):
 
     frac1, int1 = np.modf(frac_ind1)
     frac2, int2 = np.modf(frac_ind2)
-
-    if mode != 'none':
-        int1 = int(int1)
-        int2 = int(int2)
+    int1 = int(int1)
+    int2 = int(int2)
 
     if mode == 'round':
         # Lower end of wavelength range
@@ -412,7 +404,7 @@ def pixel_range(bins, waverange, mode='round'):
     Raises
     ------
     synphot.exceptions.OverlapError
-        If given wavelength range exceeds the bounds of given bins.
+        Given wavelength range exceeds the bounds of given bins.
 
     synphot.exceptions.SynphotError
         Invalid mode.

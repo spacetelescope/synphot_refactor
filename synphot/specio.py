@@ -1,10 +1,10 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""This modules handles pysynphot data formats."""
+"""This modules handles synthetic photometry data formats."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 # STDLIB
-import fnmatch
 import os
+import warnings
 
 # THIRD-PARTY
 import numpy as np
@@ -15,80 +15,15 @@ from astropy import units as u
 from astropy.extern import six
 from astropy.io import ascii, fits
 from astropy.utils.data import get_readable_fileobj
+from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from . import exceptions, units
 from synphot import __version__
 
 
-__all__ = ['get_latest_file', 'read_remote_spec', 'read_spec',
-           'read_ascii_spec', 'read_fits_spec', 'write_fits_spec']
-
-
-def get_latest_file(template, raise_error=False, err_msg=''):
-    """Find the filename that appears last in sorted order
-    based on given template.
-
-    Parameters
-    ----------
-    template : str
-        Search template in the form of ``path/pattern``
-        where pattern is acceptable by :py:mod:`fnmatch`.
-
-    raise_error : bool, optional
-        Raise an error when no files found.
-        Otherwise, will issue warning only.
-
-    err_msg : str
-        Alternate message for when no files found.
-        If not given, generic message is used.
-
-    Returns
-    -------
-    filename : str
-        Latest filename.
-
-    Raises
-    ------
-    IOError
-        No files found.
-
-    """
-    path, pattern = os.path.split(template)
-
-    # Remote FTP directory
-    if path.lower().startswith('ftp:'):
-        from astropy.extern.six.moves.urllib import request
-
-        response = request.urlopen(path).read().decode('utf-8').splitlines()
-        allfiles = list(set([x.split()[-1] for x in response]))  # Rid symlink
-
-    # Local directory
-    elif os.path.isdir(path):
-        allfiles = os.listdir(path)
-
-    # Bogus directory
-    else:
-        allfiles = []
-
-    matched_files = sorted(fnmatch.filter(allfiles, pattern))
-
-    # Last file in sorted listing
-    if matched_files:
-        filename = os.path.join(path, matched_files[-1])
-
-    # No files found
-    else:
-        if not err_msg:
-            err_msg = 'No files found for {0}'.format(template)
-
-        if raise_error:
-            raise IOError(err_msg)
-        else:
-            log.warn(err_msg)
-            filename = ''
-
-    return filename
+__all__ = ['read_remote_spec', 'read_spec', 'read_ascii_spec',
+           'read_fits_spec', 'write_fits_spec']
 
 
 def read_remote_spec(filename, encoding=None, cache=True, show_progress=True,
@@ -101,7 +36,7 @@ def read_remote_spec(filename, encoding=None, cache=True, show_progress=True,
         Spectrum filename.
 
     encoding, cache, show_progress
-        See :func:`astropy.utils.data.get_readable_fileobj`.
+        See :func:`~astropy.utils.data.get_readable_fileobj`.
 
     kwargs : dict
         Keywords acceptable by :func:`read_fits_spec` (if FITS) or
@@ -112,7 +47,7 @@ def read_remote_spec(filename, encoding=None, cache=True, show_progress=True,
     header : dict
         Metadata.
 
-    wavelengths, fluxes : `astropy.units.quantity.Quantity`
+    wavelengths, fluxes : `~astropy.units.quantity.Quantity`
         Wavelength and flux of the spectrum.
 
     """
@@ -143,7 +78,7 @@ def read_spec(filename, fname='', **kwargs):
     header : dict
         Metadata.
 
-    wavelengths, fluxes : `astropy.units.quantity.Quantity`
+    wavelengths, fluxes : `~astropy.units.quantity.Quantity`
         Wavelength and flux of the spectrum.
 
     Raises
@@ -181,7 +116,7 @@ def read_ascii_spec(filename, wave_unit=u.AA, flux_unit=units.FLAM, **kwargs):
     filename : str or file pointer
         Spectrum file name or pointer.
 
-    wave_unit, flux_unit : str or `astropy.units.core.Unit`
+    wave_unit, flux_unit : str or `~astropy.units.core.Unit`
         Wavelength and flux units, which default to Angstrom and FLAM,
         respectively.
 
@@ -194,7 +129,7 @@ def read_ascii_spec(filename, wave_unit=u.AA, flux_unit=units.FLAM, **kwargs):
         This is just an empty dictionary, so returned values
         are the same as :func:`read_fits_spec`.
 
-    wavelengths, fluxes : `astropy.units.quantity.Quantity`
+    wavelengths, fluxes : `~astropy.units.quantity.Quantity`
         Wavelength and flux of the spectrum.
         They are set to 'float64' percision.
 
@@ -236,7 +171,7 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
     wave_col, flux_col : str
         Wavelength and flux column names (case-insensitive).
 
-    wave_unit, flux_unit : str or `astropy.units.core.Unit`
+    wave_unit, flux_unit : str or `~astropy.units.core.Unit`
         Wavelength and flux units, which default to Angstrom and FLAM,
         respectively. These are *only* used if ``TUNIT1`` and ``TUNIT2``
         keywords are not present in table (not primary) header.
@@ -246,7 +181,7 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
     header : dict
         Primary header only. Extension header is discarded.
 
-    wavelengths, fluxes : `astropy.units.quantity.Quantity`
+    wavelengths, fluxes : `~astropy.units.quantity.Quantity`
         Wavelength and flux of the spectrum.
 
     """
@@ -261,15 +196,19 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
         try:
             wave_unit = units.validate_unit(fits_wave_unit)
         except (exceptions.SynphotError, ValueError) as e:  # pragma: no cover
-            log.warn('{0} from FITS header is not valid wavelength unit, using '
-                     '{1}: {2}'.format(fits_wave_unit, wave_unit, e))
+            warnings.warn(
+                '{0} from FITS header is not valid wavelength unit, using '
+                '{1}: {2}'.format(fits_wave_unit, wave_unit, e),
+                AstropyUserWarning)
 
     if fits_flux_unit is not None:
         try:
             flux_unit = units.validate_unit(fits_flux_unit)
         except (exceptions.SynphotError, ValueError) as e:  # pragma: no cover
-            log.warn('{0} from FITS header is not valid flux unit, using '
-                     '{1}: {2}'.format(fits_flux_unit, flux_unit, e))
+            warnings.warn(
+                '{0} from FITS header is not valid flux unit, using '
+                '{1}: {2}'.format(fits_flux_unit, flux_unit, e),
+                AstropyUserWarning)
 
     wave_unit = units.validate_unit(wave_unit)
     flux_unit = units.validate_unit(flux_unit)
@@ -300,7 +239,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
     filename : str
         Output spectrum filename.
 
-    wavelengths, fluxes : array_like or `astropy.units.quantity.Quantity`
+    wavelengths, fluxes : array_like or `~astropy.units.quantity.Quantity`
         Wavelength and flux of the spectrum.
 
     pri_header, ext_header : dict
@@ -332,7 +271,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
     wave_col, flux_col : str
         Wavelength and flux column names (case-insensitive).
 
-    wave_unit, flux_unit : str or `astropy.units.core.Unit`
+    wave_unit, flux_unit : str or `~astropy.units.core.Unit`
         Wavelength and flux units, which default to Angstrom and FLAM,
         respectively. These are *only* used if wavelengths and fluxes
         are not in astropy quantities.
@@ -340,7 +279,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
     Raises
     ------
     synphot.exceptions.SynphotError
-        If wavelengths and fluxes have difference shapes or value precision
+        Wavelengths and fluxes have difference shapes or value precision
         is not supported.
 
     """
@@ -413,8 +352,10 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
         flux_value = np.append(flux_value[idx], flux_value[-1])
         n_thrown = orig_size - wave_value.size
         if n_thrown != 0:
-            log.warn('{0} rows are thrown out in converting wavelengths from '
-                     'double- to single-precision'.format(n_thrown))
+            warnings.warn(
+                '{0} rows are thrown out in converting wavelengths from '
+                'double- to single-precision'.format(n_thrown),
+                AstropyUserWarning)
 
     # Keep one zero at each end
     if pad_zero_ends:

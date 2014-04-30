@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""This module handles synphot units that are not in `astropy.units`."""
+"""This module handles photometry units that are not in `astropy.units`."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 # THIRD-PARTY
@@ -14,12 +14,11 @@ from astropy.extern import six
 from . import exceptions
 
 
-__all__ = ['H', 'C', 'HC', 'AREA', 'THROUGHPUT', 'PHOTLAM', 'PHOTNU', 'FLAM',
-           'FNU', 'STMAG', 'ABMAG', 'OBMAG', 'VEGAMAG', 'ABZERO', 'STZERO',
-           'spectral_density_mag', 'spectral_density_vega',
+__all__ = ['H', 'C', 'HC', 'SR_PER_ARCSEC2', 'AREA', 'THROUGHPUT', 'PHOTLAM',
+           'PHOTNU', 'FLAM', 'FNU', 'STMAG', 'ABMAG', 'OBMAG', 'VEGAMAG',
+           'ABZERO', 'STZERO', 'spectral_density_mag', 'spectral_density_vega',
            'spectral_density_count', 'convert_flux', 'validate_unit',
-           'validate_quantity']
-
+           'validate_wave_unit', 'validate_quantity']
 
 #-------------------#
 # General constants #
@@ -28,6 +27,7 @@ __all__ = ['H', 'C', 'HC', 'AREA', 'THROUGHPUT', 'PHOTLAM', 'PHOTNU', 'FLAM',
 H = const.h.cgs  # Planck's constant in erg * sec
 C = const.c.to('AA/s')  # Speed of light in Angstrom/sec
 HC = H * C
+SR_PER_ARCSEC2 = u.rad.to(u.arcsec) ** -2  # steradian per arcsec^2
 
 #---------------#
 # synphot units #
@@ -77,7 +77,7 @@ def spectral_density_mag(wav, magname):
 
     Parameters
     ----------
-    wav : `astropy.units.quantity.Quantity`
+    wav : `~astropy.units.quantity.Quantity`
         Quantity associated with values being converted
         (e.g., wavelength or frequency).
 
@@ -121,11 +121,11 @@ def spectral_density_vega(wav, vegaflux):
 
     Parameters
     ----------
-    wav : `astropy.units.quantity.Quantity`
+    wav : `~astropy.units.quantity.Quantity`
         Quantity associated with values being converted
         (e.g., wavelength or frequency).
 
-    vegaflux : `astropy.units.quantity.Quantity`
+    vegaflux : `~astropy.units.quantity.Quantity`
         Flux of Vega at ``wav``.
 
     Returns
@@ -156,11 +156,11 @@ def spectral_density_count(wav, area):
 
     Parameters
     ----------
-    wav : `astropy.units.quantity.Quantity`
+    wav : `~astropy.units.quantity.Quantity`
         Quantity associated with values being converted
         (e.g., wavelength or frequency).
 
-    area : `astropy.units.quantity.Quantity`
+    area : `~astropy.units.quantity.Quantity`
         Telescope collecting area.
 
     Returns
@@ -197,28 +197,28 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
 
     Parameters
     ----------
-    wavelengths : array_like or `astropy.units.quantity.Quantity`
+    wavelengths : array_like or `~astropy.units.quantity.Quantity`
         Wavelength values. If not a Quantity, assumed to be in
         Angstrom.
 
-    fluxes : array_like or `astropy.units.quantity.Quantity`
+    fluxes : array_like or `~astropy.units.quantity.Quantity`
         Flux values. If not a Quantity, assumed to be in PHOTLAM.
 
-    out_flux_unit : str or `astropy.units.core.Unit`
+    out_flux_unit : str or `~astropy.units.core.Unit`
         Output flux unit.
 
-    area : float or `astropy.units.quantity.Quantity`
-        Area that fluxes cover. If not a Quantity, assumed to be in cm^2.
-        This value *must* be provided for conversions involving
+    area : float or `~astropy.units.quantity.Quantity`
+        Area that fluxes cover. If not a Quantity, assumed to be in
+        :math:`cm^{2}`. This value *must* be provided for conversions involving
         OBMAG and count, otherwise it is not needed.
 
-    vegaspec : `synphot.spectrum.SourceSpectrum`
-        Vega spectrum from :func:`synphot.spectrum.SourceSpectrum.from_vega`.
+    vegaspec : `~synphot.spectrum.SourceSpectrum`
+        Vega spectrum from :func:`~synphot.spectrum.SourceSpectrum.from_vega`.
         This is *only* used for conversions involving VEGAMAG.
 
     Returns
     -------
-    out_flux : `astropy.units.quantity.Quantity`
+    out_flux : `~astropy.units.quantity.Quantity`
         Converted flux values.
 
     Raises
@@ -291,7 +291,7 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None, vegaspec=None):
         if not isinstance(vegaspec, SourceSpectrum):
             raise exceptions.SynphotError('Vega spectrum is missing.')
 
-        flux_vega = vegaspec.resample(wavelengths)
+        flux_vega = vegaspec(wavelengths)
         out_flux = fluxes.to(
             out_flux_unit,
             equivalencies=spectral_density_vega(wavelengths, flux_vega))
@@ -323,7 +323,7 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None, vegaspec=None):
 
     else:
         raise u.UnitsError('{0} and {1} are not convertible'.format(
-                fluxes.unit, out_flux_unit))
+            fluxes.unit, out_flux_unit))
 
     return u.Quantity(out_flux, unit=out_flux_unit)
 
@@ -344,18 +344,18 @@ def validate_unit(input_unit):
 
     Parameters
     ----------
-    input_unit : str or `astropy.units.core.Unit`
+    input_unit : str or `~astropy.units.core.Unit`
         Unit to validate.
 
     Returns
     -------
-    output_unit : `astropy.units.core.Unit`
+    output_unit : `~astropy.units.core.Unit`
         Validated unit.
 
     Raises
     ------
     synphot.exceptions.SynphotError
-        If unit is invalid.
+        Invalid unit.
 
     """
     if isinstance(input_unit, six.string_types):
@@ -384,26 +384,41 @@ def validate_unit(input_unit):
     return output_unit
 
 
+def validate_wave_unit(wave_unit):
+    """Like :func:`validate_unit` but specific to wavelength."""
+    output_unit = validate_unit(wave_unit)
+    unit_type = output_unit.physical_type
+
+    if unit_type not in ('length', 'wavenumber', 'frequency'):
+        raise exceptions.SynphotError(
+            'wavelength physical type is not length, wave number, or '
+            'frequency: {0}'.format(unit_type))
+
+    return output_unit
+
+
 def validate_quantity(input_value, output_unit, equivalencies=[]):
     """Validate quantity (value and unit).
 
+    .. note::
+
+        For flux conversion, use :func:`convert_flux` instead.
+
     Parameters
     ----------
-    input_value : number, array_like, or `astropy.units.quantity.Quantity`
+    input_value : number, array_like, or `~astropy.units.quantity.Quantity`
         Quantity to validate. If not a Quantity, assumed to be
         already in output unit.
 
-    output_unit : str or `astropy.units.core.Unit`
+    output_unit : str or `~astropy.units.core.Unit`
         Output quantity unit.
 
     equivalencies : list of equivalence pairs, optional
-        See :func:`astropy.units.core.UnitBase.to`.
-        Does not work for flux conversion
-        (see :func:`convert_flux`).
+        See `astropy.units`.
 
     Returns
     -------
-    output_value : `astropy.units.quantity.Quantity`
+    output_value : `~astropy.units.quantity.Quantity`
         Validated quantity in given unit.
 
     """

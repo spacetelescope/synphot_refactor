@@ -1,21 +1,24 @@
+.. doctest-skip-all
+
 .. _synphot_formulae:
 
 
-``synphot`` Formulae
-====================
+Spectrum Property Formulae
+==========================
 
 This section contains the formulae for different spectrum properties.
-Some are used for both observation (source spectrum convolved with passband)
-and passband, while some are just for one of them, as specified below.
 
-*INT* is the integral with respect to wavelengths, *EXP* is exponent,
-*LN* is the natural logarithm, *LOG* is base 10 logarithm,
-*flux* is spectrum flux array, *thru* is passband throughput,
-and *wave* is the array of wavelengths corresponding to flux or throughput.
+* *INT* - integral with respect to wavelength
+* *EXP* - exponent
+* *LN* - natural logarithm
+* *LOG* - base-10 logarithm
+* *flux* - spectrum flux array
+* *thru* - bandpass throughput
+* *wave* - wavelength array corresponding to *flux* or *thru*
 
 
-For Both Observation and Passband
----------------------------------
+For All Spectrum Objects
+------------------------
 
 In this case, *flux* in the formulae can also be replaced by *thru*.
 
@@ -25,11 +28,11 @@ In this case, *flux* in the formulae can also be replaced by *thru*.
 Average Wavelength
 ^^^^^^^^^^^^^^^^^^
 
-This implements the equation for :math:`\\lambda_{0}` as defined in
+This implements the equation for :math:`\lambda_{0}` as defined in
 :ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>`, page 836.
 
 Equivalent to IRAF SYNPHOT BANDPAR results for
-``AVGLAM``, ``AVGWV``, or ``REFWAVE``. For a passband, the throughput at this
+``AVGLAM``, ``AVGWV``, or ``REFWAVE``. For a bandpass, the throughput at this
 wavelength is ``TLAMBDA``.
 
 .. math::
@@ -49,7 +52,19 @@ Equivalent to IRAF SYNPHOT result for ``BARLAM``.
     \bar{\lambda} = EXP(INT(flux * LN(wave) / wave) / INT(flux / wave))
 
 
-For Passband Only
+.. _synphot-formula-pivwv:
+
+Pivot Wavelength
+^^^^^^^^^^^^^^^^
+
+Equivalent to IRAF SYNPHOT result for ``PIVWV`` and ``Pivot``.
+
+.. math::
+
+    \lambda_{pivot} = \sqrt{\frac{INT(flux * wave)}{INT(flux / wave)}}
+
+
+For Bandpass Only
 -----------------
 
 .. _synphot-formula-uresp:
@@ -58,34 +73,22 @@ Unit Response
 ^^^^^^^^^^^^^
 
 This is the flux (in FLAM) of a star that produces a response of one photon
-per second in the passband.
+per second in the bandpass.
 
 Equivalent to IRAF SYNPHOT BANDPAR result for ``URESP``, where H and C are
 astronomical constants, and *AREA* is the telescope collecting area.
 
 .. math::
 
-    URESP = \\frac{H * C}{AREA * INT(thru * wave)}
-
-
-.. _synphot-formula-pivwv:
-
-Pivot Wavelength
-^^^^^^^^^^^^^^^^
-
-Equivalent to IRAF SYNPHOT BANDPAR result for ``PIVWV``.
-
-.. math::
-
-    \lambda_{pivot} = \sqrt{\frac{INT(thru * wave)}{INT(thru / wave)}}
+    URESP = \frac{H * C}{AREA * INT(thru * wave)}
 
 
 .. _synphot-formula-bandw:
 
-Passband RMS Width (IRAF)
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Bandpass RMS Width (IRAF SYNPHOT)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This is not the same as passband RMS width in
+This is not the same as bandpass RMS width in
 :ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>`.
 
 Equivalent to IRAF SYNPHOT BANDPAR result for ``BANDW``, where
@@ -204,4 +207,4 @@ Equivalent to IRAF SYNPHOT CALCPHOT result for ``EFFSTIM``.
 
 .. math::
 
-    EFFSTIM = \frac{INT(flux_{source} * thru_{passband} * wave)}{INT(thru_{passband} * wave)}
+    EFFSTIM = \frac{INT(flux_{source} * thru_{bandpass} * wave)}{INT(thru_{bandpass} * wave)}

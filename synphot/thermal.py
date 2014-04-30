@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""This module contains thermal spectrum functionalities."""
+"""This module defines thermal spectra."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 # ASTROPY
@@ -7,176 +7,126 @@ from astropy import units as u
 from astropy.io import fits
 
 # LOCAL
-from . import exceptions, planck, specio, spectrum, units
+from . import exceptions, specio, units
+from .models import BlackBody1D, Empirical1D
+from .spectrum import BaseUnitlessSpectrum, SourceSpectrum
 
 
 __all__ = ['ThermalSpectralElement']
 
 
-class ThermalSpectralElement(spectrum.BaseUnitlessSpectrum):
+class ThermalSpectralElement(BaseUnitlessSpectrum):
     """Class to handle spectral element with associated thermal
     properties.
 
-    This differs from `~synphot.spectrum.SpectralElements` in the
-    sense that it carries thermal parameters such as temperature
+    This differs from `~synphot.spectrum.SpectralElement` in the
+    sense that it carries thermal parameters, i.e., temperature
     and beam filling factor.
 
     .. note::
 
-        Use :func:`to_thermal_source` to apply its emissivity to an
+        Use :func:`thermal_source` to apply its emissivity to an
         existing beam.
-
-    Wavelengths must be monotonic ascending/descending without zeroes
-    or duplicate values.
-
-    Values for the unitless component (hereafter, known as emissivity)
-    must be dimensionless. They are checked for negative values.
-    If found, warning is issued and negative values are set to zeroes.
 
     Parameters
     ----------
-    wavelengths : array_like or `astropy.units.quantity.Quantity`
-        Wavelength values. If not a Quantity, assumed to be in
-        Angstrom.
+    modelclass, metadata, kwargs
+        See `~synphot.spectrum.BaseSpectrum`.
 
-    emissivity : array_like or `astropy.units.quantity.Quantity`
-        Emissivity values. Must be dimensionless.
-        If not a Quantity, assumed to be in THROUGHPUT.
-
-    temperature : float or `astropy.units.quantity.Quantity`
+    temperature : float or `~astropy.units.quantity.Quantity`
         Temperature. If not a Quantity, assumed to be in Kelvin.
 
-    beam_fill_factor : float
-        Beam filling factor.
-
-    kwargs : dict
-        Keywords accepted by `~synphot.spectrum.BaseSpectrum`,
-        except ``flux_unit``.
-
-    Attributes
-    ----------
-    wave, thru : `astropy.units.quantity.Quantity`
-        Wavelength and emissivity of the spectrum.
-
-    temperature : `astropy.units.quantity.Quantity`
-        Temperature.
-
-    beam_fill_factor : float
-        Beam filling factor.
-
-    primary_area : `astropy.units.quantity.Quantity` or `None`
-        Area that flux covers in cm^2.
-
-    metadata : dict
-        Metadata. ``self.metadata['expr']`` must contain a descriptive string of the object.
-
-    warnings : dict
-        List of warnings related to spectrum object.
-
-    Raises
-    ------
-    synphot.exceptions.SynphotError
-        If wavelengths and emissivity do not match, or if they have
-        invalid units.
-
-    synphot.exceptions.DuplicateWavelength
-        If wavelength array contains duplicate entries.
-
-    synphot.exceptions.UnsortedWavelength
-        If wavelength array is not monotonic.
-
-    synphot.exceptions.ZeroWavelength
-        If negative or zero wavelength occurs in wavelength array.
+    beam_fill_factor : float or `~astropy.units.quantity.Quantity`
+        Beam filling factor. If a Quantity, must be unitless.
+        Defaults to 1.
 
     """
-    def __init__(self, wavelengths, emissivity, temperature, beam_fill_factor,
-                 **kwargs):
-        super(ThermalSpectralElement, self).__init__(
-            wavelengths, emissivity, **kwargs)
-        self.temperature = units.validate_quantity(temperature, u.K)
-        self.beam_fill_factor = float(beam_fill_factor)
+    def __init__(self, modelclass, temperature, beam_fill_factor=1, **kwargs):
+        super(ThermalSpectralElement, self).__init__(modelclass, **kwargs)
+        self.temperature = temperature
+        self.beam_fill_factor = beam_fill_factor
 
-    def to_thermal_source(self, wavelengths=None):
+    @property
+    def temperature(self):
+        """Temperature."""
+        return self._temperature
+
+    @temperature.setter
+    def temperature(self, what):
+        """Set temperature."""
+        self._temperature = units.validate_quantity(what, u.K)
+
+    @property
+    def beam_fill_factor(self):
+        """Beam filling factor."""
+        return self._beam_fill_factor
+
+    @beam_fill_factor.setter
+    def beam_fill_factor(self, what):
+        """Set beam filling factor."""
+        self._beam_fill_factor = units.validate_quantity(what, '').value
+
+    def taper(self, **kwargs):
+        """Tapering is disabled."""
+        raise NotImplementedError('Thermal spectral element cannot be tapered.')
+
+    def thermal_source(self):
         """Apply emissivity to an existing beam to produce a thermal
         source spectrum (without optical counterpart).
 
         Thermal source spectrum is calculated as follow:
 
-            #. Create a blackbody spectrum in
-               :math:`\\textnormal{PHOTLAM} \\textnormal{arcsec^{-2}}`
-               with ``self.temperature`` using
-               :func:`synphot.planck.bb_photlam_arcsec`.
-            #. Multiply the blackbody with ``self.beam_fill_factor``
-               and ``self.thru``.
-
-        Parameters
-        ----------
-        wavelengths : array_like or `astropy.units.quantity.Quantity`, optional
-            Wavelength values. If not a Quantity, assumed to be in
-            Angstrom. If `None`, ``self.wave`` is used.
+            #. Create a blackbody spectrum in PHOTLAM per square arcsec
+               with `temperature`.
+            #. Multiply the blackbody with `beam_fill_factor` and ``self``.
 
         Returns
         -------
         sp : `~synphot.spectrum.SourceSpectrum`
-            Thermal source spectrum in PHOTLAM.
+            Thermal source spectrum.
 
         """
-        if wavelengths is None:
-            wavelengths = self.wave
-
-        bbflux = planck.bb_photlam_arcsec(wavelengths, self.temperature)
-        sp_bb = spectrum.SourceSpectrum(
-            wavelengths, bbflux.value, flux_unit=units.PHOTLAM,
-            area=self.primary_area)
-
-        sp = sp_bb * self.beam_fill_factor * self
-
-        # Clear confusing metadata
-        for k in list(sp.metadata.keys()):
-            if k != 'expr':
-                del sp.metadata[k]
-
-        # Add new metadata
+        sp = (SourceSpectrum(BlackBody1D, temperature=self.temperature) *
+              units.SR_PER_ARCSEC2 * self.beam_fill_factor * self)
         sp.metadata['temperature'] = self.temperature
         sp.metadata['beam_fill_factor'] = self.beam_fill_factor
-
         return sp
 
     @classmethod
     def from_file(cls, filename, temperature_key='DEFT',
-                  beamfill_key='BEAMFILL', area=None, **kwargs):
-        """Creates a thermal spectrum object from FITS file.
+                  beamfill_key='BEAMFILL', **kwargs):
+        """Creates a thermal spectral element from file.
+
+        .. note::
+
+            Only FITS format is supported.
 
         Parameters
         ----------
         filename : str
-            Thermal spectrum filename.
+            Thermal spectral element filename.
 
         temperature_key, beamfill_key : str
             Keywords in FITS *table extension* that store temperature
             (in Kelvin) and beam filling factor values.
             Beam filling factor is set to 1 if its keyword is missing.
 
-        area : float or `astropy.units.quantity.Quantity`, optional
-            Telescope collecting area.
-            If not a Quantity, assumed to be in cm^2.
-
         kwargs : dict
-            Keywords acceptable by :func:`synphot.stio.read_fits_spec`.
+            Keywords acceptable by :func:`~synphot.specio.read_fits_spec`.
 
         Returns
         -------
-        newspec : obj
-            New thermal spectrum object.
+        th : `ThermalSpectralElement`
+            Empirical thermal spectral element.
 
         Raises
         ------
         synphot.exceptions.SynphotError
-            Invalid file format or missing keyword.
+            Invalid inputs.
 
         """
         if not (filename.endswith('fits') or filename.endswith('fit')):
-            raise exceptions.SynphotError('Only FITS is supported.')
+            raise exceptions.SynphotError('Only FITS format is supported.')
 
         # Extra info from table header
         ext = kwargs.get('ext', 1)
@@ -187,31 +137,14 @@ class ThermalSpectralElement(spectrum.BaseUnitlessSpectrum):
             raise exceptions.SynphotError(
                 'Missing {0} keyword.'.format(temperature_key))
 
-        beam_fill_factor = tab_hdr.get('BEAMFILL', 1.0)
+        beam_fill_factor = tab_hdr.get('BEAMFILL', 1)
 
         if 'flux_unit' not in kwargs:
-            kwargs['flux_unit'] = units.THROUGHPUT
+            kwargs['flux_unit'] = cls._internal_flux_unit
 
         if 'flux_col' not in kwargs:
             kwargs['flux_col'] = 'EMISSIVITY'
 
-        header, wavelengths, fluxes = specio.read_spec(filename, **kwargs)
-        return cls(wavelengths, fluxes, temperature, beam_fill_factor,
-                   area=area, header=header)
-
-    def plot(self, **kwargs):  # pragma: no cover
-        """Plot the emissivity.
-
-        .. note:: Uses :mod:`matplotlib`.
-
-        Parameters
-        ----------
-        kwargs : dict
-            Keywords accepted by :func:`synphot.spectrum.BaseSpectrum.plot`,
-            *except* ``ylabel``.
-
-        """
-        if 'ylabel' in kwargs:
-            del kwargs[key]
-
-        super(ThermalSpectralElement, self).plot(ylabel='Emissivity', **kwargs)
+        header, wavelengths, em = specio.read_spec(filename, **kwargs)
+        return cls(Empirical1D, temperature, beam_fill_factor=beam_fill_factor,
+                   x=wavelengths, y=em, metadata=header)

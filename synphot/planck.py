@@ -16,7 +16,7 @@ from astropy import units as u
 from . import units
 
 
-__all__ = ['bbfunc', 'bb_photlam_arcsec', 'bb_photlam']
+__all__ = ['bbfunc']
 
 # Underflow and overflow limits taken from IRAF SYNPHOT
 _VERY_SMALL = 1e-4
@@ -33,15 +33,15 @@ def bbfunc(wavelengths, temperature):
 
     Parameters
     ----------
-    wavelengths : array_like or `astropy.units.quantity.Quantity`
+    wavelengths : array_like or `~astropy.units.quantity.Quantity`
         Wavelength values. If not a Quantity, assumed to be in Angstrom.
 
-    temperature : float or `astropy.units.quantity.Quantity`
+    temperature : float or `~astropy.units.quantity.Quantity`
         Blackbody temperature. If not a Quantity, assumed to be in Kelvin.
 
     Returns
     -------
-    fluxes : `astropy.units.quantity.Quantity`
+    fluxes : `~astropy.units.quantity.Quantity`
         Blackbody radiation in PHOTLAM per steradian.
 
     """
@@ -80,20 +80,21 @@ def bbfunc(wavelengths, temperature):
     return u.Quantity(bb_lam, unit=units.PHOTLAM/u.sr)
 
 
-def bb_photlam_arcsec(wavelengths, temperature):
+# Replaced by ThermalSpectralElement.thermal_source() but kept for testing.
+def _bb_photlam_arcsec(wavelengths, temperature):
     """Planck law for blackbody radiation in PHOTLAM per square arcsec.
 
     Parameters
     ----------
-    wavelengths : array_like or `astropy.units.quantity.Quantity`
+    wavelengths : array_like or `~astropy.units.quantity.Quantity`
         Wavelength values. If not a Quantity, assumed to be in Angstrom.
 
-    temperature : float or `astropy.units.quantity.Quantity`
+    temperature : float or `~astropy.units.quantity.Quantity`
         Blackbody temperature. If not a Quantity, assumed to be in Kelvin.
 
     Returns
     -------
-    fluxes : `astropy.units.quantity.Quantity`
+    fluxes : `~astropy.units.quantity.Quantity`
         Blackbody radiation in PHOTLAM per square arcsec.
 
     """
@@ -102,7 +103,8 @@ def bb_photlam_arcsec(wavelengths, temperature):
     return bb_photlam / fac
 
 
-def bb_photlam(wavelengths, temperature, r=const.R_sun, d=const.kpc):
+# Replaced by SourceSpectrum.from_blackbody() but kept for testing.
+def _bb_photlam(wavelengths, temperature, r=const.R_sun, d=const.kpc):
     """Planck law for blackbody radiation in PHOTLAM,
     where the radiation is normalized to a star of given radius
     at a given distance.
@@ -116,23 +118,23 @@ def bb_photlam(wavelengths, temperature, r=const.R_sun, d=const.kpc):
 
     Parameters
     ----------
-    wavelengths : array_like or `astropy.units.quantity.Quantity`
+    wavelengths : array_like or `~astropy.units.quantity.Quantity`
         Wavelength values. If not a Quantity, assumed to be in Angstrom.
 
-    temperature : float or `astropy.units.quantity.Quantity`
+    temperature : float or `~astropy.units.quantity.Quantity`
         Blackbody temperature. If not a Quantity, assumed to be in Kelvin.
 
-    r : float or `astropy.units.quantity.Quantity`
+    r : float or `~astropy.units.quantity.Quantity`
         Radius of the star. If not a Quantity, assumed to be in meter.
         Default is a solar radius.
 
-    d : float or `astropy.units.quantity.Quantity`
+    d : float or `~astropy.units.quantity.Quantity`
         Distance to the star. If not a Quantity, assumed to be in the
         same unit as ``r``. Default is 1 kpc.
 
     Returns
     -------
-    fluxes : `astropy.units.quantity.Quantity`
+    fluxes : `~astropy.units.quantity.Quantity`
         Normalized blackbody radiation in PHOTLAM.
 
     """

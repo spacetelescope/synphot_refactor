@@ -1,13 +1,27 @@
+.. doctest-skip-all
+
 .. _synphot-top-level:
 
 #####################
 synphot Documentation
 #####################
 
-This is a placeholder for ``astropy`` main page, to make transition to
-its core package easier.
+Currently, ``synphot`` is an astropy-affiliated package.
+It depends on the following external packages:
 
-**Astronomy computations and utilities**
+* `Astropy <http://astropy.org>`_ - Currently requires a special version that has ``modeling``
+  that handles composite models and ``sampleset`` property.
+* `numpy <http://www.numpy.org/>`_
+* `matplotlib <http://matplotlib.org/>`_ (optional, for plotting)
+
+It is tested with the following Python versions:
+
+* 2.7.5
+* 3.2.3
+* 3.3.2
+* 3.4.0
+
+Contents:
 
 .. toctree::
    :maxdepth: 1

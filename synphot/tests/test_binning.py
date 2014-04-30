@@ -4,15 +4,16 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 # STDLIB
 import os
+import warnings
 
 # THIRD PARTY
 import numpy as np
 
 # ASTROPY
-from astropy import log
 from astropy import units as u
 from astropy.tests.helper import pytest
 from astropy.utils.data import get_pkg_data_filename
+from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from .. import binning, exceptions, specio
@@ -54,7 +55,7 @@ def test_calculate_bin_centers(in_arr, out_arr):
 
 def test_center_edge_center_roundtrip():
     """Test that we get back the same centers."""
-    centers = u.Quantity([1, 2, 4, 10, 20], unit=u.micron)
+    centers = u.Quantity([1, 2, 4, 10, 20], u.micron)
     calc_centers = binning.calculate_bin_centers(
         binning.calculate_bin_edges(centers))
     np.testing.assert_array_equal(calc_centers.value, centers.value)
@@ -226,7 +227,8 @@ def test_calcbinflux():
     try:
         from .. import synphot_utils
     except ImportError:
-        log.warn('synphot_utils import failed, C-ext test is skipped.')
+        warnings.warn('synphot_utils import failed, C-ext test is skipped.',
+                      AstropyUserWarning)
     else:
         binflux_c, intwave_c = synphot_utils.calcbinflux(
             bins.size, i_beg, i_end, avflux, deltaw)

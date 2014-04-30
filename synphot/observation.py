@@ -1,12 +1,12 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module defines an observed spectrum, i.e., a source spectrum
-that has gone through a passband.
+that has gone through a bandpass.
 
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 # STDLIB
-from copy import deepcopy
+import warnings
 
 # THIRD-PARTY
 import numpy as np
@@ -14,254 +14,273 @@ import numpy as np
 # ASTROPY
 from astropy import log
 from astropy import units as u
+from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
-from . import analytic, binning, spectrum, exceptions, specio, utils, units
+from . import binning, exceptions, specio, units, utils
+from .integrator import TrapezoidIntegrator
+from .models import Empirical1D
+from .spectrum import BaseSourceSpectrum, SourceSpectrum, SpectralElement
 
 
 __all__ = ['Observation']
 
 
-class Observation(spectrum.SourceSpectrum):
+class Observation(BaseSourceSpectrum):
     """This is an observed spectrum, where a source spectrum
-    has gone through a passband.
-
-    While it mostly inherits from `~synphot.spectrum.SourceSpectrum`,
-    it has additional methods and attributes. It also disables some
-    existing methods from parent class. This is such that its
-    behavior is consistent with an observed spectrum that it
-    represents.
-
-    Most notably, this class has extra attributes that deal
-    with binning, which is introduced by the detector.
+    has gone through a bandpass.
 
     Usually, this is the end point of a chain of spectral
-    manipulation.
+    manipulation. It has extra attributes that deal with binning,
+    which is introduced by the detector.
 
     Parameters
     ----------
-    wavelengths : array_like or `astropy.units.quantity.Quantity`
-        Wavelength values. If not a Quantity, assumed to be in
-        Angstrom.
+    spec : `~synphot.spectrum.SourceSpectrum`
+        Source spectrum.
 
-    fluxes : array_like or `astropy.units.quantity.Quantity`
-        Flux values. If not a Quantity, assumed to be in FLAM.
+    band : `~synphot.spectrum.SpectralElement`
+        Bandpass.
 
-    binwave : `None`, array_like, or `astropy.units.quantity.Quantity`
-        Center of binned wavelengths. If not a Quantity, assumed
-        to have the same unit as ``wavelengths``.
-        If `None`, not binned data is stored.
-
-    kwargs : dict
-        Keywords accepted by `~synphot.spectrum.BaseSpectrum`.
-
-    Attributes
-    ----------
-    wave, flux : `astropy.units.quantity.Quantity`
-        Wavelength and flux of the spectrum.
-
-    binwave : `None` or `astropy.units.quantity.Quantity`
+    binset : array_like, `~astropy.units.quantity.Quantity`, or `None`
         Center of binned wavelengths.
+        If not a Quantity, assumed to be in Angstrom.
+        If `None`, input ``self.waveset`` values are used.
 
-    binflux : `None` or `astropy.units.quantity.Quantity`
-        Binned flux corresponding to ``self.binwave``.
+    force : {'none', 'extrap', 'taper'}
+        Force creation of an observation even when source spectrum
+        and bandpass do not fully overlap:
 
-    bin_edges : `None` or `astropy.units.quantity.Quantity`
-        Edges of the binned wavelengths.
-
-    primary_area : `astropy.units.quantity.Quantity` or `None`
-        Area that flux covers in cm^2.
-
-    metadata : dict
-        Metadata. ``self.metadata['expr']`` must contain a descriptive string of the object.
-
-    warnings : dict
-        Dictionary of warning key-value pairs related to spectrum object.
+            * 'none' - Source must encompass bandpass (default)
+            * 'extrap' - Extrapolate source spectrum
+            * 'taper' - Taper source spectrum
 
     Raises
     ------
+    synphot.exceptions.DisjointError
+        Bandpass does not overlap with source spectrum.
+
+    synphot.exceptions.PartialOverlap
+        Bandpass only partially overlaps with source spectrum
+        when they must fully overlap.
+
     synphot.exceptions.SynphotError
-        If wavelengths and fluxes do not match, or if they have invalid units.
+        Invalid inputs.
 
-    synphot.exceptions.DuplicateWavelength
-        If wavelength array contains duplicate entries.
-
-    synphot.exceptions.UnsortedWavelength
-        If wavelength array is not monotonic.
-
-    synphot.exceptions.ZeroWavelength
-        If negative or zero wavelength occurs in wavelength array.
+    synphot.exceptions.UndefinedBinset
+        Missing binned wavelength set.
 
     """
-    def __init__(self, wavelengths, fluxes, binwave=None, **kwargs):
-        super(Observation, self).__init__(wavelengths, fluxes, **kwargs)
+    def __init__(self, spec, band, binset=None, force='none'):
+        if not isinstance(spec, SourceSpectrum):
+            raise exceptions.SynphotError('Invalid source spectrum.')
 
-        if binwave is None:
-            self.binwave = None
-            self.binflux = None
-            self.bin_edges = None
-        else:
-            self.binspec(binwave)
+        if not isinstance(band, SpectralElement):
+            raise exceptions.SynphotError('Invalid bandpass.')
 
-        # This is set internally before calculations, as needed
-        self._set_data(False)
+        # Inherit input warnings like ASTROLIB PYSYNPHOT
+        warn = {}
+        warn.update(spec.warnings)
+        warn.update(band.warnings)
 
-    def binspec(self, binwave):
-        """Set binning attributes based on given binned wavelength
-        centers.
+        # Validate overlap
+        force = force.lower()
+        stat = band.check_overlap(spec)
 
-        By contrast, the native wave and flux should be considered
+        if stat == 'none':
+            raise exceptions.DisjointError(
+                'Source spectrum and bandpass are disjoint.')
+        elif 'partial' in stat:
+            if force == 'none':
+                raise exceptions.PartialOverlap(
+                    'Source spectrum and bandpass do not fully overlap. '
+                    'You may use force=[extrap|taper] to force this '
+                    'Observation anyway.')
+            elif force == 'taper':
+                spec = spec.taper()
+                msg = 'Source spectrum is tapered.'
+                warnings.warn(msg, AstropyUserWarning)
+                warn['PartialOverlap'] = msg
+            elif force.startswith('extrap'):
+                msg = ('Source spectrum will be extrapolated (at constant ' +
+                       'value for empirical model).')
+                warnings.warn(msg, AstropyUserWarning)
+                warn['PartialOverlap'] = msg
+            else:
+                raise exceptions.SynphotError(
+                    'force={0} is invalid, must be "none", "taper", '
+                    'or "extrap"'.format(force))
+        elif stat != 'full':  # pragma: no cover
+            raise exceptions.SynphotError(
+                'Overlap result of {0} is unexpected'.format(stat))
+
+        # Create composite spectrum
+        super(Observation, self).__init__(
+            spec * band, metadata={'warnings': warn})
+        self._spec = spec
+        self._band = band
+        self._force = force
+
+        # Initialize bins
+        self._init_bins(binset)
+
+    def _init_bins(self, binset):
+        """Calculated binned wavelength centers, edges, and flux.
+
+        By contrast, the native waveset and flux should be considered
         samples of a continuous function.
 
-        Thus, it makes sense to interpolate ``self.wave`` and
-        ``self.flux``, but not ``self.binwave`` and ``self.binflux``.
-
-        Parameters
-        ----------
-        binwave : array_like or `astropy.units.quantity.Quantity`
-            Center of binned wavelengths. If not a Quantity, assumed
-            to have the same unit as ``self.wave``.
+        Thus, it makes sense to interpolate ``self.waveset`` and
+        ``self(self.waveset)``, but not `binset` and `binflux`.
 
         """
-        # Convert binwave to native wavelength unit and validate.
-        self.binwave = units.validate_quantity(
-            binwave, self.wave.unit, equivalencies=u.spectral())
-        utils.validate_wavelengths(self.binwave)
+        if binset is None:
+            if self.bandpass.waveset is not None:
+                self._binset = self.bandpass.waveset
+            elif self.spectrum.waveset is not None:
+                self._binset = self.spectrum.waveset
+                log.info('Bandpass waveset is undefined; '
+                         'Using source spectrum waveset instead.')
+            else:
+                raise exceptions.UndefinedBinset(
+                    'Both source spectrum and bandpass have undefined waveset; '
+                    'Provide binset manually.')
+        else:
+            self._binset = self._validate_wavelengths(binset)
 
-        # binwave must be in ascending order for calcbinflux()
+        # binset must be in ascending order for calcbinflux()
         # to work properly.
-        if self.binwave[0] > self.binwave[-1]:
-            self.binwave = u.Quantity(
-                self.binwave.value[::-1], unit=self.binwave.unit)
+        if self._binset[0] > self._binset[-1]:
+            self._binset = self._binset[::-1]
 
-        self.bin_edges = binning.calculate_bin_edges(self.binwave)
+        self._bin_edges = binning.calculate_bin_edges(self._binset)
 
         # Merge bin edges and centers in with the natural waveset
-        spwave = utils.merge_wavelengths(utils.merge_wavelengths(
-                self.wave.value, self.bin_edges.value), self.binwave.value)
+        spwave = utils.merge_wavelengths(
+            self._bin_edges.value, self._binset.value)
+        if self.waveset is not None:
+            spwave = utils.merge_wavelengths(spwave, self.waveset.value)
 
         # Compute indices associated to each endpoint.
-        indices = np.searchsorted(spwave, self.bin_edges.value)
+        indices = np.searchsorted(spwave, self._bin_edges.value)
         i_beg = indices[:-1]
         i_end = indices[1:]
 
         # Prepare integration variables.
-        flux = self.resample(spwave)
+        flux = self(spwave)
         avflux = (flux.value[1:] + flux.value[:-1]) * 0.5
         deltaw = spwave[1:] - spwave[:-1]
 
         # Sum over each bin.
         binflux, intwave = binning.calcbinflux(
-            self.binwave.size, i_beg, i_end, avflux, deltaw)
+            self._binset.size, i_beg, i_end, avflux, deltaw)
 
-        self.binflux = u.Quantity(binflux, unit=self.flux.unit)
+        self._binflux = u.Quantity(binflux, flux.unit)
 
-    def _set_data(self, binned):
-        """Set the data for calculations, either native or binned."""
-        if binned:
-            if (self.binwave is None or self.binflux is None or
-                    self.bin_edges is None):
-                raise exceptions.UndefinedBinset('No binned data.')
-            self._wave = self.binwave
-            self._flux = self.binflux
-        else:
-            self._wave = self.wave
-            self._flux = self.flux
+    @property
+    def spectrum(self):
+        """Source spectrum of the observation."""
+        return self._spec
 
-    def __add__(self, other):
-        raise NotImplementedError('Observations cannot be added.')
+    @property
+    def bandpass(self):
+        """Bandpass of the observation."""
+        return self._band
 
-    def __sub__(self, other):
-        raise NotImplementedError('Observations cannot be subtracted.')
+    @property
+    def binset(self):
+        """Center of binned wavelengths."""
+        return self._binset
+
+    @property
+    def bin_edges(self):
+        """Edges of binned wavelengths."""
+        return self._bin_edges
+
+    @property
+    def binflux(self):
+        """Binned flux corresponding to `binset`."""
+        return self._binflux
 
     def __mul__(self, other):
-        """Extends base class mul to handle binned data."""
-        new_obs = super(Observation, self).__mul__(other)
-        new_obs.binspec(self.binwave)
-        return new_obs
+        """Multiply self and other."""
+        sp = self.spectrum * other
+        return self.__class__(
+            sp, self.bandpass, binset=self.binset, force=self._force)
 
-    def __truediv__(self, other):
-        """Extends base class truediv to handle binned data."""
-        new_obs = super(Observation, self).__truediv__(other)
-        new_obs.binspec(self.binwave)
-        return new_obs
+    def taper(self, **kwargs):
+        """Tapering is disabled."""
+        raise NotImplementedError('Observation cannot be tapered.')
 
-    def apply_redshift(self, z):
-        raise NotImplementedError('Observations cannot be redshifted.')
+    def _validate_binned_wavelengths(self, wave):
+        if wave is None:
+            wavelengths = self.binset
+        else:
+            wavelengths = self._validate_wavelengths(wave)
+        return wavelengths
 
-    def convert_flux(self, out_flux_unit):
-        """Convert ``self.flux`` and ``self.binflux`` to a different unit.
-        The attribute is updated in-place.
+    def sample_binned(self, wavelengths=None, flux_unit=units.PHOTLAM,
+                      **kwargs):
+        """Sample binned observation without interpolation.
 
-        See :func:`synphot.units.convert_flux` for more details.
-
-        Parameters
-        ----------
-        out_flux_unit : str or `astropy.units.core.Unit`
-            Output flux unit.
-
-        """
-        self._validate_flux_unit(out_flux_unit)
-        self.flux = units.convert_flux(self.wave, self.flux, out_flux_unit,
-                                       area=self.primary_area, vegaspec=None)
-
-        if self.binwave is not None and self.binflux is not None:
-            self.binflux = units.convert_flux(
-                self.binwave, self.binflux, out_flux_unit,
-                area=self.primary_area, vegaspec=None)
-
-        # Also update hidden attributes, just in case
-        self._set_data(False)
-
-    def sample_binned(self, wavelengths):
-        """Sample binned observation at the given wavelengths,
-        without interpolation.
-
-        To sample unbinned data, use the ``resample()`` method.
+        To sample unbinned data, use ``__call__``.
 
         Parameters
         ----------
-        wavelengths : array_like or `astropy.units.quantity.Quantity`
-            Wavelength values for sampling. If not a Quantity,
-            assumed to be the unit of ``self.binwave``.
+        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+            Wavelength values for sampling.
+            If not a Quantity, assumed to be in Angstrom.
+            If `None`, `binset` is used.
+
+        flux_unit : str or `~astropy.units.core.Unit`
+            Flux is converted to this unit.
+
+        kwargs : dict
+            Keywords acceptable by :func:`~synphot.units.convert_flux`.
 
         Returns
         -------
-        sampled_result : `astropy.units.quantity.Quantity`
-            Sampled binned flux that is in-sync with given wavelengths.
+        flux : `~astropy.units.quantity.Quantity`
+            Binned flux in given unit.
 
         Raises
         ------
         synphot.exceptions.InterpolationNotAllowed
             Interpolation of binned data is not allowed.
 
-        synphot.exceptions.UndefinedBinset
-            Missing binned data.
-
         """
-        self._set_data(True)  # Use binned data
-
-        # Convert wavelengths to self.binwave unit, and do validation
-        wavelengths = units.validate_quantity(
-            wavelengths, self._wave.unit, equivalencies=u.spectral())
-        utils.validate_wavelengths(wavelengths)
-
-        if not np.all(np.in1d(wavelengths, self._wave)):
+        x = self._validate_binned_wavelengths(wavelengths)
+        i = np.searchsorted(self.binset, x)
+        if not np.allclose(self.binset[i], x):
             raise exceptions.InterpolationNotAllowed(
-                'Given wavelengths are not in binwave attribute')
+                'Some or all wavelength values are not in binset.')
+        y = self.binflux[i]
+        return units.convert_flux(x, y, flux_unit, **kwargs)
 
-        return self._flux[np.searchsorted(self._wave, wavelengths)]
+    def _get_binned_arrays(self, wavelengths, flux_unit, area=None,
+                           vegaspec=None):
+        """Get binned observation in user units."""
+        x = self._validate_binned_wavelengths(wavelengths)
+        y = self.sample_binned(wavelengths=x, flux_unit=flux_unit, area=area,
+                               vegaspec=vegaspec)
 
-    def wave_range(self, cenwave, npix, **kwargs):
+        if isinstance(wavelengths, u.Quantity):
+            w = x.to(wavelengths.unit, u.spectral())
+        else:
+            w = x
+
+        return w, y
+
+    def binned_waverange(self, cenwave, npix, **kwargs):
         """Calculate the wavelength range covered by the given number
         of pixels centered on the given central wavelengths of
-        ``self.binwave``.
+        `binset`.
 
         Parameters
         ----------
-        cenwave : float or `astropy.units.quantity.Quantity`
-            Desired central wavelength. If not a Quantity,
-            assumed to be in the unit of ``self.binwave``.
+        cenwave : float or `~astropy.units.quantity.Quantity`
+            Desired central wavelength.
+            If not a Quantity, assumed to be in Angstrom.
 
         npix : int
             Desired number of pixels, centered on ``cenwave``.
@@ -271,122 +290,60 @@ class Observation(spectrum.SourceSpectrum):
 
         Returns
         -------
-        wave1, wave2 : `astropy.units.quantity.Quantity`
+        waverange : `~astropy.units.quantity.Quantity`
             Lower and upper limits of the wavelength range,
             in the unit of ``cenwave``.
 
-        Raises
-        ------
-        synphot.exceptions.UndefinedBinset
-            Missing binned data.
-
         """
-        self._set_data(True)  # Use binned data
+        # Calculation is done in the unit of cenwave.
+        if not isinstance(cenwave, u.Quantity):
+            cenwave = u.Quantity(cenwave, self._internal_wave_unit)
 
-        if isinstance(cenwave, u.Quantity):
-            bin_wave = units.validate_quantity(
-                self._wave, cenwave.unit, equivalencies=u.spectral())
-        else:
-            cenwave = u.Quantity(cenwave, unit=self._wave.unit)
-            bin_wave = self._wave
+        bin_wave = units.validate_quantity(
+            self.binset, cenwave.unit, equivalencies=u.spectral())
 
-        w1, w2 = binning.wave_range(
-            bin_wave.value, cenwave.value, npix, **kwargs)
+        return u.Quantity(
+            binning.wave_range(bin_wave.value, cenwave.value, npix, **kwargs),
+            cenwave.unit)
 
-        return u.Quantity([w1, w2], unit=cenwave.unit)
-
-    def pixel_range(self, waverange, **kwargs):
+    def binned_pixelrange(self, waverange, **kwargs):
         """Calculate the number of pixels within the given wavelength
-        range and ``self.binwave``.
+        range and `binset`.
 
         Parameters
         ----------
-        waverange : tuple of float or `astropy.units.quantity.Quantity`
+        waverange : tuple of float or `~astropy.units.quantity.Quantity`
             Lower and upper limits of the desired wavelength range.
-            If not a Quantity, assumed to be in the same unit as
-            ``self.binwave``.
+            If not a Quantity, assumed to be in Angstrom.
 
         kwargs : dict
             Keywords accepted by :func:`synphot.binning.pixel_range`.
 
         Returns
         -------
-        npix : number
+        npix : int
             Number of pixels.
 
-        Raises
-        ------
-        synphot.exceptions.UndefinedBinset
-            Missing binned data.
-
         """
-        self._set_data(True)  # Use binned data
+        x = units.validate_quantity(
+            waverange, self._internal_wave_unit, equivalencies=u.spectral())
+        return binning.pixel_range(self.binset.value, x.value, **kwargs)
 
-        w1 = units.validate_quantity(
-            waverange[0], self._wave.unit, equivalencies=u.spectral())
-        w2 = units.validate_quantity(
-            waverange[-1], self._wave.unit, equivalencies=u.spectral())
-
-        return binning.pixel_range(
-            self._wave.value, (w1.value, w2.value), **kwargs)
-
-    def avgwave(self, binned=False):
-        """Calculate the observation average wavelength using
-        :func:`synphot.utils.avg_wavelength`.
-
-        Parameters
-        ----------
-        binned : bool
-            Use native (default) or binned data.
-
-        Returns
-        -------
-        avg_wave : `astropy.units.quantity.Quantity`
-            Observation average wavelength.
-
-        Raises
-        ------
-        synphot.exceptions.UndefinedBinset
-            Missing binned data.
-
-        """
-        self._set_data(binned)
-        wave = utils.to_length(self._wave)
-        avg_wave = utils.avg_wavelength(wave.value, self._flux.value)
-        return u.Quantity(avg_wave, unit=wave.unit)
-
-    def barlam(self, binned=False):
-        """Calculate the observation mean log wavelength using
-        :func:`synphot.utils.barlam`.
-
-        Parameters
-        ----------
-        binned : bool
-            Use native (default) or binned data.
-
-        Returns
-        -------
-        bar_lam : `astropy.units.quantity.Quantity`
-            Observation mean log wavelength.
-
-        Raises
-        ------
-        synphot.exceptions.UndefinedBinset
-            Missing binned data.
-
-        """
-        self._set_data(binned)
-        wave = utils.to_length(self._wave)
-        bar_lam = utils.barlam(wave.value, self._flux.value)
-        return u.Quantity(bar_lam, unit=wave.unit)
-
-    def effective_wavelength(self, binned=False, mode='efflerg'):
+    def effective_wavelength(self, binned=True, wavelengths=None,
+                             mode='efflerg'):
         """Calculate :ref:`effective wavelength <synphot-formula-effwave>`.
 
         Parameters
         ----------
         binned : bool
-            Use native (default) or binned data.
+            Sample data in native wavelengths if `False`.
+            Else, sample binned data (default).
+
+        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+            Wavelength values for sampling.
+            If not a Quantity, assumed to be in Angstrom.
+            If `None`, ``self.waveset`` or `binset` is used, depending
+            on ``binned``.
 
         mode : {'efflerg', 'efflphot'}
             Flux is first converted to the unit below before calculation:
@@ -396,75 +353,74 @@ class Observation(spectrum.SourceSpectrum):
 
         Returns
         -------
-        eff_lam : `astropy.units.quantity.Quantity`
+        eff_lam : `~astropy.units.quantity.Quantity`
             Observation effective wavelength.
 
         Raises
         ------
-        synphot.exceptions.UndefinedBinset
-            Missing binned data.
-
         synphot.exceptions.SynphotError
             Invalid mode.
 
         """
-        self._set_data(binned)
-
-        # Convert flux to appropriate unit
         mode = mode.lower()
         if mode == 'efflerg':
-            flux = units.convert_flux(
-                self._wave, self._flux, units.FLAM, area=self.primary_area)
+            flux_unit = units.FLAM
         elif mode == 'efflphot':
-            flux = units.convert_flux(
-                self._wave, self._flux, units.PHOTLAM, area=self.primary_area)
+            warnings.warn(
+                'Usage of EFFLPHOT is depreciated.', AstropyUserWarning)
+            flux_unit = units.PHOTLAM
         else:
             raise exceptions.SynphotError(
-                'mode={0} is invalid, must be "efflerg" or '
-                '"efflphot"'.format(mode))
+                'mode must be "efflerg" or "efflphot"')
 
-        wave = utils.to_length(self._wave)
-        num = utils.trapezoid_integration(
-            wave.value, flux.value * wave.value ** 2)
-        den = utils.trapezoid_integration(
-            wave.value, flux.value * wave.value)
+        if binned:
+            x = self._validate_binned_wavelengths(wavelengths).value
+            y = self.sample_binned(wavelengths=x, flux_unit=flux_unit).value
+        else:
+            x = self._validate_wavelengths(wavelengths).value
+            y = units.convert_flux(x, self(x), flux_unit).value
+
+        t = TrapezoidIntegrator()
+        num = t._raw_math(x, y * x ** 2)
+        den = t._raw_math(x, y * x)
 
         if den == 0.0:  # pragma: no cover
             eff_lam = 0.0
         else:
             eff_lam = num / den
 
-        return u.Quantity(eff_lam, unit=wave.unit)
+        return u.Quantity(eff_lam, self._internal_wave_unit)
 
-    def effstim(self, binned=False, flux_unit=None, band=None,
-                vegaspec=None, wave_range=None, force=False):
+    def effstim(self, binned=False, wavelengths=None, flux_unit=units.PHOTLAM,
+                area=None, vegaspec=None, waverange=None, force=False):
         """Calculate :ref:`effective stimulus <synphot-formula-effstim>`.
 
-        Calculations are done with flux in given unit, and wavelengths
+        Calculations are done in given flux unit, and wavelengths
         in Angstrom.
 
         Parameters
         ----------
         binned : bool
-            Use native (default) or binned data.
+            Sample data in native wavelengths if `False` (default).
+            Else, sample binned data.
 
-        flux_unit : `None`, str, or `astropy.units.core.Unit`
-            The unit of effective stimulus. If `None`, uses ``self`` flux unit.
-            COUNT gives result in count/s/area.
+        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+            Wavelength values for sampling.
+            If not a Quantity, assumed to be in Angstrom.
+            If `None`, ``self.waveset`` or `binset` is used, depending
+            on ``binned``.
 
-        band : `~synphot.spectrum.SpectralElement` or `~synphot.analytic.MixinAnalyticPassband`
-            Passband that went into the observation. This is needed
-            unless flux unit is count or OBMAG.
+        flux_unit : str or `~astropy.units.core.Unit`
+            The unit of effective stimulus.
+            COUNT gives result in count/s.
 
-        vegaspec : `synphot.spectrum.SourceSpectrum`
-            Vega spectrum from :func:`SourceSpectrum.from_vega`.
-            This is *only* used if given flux unit is VEGAMAG.
+        area, vegaspec
+            See :func:`~synphot.units.convert_flux`.
 
-        wave_range : tuple of float or `astropy.units.quantity.Quantity`, or `None`
-            Wavelength range (inclusive) for calculations in the
-            form of ``(low, high)``. If not Quantity, assumed to be
-            in the wavelength unit of ``self``. If `None`, the full
-            range is used.
+        waverange : tuple of float, `~astropy.units.quantity.Quantity`, or `None`
+            Lower and upper limits of the desired wavelength range.
+            If not a Quantity, assumed to be in Angstrom.
+            If `None`, the full range is used.
 
         force : bool
             If a wavelength range is given, partial overlap raises
@@ -474,58 +430,82 @@ class Observation(spectrum.SourceSpectrum):
 
         Returns
         -------
-        eff_stim : `astropy.units.quantity.Quantity`
+        eff_stim : `~astropy.units.quantity.Quantity`
             Observation effective stimulus based on given flux unit.
 
         Raises
         ------
         synphot.exceptions.DisjointError
-            Passband or wavelength range does not overlap with observation.
+            Wavelength range does not overlap with observation.
 
         synphot.exceptions.PartialOverlap
-            Passband or wavelength range only partially overlaps with
-            observation.
-
-        synphot.exceptions.UndefinedBinset
-            Missing binned data.
+            Wavelength range only partially overlaps with observation.
 
         synphot.exceptions.SynphotError
-            Missing passband, invalid inputs, or calculation failed.
+            Calculation failed.
 
         """
-        self._set_data(binned)
+        flux_unit = units.validate_unit(flux_unit)
+        flux_unit_name = flux_unit.to_string()
 
-        if flux_unit is None:
-            flux_unit = self._flux.unit
+        # Calculation is actually done in this unit
+        if flux_unit_name == units.OBMAG.to_string():
+            eff_flux_unit = u.count
+        elif flux_unit_name in (units.STMAG.to_string(),
+                                units.VEGAMAG.to_string()):
+            eff_flux_unit = units.FLAM
+        elif flux_unit_name == units.ABMAG.to_string():
+            eff_flux_unit = units.FNU
+        elif flux_unit.decompose() != u.mag:
+            eff_flux_unit = flux_unit
         else:
-            flux_unit = units.validate_unit(flux_unit)
+            raise exceptions.SynphotError(
+                'Flux unit {0} is invalid'.format(flux_unit))
+
+        # Sample the observation
+        if binned:
+            x = self._validate_binned_wavelengths(wavelengths).value
+            y = self.sample_binned(wavelengths=x, flux_unit=eff_flux_unit,
+                                   area=area, vegaspec=vegaspec).value
+        else:
+            x = self._validate_wavelengths(wavelengths).value
+            y = units.convert_flux(x, self(x), eff_flux_unit,
+                                   area=area, vegaspec=vegaspec).value
+
+        # Special flux handling for VEGAMAG
+        if flux_unit_name == units.VEGAMAG.to_string():
+            if not isinstance(vegaspec, SourceSpectrum):
+                raise exceptions.SynphotError('Vega spectrum is missing.')
+            y_vega = units.convert_flux(
+                x, vegaspec(x), eff_flux_unit, area=area).value
+            mask = y_vega > 0  # Avoid NaN
+            x = x[mask]
+            y = y[mask] / y_vega[mask]
 
         # Use entire wavelength range
-        if wave_range is None:
-            inwave = self._wave
-            influx = self._flux
+        if waverange is None:
+            inwave = x
+            influx = y
 
         # Use given wavelength range
         else:
-            w1 = units.validate_quantity(wave_range[0], self._wave.unit,
-                                         equivalencies=u.spectral())
-            w2 = units.validate_quantity(wave_range[-1], self._wave.unit,
-                                         equivalencies=u.spectral())
-            if w1 >= w2:
-                raise exceptions.SynphotError('Invalid wavelength range.')
-
-            stat = utils.overlap_status(
-                np.array([w1.value, w2.value]), self._wave.value)
+            w = units.validate_quantity(waverange, self._internal_wave_unit,
+                                        equivalencies=u.spectral()).value
+            stat = utils.overlap_status(w, x)
+            w1 = w.min()
+            w2 = w.max()
 
             if stat == 'none':
                 raise exceptions.DisjointError(
                     'Observation and wavelength range are disjoint.')
             elif 'partial' in stat:
                 if force:
-                    log.warn('EFFSTIM calculated only for wavelengths in the '
-                             'overlap between observation and given range.')
-                    w1 = max(w1, self._wave.min())
-                    w2 = min(w2, self._wave.max())
+                    warnings.warn(
+                        'EFFSTIM calculated only for wavelengths in the '
+                        'overlap between observation and given range.',
+                        AstropyUserWarning)
+                    w1 = max(w1, x.min())
+                    w2 = min(w2, x.max())
                 else:
                     raise exceptions.PartialOverlap(
                         'Observation and wavelength range do not fully '
@@ -536,92 +516,39 @@ class Observation(spectrum.SourceSpectrum):
                     'Overlap result of {0} is unexpected'.format(stat))
 
             if binned:
-                i1 = np.searchsorted(self.bin_edges, w1) - 1
-                i2 = np.searchsorted(self.bin_edges, w2)
-                inwave = self._wave[i1:i2]
-                influx = self.sample_binned(inwave)
+                if wavelengths is None:
+                    bin_edges = self.bin_edges.value
+                else:
+                    bin_edges = binning.calculate_bin_edges(x).value
+                i1 = np.searchsorted(bin_edges, w1) - 1
+                i2 = np.searchsorted(bin_edges, w2)
+                inwave = x[i1:i2]
+                influx = y[i1:i2]
             else:
-                mask = ((self._wave >= w1) & (self._wave <= w2))
-                inwave = u.Quantity(utils.merge_wavelengths(
-                        self._wave[mask].value,
-                        np.array([w1.value, w2.value])), unit=self._wave.unit)
-                utils.validate_wavelengths(inwave)
-                influx = self.resample(inwave)
-
-        flux_unit_name = flux_unit.to_string()
+                mask = ((x >= w1) & (x <= w2))
+                inwave = x[mask]
+                influx = y[mask]
 
         # Special handling for non-density units
         if flux_unit_name in (u.count.to_string(), units.OBMAG.to_string()):
-            self_flux = units.convert_flux(
-                inwave, influx, u.count, area=self.primary_area)
-            val = self_flux.sum()
-            utils.validate_totalflux(val.value)
+            val = influx.sum()
+            utils.validate_totalflux(val)
 
             if flux_unit.decompose() == u.mag:
-                eff_stim = u.Quantity(
-                    -2.5 * np.log10(val.value), unit=flux_unit)
+                eff_stim = u.Quantity(-2.5 * np.log10(val), flux_unit)
             else:
-                eff_stim = u.Quantity(val.value, u.count / (u.s * units.AREA))
+                eff_stim = u.Quantity(val, u.count / u.s)
 
         # Density flux units and VEGAMAG
         else:
-            # Passband is required and must overlap
-            if isinstance(band, spectrum.SpectralElement):
-                stat = band.check_overlap(self)
-                if stat == 'none':
-                    raise exceptions.DisjointError(
-                        'Observation and passband are disjoint.')
-                elif 'partial' in stat:
-                    raise exceptions.PartialOverlap(
-                        'Observation and passband do not fully overlap.')
-                elif stat != 'full':  # pragma: no cover
-                    raise exceptions.SynphotError(
-                        'Overlap result of {0} is unexpected'.format(stat))
-            elif isinstance(band, analytic.MixinAnalyticPassband):
-                if band.param_dim > 1:
-                    raise exceptions.SynphotError(
-                        'Ambiguous analytic passband with {0} parameter '
-                        'sets.'.format(band.param_dim))
-                band = band.to_spectrum(self.wave)
-            else:
-                raise exceptions.SynphotError('Missing passband data.')
-
-            # Convert wavelengths to Angstrom
-            band_wave = band.wave.to(u.AA, equivalencies=u.spectral())
-            self_wave = inwave.to(u.AA, equivalencies=u.spectral())
-
-            # Convert observation to given flux unit.
-            # For mag, convert to corresponding linear flux unit.
-            if flux_unit_name in (units.STMAG.to_string(),
-                                  units.VEGAMAG.to_string()):
-                tmp_unit = units.FLAM
-            elif flux_unit_name == units.ABMAG.to_string():
-                tmp_unit = units.FNU
-            elif flux_unit.decompose() != u.mag:
-                tmp_unit = flux_unit
-            else:
-                raise exceptions.SynphotError(
-                    'Flux unit {0} is invalid'.format(flux_unit))
-
-            self_flux = units.convert_flux(
-                self_wave, influx, tmp_unit, area=self.primary_area)
-
-            if flux_unit_name == units.VEGAMAG.to_string():
-                if not isinstance(vegaspec, spectrum.SourceSpectrum):
-                    raise exceptions.SynphotError(
-                        'Vega spectrum is missing.')
-                vega_flux = units.convert_flux(
-                    self_wave, vegaspec.resample(self_wave), tmp_unit,
-                    area=self.primary_area, vegaspec=None)
-                flux = self_flux.value / vega_flux.value
-            else:
-                flux = self_flux.value
+            # Sample the bandpass
+            x_band = self.bandpass._validate_wavelengths(wavelengths).value
+            y_band = self.bandpass(x_band).value
 
             # Integrate
-            num = utils.trapezoid_integration(
-                self_wave.value, self_wave.value * flux)
-            den = utils.trapezoid_integration(
-                band_wave.value, band_wave.value * band.thru.value)
+            t = TrapezoidIntegrator()
+            num = t._raw_math(inwave, inwave * influx)
+            den = t._raw_math(x_band, x_band * y_band)
             utils.validate_totalflux(num)
             utils.validate_totalflux(den)
             val = num / den
@@ -630,250 +557,118 @@ class Observation(spectrum.SourceSpectrum):
             if flux_unit_name in (units.STMAG.to_string(),
                                   units.ABMAG.to_string()):
                 eff_stim = units.convert_flux(
-                    1, u.Quantity(val, unit=tmp_unit), flux_unit)
+                    1, u.Quantity(val, eff_flux_unit), flux_unit)
             elif flux_unit_name == units.VEGAMAG.to_string():
-                eff_stim = u.Quantity(-2.5 * np.log10(val), unit=flux_unit)
+                eff_stim = u.Quantity(-2.5 * np.log10(val), flux_unit)
             else:
-                eff_stim = u.Quantity(val, unit=flux_unit)
+                eff_stim = u.Quantity(val, flux_unit)
 
         return eff_stim
 
-    def countrate(self, binned=True, wave_range=None, force=False):
+    def countrate(self, area, binned=True, wavelengths=None, waverange=None,
+                  force=False):
         """Calculate :ref:`effective stimulus <synphot-formula-effstim>`
-        in counts.
+        in count/s.
 
         Parameters
         ----------
-        binned, wave_range, force
+        area : float or `~astropy.units.quantity.Quantity`
+            Area that flux covers. If not a Quantity, assumed to be in
+            :math:`cm^{2}`.
+
+        binned : bool
+            Sample data in native wavelengths if `False`.
+            Else, sample binned data (default).
+
+        wavelengths, waverange, force
             See :func:`effstim`.
 
         Returns
         -------
-        eff_stim : `astropy.units.quantity.Quantity`
-            Effective stimulus in count/s/area.
+        eff_stim : `~astropy.units.quantity.Quantity`
+            Observation effective stimulus in count/s.
 
         """
-        return self.effstim(binned=binned, flux_unit=u.count, band=None,
-                            vegaspec=None, wave_range=wave_range, force=force)
+        return self.effstim(
+            binned=binned, wavelengths=wavelengths, flux_unit=u.count,
+            area=area, waverange=waverange, force=force)
 
-    def to_fits(self, filename, binned=True, **kwargs):
-        """Write the spectrum to a FITS file.
+    def plot(self, binned=True, wavelengths=None, flux_unit=units.PHOTLAM,
+             area=None, vegaspec=None, **kwargs):  # pragma: no cover
+        """Plot the observation.
+
+        .. note:: Uses ``matplotlib``.
 
         Parameters
         ----------
-        filename : str
-            Output filename.
-
         binned : bool
-            Write out data in native wavelengths if `False`.
-            Else, write binned data (default).
+            Plot data in native wavelengths if `False`.
+            Else, plot binned data (default).
+
+        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+            Wavelength values for sampling.
+            If not a Quantity, assumed to be in Angstrom.
+            If `None`, ``self.waveset`` or `binset` is used, depending
+            on ``binned``.
+
+        flux_unit : str or `~astropy.units.core.Unit`
+            Flux is converted to this unit for plotting.
+
+        area, vegaspec
+            See :func:`~synphot.units.convert_flux`.
 
         kwargs : dict
-            Keywords accepted by :func:`synphot.specio.write_fits_spec`.
+            See :func:`synphot.spectrum.BaseSpectrum.plot`.
 
         Raises
         ------
-        synphot.exceptions.UndefinedBinset
-            Missing binned data.
-
-        """
-        self._set_data(binned)
-
-        # There are some standard keywords that should be added
-        # to the extension header.
-        bkeys = {
-            'expr': (str(self), 'synphot expression'),
-            'binned': binned,
-            'tdisp1': 'G15.7',
-            'tdisp2': 'G15.7' }
-
-        if 'ext_header' in kwargs:
-            kwargs['ext_header'].update(bkeys)
-        else:
-            kwargs['ext_header'] = bkeys
-
-        specio.write_fits_spec(filename, self._wave, self._flux, **kwargs)
-
-    @classmethod
-    def from_spec_band(cls, spec, band, binwave=None, force='none'):
-        """Create an Observation from given source spectrum and passband.
-
-        By default, it is required that the spectrum and passband fully
-        overlap. Partial overlap will raise an error in the absence of the
-        ``force`` keyword. If they do not overlap at all, an error
-        is raised regardless.
-
-        **Handling of Analytic Spectrum**
-
-        If one of the input spectra is analytic, it is sampled at the
-        wavelengths of the non-analytic component. If both are analytic,
-        they are sampled at ``binwave`` and raise an exception if
-        ``binwave`` is undefined.
-
-        To create a purely analytic "observation", one can use
-        composite analytic spectrum in `synphot.analytic`, which will
-        be implemented when `astropy.modeling` has the adequate
-        composite model(s). From there, one can convert it to
-        Observation at the time of sampling.
-
-        Observation currently does not support analytic spectra with
-        multiple parameter sets.
-
-        Parameters
-        ----------
-        spec : `~synphot.spectrum.SourceSpectrum`, `~synphot.analytic.MixinAnalyticFlamSource`, or `~synphot.analytic.MixinAnalyticSource`
-            Source spectrum.
-
-        band : `~synphot.spectrum.SpectralElement` or `~synphot.analytic.MixinAnalyticPassband`
-            Passband.
-
-        binwave : `None`, array_like, or `astropy.units.quantity.Quantity`
-            Center of binned wavelengths. If `None`, ``spec.wave`` is used
-            (or ``band.wave`` if source spectrum is analytic).
-            If array is given but not a Quantity, assumed to have the same
-            unit as source spectrum (or passband if source spectrum is
-            analytic).
-
-        force : {'none', 'extrap', 'taper'}
-            Force creation of an Observation even when source spectrum
-            and passband do not fully overlap:
-
-                * 'none' - Source must encompass passband (default)
-                * 'extrap' - Extrapolate source spectrum
-                * 'taper' - Taper source spectrum
-
-        Returns
-        -------
-        obspec : obj
-            Observation spectrum.
-
-        Raises
-        ------
-        synphot.exceptions.DisjointError
-            Passband does not overlap with source spectrum.
-
-        synphot.exceptions.PartialOverlap
-            Passband only partially overlaps with source spectrum
-            when they must fully overlap.
-
         synphot.exceptions.SynphotError
             Invalid inputs.
 
         """
-        if isinstance(spec, (analytic.MixinAnalyticFlamSource,
-                             analytic.MixinAnalyticSource)):
-            if spec.param_dim > 1:
-                raise exceptions.SynphotError(
-                    'Ambiguous analytic source spectrum with {0} parameter '
-                    'sets.'.format(spec.param_dim))
-        elif not isinstance(spec, spectrum.SourceSpectrum):
-            raise exceptions.SynphotError('Invalid source spectrum')
-
-        if isinstance(band, analytic.MixinAnalyticPassband):
-            if band.param_dim > 1:
-                raise exceptions.SynphotError(
-                    'Ambiguous analytic passband with {0} parameter '
-                    'sets.'.format(band.param_dim))
-        elif not isinstance(band, spectrum.SpectralElement):
-            raise exceptions.SynphotError('Invalid passband')
-
-        # Both spectra are analytic
-        if (isinstance(spec, analytic.BaseMixinAnalytic) and
-                isinstance(band, analytic.BaseMixinAnalytic)):
-            if binwave is None:
-                raise exceptions.SynphotError('No wavelengths for sampling.')
-            spec = spec.to_spectrum(binwave)
-            band = band.to_spectrum(binwave)
-            warn = {}
-            log.info('Observation wavelengths are taken from binwave.')
-
-        # Source spectrum is analytic
-        elif isinstance(spec, analytic.BaseMixinAnalytic):
-            spec = spec.to_spectrum(band.wave)
-            warn = deepcopy(band.warnings)
-            if binwave is None:
-                binwave = band.wave
-                log.info('Observation binned wavelength centers will be '
-                         'taken from passband wavelengths.')
-
-        # Passband is analytic
-        elif isinstance(band, analytic.BaseMixinAnalytic):
-            band = band.to_spectrum(spec.wave)
-            warn = deepcopy(spec.warnings)
-            if binwave is None:
-                binwave = spec.wave
-                log.info('Observation binned wavelength centers will be '
-                         'taken from source spectrum wavelengths.')
-
-        # No analytic
+        if binned:
+            w, y = self._get_binned_arrays(wavelengths, flux_unit, area=area,
+                                           vegaspec=vegaspec)
         else:
-            if binwave is None:
-                binwave = spec.wave
-                log.info('Observation binned wavelength centers will be '
-                         'taken from source spectrum wavelengths.')
+            w, y = self._get_arrays(wavelengths, flux_unit, area=area,
+                                    vegaspec=vegaspec)
+        self._do_plot(w, y, **kwargs)
 
-            # Inherit warnings, with source spectrum having higher priority
-            warn = deepcopy(band.warnings)
-            warn.update(spec.warnings)
+    def as_spectrum(self, binned=True, wavelengths=None):
+        """Reduce the observation to an empirical source spectrum.
 
-            # Validate overlap
-            force = force.lower()
-            stat = band.check_overlap(spec)
+        An observation is a complex object with some restrictions
+        on its capabilities. At times, it would be useful to work
+        with the observation as a simple object that is easier to
+        manipulate and takes up less memory.
 
-            if stat == 'none':
-                raise exceptions.DisjointError(
-                    'Source spectrum and passband are disjoint.')
-            elif 'partial' in stat:
-                if force == 'none':
-                    raise exceptions.PartialOverlap(
-                        'Source spectrum and passband do not fully overlap. '
-                        'You may use force=[extrap|taper] to force this '
-                        'Observation anyway.')
-                elif force == 'taper':
-                    spec = deepcopy(spec)  # Avoid modifying input
-                    spec.taper()
-                    msg = 'Source spectrum is tapered.'
-                    log.warn(msg)
-                    warn['PartialOverlap'] = msg
-                elif force.startswith('extrap'):
-                    msg = ('Source spectrum will be extrapolated at ' +
-                           'constant value.')
-                    log.warn(msg)
-                    warn['PartialOverlap'] = msg
-                else:
-                    raise exceptions.SynphotError(
-                        'force={0} is invalid, must be "none", "taper", '
-                        'or "extrap"'.format(force))
-            elif stat != 'full':  # pragma: no cover
-                raise exceptions.SynphotError(
-                    'Overlap result of {0} is unexpected'.format(stat))
-
-        mulspec = spec * band
-        header = {'expr': '{0} * {1}'.format(str(spec), str(band))}
-
-        # Inherit primary area and set warning
-        obspec = cls(mulspec.wave, mulspec.flux, binwave=binwave,
-                     area=mulspec.primary_area, header=header)
-        obspec.warnings.update(warn)
-
-        return obspec
-
-    def plot(self, **kwargs):  # pragma: no cover
-        """Plot the observation.
-
-        .. note:: Uses :mod:`matplotlib`.
+        This is also useful for writing an observation as sampled
+        spectrum out to a FITS file.
 
         Parameters
         ----------
-        kwargs : dict
-            Keywords accepted by :func:`synphot.spectrum.BaseSpectrum.plot`,
-            *except* ``overplot_data`` and ``data_labels``.
+        binned : bool
+            Write out data in native wavelengths if `False`.
+            Else, write binned data (default).
+
+        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+            Wavelength values for sampling.
+            If not a Quantity, assumed to be in Angstrom.
+            If `None`, ``self.waveset`` or `binset` is used, depending
+            on ``binned``.
+
+        Returns
+        -------
+        sp : `~synphot.spectrum.SourceSpectrum`
+            Empirical source spectrum.
 
         """
-        for key in ('overplot_data', 'data_labels'):
-            if key in kwargs:
-                del kwargs[key]
+        if binned:
+            w, y = self._get_binned_arrays(
+                wavelengths, self._internal_flux_unit)
+        else:
+            w, y = self._get_arrays(wavelengths, self._internal_flux_unit)
 
-        super(Observation, self).plot(
-            overplot_data=(self.binwave.value, self.binflux.value),
-            data_labels=('Native dataset', 'Binned dataset'), **kwargs)
+        return SourceSpectrum(
+            Empirical1D, x=w, y=y,
+            metadata={'observation': str(self), 'binned': binned})

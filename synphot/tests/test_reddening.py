@@ -1,10 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Test reddening.py module.
-
-Inherited methods from BaseUnitlessSpectrum are already tested in
-test_spectrum.py under SpectralElement, so not tested here.
-
-"""
+"""Test reddening.py module."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 # STDLIB
@@ -22,129 +17,82 @@ from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import analytic, spectrum, exceptions, units
+from .. import exceptions, units
+from ..models import ConstFlux1D, Empirical1D
 from ..reddening import ReddeningLaw, ExtinctionCurve
-
-
-# HST primary mirror
-_area = u.Quantity(45238.93416, units.AREA)
+from ..spectrum import SourceSpectrum
 
 
 class TestExtinction(object):
     """Test ReddeningLaw and ExtinctionCurve classes (most methods)."""
     def setup_class(self):
-        self.redlaw = ReddeningLaw.from_file(get_pkg_data_filename(
-                os.path.join('data', 'milkyway_diffuse_001.fits')), area=_area)
-        self.ebv = u.Quantity(0.3, u.mag)
-        self.extcurve = ExtinctionCurve.from_reddening_law(
-            self.redlaw, self.ebv)
+        rfile = get_pkg_data_filename(
+            os.path.join('data', 'milkyway_diffuse_001.fits'))
+        self.redlaw = ReddeningLaw.from_file(rfile)
+        self.extcurve = self.redlaw.extinction_curve(0.3 * u.mag)
 
-    def test_instance(self):
-        assert isinstance(self.redlaw, ReddeningLaw)
-        assert isinstance(self.redlaw, spectrum.BaseUnitlessSpectrum)
+    def test_invalid_ebv(self):
+        with pytest.raises(exceptions.SynphotError):
+            extcurve = self.redlaw.extinction_curve(1 * units.FLAM)
 
-        assert isinstance(self.extcurve, ExtinctionCurve)
-        assert isinstance(self.extcurve, spectrum.BaseUnitlessSpectrum)
-
-    def test_redlaw_attributes(self):
+    def test_redlaw_call(self):
+        w = self.redlaw.waveset[48:53]
         np.testing.assert_allclose(
-            self.redlaw.wave.value[48:53],
+            w.to(u.micron ** -1, u.spectral()).value,
             [5.03399992, 5.12949991, 5.2249999, 5.3204999, 5.41599989])
         np.testing.assert_allclose(
-            self.redlaw.thru.value[48:53],
+            self.redlaw(w).value,
             [8.69231796, 8.40150452, 8.17892265, 8.01734924, 7.90572977])
-        assert self.redlaw.wave.unit == u.micron ** -1
-        assert self.redlaw.thru.unit == units.THROUGHPUT
-        assert self.redlaw.thru is self.redlaw.flux
-        assert self.redlaw.metadata['SHORTNM'] == 'MWAvg'
 
-    def test_extcurve_attributes(self):
-        np.testing.assert_array_equal(
-            self.extcurve.wave.value, self.redlaw.wave.value)
-        np.testing.assert_allclose(
-            self.extcurve.thru.value,
-            10 ** (-0.4 * self.redlaw.thru.value * self.ebv.value))
-        assert self.extcurve.wave.unit == self.redlaw.wave.unit
-        assert self.extcurve.thru.unit == units.THROUGHPUT
-        assert self.extcurve.thru is self.extcurve.flux
-        assert self.extcurve.primary_area.value == _area.value
-        assert 'ExtinctionCurve' in self.extcurve.metadata['expr']
+    def test_extcurve_call(self):
+        w = self.extcurve.waveset
+        y = self.extcurve(w)
+        np.testing.assert_array_equal(w, self.redlaw.waveset)
+        np.testing.assert_allclose(y, 10 ** (-0.4 * self.redlaw(w) * 0.3))
 
-        # E(B-V) as float instead of Quantity
-        extcurve = ExtinctionCurve.from_reddening_law(
-            self.redlaw, self.ebv.value)
-        np.testing.assert_allclose(
-            self.extcurve.thru.value, extcurve.thru.value)
-
-    @pytest.mark.parametrize(('op_type'), ['*', '/'])
-    def test_muldiv_sp(self, op_type):
+    def test_mul_spec(self):
         """Apply extinction curve in inverse micron to flat spectrum in
         Angstrom.
 
         """
-        flat = analytic.flat_spectrum(units.FLAM, area=_area)
-        sp = flat.to_spectrum([1000.0])
-        ans = self.extcurve.resample(5.03399992)
-
-        if op_type == '*':
-            ex_sp = self.extcurve * sp
-        elif op_type == '/':
-            ex_sp = sp / self.extcurve
-            ans = 1 / ans
-
-        np.testing.assert_allclose(
-            ex_sp.resample(1986.491886952592).value, ans, rtol=1e-6)
-
-    def test_redlaw_exceptions(self):
-        # Invalid R(V)
-        with pytest.raises(exceptions.SynphotError):
-            redlaw = ReddeningLaw([1000, 2000], u.Quantity([1, 1], units.FLAM))
-
-        # Invalid reddening law model
-        with pytest.raises(exceptions.SynphotError):
-            redlaw = ReddeningLaw.from_model('foo')
-
-    def test_extcurve_exceptions(self):
-        # Invalid reddening law
-        with pytest.raises(exceptions.SynphotError):
-            extcurve = ExtinctionCurve.from_reddening_law(np.ones(10), self.ebv)
-
-        # Invalid E(B-V)
-        with pytest.raises(exceptions.SynphotError):
-            extcurve = ExtinctionCurve.from_reddening_law(self.redlaw, [1,2])
-        with pytest.raises(exceptions.SynphotError):
-            extcurve = ExtinctionCurve.from_reddening_law(
-                self.redlaw, u.Quantity(1, units.FLAM))
+        sp = SourceSpectrum(ConstFlux1D, amplitude=1)
+        sp2 = self.extcurve * sp
+        w = u.Quantity(5.03399992, u.micron ** -1)
+        ans = self.extcurve(w).value
+        np.testing.assert_allclose(sp2(w).value, ans, rtol=1e-6)
 
 
 @remote_data
 @pytest.mark.parametrize(
-    ('modelname'),
+    'modelname',
     ['lmc30dor', 'lmcavg', 'mwavg', 'mwdense', 'mwrv21', 'mwrv40',
      'smcbar', 'xgalsb'])
 def test_redlaw_from_model(modelname):
-    """Test ReddeningLaw.from_model() method.
+    """Test ReddeningLaw from remote file.
 
-    .. note:: No check on data quality as it is dependent on remote file.
+    .. note:: No check on data quality as it is dependent on data file.
 
     """
-    redlaw = ReddeningLaw.from_model(modelname, encoding='binary')
-    wave = redlaw.wave.to(u.AA, equivalencies=u.spectral())
-    assert redlaw.thru.unit == units.THROUGHPUT
+    redlaw = ReddeningLaw.from_extinction_model(modelname, encoding='binary')
     assert modelname in redlaw.metadata['expr']
     assert 'filename' in redlaw.metadata
     assert 'descrip' in redlaw.metadata
 
 
+def test_redlaw_from_model_exception():
+    with pytest.raises(exceptions.SynphotError):
+        redlaw = ReddeningLaw.from_extinction_model('foo')
+
+
 class TestWriteReddeningLaw(object):
-    """Test ReddeningLaw.to_fits() method."""
+    """Test ReddeningLaw ``to_fits()`` method."""
     def setup_class(self):
         self.outdir = tempfile.mkdtemp()
-        self.wave = np.arange(1000, 5001, 1000, dtype=np.float64)
-        self.thru = np.arange(0.1, 0.51, 0.1)
-        self.redlaw = ReddeningLaw(self.wave, self.thru)
+        self.x = np.linspace(1000, 5000, 5)
+        self.y = np.linspace(1, 5, 5) * 0.1
+        self.redlaw = ReddeningLaw(Empirical1D, x=self.x, y=self.y)
 
-    @pytest.mark.parametrize(('ext_hdr'), [None, {'foo': 'foo'}])
+    @pytest.mark.parametrize('ext_hdr', [None, {'foo': 'foo'}])
     def test_write(self, ext_hdr):
         outfile = os.path.join(self.outdir, 'outredlaw.fits')
 
@@ -155,15 +103,11 @@ class TestWriteReddeningLaw(object):
 
         # Read it back in and check
         redlaw2 = ReddeningLaw.from_file(outfile)
-        np.testing.assert_allclose(redlaw2.wave.value, self.wave)
-        np.testing.assert_allclose(redlaw2.thru.value, self.thru)
-        assert redlaw2.thru is redlaw2.flux
-        assert redlaw2.wave.unit == u.AA
-        assert redlaw2.thru.unit == units.THROUGHPUT
+        np.testing.assert_allclose(redlaw2.waveset.value, self.x)
+        np.testing.assert_allclose(redlaw2(self.x).value, self.y)
 
-        hdr = fits.getheader(outfile, 1)
-        assert 'expr' in hdr
         if ext_hdr is not None:
+            hdr = fits.getheader(outfile, 1)
             assert 'foo' in hdr
 
     def teardown_class(self):

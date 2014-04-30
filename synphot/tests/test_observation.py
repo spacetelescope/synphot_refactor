@@ -4,57 +4,87 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 # STDLIB
 import os
-import shutil
-import tempfile
 
 # THIRD-PARTY
 import numpy as np
 
 # ASTROPY
 from astropy import units as u
-from astropy.io import fits
+#from astropy.modeling import models
 from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
+# STSCI
+from modeling import models
+
 # LOCAL
-from .. import analytic, spectrum, exceptions, units
+from .test_units import _area
+from .. import exceptions, units
+from ..models import ConstFlux1D, Empirical1D
 from ..observation import Observation
+from ..spectrum import SourceSpectrum, SpectralElement
 
 
-# HST primary mirror
-_area = u.Quantity(45238.93416, units.AREA)
-
-# Test data files
+# Global test data files
+_specfile = get_pkg_data_filename(
+    os.path.join('data', 'grw_70d5824_stisnic_005.fits'))
 _bandfile = get_pkg_data_filename(
     os.path.join('data', 'hst_acs_hrc_f555w.fits'))
-_specfile = get_pkg_data_filename(
-    os.path.join('data', 'hst_acs_hrc_f555w_x_grw70d5824.fits'))
 
 
 class TestObservation(object):
     """Test Observation (most of them)."""
     def setup_class(self):
-        """Source spectrum is analytic."""
-        self.flat_sp = analytic.flat_spectrum(units.FLAM, area=_area)
-        self.bp = spectrum.SpectralElement.from_file(_bandfile, area=_area)
-        self.binwave = np.arange(1000, 11001, dtype=np.float64)
-        self.obs = Observation.from_spec_band(
-            self.flat_sp, self.bp, binwave=self.binwave)
+        sp = SourceSpectrum(
+            ConstFlux1D, amplitude=u.Quantity(1, units.FLAM),
+            metadata={'warnings': {'w1': 'spec warn', 'w2': 'foo'}})
+        bp = SpectralElement.from_file(_bandfile)
+        bp.metadata['warnings'] = {'w1': 'band warn'}
+        w = np.arange(1000, 11001, dtype=np.float64)
+        self.obs = Observation(sp, bp, binset=w)
 
-    def test_instance(self):
-        assert isinstance(self.obs, Observation)
-        assert isinstance(self.obs, spectrum.SourceSpectrum)
+    def test_invalid_input_spec(self):
+        with pytest.raises(exceptions.SynphotError):
+            obs2 = Observation(self.obs.bandpass, self.obs.bandpass)
+        with pytest.raises(exceptions.SynphotError):
+            obs2 = Observation(self.obs.spectrum, self.obs.spectrum)
+
+    def test_inherit_warnings(self):
+        assert sorted(self.obs.warnings) == ['w1', 'w2']
+        assert self.obs.warnings['w1'] == 'band warn'
+
+    def test_disjoint_spec(self):
+        """The rest of overlap logic is tested in `TestInitWithForce`."""
+        sp = SourceSpectrum(
+            Empirical1D, x=[39999.9, 40000, 40001, 40001.1], y=[0, 1, 1, 0])
+        with pytest.raises(exceptions.DisjointError):
+            obs2 = Observation(sp, self.obs.bandpass)
+
+    def test_taper(self):
+        with pytest.raises(NotImplementedError):
+            obs2 = self.obs.taper()
 
     def test_binned_data(self):
         # Binned flux
-        np.testing.assert_array_equal(self.obs.binflux.value[:10], 0)
+        np.testing.assert_array_equal(self.obs.binflux[:10], 0)
+        np.testing.assert_array_equal(self.obs.binflux[-10:], 0)
         np.testing.assert_allclose(
-            self.obs.binflux.value[5000:5010],
+            self.obs.sample_binned(wavelengths=self.obs.binset[5000:5010],
+                                   flux_unit=units.FLAM).value,
             [0.12265425, 0.12226972, 0.12184207, 0.12141429, 0.12098646,
              0.1205586, 0.1201307, 0.11970269, 0.11927488, 0.11884699],
             rtol=1e-4)
-        np.testing.assert_array_equal(self.obs.binflux.value[-10:], 0)
-        assert self.obs.binflux.unit == self.obs.flux.unit
+
+        # Binned wave and flux
+        w, y = self.obs._get_binned_arrays(
+            [599.9999999999, 600.4, 600.9] * u.nm, units.FLAM)
+        np.testing.assert_allclose(w.value, [600, 600.4, 600.9])
+        np.testing.assert_allclose(
+            y.value, [0.12265425, 0.12098646, 0.11884699], rtol=1e-4)
+
+        w, y = self.obs._get_binned_arrays(None, units.PHOTLAM)
+        np.testing.assert_array_equal(w, self.obs.binset)
+        np.testing.assert_array_equal(y, self.obs.binflux)
 
         # Bin edges
         np.testing.assert_array_equal(
@@ -69,308 +99,200 @@ class TestObservation(object):
             self.obs.bin_edges.value[-10:],
             [10991.5, 10992.5, 10993.5, 10994.5, 10995.5, 10996.5, 10997.5,
              10998.5, 10999.5, 11000.5])
-        assert self.obs.bin_edges.unit == self.obs.wave.unit
-        assert self.obs.bin_edges.unit == self.obs.binwave.unit
 
-    def test_binspec_reversed_binwave(self):
-        obs = Observation.from_spec_band(
-            self.flat_sp, self.bp, binwave=self.binwave[::-1])
-        np.testing.assert_array_equal(
-            obs.binflux.value, self.obs.binflux.value)
-        np.testing.assert_array_equal(
-            obs.binwave.value, self.obs.binwave.value)
-        np.testing.assert_array_equal(
-            obs.bin_edges.value, self.obs.bin_edges.value)
-        assert obs.binflux.unit == self.obs.binflux.unit
-        assert obs.bin_edges.unit == obs.binwave.unit == self.obs.binwave.unit
+    def test_reversed_binset(self):
+        obs2 = Observation(
+            self.obs.spectrum, self.obs.bandpass, binset=self.obs.binset[::-1])
+        np.testing.assert_array_equal(obs2.binset, self.obs.binset)
+        np.testing.assert_array_equal(obs2.binflux, self.obs.binflux)
+        np.testing.assert_array_equal(obs2.bin_edges, self.obs.bin_edges)
 
-    @pytest.mark.parametrize(('binned'), [True, False])
-    def test_set_data(self, binned):
-        self.obs._set_data(binned)
-
-        if binned:
-            ans_wave = self.obs.binwave
-            ans_flux = self.obs.binflux
-        else:
-            ans_wave = self.obs.wave
-            ans_flux = self.obs.flux
-
-        np.testing.assert_array_equal(self.obs._wave.value, ans_wave.value)
-        np.testing.assert_array_equal(self.obs._flux.value, ans_flux.value)
-        assert self.obs._wave.unit == ans_wave.unit
-        assert self.obs._flux.unit == ans_flux.unit
-
-    def test_redshift(self):
-        """This method is disabled."""
-        with pytest.raises(NotImplementedError):
-            new_obs = self.obs.apply_redshift(0.5)
-
-    def test_convert_flux(self):
-        old_flux = self.obs.flux.copy()
-        old_binflux = self.obs.binflux.copy()
-
-        self.obs.convert_flux(units.PHOTNU)
-        np.testing.assert_allclose(
-            self.obs.flux.value[4500], 0.63565744706778005)
-        np.testing.assert_allclose(
-            self.obs.binflux.value[4000], 0.4870874388526275)
-        np.testing.assert_array_equal(self.obs._flux.value, self.obs.flux.value)
-        assert self.obs.flux.unit == self.obs.binflux.unit == units.PHOTNU
-
-        # Convert back to original unit
-        self.obs.convert_flux(old_flux.unit)
-        np.testing.assert_allclose(self.obs.flux.value, old_flux.value)
-        np.testing.assert_allclose(self.obs.binflux.value, old_binflux.value)
-
-    def test_sampled_binned(self):
-        flux = self.obs.sample_binned([6000, 6004, 6009])
-        np.testing.assert_allclose(
-            flux.value, [0.12265425, 0.12098646, 0.11884699], rtol=1e-4)
-        assert flux.unit == self.obs.binflux.unit
-
+    def test_sampled_binned_exceptions(self):
         with pytest.raises(exceptions.InterpolationNotAllowed):
-            flux = self.obs.sample_binned([6000, 6004.5, 6009])
-
+            y = self.obs.sample_binned([6000, 6004.5, 6009])
         with pytest.raises(exceptions.UnsortedWavelength):
-            flux = self.obs.sample_binned([6004, 6000, 6009])
+            y = self.obs.sample_binned([6004, 6000, 6009])
 
     @pytest.mark.parametrize(
-        ('cenwave', 'ans_w1', 'ans_w2'),
-        [(u.Quantity(500, u.nm),
-          u.Quantity(499.9, u.nm), u.Quantity(500.1, u.nm)),
-         (5000, u.Quantity(4999, u.AA), u.Quantity(5001, u.AA))])
-    def test_wave_range(self, cenwave, ans_w1, ans_w2):
-        w1, w2 = self.obs.wave_range(cenwave, 2, mode='none')
-        np.testing.assert_allclose(w1.value, ans_w1.value)
-        np.testing.assert_allclose(w2.value, ans_w2.value)
-        assert w1.unit == ans_w1.unit
-        assert w2.unit == ans_w2.unit
+        ('cenwave', 'ans'),
+        [(500 * u.nm, [499.9, 500.1] * u.nm),
+         (5000, [4999, 5001] * u.AA)])
+    def test_binned_waverange(self, cenwave, ans):
+        w = self.obs.binned_waverange(cenwave, 2, mode='none')
+        np.testing.assert_allclose(w, ans)
 
-    def test_pixel_range(self):
-        npix = self.obs.pixel_range(
-            [u.Quantity(499.95, u.nm), u.Quantity(500.05, u.nm)], mode='round')
-        assert npix == 1
+    def test_binned_pixelrange(self):
+        w = [499.95, 500.05] * u.nm
+        assert self.obs.binned_pixelrange(w, mode='round') == 1
 
-    def test_from_spec_band_default_binwave(self):
-        obs = Observation.from_spec_band(self.flat_sp, self.bp)
-        np.testing.assert_array_equal(
-            obs.binwave.value, self.bp.wave.value)
-        assert obs.binwave.unit == self.bp.wave.unit
+    def test_default_binset_from_bandpass(self):
+        obs2 = Observation(self.obs.spectrum, self.obs.bandpass)
+        np.testing.assert_array_equal(obs2.binset, self.obs.bandpass.waveset)
 
-    def test_from_spec_band_analytic_all(self):
-        obs = Observation.from_spec_band(
-            self.flat_sp, analytic.Box1DSpectrum(1, 5000, 100, area=_area),
-            binwave=self.binwave)
-        np.testing.assert_array_equal(obs.wave.value, obs.binwave.value)
+    def test_default_binset_from_spectrum(self):
+        sp = SourceSpectrum.from_gaussian(1, 5000, 10)
+        bp = SpectralElement(models.Const1D, amplitude=1)
+        obs2 = Observation(sp, bp, force='extrap')
+        np.testing.assert_array_equal(obs2.binset, sp.waveset)
 
-    def test_from_spec_band_analytic_band(self):
-        sp = self.flat_sp.to_spectrum(self.binwave)
-        obs = Observation.from_spec_band(
-            sp, analytic.Box1DSpectrum(1, 5000, 100, area=_area))
-        np.testing.assert_array_equal(obs.wave.value, obs.binwave.value)
+    def test_undefined_binset(self):
+        bp = SpectralElement(models.Const1D, amplitude=1)
+        with pytest.raises(exceptions.UndefinedBinset):
+            obs2 = Observation(self.obs.spectrum, bp)
 
-    def test_from_spec_band_analytic_none(self):
-        sp = self.flat_sp.to_spectrum(self.binwave)
-        sp.warnings = {'foo': 'foo'}
-        obs = Observation.from_spec_band(sp, self.bp)
-        np.testing.assert_array_equal(obs.binwave.value, sp.wave.value)
-        assert 'foo' in obs.warnings
+    def test_as_spectrum(self):
+        w = np.arange(6000, 6005)
+        sp1 = self.obs.as_spectrum(binned=True, wavelengths=w)  # Binned
+        sp2 = self.obs.as_spectrum(binned=False, wavelengths=w)  # Sampled
+        np.testing.assert_allclose(
+            sp1(sp1.waveset), sp2(sp2.waveset), rtol=1e-3)
 
-    def test_from_spec_band_exceptions(self):
-        """The rest of overlap checks are in `TestFromSpecBandForce`."""
-        # Invalid input classes
+
+class TestInitWithForce(object):
+    """Test forced initialization."""
+    def setup_class(self):
+        x = np.arange(3000, 4000)
+        y = np.ones_like(x) * 0.75
+        self.sp = SourceSpectrum(
+            Empirical1D, x=x, y=y, metadata={'expr': 'short flat'})
+        self.bp = SpectralElement(
+            Empirical1D, x=[3949.9, 3950, 4050, 4050.1], y=[0, 1, 1, 0])
+
+    @pytest.mark.parametrize(
+        ('force_type', 'ans'),
+        [('taper', 0),
+         ('extrap', 0.75)])
+    def test_force(self, force_type, ans):
+        obs = Observation(self.sp, self.bp, force=force_type)
+        assert obs(4005).value == ans
+        assert force_type in obs.warnings['PartialOverlap']
+
+    def test_exceptions(self):
+        with pytest.raises(exceptions.PartialOverlap):
+            obs = Observation(self.sp, self.bp)
         with pytest.raises(exceptions.SynphotError):
-            obs = Observation.from_spec_band(self.bp, self.bp)
-        with pytest.raises(exceptions.SynphotError):
-            obs = Observation.from_spec_band(self.flat_sp, self.flat_sp)
-
-        # Ambiguous analytic spectra
-        with pytest.raises(exceptions.SynphotError):
-            obs = Observation.from_spec_band(
-                analytic.Const1DSpectrum([1, 0.5], area=_area), self.bp)
-        with pytest.raises(exceptions.SynphotError):
-            obs = Observation.from_spec_band(
-                self.flat_sp, analytic.Box1DSpectrum(
-                    [1, 1], [5000, 5500], [100, 50], area=_area))
-
-        # Pure analytic inputs without binwave
-        with pytest.raises(exceptions.SynphotError):
-            obs = Observation.from_spec_band(
-                self.flat_sp, analytic.Box1DSpectrum(1, 5000, 100, area=_area))
-
-        # Disjoint passband
-        with pytest.raises(exceptions.DisjointError):
-            sp = spectrum.SourceSpectrum(
-                [39999.9, 40000.0, 40001.0, 40001.1], [0, 1.0, 1.0, 0])
-            obs = Observation.from_spec_band(sp, self.bp)
+            obs = Observation(self.sp, self.bp, force='foo')
 
 
 class TestMathOperators(object):
     """Test Observation math operators."""
     def setup_class(self):
-        sp = analytic.flat_spectrum(units.FLAM)
-        bp = analytic.Box1DSpectrum(1, 5000, 100)
-        binwave = np.arange(1000, 10000)
-        self.obs = Observation.from_spec_band(sp, bp, binwave=binwave)
+        sp = SourceSpectrum(ConstFlux1D, amplitude=1)
+        bp = SpectralElement(models.Box1D, amplitude=1, x_0=5000, width=100)
+        w = np.arange(1000, 10000)
+        self.obs = Observation(sp, bp, binset=w)
 
-        # Trim off zero throughput to avoid nan at div test
-        self.other_bp = spectrum.SpectralElement([100.0, 9000.0], [2.0, 2.0])
-
-    def _get_other(self, is_scalar):
+    @pytest.mark.parametrize('is_scalar', [True, False])
+    def test_mul(self, is_scalar):
         if is_scalar:
             other = 2
         else:
-            other = self.other_bp
-        return other
+            other = SpectralElement(models.Const1D, amplitude=2)
 
-    @pytest.mark.parametrize(
-        ('op_type', 'is_scalar'),
-        [('*', True),
-         ('*', False),
-         ('/', True),
-         ('/', False)])
-    def test_mul_div(self, op_type, is_scalar):
-        """This is extensively tested in test_spectrum.py.
-        Only simple test here for sanity check.
+        obs2 = self.obs * other
+        np.testing.assert_allclose(obs2([1000, 5000]).value, [0, 2])
+        np.testing.assert_allclose(
+            obs2.sample_binned([4000, 4999]).value, [0, 2])
 
-        """
-        other = self._get_other(is_scalar)
-
-        if op_type == '*':
-            new_obs = self.obs * other
-            ans = 2
-        elif op_type == '/':
-            new_obs = self.obs / other
-            ans = 0.5
-
-        # Native dataset
-        assert new_obs.resample(5000).value == ans
-        assert new_obs.resample(1000).value == 0
-
-        # Binned dataset
-        assert new_obs.binflux.value[4000] == ans
-        assert new_obs.binflux.value[0] == 0
-
-    @pytest.mark.parametrize(('is_scalar'), [True, False])
-    def test_exceptions(self, is_scalar):
-        """These operators are disabled."""
-        other = self._get_other(is_scalar)
-
+    def test_div(self):
         with pytest.raises(NotImplementedError):
-            new_obs = self.obs + other
-        with pytest.raises(NotImplementedError):
-            new_obs = self.obs - other
+            obs2 = self.obs / 2
+
+    def test_addsub(self):
+        with pytest.raises(TypeError):
+            obs2 = self.obs + self.obs
+        with pytest.raises(TypeError):
+            obs2 = self.obs - self.obs
 
 
 class TestObsPar(object):
-    """Test Observation values from IRAF SYNPHOT CALCPHOT.
-
-    .. note:: ``binned=True`` not tested.
+    """Test Observation values from IRAF SYNPHOT CALCPHOT,
+    unless noted otherwise.
 
     """
     def setup_class(self):
-        self.obs = Observation.from_file(_specfile, area=_area)
-        self.bp = spectrum.SpectralElement.from_file(_bandfile, area=_area)
+        sp = SourceSpectrum.from_file(_specfile)
+        bp = SpectralElement.from_file(_bandfile)
+        self.obs = Observation(sp, bp)
 
     def test_avglam(self):
-        """Tested for FLAM only."""
-        avglam = self.obs.avgwave()
-        np.testing.assert_allclose(avglam.value, 5298.11, rtol=1e-5)
-        assert avglam.unit == u.AA
+        """Tested for PHOTLAM only; no binning."""
+        np.testing.assert_allclose(
+            self.obs.avgwave().value, 5321.091, rtol=1e-5)
 
     def test_barlam(self):
-        """Tested for FLAM only."""
-        bar_lam = self.obs.barlam()
-        np.testing.assert_allclose(bar_lam.value, 5264.181, rtol=1e-5)
-        assert bar_lam.unit == u.AA
+        """Tested for PHOTLAM only; no binning."""
+        np.testing.assert_allclose(self.obs.barlam().value, 5286.685, rtol=1e-5)
+
+    def test_pivot(self):
+        """Tested with value from ASTROLIB PYSYNPHOT; no binning."""
+        np.testing.assert_allclose(self.obs.pivot().value, 5309.578, rtol=1e-5)
+
+    def test_normalize(self):
+        """Tested with value from ASTROLIB PYSYNPHOT; no binning."""
+        obs2 = self.obs.normalize(1 * units.PHOTLAM, band=self.obs.bandpass)
+        np.testing.assert_allclose(
+            obs2.countrate(_area).value, 59517756.384, rtol=1e-5)
 
     @pytest.mark.parametrize(
         ('mode', 'ans'),
-        [('efflerg', 5321.148),
-         ('efflphot', 5344.384)])
+        [('efflerg', 5321.091),
+         ('efflphot', 5344.312)])
     def test_efflam(self, mode, ans):
-        eff_lam = self.obs.effective_wavelength(mode=mode)
-        np.testing.assert_allclose(eff_lam.value, ans, rtol=1e-5)
-        assert eff_lam.unit == u.AA
+        np.testing.assert_allclose(
+            self.obs.effective_wavelength(mode=mode, binned=False).value,
+            ans, rtol=1e-4)
+        np.testing.assert_allclose(
+            self.obs.effective_wavelength(mode=mode, binned=True).value,
+            ans, rtol=1e-4)
 
-    def test_efflam_exceptions(self):
+    def test_efflam_exception(self):
         with pytest.raises(exceptions.SynphotError):
-            eff_lam = self.obs.effective_wavelength(mode='foo')
+            w = self.obs.effective_wavelength(mode='foo')
 
     @pytest.mark.parametrize(
         ('flux_unit', 'ans'),
-        [(None, 3.07e-14),
-         (units.STMAG, 12.68222),
-         (units.FNU, 2.94e-25),
-         (units.ABMAG, 12.73013),
-         (units.PHOTLAM, 8.295e-3),
-         (units.PHOTNU, 7.87e-14),
-         (u.count, 1.020766e+5),
-         (units.OBMAG, -12.5223),
-         (u.Jy, 2.9373e-2),
-         (u.mJy, 29.37296)])
+        [(units.FLAM, 3.05E-14),
+         (units.STMAG, 12.68878),
+         (units.FNU, 2.92E-25),
+         (units.ABMAG, 12.73669),
+         (units.PHOTLAM, 0.008245),
+         (units.PHOTNU, 7.82E-14),
+         (u.count, 101462.5),
+         (units.OBMAG, -12.5158),
+         (u.Jy, 0.029196),
+         (u.mJy, 29.19613)])
     def test_effstim(self, flux_unit, ans):
         """Test EFFSTIM for all supported flux units except VEGAMAG.
 
-        .. note:: ``wave_range`` only tested in `TestCountRateBinned`.
+        .. note::
+
+            ``binned``, ``waverange``, and ``force`` tested in `TestCountRate`.
 
         """
-        eff_stim = self.obs.effstim(flux_unit=flux_unit, band=self.bp)
-        np.testing.assert_allclose(eff_stim.value, ans, rtol=0.01)  # 1%
+        np.testing.assert_allclose(
+            self.obs.effstim(flux_unit=flux_unit, area=_area).value,
+            ans, rtol=0.01)  # 1%
 
-        if flux_unit is None:
-            assert eff_stim.unit == units.FLAM
-        elif flux_unit == u.count:
-            assert eff_stim.unit == u.count / (u.s * units.AREA)
-        else:
-            assert eff_stim.unit == flux_unit
+    def test_effstim_analytic(self):
+        sp = SourceSpectrum.from_blackbody(5000)
+        bp = SpectralElement(models.Box1D, amplitude=1, x_0=5500, width=1)
+        obs = Observation(sp, bp)
+        np.testing.assert_allclose(
+            obs.effstim(flux_unit=units.FLAM).value, 2.03E-15, rtol=0.01)  # 1%
 
     @remote_data
     def test_effstim_vegamag(self):
-        vspec = spectrum.SourceSpectrum.from_vega(
-            cache=False, show_progress=False, area=_area, encoding='binary')
-        eff_stim = self.obs.effstim(
-            flux_unit=units.VEGAMAG, band=self.bp, vegaspec=vspec)
-        np.testing.assert_allclose(eff_stim.value, 12.74005, rtol=1e-4)
-        assert eff_stim.unit == units.VEGAMAG
-
-    def test_effstim_analytic_band(self):
-        bb = analytic.BlackBody1DSpectrum(5000, area=_area)
-        sp = bb.to_spectrum(self.obs.wave)
-        bp = analytic.Box1DSpectrum(1, 5500, 1, area=_area)
-        obs = Observation.from_spec_band(sp, bp)
-        eff_stim = obs.effstim(flux_unit=units.FLAM, band=bp)
-        np.testing.assert_allclose(eff_stim.value, 2.03E-15, rtol=5e-4)
+        vspec = SourceSpectrum.from_vega(encoding='binary')
+        np.testing.assert_allclose(
+            self.obs.effstim(flux_unit=units.VEGAMAG, vegaspec=vspec).value,
+            12.74661, rtol=0.01)  # 1%
 
     def test_effstim_exceptions(self):
-        # Invalid flux unit
         with pytest.raises(exceptions.SynphotError):
-            eff_stim = self.obs.effstim(flux_unit=u.mag, band=self.bp)
-
-        # Missing passband
+            x = self.obs.effstim(flux_unit=u.mag)
         with pytest.raises(exceptions.SynphotError):
-            eff_stim = self.obs.effstim()
-
-        # Disjoint passband
-        with pytest.raises(exceptions.DisjointError):
-            eff_stim = self.obs.effstim(
-                band=spectrum.SpectralElement(
-                    [1998.9, 1999, 2000, 2000.1], [0, 1.0, 1.0, 0]))
-
-        # Partial overlap passband
-        with pytest.raises(exceptions.PartialOverlap):
-            eff_stim = self.obs.effstim(
-                band=spectrum.SpectralElement(
-                    [3249.9, 3250, 3750, 3750.1], [0, 1.0, 1.0, 0]))
-
-        # Ambiguous analytic passband
-        with pytest.raises(exceptions.SynphotError):
-            eff_stim = self.obs.effstim(
-                band=analytic.Box1DSpectrum([1, 1], [5000, 5500], [100, 50]))
-
-        # Missing Vega spectrum
-        with pytest.raises(exceptions.SynphotError):
-            eff_stim = self.obs.effstim(flux_unit=units.VEGAMAG, band=self.bp)
+            x = self.obs.effstim(flux_unit=units.VEGAMAG)
 
 
 class TestCountRate(object):
@@ -380,33 +302,26 @@ class TestCountRate(object):
 
     """
     def setup_class(self):
-        wave = np.arange(1000, 1100, 0.5)
-        flux_flam = units.convert_flux(
-            wave, u.Quantity(wave - 1000, u.count), units.FLAM, area=_area)
-        sp = spectrum.SourceSpectrum(
-            wave, flux_flam, area=_area, header={'expr': 'slope1'})
-        bp = spectrum.SpectralElement(
-            [1000, 1009.95, 1010, 1030, 1030.05, 1100], [0, 0, 1, 1, 0, 0],
-            area=_area, header={'expr': 'handmade_box'})
-        self.obs = Observation.from_spec_band(
-            sp, bp, binwave=np.arange(1000, 1020))
-
-    def test_no_waverange(self):
-        """Use all bins."""
-        ct_rate = self.obs.countrate()
-        np.testing.assert_allclose(ct_rate.value, 280.75, rtol=1e-4)
-        assert ct_rate.unit == u.count / (u.s * units.AREA)
+        x = np.arange(1000, 1100, 0.5)
+        y = units.convert_flux(
+            x, u.Quantity(x - 1000, u.count), units.PHOTLAM, area=_area).value
+        sp = SourceSpectrum(Empirical1D, x=x, y=y, metadata={'expr': 'slope1'})
+        bp = SpectralElement(
+            Empirical1D, x=[1009.95, 1010, 1030, 1030.05],
+            y=[0, 1, 1, 0], metadata={'expr': 'handmade_box'})
+        self.obs = Observation(sp, bp, binset=np.arange(1000, 1020))
 
     @pytest.mark.parametrize(
-        ('w1', 'w2', 'ans'),
-        [(1000, 1019, 280.75),
-         (1013, 1016, 116),
-         (1012.8, 1016, 116),
-         (1013.2, 1016, 116)])
-    def test_waverange(self, w1, w2, ans):
-        """Use given wavelength range."""
-        ct_rate = self.obs.countrate(wave_range=[w1, w2])
-        np.testing.assert_allclose(ct_rate.value, ans, rtol=1e-4)
+        ('w', 'ans'),
+        [(None, 280.75),
+         ([1000, 1019], 280.75),
+         ([1013, 1016], 116),
+         ([1012.8, 1016], 116),
+         ([1013.2, 1016], 116)])
+    def test_waverange(self, w, ans):
+        """Use given wavelength range on binned data."""
+        np.testing.assert_allclose(
+            self.obs.countrate(_area, waverange=w).value, ans)
 
     def test_waverange_no_bin(self):
         """Use given wavelength range on native dataset.
@@ -414,101 +329,23 @@ class TestCountRate(object):
         .. note:: Accuracy unsure as there was no precedent to test against.
 
         """
-        ct_rate = self.obs.countrate(wave_range=[1000, 1019], binned=False)
-        np.testing.assert_allclose(ct_rate.value, 271, rtol=1e-4)
+        w = [1000, 1019]
+        np.testing.assert_allclose(
+            self.obs.countrate(_area, waverange=w, binned=False).value, 271)
 
     @pytest.mark.parametrize(
-        ('w1', 'w2', 'ans'),
-        [(1016, 1026, 140),
-         (999, 1016, 172.75)])
-    def test_force(self, w1, w2, ans):
+        ('w', 'ans'),
+        [([1016, 1026], 140),
+         ([999, 1016], 172.75)])
+    def test_force(self, w, ans):
         """Force calculation for partial overlap."""
-        ct_rate = self.obs.countrate(wave_range=[w1, w2], force=True)
-        np.testing.assert_allclose(ct_rate.value, ans, rtol=1e-4)
+        np.testing.assert_allclose(
+            self.obs.countrate(_area, waverange=w, force=True).value, ans)
 
         # Must raise error without force
         with pytest.raises(exceptions.PartialOverlap):
-            ct_rate = self.obs.countrate(wave_range=[w1, w2])
+            x = self.obs.countrate(_area, waverange=w)
 
-    def test_waverange_exceptions(self):
-        # Invalid wavelength range
-        with pytest.raises(exceptions.SynphotError):
-            ct_rate = self.obs.countrate(wave_range=[1016, 1013.2])
-
-        # Disjoint wavelength range
+    def test_disjoint_waverange(self):
         with pytest.raises(exceptions.DisjointError):
-            ct_rate = self.obs.countrate(wave_range=[1020, 1030])
-
-
-class TestFromSpecBandForce(object):
-    """Test from_spec_band() method with force."""
-    def setup_class(self):
-        self.sp = spectrum.SourceSpectrum(
-            np.arange(3000, 4000, dtype=np.float64), np.ones(1000) * 0.75,
-            header={'expr': 'short flat'})
-        self.bp = spectrum.SpectralElement(
-            [3949.9, 3950, 4050, 4050.1], [0, 1.0, 1.0, 0])
-        self.refwave = u.Quantity(4005, u.AA)
-
-    def test_exceptions(self):
-        with pytest.raises(exceptions.PartialOverlap):
-            obs = Observation.from_spec_band(self.sp, self.bp)
-        with pytest.raises(exceptions.SynphotError):
-            obs = Observation.from_spec_band(self.sp, self.bp, force='foo')
-
-    @pytest.mark.parametrize(
-        ('force_type', 'ans'),
-        [('taper', 0),
-         ('extrap', 0.75)])
-    def test_taper(self, force_type, ans):
-        obs = Observation.from_spec_band(self.sp, self.bp, force=force_type)
-        flux = obs.resample(self.refwave)
-        assert flux.value == ans
-        assert flux.unit == units.FLAM
-        assert force_type in obs.warnings['PartialOverlap']
-
-
-class TestReadWriteObs(object):
-    """Test from_file() and to_fits() methods (no binned data)."""
-    def setup_class(self):
-        self.outdir = tempfile.mkdtemp()
-        self.obs = Observation.from_file(_specfile)
-
-    def test_no_bins(self):
-        """Reading from file does not set binned data."""
-        assert self.obs.binwave is None
-        assert self.obs.binflux is None
-        assert self.obs.bin_edges is None
-
-        with pytest.raises(exceptions.UndefinedBinset):
-            self.obs._set_data(True)
-
-    @pytest.mark.parametrize(('ext_hdr'), [None, {'foo': 'foo'}])
-    def test_write(self, ext_hdr):
-        outfile = os.path.join(self.outdir, 'outobs.fits')
-
-        if ext_hdr is None:
-            self.obs.to_fits(
-                outfile, clobber=True, binned=False, trim_zero=False,
-                pad_zero_ends=False)
-        else:
-            self.obs.to_fits(
-                outfile, clobber=True, binned=False, trim_zero=False,
-                pad_zero_ends=False, ext_header=ext_hdr)
-
-        # Read it back in and check
-        obs = Observation.from_file(outfile)
-
-        np.testing.assert_allclose(obs.wave.value, self.obs.wave.value)
-        np.testing.assert_allclose(obs.flux.value, self.obs.flux.value)
-        assert obs.wave.unit == self.obs.wave.unit
-        assert obs.flux.unit == self.obs.flux.unit
-
-        hdr = fits.getheader(outfile, 1)
-        assert 'expr' in hdr
-        assert 'binned' in hdr
-        if ext_hdr is not None:
-            assert 'foo' in hdr
-
-    def teardown_class(self):
-        shutil.rmtree(self.outdir)
+            x = self.obs.countrate(_area, waverange=[1020, 1030])
