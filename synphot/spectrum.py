@@ -1113,7 +1113,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             Empirical Vega spectrum.
 
         """
-        filename = config.VEGA_FILE()
+        filename = config.conf.vega_file
         header, wavelengths, fluxes = specio.read_remote_spec(
             filename, **kwargs)
         header['expr'] = 'Vega from {0}'.format(os.path.basename(filename))
@@ -1707,29 +1707,29 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         # Select filename based on filter name
         if filtername == 'bessel_j':
-            cfgitem = config.BESSEL_J_FILE
+            cfgitem = config.conf.__class__.bessel_j_file
         elif filtername == 'bessel_h':
-            cfgitem = config.BESSEL_H_FILE
+            cfgitem = config.conf.__class__.bessel_h_file
         elif filtername == 'bessel_k':
-            cfgitem = config.BESSEL_K_FILE
+            cfgitem = config.conf.__class__.bessel_k_file
         elif filtername == 'cousins_r':
-            cfgitem = config.COUSINS_R_FILE
+            cfgitem = config.conf.__class__.cousins_r_file
         elif filtername == 'cousins_i':
-            cfgitem = config.COUSINS_I_FILE
+            cfgitem = config.conf.__class__.cousins_i_file
         elif filtername == 'johnson_u':
-            cfgitem = config.JOHNSON_U_FILE
+            cfgitem = config.conf.__class__.johnson_u_file
         elif filtername == 'johnson_b':
-            cfgitem = config.JOHNSON_B_FILE
+            cfgitem = config.conf.__class__.johnson_b_file
         elif filtername == 'johnson_v':
-            cfgitem = config.JOHNSON_V_FILE
+            cfgitem = config.conf.__class__.johnson_v_file
         elif filtername == 'johnson_r':
-            cfgitem = config.JOHNSON_R_FILE
+            cfgitem = config.conf.__class__.johnson_r_file
         elif filtername == 'johnson_i':
-            cfgitem = config.JOHNSON_I_FILE
+            cfgitem = config.conf.__class__.johnson_i_file
         elif filtername == 'johnson_j':
-            cfgitem = config.JOHNSON_J_FILE
+            cfgitem = config.conf.__class__.johnson_j_file
         elif filtername == 'johnson_k':
-            cfgitem = config.JOHNSON_K_FILE
+            cfgitem = config.conf.__class__.johnson_k_file
         else:
             raise exceptions.SynphotError(
                 'Filter name {0} is invalid.'.format(filtername))

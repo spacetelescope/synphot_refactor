@@ -173,21 +173,21 @@ class ReddeningLaw(BaseUnitlessSpectrum):
 
         # Select filename based on model name
         if modelname == 'lmc30dor':
-            cfgitem = config.LMC30DOR_FILE
+            cfgitem = config.conf.__class__.lmc30dor_file
         elif modelname == 'lmcavg':
-            cfgitem = config.LMCAVG_FILE
+            cfgitem = config.conf.__class__.lmcavg_file
         elif modelname == 'mwavg':
-            cfgitem = config.MWAVG_FILE
+            cfgitem = config.conf.__class__.mwavg_file
         elif modelname == 'mwdense':
-            cfgitem = config.MWDENSE_FILE
+            cfgitem = config.conf.__class__.mwdense_file
         elif modelname == 'mwrv21':
-            cfgitem = config.MWRV21_FILE
+            cfgitem = config.conf.__class__.mwrv21_file
         elif modelname == 'mwrv40':
-            cfgitem = config.MWRV40_FILE
+            cfgitem = config.conf.__class__.mwrv40_file
         elif modelname == 'smcbar':
-            cfgitem = config.SMCBAR_FILE
+            cfgitem = config.conf.__class__.smcbar_file
         elif modelname == 'xgalsb':
-            cfgitem = config.XGAL_FILE
+            cfgitem = config.conf.__class__.xgal_file
         else:
             raise exceptions.SynphotError(
                 'Extinction model {0} is invalid.'.format(modelname))

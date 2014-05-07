@@ -29,9 +29,9 @@ def test_read_remote_spec():
     """
     from .. import config
 
-    specfile = config.VEGA_FILE()
     hdr, wave, flux = specio.read_remote_spec(
-        specfile, cache=False, show_progress=False, encoding='binary')
+        config.conf.vega_file, cache=False, show_progress=False,
+        encoding='binary')
 
     assert isinstance(wave, u.Quantity)
     assert isinstance(flux, u.Quantity)
