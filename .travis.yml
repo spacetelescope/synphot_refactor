@@ -4,19 +4,18 @@ python:
     - 2.6
     - 2.7
     - 3.2
-    - 3.3
     - 3.4
 
 env:
     # Try all python versions with the latest numpy
-    - ASTROPY_VERSION=stable NUMPY_VERSION=1.8.0 SETUP_CMD='test'
+    - ASTROPY_VERSION=stable NUMPY_VERSION=1.8 SETUP_CMD='test'
 
 matrix:
     include:
         # Doc build test disabled for now
         #- python: 2.7
         #  # opdeps needed because the matplotlib sphinx extension requires them
-        #  env: ASTROPY_VERSION=stable NUMPY_VERSION=1.8.0 SETUP_CMD='build_sphinx -w -n'
+        #  env: ASTROPY_VERSION=stable NUMPY_VERSION=1.8 SETUP_CMD='build_sphinx -w -n'
 
         # Try alternate numpy versions
         - python: 2.7
@@ -43,7 +42,7 @@ install:
     - if [[ $SETUP_CMD == build_sphinx* ]]; then pip -q install matplotlib --use-mirrors; fi
 
     # Different flavors of astropy
-    - if [[ $ASTROPY_VERSION == stable ]]; then pip -q install astropy==0.3 --use-mirrors; fi
+    - if [[ $ASTROPY_VERSION == stable ]]; then pip -q install astropy==0.4 --use-mirrors; fi
     #- if [[ $ASTROPY_VERSION == development ]]; then pip -q install git+http://github.com/astropy/astropy.git#egg=astropy --use-mirrors; fi
     # Freeze at certain dev commit
     #- if [[ $ASTROPY_VERSION == development ]]; then pip -q install git+git://github.com/astropy/astropy.git@ef19baf695; fi

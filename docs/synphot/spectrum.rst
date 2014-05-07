@@ -267,12 +267,12 @@ Vega
 ^^^^
 
 By default, Vega spectrum is downloaded from STScI via configurable item
-``synphot.config.VEGA_FILE``, which requires internet connection, unless a local
-cached copy exists. One can use any desired Vega spectrum as long as it is a
-valid file format, remote or local, by changing the ``VEGA_FILE`` value.
+``synphot.config.conf.vega_file``, which requires internet connection, unless
+a local or cached copy is used. One can use any desired Vega spectrum as long as
+it is a valid file format, remote or local, by changing the ``vega_file`` value.
 
->>> from synphot.config import VEGA_FILE
->>> with VEGA_FILE.set_temp('/grp/hst/cdbs/calspec/alpha_lyr_stis_007.fits'):
+>>> from synphot.config import conf
+>>> with conf.set_temp('vega_file', '/my/path/alpha_lyr_stis_007.fits'):
 ...     vegaspec = SourceSpectrum.from_vega(encoding='binary')
 >>> vegaspec.plot(right=20000, flux_unit=units.FLAM, title='Vega spectrum')
 
@@ -296,22 +296,22 @@ downloaded from STScI as defined in ``synphot.config``. They can be accessed via
 :func:`~synphot.spectrum.SpectralElement.from_filter` by providing the following
 filter names:
 
-===========  ==================  ===========
-Filter name  Config Item         Description
-===========  ==================  ===========
-'bessel_j'   ``BESSEL_J_FILE``   Bessel J
-'bessel_h'   ``BESSEL_H_FILE``   Bessel H
-'bessel_k'   ``BESSEL_K_FILE``   Bessel K
-'cousins_r'  ``COUSINS_R_FILE``  Cousins R
-'cousins_i'  ``COUSINS_I_FILE``  Cousins I
-'johnson_u'  ``JOHNSON_U_FILE``  Johnson U
-'johnson_b'  ``JOHNSON_B_FILE``  Johnson B
-'johnson_v'  ``JOHNSON_V_FILE``  Johnson V
-'johnson_r'  ``JOHNSON_R_FILE``  Johnson R
-'johnson_i'  ``JOHNSON_I_FILE``  Johnson I
-'johnson_j'  ``JOHNSON_J_FILE``  Johnson J
-'johnson_k'  ``JOHNSON_K_FILE``  Johnson K
-===========  ==================  ===========
+===========  ======================================  ===========
+Filter name  Config Item                             Description
+===========  ======================================  ===========
+'bessel_j'   ``synphot.config.conf.bessel_j_file``   Bessel J
+'bessel_h'   ``synphot.config.conf.bessel_h_file``   Bessel H
+'bessel_k'   ``synphot.config.conf.bessel_k_file``   Bessel K
+'cousins_r'  ``synphot.config.conf.cousins_r_file``  Cousins R
+'cousins_i'  ``synphot.config.conf.cousins_i_file``  Cousins I
+'johnson_u'  ``synphot.config.conf.johnson_u_file``  Johnson U
+'johnson_b'  ``synphot.config.conf.johnson_b_file``  Johnson B
+'johnson_v'  ``synphot.config.conf.johnson_v_file``  Johnson V
+'johnson_r'  ``synphot.config.conf.johnson_r_file``  Johnson R
+'johnson_i'  ``synphot.config.conf.johnson_i_file``  Johnson I
+'johnson_j'  ``synphot.config.conf.johnson_j_file``  Johnson J
+'johnson_k'  ``synphot.config.conf.johnson_k_file``  Johnson K
+===========  ======================================  ===========
 
 >>> from synphot import SpectralElement
 >>> johnson_b = SpectralElement.from_filter('johnson_b', encoding='binary')
