@@ -111,10 +111,10 @@ class TestEmpiricalSourceFromFile(object):
             [1.87284130e-15, 1.85656811e-15, 1.84030867e-15, 1.82404183e-15])
 
     def test_neg_flux(self):
-        """Warning is issued but not tested."""
         w = [1000, 5000, 9000]
         sp = SourceSpectrum(Empirical1D, x=w, y=[100, -45, 5e-17])
         np.testing.assert_array_equal(sp(w).value, [100, 0, 5e-17])
+        assert 'NegativeFlux' in sp.warnings
 
     def test_conversion(self):
         x = u.Quantity(0.60451641, u.micron)
@@ -398,7 +398,8 @@ class TestBuildModels(object):
         sp = SourceSpectrum(
             models.MexicanHat1D, amplitude=1, x_0=6000, sigma=100)
         y = sp([5000, 6000, 7000])
-        np.testing.assert_allclose(y.value, [0, 1, 0])
+        np.testing.assert_allclose(
+            y.value, [-1.90946235e-20, 1, -1.90946235e-20])
 
     def test_PowerLaw1D(self):
         sp = SourceSpectrum(models.PowerLaw1D, amplitude=1, x_0=6000, alpha=4)
@@ -679,12 +680,13 @@ class TestMathOperators(object):
              0.01985257, 0.02337638, 0.00978454], rtol=1e-4)
 
     def test_source_sub(self):
-        """Compare with ASTROLIB PYSYNPHOT, except negative flux set to 0."""
+        """Compare with ASTROLIB PYSYNPHOT."""
         ans = self.sp_1 - self.sp_2
         np.testing.assert_allclose(
             ans(ans.waveset).value,
-            [0, 0, 1.72346256e-04, 0, 1.69629843e-04, 2.83499328e-04,
-             3.80731187e-03, 0], rtol=1e-4)
+            [-9.76520783e-03, -2.71758275e-03, 1.72346256e-04, -9.29051118e-05,
+             1.69629843e-04, 2.83499328e-04, 3.80731187e-03, -9.78453651e-03],
+            rtol=1e-4)
 
     def test_source_addsub_circular(self):
         """sp = sp + sp - sp"""

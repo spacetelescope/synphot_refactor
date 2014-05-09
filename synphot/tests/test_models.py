@@ -144,6 +144,16 @@ class TestEmpirical1D(object):
             y.value, [8.57166622e-15, 8.86174843e-15, 8.68707743e-15],
             rtol=1e-6)
 
+    @pytest.mark.parametrize(
+        ('keep_neg', 'ans'),
+        [(True, [-1.1, 0, 1.1]),
+         (False, [0, 0, 1.1])])
+    def test_neg(self, keep_neg, ans):
+        m2 = Empirical1D(x=[1, 2, 3], y=[-1.1, 0, 1.1], keep_neg=keep_neg)
+        np.testing.assert_array_equal(m2([1, 2, 3]), ans)
+        if not keep_neg:
+            assert 'NegativeFlux' in m2.warnings
+
 
 class TestPowerLawFlux1D(object):
     """Test PowerLawFlux1D model."""

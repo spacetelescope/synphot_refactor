@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 # STDLIB
 import collections
+import warnings
 
 # THIRD-PARTY
 import numpy as np
@@ -12,6 +13,7 @@ import numpy as np
 from astropy import constants as const
 #from astropy import modeling
 from astropy import units as u
+from astropy.utils.exceptions import AstropyUserWarning
 
 # STSCI
 import modeling
@@ -178,14 +180,33 @@ class Empirical1D(modeling.Model):
     y : ndarray
         Flux or throughput.
 
+    keep_neg : bool
+        Convert negative ``y`` values to zeroes?
+        This is to be consistent with ASTROLIB PYSYNPHOT.
+
     """
     x = modeling.Parameter('x')
     y = modeling.Parameter('y')
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, keep_neg=False):
+        y = np.asarray(y)
+        if not keep_neg:
+            i = np.where(y < 0)
+            n_neg = len(i[0])
+            if n_neg > 0:
+                y[i] = 0
+                warn_str = ('{0} bin(s) contained negative flux or throughput; '
+                            'it/they will be set to zero.'.format(n_neg))
+                self._warnings = {'NegativeFlux': warn_str}
+                warnings.warn(warn_str, AstropyUserWarning)
         self._x = x
         self._y = y
         super(Empirical1D, self).__init__(param_dim=1)
+
+    @property
+    def warnings(self):
+        """Dictionary of warning key-value pairs."""
+        return self._warnings
 
     @property
     def sampleset(self):

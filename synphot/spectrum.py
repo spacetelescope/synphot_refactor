@@ -74,7 +74,7 @@ class BaseSpectrum(object):
             'alpha_2': u.dimensionless_unscaled},
         'Const1D': {'amplitude': 'noconv'},
         'ConstFlux1D': {'amplitude': 'noconv'},
-        'Empirical1D': {'x': 'wave', 'y': 'flux'},
+        'Empirical1D': {'x': 'wave', 'y': 'flux', 'keep_neg': 'noconv'},
         'ExponentialCutoffPowerLaw1D': {
             'amplitude': 'flux', 'x_0': 'wave', 'x_cutoff': 'wave',
             'alpha': u.dimensionless_unscaled},
@@ -113,6 +113,8 @@ class BaseSpectrum(object):
         self.metadata = metadata
         if 'warnings' not in self.metadata:
             self.metadata['warnings'] = {}
+        if hasattr(self.model, 'warnings'):
+            self.metadata['warnings'].update(self.model.warnings)
 
     def _build_model(self, modelclass, **kwargs):
         """Build the model."""
@@ -136,12 +138,6 @@ class BaseSpectrum(object):
             raise exceptions.SynphotError(
                 '{0} is not supported.'.format(modelname))
 
-        # Check if all required parameters are given.
-        for pname in self._model_param_dict[modelname]:
-            if pname not in kwargs:
-                raise exceptions.SynphotError(
-                    '{0} required for {1}.'.format(pname, modelname))
-
         modargs = {}
 
         # Process wavelength needed for flux conversion first, if applicable.
@@ -155,6 +151,8 @@ class BaseSpectrum(object):
 
         # Process the rest of the parameters.
         for pname, ptype in six.iteritems(self._model_param_dict[modelname]):
+            if pname not in kwargs:
+                continue
             if pname == pname_wav:
                 continue
             kval = kwargs[pname]
@@ -232,7 +230,6 @@ class BaseSpectrum(object):
     @property
     def warnings(self):
         """Dictionary of warning key-value pairs related to spectrum/bandpass.
-        Shortcut for ``self.metadata['warnings']``.
         """
         return self.metadata['warnings']
 
@@ -276,10 +273,6 @@ class BaseSpectrum(object):
     def __call__(self, wavelengths):
         """Sample the spectrum or bandpass.
 
-        .. note::
-
-            Negative flux or throughput is set to zero with warning.
-
         Parameters
         ----------
         wavelengths : array_like or `~astropy.units.quantity.Quantity`
@@ -295,21 +288,7 @@ class BaseSpectrum(object):
 
         """
         w = self._validate_wavelengths(wavelengths)
-        flux = self.model(w.value)
-        i = np.where(flux < 0)
-        n_neg = len(i[0])
-
-        if n_neg > 0:
-            if np.isscalar(flux):
-                flux = 0.0
-            else:
-                flux[i] = 0.0
-            warn_str = ('{0} bin(s) contained negative flux or throughput; '
-                        'it/they will be set to zero.'.format(n_neg))
-            #self.metadata['warnings']['NegativeFlux'] = warn_str
-            warnings.warn(warn_str, AstropyUserWarning)
-
-        return u.Quantity(flux, unit=self._internal_flux_unit)
+        return u.Quantity(self.model(w.value), unit=self._internal_flux_unit)
 
     def __mul__(self, other):
         """Multiply self and other."""
@@ -1073,7 +1052,7 @@ class SourceSpectrum(BaseSourceSpectrum):
         specio.write_fits_spec(filename, w, y, **kwargs)
 
     @classmethod
-    def from_file(cls, filename, **kwargs):
+    def from_file(cls, filename, keep_neg=False, **kwargs):
         """Create a spectrum from file.
 
         If filename has 'fits' or 'fit' suffix, it is read as FITS.
@@ -1083,6 +1062,9 @@ class SourceSpectrum(BaseSourceSpectrum):
         ----------
         filename : str
             Spectrum filename.
+
+        keep_neg : bool
+            See `~synphot.models.Empirical1D`.
 
         kwargs : dict
             Keywords acceptable by
@@ -1096,7 +1078,8 @@ class SourceSpectrum(BaseSourceSpectrum):
 
         """
         header, wavelengths, fluxes = specio.read_spec(filename, **kwargs)
-        return cls(Empirical1D, x=wavelengths, y=fluxes, metadata=header)
+        return cls(Empirical1D, x=wavelengths, y=fluxes, keep_neg=keep_neg,
+                   metadata=header)
 
     @classmethod
     def from_vega(cls, **kwargs):

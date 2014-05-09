@@ -349,3 +349,24 @@ class TestCountRate(object):
     def test_disjoint_waverange(self):
         with pytest.raises(exceptions.DisjointError):
             x = self.obs.countrate(_area, waverange=[1020, 1030])
+
+
+class TestCountRateNegFlux(object):
+    """Test countrate with files containing negative flux/throughput values."""
+    def setup_class(self):
+        self.bp = SpectralElement.from_file(get_pkg_data_filename(
+            os.path.join('data', 'cos_fuv_g130m_c1309_psa.fits')))
+        self.spfile = get_pkg_data_filename(os.path.join('data', 'us7.txt'))
+
+    @pytest.mark.parametrize(
+        ('keep_neg', 'ans'),
+        [(True, 1510.219531414891),
+         (False, 1627.8250215634343)])
+    def test_neg_handling(self, keep_neg, ans):
+        sp = SourceSpectrum.from_file(self.spfile, keep_neg=keep_neg)
+        obs = Observation(sp, self.bp)
+        c = obs.countrate(_area)
+        np.testing.assert_allclose(c.value, ans, rtol=1e-4)
+
+        if not keep_neg:
+            assert 'NegativeFlux' in obs.warnings
