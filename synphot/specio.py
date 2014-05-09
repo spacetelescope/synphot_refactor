@@ -381,7 +381,8 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
         hdr_hdu.header[key] = val
 
     # Make the extension HDU and include user dictionary in extension header.
-    tab_hdu = fits.new_table(fits.ColDefs([cw, cf]))
+    tab_hdu = fits.BinTableHDU(
+        data=fits.FITS_rec.from_columns(fits.ColDefs([cw, cf])))
     for key, val in ext_header.items():
         tab_hdu.header[key] = val
 
