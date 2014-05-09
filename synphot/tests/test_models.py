@@ -175,3 +175,10 @@ class TestPowerLawFlux1D(object):
                 1, 0.99673203, 0.99348534, 0.99025974, 0.98705502]
         np.testing.assert_allclose(
             y.value, np.vstack([ans1, ans2]).T, rtol=1e-6)
+
+    @pytest.mark.parametrize(
+        'flux_unit', [u.count, units.OBMAG, units.VEGAMAG, u.AA])
+    def test_invalid_units(self, flux_unit):
+        with pytest.raises(NotImplementedError):
+            m = PowerLawFlux1D(
+                amplitude=u.Quantity(1, flux_unit), x_0=5000, alpha=4)

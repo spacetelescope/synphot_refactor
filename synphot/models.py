@@ -331,13 +331,21 @@ class PowerLawFlux1D(modeling.Parametric1DModel):
         except TypeError:
             param_dim = 1
 
-        if isinstance(x_0, u.Quantity):
-            x_0 = x_0.to(u.AA, u.spectral()).value
-
         if not isinstance(amplitude, u.Quantity):
             amplitude = u.Quantity(amplitude, units.PHOTLAM)
 
-        self._flux_unit = amplitude.unit
+        if ((amplitude.unit.to_string() in
+             (units.STMAG.to_string(), units.ABMAG.to_string())) or
+            (amplitude.unit.physical_type in
+             ('spectral flux density', 'spectral flux density wav',
+              'photon flux density', 'photon flux density wav'))):
+            self._flux_unit = amplitude.unit
+        else:
+            raise NotImplementedError(
+                '{0} not supported.'.format(amplitude.unit))
+
+        if isinstance(x_0, u.Quantity):
+            x_0 = x_0.to(u.AA, u.spectral()).value
 
         super(PowerLawFlux1D, self).__init__(
             param_dim=param_dim, amplitude=amplitude.value, x_0=x_0,
