@@ -10,7 +10,7 @@ import numpy as np
 from astropy import units as u
 
 # STSCI
-import modeling
+from jwst_lib import modeling
 
 # LOCAL
 from . import exceptions, units

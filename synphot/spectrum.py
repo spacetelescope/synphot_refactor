@@ -19,7 +19,7 @@ from astropy.extern import six
 from astropy.utils.exceptions import AstropyUserWarning
 
 # STSCI
-import modeling
+from jwst_lib import modeling
 
 # LOCAL
 from . import config, exceptions, specio, units, utils

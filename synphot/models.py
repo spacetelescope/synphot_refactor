@@ -16,7 +16,7 @@ from astropy import units as u
 from astropy.utils.exceptions import AstropyUserWarning
 
 # STSCI
-import modeling
+from jwst_lib import modeling
 
 # LOCAL
 from . import units
@@ -422,6 +422,6 @@ class Redshift(modeling.Parametric1DModel):
     def inverse(self):
         """Inverse Redshift model."""
         if self.param_dim == 1:
-            return Redshift(z = 1.0 / (1.0 + self.z) - 1.0)
+            return Redshift(z=1.0 / (1.0 + self.z) - 1.0)
         else:
-            return Redshift(z = [1.0 / (1.0 + z) - 1.0 for z in self.z])
+            return Redshift(z=[1.0 / (1.0 + z) - 1.0 for z in self.z])

@@ -134,7 +134,7 @@ class TestBinRange(object):
 
     def test_wave_range_descending_order(self):
         """Make sure calculations are correct for bins in descending order."""
-        cenwave =  5004.5
+        cenwave = 5004.5
         npix = 7
         assert (binning.wave_range(self.bins, cenwave, npix) ==
                 binning.wave_range(self.bins[::-1], cenwave, npix))
@@ -146,7 +146,7 @@ class TestBinRange(object):
         with pytest.raises(exceptions.OverlapError):
             x = binning.pixel_range(self.bins, (500, 5001))
         with pytest.raises(exceptions.OverlapError):
-            x = binning.pixel_range(self.bins, (5000,50010))
+            x = binning.pixel_range(self.bins, (5000, 50010))
 
     @pytest.mark.parametrize(
         ('waverange', 'ans', 'mode'),
@@ -205,8 +205,8 @@ def test_calcbinflux():
     edges = binning.calculate_bin_edges(bins)
 
     # Merge bin edges and centers in with the natural waveset.
-    spwave = merge_wavelengths(merge_wavelengths(
-            wave.value, edges.value), bins.value)
+    spwave = merge_wavelengths(
+        merge_wavelengths(wave.value, edges.value), bins.value)
 
     # Compute indices associated to each endpoint.
     indices = np.searchsorted(spwave, edges.value)

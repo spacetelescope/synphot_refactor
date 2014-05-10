@@ -13,7 +13,7 @@ import numpy as np
 #from astropy.modeling import models
 
 # STSCI
-from modeling import models
+from jwst_lib.modeling import models
 
 # LOCAL
 from .. import integrator

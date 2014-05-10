@@ -100,8 +100,8 @@ class TestMergeWave(object):
         assert utils.merge_wavelengths(None, None) is None
         np.testing.assert_array_equal(
             utils.merge_wavelengths(None, self.wave), self.wave)
-        np.testing.assert_array_equal(utils.merge_wavelengths(
-                self.wave, None), self.wave)
+        np.testing.assert_array_equal(
+            utils.merge_wavelengths(self.wave, None), self.wave)
 
     def test_merge_thres(self):
         w = [5000.005, 5000.02 + self.thres, 5500.0, 6000.0]

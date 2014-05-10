@@ -18,7 +18,7 @@ from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
 # STSCI
-from modeling import models
+from jwst_lib.modeling import models
 
 # LOCAL
 from .test_units import _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
@@ -287,7 +287,8 @@ class TestBoxBandpass(object):
         """This is not allowed."""
         with pytest.raises(exceptions.SynphotError):
             bp = SpectralElement(
-                models.Box1D, amplitude=[1,1], x_0=[5000,6000], width=[100,1])
+                models.Box1D, amplitude=[1, 1], x_0=[5000, 6000],
+                width=[100, 1])
 
 
 class TestBlackBodySource(object):

@@ -15,7 +15,7 @@ from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
 # STSCI
-from modeling import models
+from jwst_lib.modeling import models
 
 # LOCAL
 from .test_units import _area
