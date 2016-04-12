@@ -9,7 +9,8 @@ import numbers
 from astropy import units as u
 
 # LOCAL
-from . import config, exceptions, specio
+from . import exceptions, specio
+from .config import Conf
 from .models import Empirical1D
 from .spectrum import BaseUnitlessSpectrum
 
@@ -173,21 +174,21 @@ class ReddeningLaw(BaseUnitlessSpectrum):
 
         # Select filename based on model name
         if modelname == 'lmc30dor':
-            cfgitem = config.conf.__class__.lmc30dor_file
+            cfgitem = Conf.lmc30dor_file
         elif modelname == 'lmcavg':
-            cfgitem = config.conf.__class__.lmcavg_file
+            cfgitem = Conf.lmcavg_file
         elif modelname == 'mwavg':
-            cfgitem = config.conf.__class__.mwavg_file
+            cfgitem = Conf.mwavg_file
         elif modelname == 'mwdense':
-            cfgitem = config.conf.__class__.mwdense_file
+            cfgitem = Conf.mwdense_file
         elif modelname == 'mwrv21':
-            cfgitem = config.conf.__class__.mwrv21_file
+            cfgitem = Conf.mwrv21_file
         elif modelname == 'mwrv40':
-            cfgitem = config.conf.__class__.mwrv40_file
+            cfgitem = Conf.mwrv40_file
         elif modelname == 'smcbar':
-            cfgitem = config.conf.__class__.smcbar_file
+            cfgitem = Conf.smcbar_file
         elif modelname == 'xgalsb':
-            cfgitem = config.conf.__class__.xgal_file
+            cfgitem = Conf.xgal_file
         else:
             raise exceptions.SynphotError(
                 'Extinction model {0} is invalid.'.format(modelname))

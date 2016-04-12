@@ -22,7 +22,8 @@ from astropy.utils.exceptions import AstropyUserWarning
 from jwst_lib import modeling
 
 # LOCAL
-from . import config, exceptions, specio, units, utils
+from . import exceptions, specio, units, utils
+from .config import Conf, conf
 from .integrator import TrapezoidIntegrator, TrapezoidFluxIntegrator
 from .models import BlackBody1D, ConstFlux1D, Empirical1D, Redshift
 
@@ -1096,7 +1097,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             Empirical Vega spectrum.
 
         """
-        filename = config.conf.vega_file
+        filename = conf.vega_file
         header, wavelengths, fluxes = specio.read_remote_spec(
             filename, **kwargs)
         header['expr'] = 'Vega from {0}'.format(os.path.basename(filename))
@@ -1690,29 +1691,29 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         # Select filename based on filter name
         if filtername == 'bessel_j':
-            cfgitem = config.conf.__class__.bessel_j_file
+            cfgitem = Conf.bessel_j_file
         elif filtername == 'bessel_h':
-            cfgitem = config.conf.__class__.bessel_h_file
+            cfgitem = Conf.bessel_h_file
         elif filtername == 'bessel_k':
-            cfgitem = config.conf.__class__.bessel_k_file
+            cfgitem = Conf.bessel_k_file
         elif filtername == 'cousins_r':
-            cfgitem = config.conf.__class__.cousins_r_file
+            cfgitem = Conf.cousins_r_file
         elif filtername == 'cousins_i':
-            cfgitem = config.conf.__class__.cousins_i_file
+            cfgitem = Conf.cousins_i_file
         elif filtername == 'johnson_u':
-            cfgitem = config.conf.__class__.johnson_u_file
+            cfgitem = Conf.johnson_u_file
         elif filtername == 'johnson_b':
-            cfgitem = config.conf.__class__.johnson_b_file
+            cfgitem = Conf.johnson_b_file
         elif filtername == 'johnson_v':
-            cfgitem = config.conf.__class__.johnson_v_file
+            cfgitem = Conf.johnson_v_file
         elif filtername == 'johnson_r':
-            cfgitem = config.conf.__class__.johnson_r_file
+            cfgitem = Conf.johnson_r_file
         elif filtername == 'johnson_i':
-            cfgitem = config.conf.__class__.johnson_i_file
+            cfgitem = Conf.johnson_i_file
         elif filtername == 'johnson_j':
-            cfgitem = config.conf.__class__.johnson_j_file
+            cfgitem = Conf.johnson_j_file
         elif filtername == 'johnson_k':
-            cfgitem = config.conf.__class__.johnson_k_file
+            cfgitem = Conf.johnson_k_file
         else:
             raise exceptions.SynphotError(
                 'Filter name {0} is invalid.'.format(filtername))
