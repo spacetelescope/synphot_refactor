@@ -6,11 +6,11 @@ but it can be easily re-configured as the user wishes via
 `astropy.config`.
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 # ASTROPY
 from astropy.config import ConfigNamespace, ConfigItem
-
 
 __all__ = ['conf']
 
@@ -20,7 +20,7 @@ class Conf(ConfigNamespace):
 
     # STANDARD STARS
     vega_file = ConfigItem(
-        'ftp://ftp.stsci.edu/cdbs/calspec/alpha_lyr_stis_007.fits', 'Vega')
+        'ftp://ftp.stsci.edu/cdbs/calspec/alpha_lyr_stis_008.fits', 'Vega')
 
     # REDDENING/EXTINCTION LAWS
     lmc30dor_file = ConfigItem(

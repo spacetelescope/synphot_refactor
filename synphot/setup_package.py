@@ -1,16 +1,15 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+from astropy.extern import six
 
 # STDLIB
 import io
 import os
-import sys
 from setuptools import Extension
 
 # ASTROPY
 from astropy import setup_helpers
-from astropy.extern import six
-
 
 LOCALROOT = os.path.relpath(os.path.dirname(__file__))
 
@@ -123,12 +122,3 @@ def get_extensions():
     cfg = dict((str(key), val) for key, val in six.iteritems(cfg))
 
     return [Extension(str('synphot.synphot_utils'), **cfg)]
-
-
-def get_package_data():
-    return {str('synphot.tests'): [str('data/*.dat'), str('data/*.fits'),
-                                   str('data/*.txt'), str('coveragerc')]}
-
-
-def requires_2to3():
-    return False

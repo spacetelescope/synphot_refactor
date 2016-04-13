@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Test spectrum.py module and related functionalities."""
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 # STDLIB
 import os
@@ -23,10 +24,10 @@ from jwst_lib.modeling import models
 # LOCAL
 from .test_units import _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
 from .. import exceptions, units, utils
-from ..models import ConstFlux1D, Empirical1D, GaussianAbsorption1D, PowerLawFlux1D, Redshift
+from ..models import (ConstFlux1D, Empirical1D, GaussianAbsorption1D,
+                      PowerLawFlux1D, Redshift)
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
-
 
 # GLOBAL VARIABLES
 _vspec = None  # Loaded in test_load_vspec()

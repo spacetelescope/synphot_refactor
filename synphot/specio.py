@@ -1,6 +1,8 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This modules handles synthetic photometry data formats."""
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+from astropy.extern import six
 
 # STDLIB
 import os
@@ -12,7 +14,6 @@ import numpy as np
 # ASTROPY
 from astropy import log
 from astropy import units as u
-from astropy.extern import six
 from astropy.io import ascii, fits
 from astropy.utils.data import get_readable_fileobj
 from astropy.utils.exceptions import AstropyUserWarning
@@ -20,7 +21,6 @@ from astropy.utils.exceptions import AstropyUserWarning
 # LOCAL
 from . import exceptions, units
 from synphot import __version__
-
 
 __all__ = ['read_remote_spec', 'read_spec', 'read_ascii_spec',
            'read_fits_spec', 'write_fits_spec']
