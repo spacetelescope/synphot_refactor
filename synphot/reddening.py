@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module defines reddening laws and extinction curves."""
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 # STDLIB
 import numbers
@@ -13,7 +14,6 @@ from . import exceptions, specio
 from .config import Conf
 from .models import Empirical1D
 from .spectrum import BaseUnitlessSpectrum
-
 
 __all__ = ['ReddeningLaw', 'ExtinctionCurve']
 

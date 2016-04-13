@@ -3,7 +3,8 @@
 that has gone through a bandpass.
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 # STDLIB
 import warnings
@@ -21,7 +22,6 @@ from . import binning, exceptions, specio, units, utils
 from .integrator import TrapezoidIntegrator
 from .models import Empirical1D
 from .spectrum import BaseSourceSpectrum, SourceSpectrum, SpectralElement
-
 
 __all__ = ['Observation']
 

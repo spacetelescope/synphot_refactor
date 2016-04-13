@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Spectrum models not in `astropy.modeling`."""
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 # STDLIB
 import collections
@@ -21,7 +22,6 @@ from jwst_lib import modeling
 # LOCAL
 from . import units
 from .planck import bbfunc
-
 
 __all__ = ['BlackBody1D', 'ConstFlux1D', 'Empirical1D', 'GaussianAbsorption1D',
            'PowerLawFlux1D', 'Redshift']

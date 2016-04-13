@@ -1,6 +1,8 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module handles photometry units that are not in `astropy.units`."""
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+from astropy.extern import six
 
 # THIRD-PARTY
 import numpy as np
@@ -8,11 +10,9 @@ import numpy as np
 # ASTROPY
 from astropy import constants as const
 from astropy import units as u
-from astropy.extern import six
 
 # LOCAL
 from . import exceptions
-
 
 __all__ = ['H', 'C', 'HC', 'SR_PER_ARCSEC2', 'AREA', 'THROUGHPUT', 'PHOTLAM',
            'PHOTNU', 'FLAM', 'FNU', 'STMAG', 'ABMAG', 'OBMAG', 'VEGAMAG',

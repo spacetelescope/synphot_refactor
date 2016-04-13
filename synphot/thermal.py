@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module defines thermal spectra."""
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 # ASTROPY
 from astropy import units as u
@@ -10,7 +11,6 @@ from astropy.io import fits
 from . import exceptions, specio, units
 from .models import BlackBody1D, Empirical1D
 from .spectrum import BaseUnitlessSpectrum, SourceSpectrum
-
 
 __all__ = ['ThermalSpectralElement']
 

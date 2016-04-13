@@ -4,7 +4,8 @@
 .. note:: VEGAMAG conversion is tested in test_spectrum.py.
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 # THIRD-PARTY
 import numpy as np
@@ -15,7 +16,6 @@ from astropy.tests.helper import pytest
 
 # LOCAL
 from .. import exceptions, units
-
 
 # Wavelength conversions
 _wave_angstrom = u.Quantity([0.1, 5000.0, 10000.0], u.AA)

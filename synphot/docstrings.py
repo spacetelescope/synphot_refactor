@@ -6,7 +6,8 @@ converted by setup.py into include/docstrings.h, which is
 included by src/synphot_utils.c.
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 
 calcbinflux = """

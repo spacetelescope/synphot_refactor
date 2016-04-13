@@ -1,6 +1,8 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module defines the different types of spectra."""
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+from astropy.extern import six
 
 # STDLIB
 import numbers
@@ -15,7 +17,6 @@ from astropy import constants as const
 from astropy import log
 #from astropy import modeling
 from astropy import units as u
-from astropy.extern import six
 from astropy.utils.exceptions import AstropyUserWarning
 
 # STSCI
@@ -26,7 +27,6 @@ from . import exceptions, specio, units, utils
 from .config import Conf, conf
 from .integrator import TrapezoidIntegrator, TrapezoidFluxIntegrator
 from .models import BlackBody1D, ConstFlux1D, Empirical1D, Redshift
-
 
 __all__ = ['BaseSpectrum', 'BaseSourceSpectrum', 'SourceSpectrum',
            'BaseUnitlessSpectrum', 'SpectralElement']

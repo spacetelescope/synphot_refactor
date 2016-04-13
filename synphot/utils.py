@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Synthetic photometry utility functions."""
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 # THIRD-PARTY
 import numpy as np
@@ -14,7 +15,6 @@ from jwst_lib import modeling
 
 # LOCAL
 from . import exceptions, units
-
 
 __all__ = ['get_waveset', 'overlap_status', 'validate_totalflux',
            'validate_wavelengths', 'generate_wavelengths', 'merge_wavelengths']

@@ -1,6 +1,8 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Utilities related to wavelength bin calculations."""
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+from astropy.extern import six
 
 # THIRD-PARTY
 import numpy as np
@@ -8,11 +10,9 @@ import numpy as np
 # ASTROPY
 from astropy import log
 from astropy import units as u
-from astropy.extern import six
 
 # LOCAL
 from . import exceptions
-
 
 __all__ = ['calcbinflux', 'calculate_bin_edges', 'calculate_bin_widths',
            'calculate_bin_centers', 'wave_range', 'pixel_range']

@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Test observation.py module."""
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 # STDLIB
 import os
@@ -23,7 +24,6 @@ from .. import exceptions, units
 from ..models import ConstFlux1D, Empirical1D
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
-
 
 # Global test data files
 _specfile = get_pkg_data_filename(
