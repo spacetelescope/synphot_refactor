@@ -17,7 +17,10 @@ from astropy import units as u
 from astropy.utils.exceptions import AstropyUserWarning
 
 # STSCI
-from jwst_lib import modeling
+try:
+    from jwst_lib import modeling
+except ImportError:  # This is so RTD would build successfully
+    pass
 
 # LOCAL
 from . import units
