@@ -12,26 +12,20 @@ import numpy as np
 
 # ASTROPY
 from astropy import constants as const
-#from astropy import modeling
+from astropy import modeling
 from astropy import units as u
+from astropy.analytic_functions.blackbody import blackbody_nu
 from astropy.utils.exceptions import AstropyUserWarning
-
-# STSCI
-try:
-    from jwst_lib import modeling
-except ImportError:  # This is so RTD would build successfully
-    pass
 
 # LOCAL
 from . import units
-from .planck import bbfunc
 
 __all__ = ['BlackBody1D', 'ConstFlux1D', 'Empirical1D', 'GaussianAbsorption1D',
            'PowerLawFlux1D', 'Redshift']
 
 
 # TODO: Use https://github.com/astropy/astropy/pull/1480 instead
-class BlackBody1D(modeling.Parametric1DModel):
+class BlackBody1D(modeling.Fittable1DModel):
     """Create a :ref:`blackbody spectrum <synphot-planck-law>`
     model with given temperature.
 
@@ -43,13 +37,13 @@ class BlackBody1D(modeling.Parametric1DModel):
     """
     temperature = modeling.Parameter('temperature')
 
-    def __init__(self, temperature, **constraints):
+    def __init__(self, temperature, **kwargs):
         try:
-            param_dim = len(temperature)
+            n_models = len(temperature)
         except TypeError:
-            param_dim = 1
+            n_models = 1
         super(BlackBody1D, self).__init__(
-            param_dim=param_dim, temperature=temperature, **constraints)
+            n_models=n_models, temperature=temperature, **kwargs)
 
     @property
     def lambda_max(self):
@@ -64,11 +58,11 @@ class BlackBody1D(modeling.Parametric1DModel):
         w0 = self.lambda_max
         w2 = np.log10(w0 + 10 * w0)
 
-        if self.param_dim == 1:
+        if self._n_models == 1:
             w = np.logspace(0, w2, num=1000)
         else:
             w = np.array([np.logspace(0, w2[i], num=1000)
-                          for i in range(self.param_dim)]).T
+                          for i in range(self._n_models)]).T
 
         return w
 
@@ -91,13 +85,11 @@ class BlackBody1D(modeling.Parametric1DModel):
 
         """
         wave = u.Quantity(np.ascontiguousarray(x), unit=u.AA)
-        t = u.Quantity(temperature, unit=u.K)
-        bbflux = bbfunc(wave, t)
-        return bbflux.value
+        bbnu_flux = blackbody_nu(wave, temperature)
 
-    @staticmethod
-    def fit_deriv(x, temperature):
-        raise NotImplementedError('fit_deriv undefined BlackBody1D.')
+        # UNTIL HERE -- convert to bbfunc unit
+
+        return bbflux.value
 
 
 class ConstFlux1D(modeling.Parametric1DModel):
