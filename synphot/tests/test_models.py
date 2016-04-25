@@ -30,32 +30,28 @@ class TestBlackBody1D(object):
     """Test BlackBody1D model."""
     def setup_class(self):
         self.m1 = BlackBody1D(temperature=5500)
-        self.m2 = BlackBody1D(temperature=[100, 10000])
 
     def test_lambda_max(self):
         np.testing.assert_allclose(self.m1.lambda_max, 5268.67, rtol=1e-5)
-        np.testing.assert_allclose(
-            self.m2.lambda_max, [2.8977685e5, 2897.7685], rtol=1e-5)
 
     def test_sampleset(self):
         f1 = self.m1(self.m1.sampleset)
         assert f1[0] == 0
         assert f1[-1] < self.m1(self.m1.lambda_max) * 0.05
 
-        f2 = self.m2(self.m2.sampleset)
-        fmax2 = np.matrix(self.m2(self.m2.lambda_max)).diagonal().getA1()
-        np.testing.assert_array_equal(f2[0], 0)
-        assert np.all(f2[-1] < fmax2 * 0.05)
-
     def test_eval(self):
-        """This tests ``bbfunc()``."""
         np.testing.assert_allclose(
             self.m1(np.arange(3000, 3100, 10)),
             [1.20906423e+17, 1.22815123e+17, 1.24735543e+17, 1.26667499e+17,
              1.28610806e+17, 1.30565276e+17, 1.32530722e+17, 1.34506953e+17,
              1.36493780e+17, 1.38491010e+17])
+
+    def test_multi_n_models(self):
+        m2 = BlackBody1D(temperature=[100, 10000], n_models=2)
         np.testing.assert_allclose(
-            self.m2(20000), [2.14331496e-14, 3.55819086e+17])
+            m2.lambda_max, [2.8977685e5, 2897.7685], rtol=1e-5)
+        np.testing.assert_allclose(
+            m2(20000), [2.14331496e-14, 3.55819086e+17])
 
 
 class TestConstFlux1D(object):
@@ -93,7 +89,7 @@ class TestConstFlux1D(object):
         np.testing.assert_allclose(f.value, val, rtol=2.5e-4)
 
     def test_multi_n_models(self):
-        m = ConstFlux1D(amplitude=[1, 2])
+        m = ConstFlux1D(amplitude=[1, 2], n_models=2)
         np.testing.assert_array_equal(m(1000), [1, 2])
 
     @pytest.mark.parametrize(
@@ -174,18 +170,17 @@ class TestPowerLawFlux1D(object):
         assert self.m(self.m.x_0) == 1
 
     def test_multi_n_models(self):
-        w2 = np.vstack([self.w, self.w]).T
         m2 = PowerLawFlux1D(
             amplitude=u.Quantity([1, 1], units.FLAM),
-            x_0=u.Quantity([0.3, 0.305], u.micron), alpha=[4, 1])
+            x_0=u.Quantity([0.3, 0.305], u.micron), alpha=[4, 1], n_models=2)
         y = units.convert_flux(
-            w2, u.Quantity(m2(w2), units.PHOTLAM), units.FLAM)
-        ans1 = [1, 0.98677704, 0.97377192, 0.96098034, 0.94839812,
-                0.93602115, 0.92384543, 0.91186704, 0.90008216, 0.88848705]
-        ans2 = [1.01666667, 1.01328904, 1.00993377, 1.00660066, 1.00328947,
-                1, 0.99673203, 0.99348534, 0.99025974, 0.98705502]
-        np.testing.assert_allclose(
-            y.value, np.vstack([ans1, ans2]).T, rtol=1e-6)
+            w, u.Quantity(m2(w, model_set_axis=False), units.PHOTLAM),
+            units.FLAM)
+        ans = [[1, 0.98677704, 0.97377192, 0.96098034, 0.94839812,
+                0.93602115, 0.92384543, 0.91186704, 0.90008216, 0.88848705],
+               [1.01666667, 1.01328904, 1.00993377, 1.00660066, 1.00328947,
+                1, 0.99673203, 0.99348534, 0.99025974, 0.98705502]]
+        np.testing.assert_allclose(y.value, ans, rtol=1e-6)
 
     @pytest.mark.parametrize(
         'flux_unit', [u.count, units.OBMAG, units.VEGAMAG, u.AA])

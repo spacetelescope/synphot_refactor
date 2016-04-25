@@ -82,7 +82,7 @@ class BlackBody1D(modeling.Fittable1DModel):
         wave = u.Quantity(np.ascontiguousarray(x), unit=u.AA)
         bbnu_flux = blackbody_nu(wave, temperature)
         bbflux = (bbnu_flux * u.sr).to(
-            unit.PHOTLAM, u.spectral_density(wave)) / u.sr  # PHOTLAM/sr
+            units.PHOTLAM, u.spectral_density(wave)) / u.sr  # PHOTLAM/sr
 
         # Restore Numpy settings
         dummy = np.seterr(**old_np_err_cfg)
