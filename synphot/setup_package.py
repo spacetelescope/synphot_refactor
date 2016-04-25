@@ -9,7 +9,7 @@ import os
 from setuptools import Extension
 
 # ASTROPY
-from astropy import setup_helpers
+from astropy_helpers import setup_helpers
 
 LOCALROOT = os.path.relpath(os.path.dirname(__file__))
 
