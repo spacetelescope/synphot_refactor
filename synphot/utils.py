@@ -7,14 +7,8 @@ from __future__ import (absolute_import, division, print_function,
 import numpy as np
 
 # ASTROPY
-#from astropy import modeling
+from astropy import modeling
 from astropy import units as u
-
-# STSCI
-try:
-    from jwst_lib import modeling
-except ImportError:  # This is so RTD would build successfully
-    pass
 
 # LOCAL
 from . import exceptions, units
@@ -28,7 +22,7 @@ def get_waveset(model):
 
     Parameters
     ----------
-    model : `~astropy.modeling.core.Model`
+    model : `~astropy.modeling.Model`
         Model.
 
     Returns
@@ -45,7 +39,7 @@ def get_waveset(model):
     if not isinstance(model, modeling.Model):
         raise exceptions.SynphotError('{0} is not a model.'.format(model))
 
-    if (isinstance(model, modeling.core.SerialCompositeModel) and
+    if (isinstance(model, modeling.SerialCompositeModel) and
             model._transforms[0].__class__.__name__ == 'Redshift'):
         z = model._transforms[0].inverse()
         w = get_waveset(model._transforms[1])
@@ -54,7 +48,7 @@ def get_waveset(model):
         else:
             waveset = z(w)
 
-    elif isinstance(model, modeling.core._CompositeModel):
+    elif isinstance(model, modeling._compound_deprecated._CompositeModel):
         w_list = [get_waveset(m) for m in model._transforms]
         waveset = merge_wavelengths(w_list[0], w_list[1])
         for cur_w in w_list[2:]:

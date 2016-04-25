@@ -10,14 +10,9 @@ from __future__ import (absolute_import, division, print_function,
 # THIRD-PARTY
 import numpy as np
 
-# ASTROPY
-#from astropy.modeling import models
-
-# STSCI
-from jwst_lib.modeling import models
-
 # LOCAL
 from .. import integrator
+from ..models import Box1D
 
 
 class DummySource(object):
@@ -36,7 +31,7 @@ class TestTrapezoidIntegrator(object):
 
     def test_box_model(self):
         # Ascending
-        m = models.Box1D(amplitude=1, x_0=5000, width=10)
+        m = Box1D(amplitude=1, x_0=5000, width=10)
         np.testing.assert_allclose(self.integrator(m, m.sampleset), 10.01)
 
         # Descending

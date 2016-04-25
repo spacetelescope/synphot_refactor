@@ -15,21 +15,16 @@ import numpy as np
 # ASTROPY
 from astropy import constants as const
 from astropy import log
-#from astropy import modeling
+from astropy import modeling
 from astropy import units as u
+from astropy.modeling.models import Redshift
 from astropy.utils.exceptions import AstropyUserWarning
-
-# STSCI
-try:
-    from jwst_lib import modeling
-except ImportError:  # This is so RTD would build successfully
-    pass
 
 # LOCAL
 from . import exceptions, specio, units, utils
 from .config import Conf, conf
 from .integrator import TrapezoidIntegrator, TrapezoidFluxIntegrator
-from .models import BlackBody1D, ConstFlux1D, Empirical1D, Redshift
+from .models import BlackBody1D, ConstFlux1D, Empirical1D, Gaussian1D
 
 __all__ = ['BaseSpectrum', 'BaseSourceSpectrum', 'SourceSpectrum',
            'BaseUnitlessSpectrum', 'SpectralElement']
@@ -126,14 +121,14 @@ class BaseSpectrum(object):
         # This is needed for internal math operations to build composite model.
         # Handles the model instance, not class. Assume it is already in the
         # correct units and param_dim.
-        if isinstance(modelclass, modeling.core.Model):
+        if isinstance(modelclass, modeling.Model):
             self._model = modelclass
             return
         if isinstance(modelclass, BaseSpectrum):
             self._model = modelclass.model
             return
 
-        if not issubclass(modelclass, modeling.core.Model):
+        if not issubclass(modelclass, modeling.Model):
             raise exceptions.SynphotError(
                 '{0} is not a valid model class.'.format(modelclass))
 
@@ -913,7 +908,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             # frequency or wavenumber
             else:  # pragma: no cover
                 rs = self._redshift_model
-            m = modeling.core.SerialCompositeModel([rs, self._model])
+            m = modeling.SerialCompositeModel([rs, self._model])
         return m
 
     @property
@@ -1158,7 +1153,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             'expr': 'em({0:g}, {1:g}, {2:g}, {3})'.format(
                 x0, fh, tf, cls._internal_flux_unit)}
 
-        return cls(modeling.models.Gaussian1D, amplitude=amplitude, mean=x0,
+        return cls(Gaussian1D, amplitude=amplitude, mean=x0,
                    stddev=sigma, z=z, metadata=header)
 
     @classmethod

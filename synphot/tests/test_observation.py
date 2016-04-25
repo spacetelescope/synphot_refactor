@@ -11,17 +11,14 @@ import numpy as np
 
 # ASTROPY
 from astropy import units as u
-#from astropy.modeling import models
+from astropy.modeling.models import Const1D
 from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
-
-# STSCI
-from jwst_lib.modeling import models
 
 # LOCAL
 from .test_units import _area
 from .. import exceptions, units
-from ..models import ConstFlux1D, Empirical1D
+from ..models import Box1D, ConstFlux1D, Empirical1D
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
 
@@ -131,12 +128,12 @@ class TestObservation(object):
 
     def test_default_binset_from_spectrum(self):
         sp = SourceSpectrum.from_gaussian(1, 5000, 10)
-        bp = SpectralElement(models.Const1D, amplitude=1)
+        bp = SpectralElement(Const1D, amplitude=1)
         obs2 = Observation(sp, bp, force='extrap')
         np.testing.assert_array_equal(obs2.binset, sp.waveset)
 
     def test_undefined_binset(self):
-        bp = SpectralElement(models.Const1D, amplitude=1)
+        bp = SpectralElement(Const1D, amplitude=1)
         with pytest.raises(exceptions.UndefinedBinset):
             obs2 = Observation(self.obs.spectrum, bp)
 
@@ -178,7 +175,7 @@ class TestMathOperators(object):
     """Test Observation math operators."""
     def setup_class(self):
         sp = SourceSpectrum(ConstFlux1D, amplitude=1)
-        bp = SpectralElement(models.Box1D, amplitude=1, x_0=5000, width=100)
+        bp = SpectralElement(Box1D, amplitude=1, x_0=5000, width=100)
         w = np.arange(1000, 10000)
         self.obs = Observation(sp, bp, binset=w)
 
@@ -187,7 +184,7 @@ class TestMathOperators(object):
         if is_scalar:
             other = 2
         else:
-            other = SpectralElement(models.Const1D, amplitude=2)
+            other = SpectralElement(Const1D, amplitude=2)
 
         obs2 = self.obs * other
         np.testing.assert_allclose(obs2([1000, 5000]).value, [0, 2])
@@ -276,7 +273,7 @@ class TestObsPar(object):
 
     def test_effstim_analytic(self):
         sp = SourceSpectrum.from_blackbody(5000)
-        bp = SpectralElement(models.Box1D, amplitude=1, x_0=5500, width=1)
+        bp = SpectralElement(Box1D, amplitude=1, x_0=5500, width=1)
         obs = Observation(sp, bp)
         np.testing.assert_allclose(
             obs.effstim(flux_unit=units.FLAM).value, 2.03E-15, rtol=0.01)  # 1%
