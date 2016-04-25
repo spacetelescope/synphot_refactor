@@ -29,7 +29,7 @@ docs/_build
 .idea
 
 # Packages/installer info
-*.egg
+*.egg*
 *.egg-info
 dist
 build
