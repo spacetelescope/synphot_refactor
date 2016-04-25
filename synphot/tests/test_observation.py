@@ -9,6 +9,13 @@ import os
 # THIRD-PARTY
 import numpy as np
 
+try:
+    import scipy  # pylint: disable=W0611
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
+
 # ASTROPY
 from astropy import units as u
 from astropy.modeling.models import Const1D
@@ -29,6 +36,7 @@ _bandfile = get_pkg_data_filename(
     os.path.join('data', 'hst_acs_hrc_f555w.fits'))
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestObservation(object):
     """Test Observation (most of them)."""
     def setup_class(self):
@@ -145,6 +153,7 @@ class TestObservation(object):
             sp1(sp1.waveset), sp2(sp2.waveset), rtol=1e-3)
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestInitWithForce(object):
     """Test forced initialization."""
     def setup_class(self):
@@ -202,6 +211,7 @@ class TestMathOperators(object):
             obs2 = self.obs - self.obs
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestObsPar(object):
     """Test Observation values from IRAF SYNPHOT CALCPHOT,
     unless noted otherwise.
@@ -292,6 +302,7 @@ class TestObsPar(object):
             x = self.obs.effstim(flux_unit=units.VEGAMAG)
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestCountRate(object):
     """Test countrate with Observation with well-defined ranges.
 
@@ -348,6 +359,7 @@ class TestCountRate(object):
             x = self.obs.countrate(_area, waverange=[1020, 1030])
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestCountRateNegFlux(object):
     """Test countrate with files containing negative flux/throughput values."""
     def setup_class(self):

@@ -11,6 +11,13 @@ import tempfile
 # THIRD-PARTY
 import numpy as np
 
+try:
+    import scipy  # pylint: disable=W0611
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
+
 # ASTROPY
 from astropy import modeling
 from astropy import units as u
@@ -35,6 +42,7 @@ _vspec = None  # Loaded in test_load_vspec()
 
 
 @remote_data
+@pytest.mark.skipif('not HAS_SCIPY')
 def test_load_vspec():
     """Load VEGA spectrum once here to be used later."""
     global _vspec
@@ -42,6 +50,7 @@ def test_load_vspec():
 
 
 @remote_data
+@pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.parametrize(
     ('in_q', 'out_u', 'ans'),
     [(_flux_photlam, units.VEGAMAG, _flux_vegamag),
@@ -60,6 +69,7 @@ def test_flux_conversion_vega(in_q, out_u, ans):
 
 
 @remote_data
+@pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.parametrize(
     'filtername',
     ['bessel_j', 'bessel_h', 'bessel_k', 'cousins_r', 'cousins_i',
@@ -84,6 +94,7 @@ def test_filter_exception():
         bp = SpectralElement.from_filter('foo')
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestEmpiricalSourceFromFile(object):
     """This is the most common model used in ASTROLIB PYSYNPHOT."""
     def setup_class(self):
@@ -148,6 +159,7 @@ class TestEmpiricalSourceFromFile(object):
             y.value, [0, 3.9135e-14, 4.0209e-14, 3.9169e-14, 0], rtol=1e-6)
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestEmpiricalBandpassFromFile(object):
     """This is the most common model used in ASTROLIB PYSYNPHOT."""
     def setup_class(self):
@@ -408,6 +420,7 @@ class TestBuildModels(object):
         np.testing.assert_allclose(y.value, [2.0736, 1, 0.53977509])
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestCheckOverlap(object):
     """Test spectrum overlap check."""
     def setup_class(self):
@@ -456,6 +469,7 @@ class TestCheckOverlap(object):
             self.sp.check_overlap(1)
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestNormalize(object):
     """Test source spectrum normalization."""
     def setup_class(self):
@@ -657,6 +671,7 @@ class TestRedShift(object):
         np.testing.assert_allclose(sp_z0(3000), sp(6900))
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestMathOperators(object):
     """Test spectrum math operators."""
     def setup_class(self):
@@ -782,6 +797,7 @@ class TestMathOperators(object):
             ans = self.bp_1 / self.bp_1
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestWriteSpec(object):
     """Test spectrum to_fits() method."""
     def setup_class(self):

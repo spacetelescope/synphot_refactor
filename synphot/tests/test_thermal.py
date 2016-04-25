@@ -9,6 +9,13 @@ import os
 # THIRD-PARTY
 import numpy as np
 
+try:
+    import scipy  # pylint: disable=W0611
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
+
 # ASTROPY
 from astropy import units as u
 from astropy.tests.helper import pytest
@@ -19,6 +26,7 @@ from .. import exceptions
 from ..thermal import ThermalSpectralElement
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestThermalSpectralElement(object):
     """Test ``ThermalSpectralElement``."""
     def setup_class(self):

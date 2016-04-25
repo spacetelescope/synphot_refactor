@@ -16,6 +16,13 @@ import os
 # THIRD-PARTY
 import numpy as np
 
+try:
+    import scipy  # pylint: disable=W0611
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
+
 # ASTROPY
 from astropy import units as u
 from astropy.tests.helper import pytest
@@ -99,6 +106,7 @@ class TestConstFlux1D(object):
             m = ConstFlux1D(amplitude=u.Quantity(1, flux_unit))
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestEmpirical1D(object):
     """Test Empirical1D model."""
     def setup_class(self):
@@ -174,7 +182,7 @@ class TestPowerLawFlux1D(object):
             amplitude=u.Quantity([1, 1], units.FLAM),
             x_0=u.Quantity([0.3, 0.305], u.micron), alpha=[4, 1], n_models=2)
         y = units.convert_flux(
-            w, u.Quantity(m2(w, model_set_axis=False), units.PHOTLAM),
+            self.w, u.Quantity(m2(self.w, model_set_axis=False), units.PHOTLAM),
             units.FLAM)
         ans = [[1, 0.98677704, 0.97377192, 0.96098034, 0.94839812,
                 0.93602115, 0.92384543, 0.91186704, 0.90008216, 0.88848705],

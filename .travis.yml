@@ -34,8 +34,9 @@ env:
         #- CONDA_DEPENDENCIES='Cython'
         - CONDA_DEPENDENCIES=''
     matrix:
+        # DISABLED - https://github.com/astropy/package-template/issues/164
         # Make sure that egg_info works without dependencies
-        - SETUP_CMD='egg_info'
+        #- SETUP_CMD='egg_info'
         # Try all python versions with the latest numpy
         - SETUP_CMD='test'
 
@@ -46,10 +47,11 @@ matrix:
         #- python: 2.7
         #  env: SETUP_CMD='test --coverage'
 
+        # DISABLED FOR NOW
         # Check for sphinx doc build warnings - we do this first because it
         # may run for a long time
-        - python: 2.7
-          env: SETUP_CMD='build_sphinx -w'
+        #- python: 2.7
+        #  env: SETUP_CMD='build_sphinx -w'
 
         # Try Astropy development version
         - python: 2.7

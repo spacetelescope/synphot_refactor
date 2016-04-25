@@ -170,6 +170,10 @@ class ConstFlux1D(modeling.models.Const1D):
 class Empirical1D(modeling.Fittable1DModel):
     """Empirical (sampled) spectrum or bandpass model.
 
+    .. note::
+
+        This model requires `SciPy <http://www.scipy.org>`_ to be installed.
+
     Parameters
     ----------
     x : ndarray
@@ -183,10 +187,12 @@ class Empirical1D(modeling.Fittable1DModel):
         This is to be consistent with ASTROLIB PYSYNPHOT.
 
     """
-    x = modeling.Parameter(default=[0])
-    y = modeling.Parameter(default=[0])
+    x = modeling.Parameter(default=0)
+    y = modeling.Parameter(default=0)
 
     def __init__(self, x, y, keep_neg=False, **kwargs):
+        from scipy.interpolate import interp1d
+
         y = np.asarray(y)
 
         if not keep_neg:
@@ -199,7 +205,13 @@ class Empirical1D(modeling.Fittable1DModel):
                 self._warnings = {'NegativeFlux': warn_str}
                 warnings.warn(warn_str, AstropyUserWarning)
 
-        super(Empirical1D, self).__init__(x=x, y=y, **kwargs)
+        # Need this to work around the output shape guessing based on model
+        # parameters. In this model, the shape is determined by input into
+        # evaluate(), not parameters.
+        self._f = interp1d(x, y)
+
+        # Do not pass in parameters here (see comment above).
+        super(Empirical1D, self).__init__(**kwargs)
 
     @property
     def warnings(self):
@@ -209,7 +221,7 @@ class Empirical1D(modeling.Fittable1DModel):
     @property
     def sampleset(self):
         """``x`` array that samples the feature."""
-        return self.x
+        return self._f.x
 
     def evaluate(self, x, *args):
         """Evaluate the model.
@@ -225,30 +237,7 @@ class Empirical1D(modeling.Fittable1DModel):
             Flux or throughput in same unit as parameter ``y``.
 
         """
-        new_wave = np.ascontiguousarray(x)
-
-        # Check whether given wavelengths are in descending order
-        if np.isscalar(new_wave) or new_wave[0] < new_wave[-1]:
-            newasc = True
-        else:
-            new_wave = new_wave[::-1]
-            newasc = False
-
-        # Interpolation flux/throughput
-        if self.x[0] < self.x[-1]:
-            oldasc = True
-            resampled_result = np.interp(new_wave, self.x, self.y)
-        else:
-            oldasc = False
-            rev = np.interp(new_wave, self.x[::-1], self.y[::-1])
-            resampled_result = rev[::-1]
-
-        # If the new and old wavelengths do not have the same parity,
-        # the answer has to be flipped again.
-        if newasc != oldasc:
-            resampled_result = resampled_result[::-1]
-
-        return resampled_result
+        return self._f(x)
 
 
 class GaussianSamplesetMixin(object):
