@@ -120,7 +120,7 @@ class BaseSpectrum(object):
 
         # This is needed for internal math operations to build composite model.
         # Handles the model instance, not class. Assume it is already in the
-        # correct units and param_dim.
+        # correct units and _n_models.
         if isinstance(modelclass, modeling.Model):
             self._model = modelclass
             return
@@ -166,8 +166,8 @@ class BaseSpectrum(object):
             modargs[pname] = pval
 
         model = modelclass(**modargs)
-        if model.param_dim != 1:
-            raise exceptions.SynphotError('Model can only have param_dim=1')
+        if model._n_models != 1:
+            raise exceptions.SynphotError('Model can only have _n_models=1')
 
         self._model = model
 

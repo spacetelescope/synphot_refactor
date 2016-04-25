@@ -284,7 +284,7 @@ class TestBoxBandpass(object):
         y = bp2([4000, 4949.95, 5000])
         np.testing.assert_array_equal(y.value, [0, 0, 1])
 
-    def test_multi_param_dim(self):
+    def test_multi_n_models(self):
         """This is not allowed."""
         with pytest.raises(exceptions.SynphotError):
             bp = SpectralElement(

@@ -92,7 +92,7 @@ class TestConstFlux1D(object):
             self.w, u.Quantity(m(self.w), units.PHOTLAM), out_unit)
         np.testing.assert_allclose(f.value, val, rtol=2.5e-4)
 
-    def test_multi_param_dim(self):
+    def test_multi_n_models(self):
         m = ConstFlux1D(amplitude=[1, 2])
         np.testing.assert_array_equal(m(1000), [1, 2])
 
@@ -173,7 +173,7 @@ class TestPowerLawFlux1D(object):
     def test_normalization(self):
         assert self.m(self.m.x_0) == 1
 
-    def test_multi_param_dim(self):
+    def test_multi_n_models(self):
         w2 = np.vstack([self.w, self.w]).T
         m2 = PowerLawFlux1D(
             amplitude=u.Quantity([1, 1], units.FLAM),
