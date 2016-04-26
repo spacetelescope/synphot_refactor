@@ -41,7 +41,7 @@ def get_waveset(model):
 
     if (isinstance(model, modeling.SerialCompositeModel) and
             model._transforms[0].__class__.__name__ == 'Redshift'):
-        z = model._transforms[0].inverse()
+        z = model._transforms[0].inverse
         w = get_waveset(model._transforms[1])
         if w is None:
             waveset = None

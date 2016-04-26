@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module defines the different types of spectra."""
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 from astropy.extern import six
 
 # STDLIB
@@ -17,7 +16,7 @@ from astropy import constants as const
 from astropy import log
 from astropy import modeling
 from astropy import units as u
-from astropy.modeling.models import Redshift
+from astropy.modeling.models import Redshift, Scale
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
@@ -904,11 +903,11 @@ class SourceSpectrum(BaseSourceSpectrum):
         else:
             # wavelength
             if self._internal_wave_unit.physical_type == 'length':
-                rs = self._redshift_model.inverse()
+                rs = self._redshift_model.inverse
             # frequency or wavenumber
             else:  # pragma: no cover
                 rs = self._redshift_model
-            m = modeling.SerialCompositeModel([rs, self._model])
+            m = rs | self._model
         return m
 
     @property
@@ -961,7 +960,7 @@ class SourceSpectrum(BaseSourceSpectrum):
                 raise exceptions.IncompatibleSources(
                     'Can only operate on real scalar number.')
 
-            newcls = self.__class__(self.model * val)
+            newcls = self.__class__(self.model | Scale(val))
 
         elif isinstance(other, BaseUnitlessSpectrum):
             newcls = self.__class__(self.model * other.model)
@@ -1232,7 +1231,7 @@ class BaseUnitlessSpectrum(BaseSpectrum):
                 raise exceptions.IncompatibleSources(
                     'Can only operate on real scalar number.')
 
-            newcls = self.__class__(self.model * val)
+            newcls = self.__class__(self.model | Scale(val))
 
         elif isinstance(other, BaseUnitlessSpectrum):
             newcls = self.__class__(self.model * other.model)

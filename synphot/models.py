@@ -172,7 +172,8 @@ class Empirical1D(modeling.Fittable1DModel):
 
     .. note::
 
-        This model requires `SciPy <http://www.scipy.org>`_ to be installed.
+        This model requires `SciPy <http://www.scipy.org>`_ 0.17
+        or later to be installed.
 
     Parameters
     ----------
@@ -208,7 +209,7 @@ class Empirical1D(modeling.Fittable1DModel):
         # Need this to work around the output shape guessing based on model
         # parameters. In this model, the shape is determined by input into
         # evaluate(), not parameters.
-        self._f = interp1d(x, y)
+        self._f = interp1d(x, y, copy=False, fill_value='extrapolate')
 
         # Do not pass in parameters here (see comment above).
         super(Empirical1D, self).__init__(**kwargs)
