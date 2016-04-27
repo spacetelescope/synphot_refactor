@@ -154,7 +154,12 @@ def validate_wavelengths(wavelengths):
         units.validate_wave_unit(wavelengths.unit)
         wave = wavelengths.value
     else:
-        wave = np.array(wavelengths)
+        wave = wavelengths
+
+    if np.isscalar(wave):
+        wave = [wave]
+
+    wave = np.asarray(wave)
 
     # Check for zeroes
     if np.any(wave <= 0):

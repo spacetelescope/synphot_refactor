@@ -114,7 +114,7 @@ class TestEmpiricalSourceFromFile(object):
             self.sp.waverange.value, [3479.99902344, 10500.00097656])
 
     def test_call(self):
-        w = self.sp.model.x.value[5000:5004]
+        w = self.sp.model.get_x()[5000:5004]
         y = units.convert_flux(w, self.sp(w), units.FLAM)
         np.testing.assert_allclose(
             w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
@@ -171,7 +171,7 @@ class TestEmpiricalBandpassFromFile(object):
             bp = SpectralElement(Empirical1D, x=_wave, y=_flux_photlam)
 
     def test_call(self):
-        w = self.bp.model.x.value[5000:5004]
+        w = self.bp.model.get_x()[5000:5004]
         y = self.bp(w)
         np.testing.assert_allclose(
             w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
@@ -181,7 +181,7 @@ class TestEmpiricalBandpassFromFile(object):
     def test_integrate(self):
         # Whole range (same as EQUVW)
         f = self.bp.integrate()
-        np.testing.assert_equal(f.value, 272.01081629459344)
+        np.testing.assert_allclose(f.value, 272.01081629459344)
 
         # Given range
         f = self.bp.integrate(wavelengths=_wave)

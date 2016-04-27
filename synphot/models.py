@@ -209,10 +209,23 @@ class Empirical1D(modeling.Fittable1DModel):
         # Need this to work around the output shape guessing based on model
         # parameters. In this model, the shape is determined by input into
         # evaluate(), not parameters.
-        self._f = interp1d(x, y, copy=False, fill_value='extrapolate')
+        self._x = x
+        self._y = y
+        #self._f = interp1d(x, y, fill_value='extrapolate')
+        self._f = interp1d(x, y, bounds_error=False, fill_value=0)
 
         # Do not pass in parameters here (see comment above).
         super(Empirical1D, self).__init__(**kwargs)
+
+    def get_x(self):
+        """Convenience function to return ``x`` since the ``x`` parameter
+        is a dummy (to avoid shape broadcast error during evaluation)."""
+        return self._x  # Not a copy
+
+    def get_y(self):
+        """Convenience function to return ``y`` since the ``y`` parameter
+        is a dummy (to avoid shape broadcast error during evaluation)."""
+        return self._y  # Not a copy
 
     @property
     def warnings(self):
@@ -222,7 +235,7 @@ class Empirical1D(modeling.Fittable1DModel):
     @property
     def sampleset(self):
         """``x`` array that samples the feature."""
-        return self._f.x
+        return self.get_x()
 
     def evaluate(self, x, *args):
         """Evaluate the model.

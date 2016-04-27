@@ -250,7 +250,7 @@ class Observation(BaseSourceSpectrum):
         """
         x = self._validate_binned_wavelengths(wavelengths)
         i = np.searchsorted(self.binset, x)
-        if not np.allclose(self.binset[i], x):
+        if not np.allclose(self.binset[i].value, x.value):
             raise exceptions.InterpolationNotAllowed(
                 'Some or all wavelength values are not in binset.')
         y = self.binflux[i]
