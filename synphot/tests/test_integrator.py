@@ -32,7 +32,7 @@ class TestTrapezoidIntegrator(object):
         # Ascending
         m = Box1D(amplitude=1, x_0=5000, width=10)
         x = m.sampleset()
-        np.testing.assert_allclose(self.integrator(m, x), 10.01)
+        np.testing.assert_allclose(self.integrator(m, x), 10.0)
 
         # Descending
-        np.testing.assert_allclose(self.integrator(m, x[::-1]), 10.01)
+        np.testing.assert_allclose(self.integrator(m, x[::-1]), 10.0)
