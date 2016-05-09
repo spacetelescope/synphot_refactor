@@ -6,8 +6,7 @@ but it can be easily re-configured as the user wishes via
 `astropy.config`.
 
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 
 # ASTROPY
 from astropy.config import ConfigNamespace, ConfigItem

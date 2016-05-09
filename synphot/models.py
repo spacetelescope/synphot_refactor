@@ -1,11 +1,11 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Spectrum models not in `astropy.modeling`."""
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
+from astropy.extern.six.moves import map, zip
 
 # STDLIB
-import collections
 import warnings
+from functools import partial
 
 # THIRD-PARTY
 import numpy as np
@@ -44,19 +44,51 @@ class BlackBody1D(modeling.Fittable1DModel):
         return u.Quantity(const.b_wien.value / self.temperature, u.m).to(
             u.AA).value
 
-    @property
-    def sampleset(self):
-        """``x`` array that samples the feature."""
+    def bounding_box(self, factor=10.0):
+        """Tuple defining the default ``bounding_box`` limits,
+        ``(x_low, x_high)``.
+
+        .. math::
+
+            x_{\\textnormal{low}} = 0
+
+            x_{\\textnormal{high}} = \\log(\\lambda_{\\textnormal{max}} \\; (1 + \\textnormal{factor}))
+
+        Parameters
+        ----------
+        factor : float
+            Used to calculate ``x_high``.
+
+        """
         w0 = self.lambda_max
-        w2 = np.log10(w0 + 10 * w0)
+        return (w0 * 0, np.log10(w0 + factor * w0))
+
+    @staticmethod
+    def _calc_sampleset(w1, w2, num):
+        """Calculate sampleset for each model."""
+        return np.logspace(w1, w2, num=num)
+
+    def sampleset(self, factor_bbox=10.0, num=1000):
+        """Return ``x`` array that samples the feature.
+
+        Parameters
+        ----------
+        factor_bbox : float
+            Factor for ``bounding_box`` calculations.
+
+        num : int
+            Number of points to generate.
+
+        """
+        w1, w2 = self.bounding_box(factor=factor_bbox)
 
         if self._n_models == 1:
-            w = np.logspace(0, w2, num=1000)
+            w = self._calc_sampleset(w1, w2, num)
         else:
-            w = np.array([np.logspace(0, w2[i], num=1000)
-                          for i in range(self._n_models)])
+            f = partial(self._calc_sampleset, num=num)
+            w = list(map(f, w1, w2))
 
-        return w
+        return np.asarray(w)
 
     @staticmethod
     def evaluate(x, temperature):
@@ -95,21 +127,38 @@ class Box1D(modeling.models.Box1D):
     ``sampleset`` defined.
 
     """
-    @property
-    def sampleset(self):
-        """``x`` array that samples the feature."""
-        step = 0.01
-        dw = 0.5 * self.width
-        w1 = self.x_0 - dw
-        w2 = self.x_0 + dw
+    @staticmethod
+    def _calc_sampleset(w1, w2, step, minimal):
+        """Calculate sampleset for each model."""
+        if minimal:
+            arr = [w1 - step, w1, w2, w2 + step]
+        else:
+            arr = np.arange(w1 - step, w2 + step, step)
+
+        return arr
+
+    def sampleset(self, step=0.01, minimal=False):
+        """Return ``x`` array that samples the feature.
+
+        Parameters
+        ----------
+        step : float
+            Distance of first and last points w.r.t. bounding box.
+
+        minimal : bool
+            Only return the minimal points needed to define the box;
+            i.e., box edges and a point outside on each side.
+
+        """
+        w1, w2 = self.bounding_box
 
         if self._n_models == 1:
-            w = np.array([w1 - step, w1, w2, w2 + step])
+            w = self._calc_sampleset(w1, w2, step, minimal)
         else:
-            w = np.array([[w1[i] - step[i], w1[i], w2[i], w2[i] + step[i]]
-                          for i in range(self._n_models)])
+            f = partial(self._calc_sampleset, step=step, minimal=minimal)
+            w = list(map(f, w1, w2))
 
-        return w
+        return np.asarray(w)
 
 
 class ConstFlux1D(modeling.models.Const1D):
@@ -167,6 +216,7 @@ class ConstFlux1D(modeling.models.Const1D):
         return y.value
 
 
+# TODO: Subclass from LookupTable (spacetelescope/gwcs#28)
 class Empirical1D(modeling.Fittable1DModel):
     """Empirical (sampled) spectrum or bandpass model.
 
@@ -188,11 +238,16 @@ class Empirical1D(modeling.Fittable1DModel):
         This is to be consistent with ASTROLIB PYSYNPHOT.
 
     """
-    x = modeling.Parameter(default=0)
-    y = modeling.Parameter(default=0)
+    standard_broadcasting = False
+    x = modeling.Parameter(default=[0, 0])
+    y = modeling.Parameter(default=[0, 0])
 
     def __init__(self, x, y, keep_neg=False, **kwargs):
         from scipy.interpolate import interp1d
+
+        n_models = kwargs.get('n_models', 1)
+        if n_models > 1:
+            raise NotImplementedError('Only n_models=1 is supported')
 
         y = np.asarray(y)
 
@@ -206,36 +261,28 @@ class Empirical1D(modeling.Fittable1DModel):
                 self._warnings = {'NegativeFlux': warn_str}
                 warnings.warn(warn_str, AstropyUserWarning)
 
-        # Need this to work around the output shape guessing based on model
-        # parameters. In this model, the shape is determined by input into
-        # evaluate(), not parameters.
-        self._x = x
-        self._y = y
         #self._f = interp1d(x, y, fill_value='extrapolate')
         self._f = interp1d(x, y, bounds_error=False, fill_value=0)
 
-        # Do not pass in parameters here (see comment above).
-        super(Empirical1D, self).__init__(**kwargs)
-
-    def get_x(self):
-        """Convenience function to return ``x`` since the ``x`` parameter
-        is a dummy (to avoid shape broadcast error during evaluation)."""
-        return self._x  # Not a copy
-
-    def get_y(self):
-        """Convenience function to return ``y`` since the ``y`` parameter
-        is a dummy (to avoid shape broadcast error during evaluation)."""
-        return self._y  # Not a copy
+        super(Empirical1D, self).__init__(x=x, y=y, **kwargs)
 
     @property
     def warnings(self):
         """Dictionary of warning key-value pairs."""
         return self._warnings
 
+    # NOTE: It is forced to be property by core Model. The decorator
+    #       here is just to make this obvious.
     @property
+    def bounding_box(self):
+        """Tuple defining the default ``bounding_box`` limits,
+        ``(x_low, x_high)``."""
+        x = self.x.value
+        return (min(x), max(x))
+
     def sampleset(self):
-        """``x`` array that samples the feature."""
-        return self.get_x()
+        """Return ``x`` array that samples the feature."""
+        return self.x.value
 
     def evaluate(self, x, *args):
         """Evaluate the model.
@@ -254,26 +301,41 @@ class Empirical1D(modeling.Fittable1DModel):
         return self._f(x)
 
 
-class GaussianSamplesetMixin(object):
-    """Mixin class to define ``sampleset`` for Gaussian models."""
-    @property
-    def sampleset(self):
-        """``x`` array that samples the feature."""
-        n = 50
-        dw = 0.1 * self.stddev
-        w1 = self.mean - n * dw
-        w2 = self.mean + n * dw
+class GaussianSampleset1DMixin(object):
+    """Mixin class to define ``sampleset`` for Gaussian models.
+    Also used for Lorentz and MexicanHat due to similarities.
+
+    """
+    @staticmethod
+    def _calc_sampleset(w1, w2, dw):
+        """Calculate sampleset for each model."""
+        return np.arange(w1, w2, dw)
+
+    def sampleset(self, factor_step=0.1, **kwargs):
+        """Return ``x`` array that samples the feature.
+
+        Parameters
+        ----------
+        factor_step : float
+            Factor for sample step calculation. The step is calculated
+            using ``factor_step * self.stddev``.
+
+        kwargs : dict
+            Keyword(s) for ``bounding_box`` calculation.
+
+        """
+        w1, w2 = self.bounding_box(**kwargs)
+        dw = factor_step * self.stddev
 
         if self._n_models == 1:
-            w = np.arange(w1, w2, dw)
+            w = self._calc_sampleset(w1, w2, dw)
         else:
-            w = np.array([np.arange(w1[i], w2[i], dw[i])
-                          for i in range(self._n_models)])
+            w = list(map(self._calc_sampleset, w1, w2, dw))
 
-        return w
+        return np.asarray(w)
 
 
-class Gaussian1D(modeling.models.Gaussian1D, GaussianSamplesetMixin):
+class Gaussian1D(modeling.models.Gaussian1D, GaussianSampleset1DMixin):
     """Same as `astropy.modeling.models.Gaussian1D`, except with
     ``sampleset`` defined.
 
@@ -282,7 +344,7 @@ class Gaussian1D(modeling.models.Gaussian1D, GaussianSamplesetMixin):
 
 
 class GaussianAbsorption1D(modeling.models.GaussianAbsorption1D,
-                           GaussianSamplesetMixin):
+                           GaussianSampleset1DMixin):
     """Same as `astropy.modeling.models.GaussianAbsorption1D`, except with
     ``sampleset`` defined.
 
@@ -290,46 +352,60 @@ class GaussianAbsorption1D(modeling.models.GaussianAbsorption1D,
     pass
 
 
-class Lorentz1D(modeling.models.Lorentz1D):
+class Lorentz1D(modeling.models.Lorentz1D, GaussianSampleset1DMixin):
     """Same as `astropy.modeling.models.Lorentz1D`, except with
     ``sampleset`` defined.
 
     """
+    # This is needed for sampletset()
     @property
-    def sampleset(self):
-        """``x`` array that samples the feature."""
-        n = 50
-        dw = 0.1 * 2.355 * self.fwhm
-        w1 = self.x_0 - n * dw
-        w2 = self.x_0 + n * dw
+    def stddev(self):
+        """Standard deviation based on FWHM."""
+        return self.fwhm * 0.5 / np.sqrt(2 * np.log(2))
 
-        if self._n_models == 1:
-            w = np.arange(w1, w2, dw)
-        else:
-            w = np.array([np.arange(w1[i], w2[i], dw[i])
-                          for i in range(self._n_models)])
+    def bounding_box(self, factor=25):
+        """Tuple defining the default ``bounding_box`` limits,
+        ``(x_low, x_high)``.
 
-        return w
+        Parameters
+        ----------
+        factor : float
+            The multiple of `stddev` used to define the limits.
+            Similar to `Gaussian1D`.
+
+        """
+        x0 = self.x_0.value
+        dx = factor * self.stddev
+
+        return (x0 - dx, x0 + dx)
 
 
-class MexicanHat1D(modeling.models.MexicanHat1D):
+class MexicanHat1D(modeling.models.MexicanHat1D, GaussianSampleset1DMixin):
     """Same as `astropy.modeling.models.MexicanHat1D`, except with
     ``sampleset`` defined.
 
     """
+    # This is needed for sampletset()
     @property
-    def sampleset(self):
-        """``x`` array that samples the feature."""
-        n = 50
-        dw = 0.1 * self.sigma
-        w1 = self.x_0 - n * dw
-        w2 = self.x_0 + n * dw
+    def stddev(self):
+        """Alias for ``sigma``."""
+        return self.sigma
 
-        if self._n_models == 1:
-            w = np.arange(w1, w2, dw)
-        else:
-            w = np.array([np.arange(w1[i], w2[i], dw[i])
-                          for i in range(self._n_models)])
+    def bounding_box(self, factor=5.5):
+        """Tuple defining the default ``bounding_box`` limits,
+        ``(x_low, x_high)``.
+
+        Parameters
+        ----------
+        factor : float
+            The multiple of ``sigma`` used to define the limits.
+            Similar to `Gaussian1D`.
+
+        """
+        x0 = self.x_0.value
+        dx = factor * self.sigma
+
+        return (x0 - dx, x0 + dx)
 
 
 class PowerLawFlux1D(modeling.models.PowerLaw1D):
@@ -388,18 +464,16 @@ class Trapezoid1D(modeling.models.Trapezoid1D):
     ``sampleset`` defined.
 
     """
-    @property
     def sampleset(self):
-        """``x`` array that samples the feature."""
-        x2 = self.x_0 - self.width * 0.5
-        x3 = self.x_0 + self.width * 0.5
-        x1 = x2 - self.amplitude / self.slope
-        x4 = x3 + self.amplitude / self.slope
+        """Return ``x`` array that samples the feature."""
+        x1, x4 = self.bounding_box
+        dw = self.width * 0.5
+        x2 = self.x_0 - dw
+        x3 = self.x_0 + dw
 
         if self._n_models == 1:
-            w = [x1[0], x2, x3, x4[0]]
+            w = [x1, x2, x3, x4]
         else:
-            w = np.array([[x1[i], x2[i], x3[i], x4[i]]
-                          for i in range(self._n_models)])
+            w = list(zip(x1, x2, x3, x4))
 
-        return w
+        return np.asarray(w)

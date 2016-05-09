@@ -114,7 +114,7 @@ class TestEmpiricalSourceFromFile(object):
             self.sp.waverange.value, [3479.99902344, 10500.00097656])
 
     def test_call(self):
-        w = self.sp.model.get_x()[5000:5004]
+        w = self.sp.model.x[5000:5004]
         y = units.convert_flux(w, self.sp(w), units.FLAM)
         np.testing.assert_allclose(
             w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
@@ -171,7 +171,7 @@ class TestEmpiricalBandpassFromFile(object):
             bp = SpectralElement(Empirical1D, x=_wave, y=_flux_photlam)
 
     def test_call(self):
-        w = self.bp.model.get_x()[5000:5004]
+        w = self.bp.model.x[5000:5004]
         y = self.bp(w)
         np.testing.assert_allclose(
             w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
@@ -604,12 +604,12 @@ class TestWaveset(object):
 
     def test_sampleset(self):
         sp = SourceSpectrum.from_gaussian(1, 5000, 10)
-        np.testing.assert_array_equal(sp.waveset.value, sp.model.sampleset)
+        np.testing.assert_array_equal(sp.waveset.value, sp.model.sampleset())
 
     def test_box1d_hack(self):
         bp = SpectralElement(Box1D, amplitude=1, x_0=5000, width=10)
         w1 = bp.waveset.value
-        w2 = bp.model.sampleset
+        w2 = bp.model.sampleset()
         np.testing.assert_allclose(w1[::w1.size-1], w2[::w2.size-1])
         np.testing.assert_allclose(w1[1:] - w1[:-1], 0.01)
 

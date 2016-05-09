@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Different types of integrators."""
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 
 # THIRD-PARTY
 import numpy as np
@@ -54,10 +53,10 @@ class TrapezoidIntegrator(BaseIntegrator):
 
     Examples
     --------
-    >>> from astropy.modeling import models
+    >>> from synphot import models
     >>> source = models.Box1D(amplitude=1, x_0=5000, width=100)
-    >>> TrapezoidIntegrator()(source, source.sampleset)
-    101.0
+    >>> TrapezoidIntegrator()(source, source.sampleset())
+    100.01
 
     """
     @staticmethod

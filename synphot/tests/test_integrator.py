@@ -4,8 +4,7 @@
 .. note:: ``TrapezoidFluxIntegrator`` is tested in test_spectrum.py.
 
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 
 # THIRD-PARTY
 import numpy as np
@@ -32,7 +31,8 @@ class TestTrapezoidIntegrator(object):
     def test_box_model(self):
         # Ascending
         m = Box1D(amplitude=1, x_0=5000, width=10)
-        np.testing.assert_allclose(self.integrator(m, m.sampleset), 10.01)
+        x = m.sampleset()
+        np.testing.assert_allclose(self.integrator(m, x), 10.01)
 
         # Descending
-        np.testing.assert_allclose(self.integrator(m, m.sampleset[::-1]), 10.01)
+        np.testing.assert_allclose(self.integrator(m, x[::-1]), 10.01)

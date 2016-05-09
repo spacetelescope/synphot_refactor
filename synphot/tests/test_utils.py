@@ -4,8 +4,7 @@
 .. note:: ``get_waveset()`` is tested in test_spectrum.py.
 
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 from astropy.extern import six
 
 # THIRD PARTY

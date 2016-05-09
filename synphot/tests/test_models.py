@@ -7,8 +7,7 @@
     tested within existing Astropy PRs.
 
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 
 # STDLIB
 import os
@@ -42,7 +41,7 @@ class TestBlackBody1D(object):
         np.testing.assert_allclose(self.m1.lambda_max, 5268.67, rtol=1e-5)
 
     def test_sampleset(self):
-        f1 = self.m1(self.m1.sampleset)
+        f1 = self.m1(self.m1.sampleset())
         assert f1[0] == 0
         assert f1[-1] < self.m1(self.m1.lambda_max) * 0.05
 
@@ -119,7 +118,7 @@ class TestEmpirical1D(object):
         self.m = Empirical1D(x=self.w, y=y.value)
 
     def test_sampleset(self):
-        np.testing.assert_array_equal(self.m.sampleset, self.w)
+        np.testing.assert_array_equal(self.m.sampleset(), self.w)
 
     def test_eval(self):
         # Sample at existing wavelength (no interpolation)

@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Synthetic photometry utility functions."""
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 
 # THIRD-PARTY
 import numpy as np
@@ -55,11 +54,7 @@ def get_waveset(model):
             waveset = merge_wavelengths(waveset, cur_w)
 
     elif hasattr(model, 'sampleset'):
-        waveset = model.sampleset
-
-        # Hack Box1D waveset so its bandpar results are consistent with IRAF
-        if model.__class__.__name__ == 'Box1D':
-            waveset = np.arange(waveset[0], waveset[-1], 0.01)
+        waveset = model.sampleset()
 
     else:
         waveset = None
