@@ -3,8 +3,10 @@
 
 .. note::
 
-    ``GaussianAbsorption1D`` and ``Redshift`` are already being
+    ``GaussianAbsorption1D`` and ``RedshiftScaleFactor`` are already being
     tested within existing Astropy PRs.
+
+    ``get_waveset()`` is tested in test_spectrum.py.
 
 """
 from __future__ import absolute_import, division, print_function

@@ -16,14 +16,15 @@ from astropy import constants as const
 from astropy import log
 from astropy import modeling
 from astropy import units as u
-from astropy.modeling.models import Redshift, Scale
+from astropy.modeling.models import RedshiftScaleFactor, Scale
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from . import exceptions, specio, units, utils
 from .config import Conf, conf
 from .integrator import TrapezoidIntegrator, TrapezoidFluxIntegrator
-from .models import BlackBody1D, ConstFlux1D, Empirical1D, Gaussian1D
+from .models import (BlackBody1D, ConstFlux1D, Empirical1D, Gaussian1D,
+                     get_waveset)
 
 __all__ = ['BaseSpectrum', 'BaseSourceSpectrum', 'SourceSpectrum',
            'BaseUnitlessSpectrum', 'SpectralElement']
@@ -90,7 +91,10 @@ class BaseSpectrum(object):
             'alpha': u.dimensionless_unscaled},
         'PowerLawFlux1D': {
             'amplitude': 'noconv', 'x_0': 'noconv',
-            'alpha': u.dimensionless_unscaled}}
+            'alpha': u.dimensionless_unscaled},
+        'Trapezoid1D': {
+            'amplitude': 'flux', 'x_0': 'wave', 'width': 'wave',
+            'slope': u.dimensionless_unscaled}}
 
     # Flux conversion will use these wavelengths.
     _model_fconv_wav = {
@@ -103,7 +107,8 @@ class BaseSpectrum(object):
         'LogParabola1D': 'x_0',
         'Lorentz1D': 'x_0',
         'MexicanHat1D': 'x_0',
-        'PowerLaw1D': 'x_0'}
+        'PowerLaw1D': 'x_0',
+        'Trapezoid1D': 'x_0'}
 
     def __init__(self, modelclass, metadata={}, **kwargs):
         self._build_model(modelclass, **kwargs)
@@ -116,6 +121,11 @@ class BaseSpectrum(object):
 
     def _build_model(self, modelclass, **kwargs):
         """Build the model."""
+
+        # Does not handle multiple model sets for now; too complicated.
+        n_models = kwargs.pop('n_models', 1)
+        if n_models != 1:
+            raise exceptions.SynphotError('Model can only have n_models=1')
 
         # This is needed for internal math operations to build composite model.
         # Handles the model instance, not class. Assume it is already in the
@@ -164,11 +174,7 @@ class BaseSpectrum(object):
                 pval = self._process_generic_param(kval, ptype)
             modargs[pname] = pval
 
-        model = modelclass(**modargs)
-        if model._n_models != 1:
-            raise exceptions.SynphotError('Model can only have _n_models=1')
-
-        self._model = model
+        self._model = modelclass(**modargs)
 
     @staticmethod
     def _process_generic_param(pval, def_unit, equivalencies=[]):
@@ -234,7 +240,7 @@ class BaseSpectrum(object):
     @property
     def waveset(self):
         """Optimal wavelengths for sampling the spectrum or bandpass."""
-        w = utils.get_waveset(self.model)
+        w = get_waveset(self.model)
         if w is not None:
             utils.validate_wavelengths(w)
             w = u.Quantity(w, self._internal_wave_unit)
@@ -527,14 +533,24 @@ class BaseSpectrum(object):
 
         """
         x = self._validate_wavelengths(wavelengths)
+
+        # Calculate new end points for tapering
         w1 = x[0] ** 2 / x[1]
-        y1 = self(w1)
         w2 = x[-1] ** 2 / x[-2]
-        y2 = self(w2)
+
+        # Special handling for empirical data.
+        # This is to be compatible with ASTROLIB PYSYNPHOT behavior.
+        if isinstance(self._model, Empirical1D):
+            y1 = self._model.y.value[0]
+            y2 = self._model.y.value[-1]
+        # Other models can just evaluate at new end points
+        else:
+            y1 = self(w1)
+            y2 = self(w2)
 
         # Nothing to do
         if y1 == 0 and y2 == 0:
-            return self  # deepcopy?
+            return self  # Do we need a deepcopy here?
 
         y = self(x)
 
@@ -922,7 +938,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             raise exceptions.SynphotError(
                 'Redshift must be a real scalar number.')
         self._z = float(what)
-        self._redshift_model = Redshift(self._z)
+        self._redshift_model = RedshiftScaleFactor(self._z)
 
     def __str__(self):
         """Descriptive information of the spectrum."""

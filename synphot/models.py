@@ -19,10 +19,12 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from . import units
+from .exceptions import SynphotError
+from .utils import merge_wavelengths
 
 __all__ = ['BlackBody1D', 'Box1D', 'ConstFlux1D', 'Empirical1D', 'Gaussian1D',
            'GaussianAbsorption1D', 'Lorentz1D', 'MexicanHat1D',
-           'PowerLawFlux1D', 'Trapezoid1D']
+           'PowerLawFlux1D', 'Trapezoid1D', 'get_waveset']
 
 
 class BlackBody1D(modeling.Fittable1DModel):
@@ -477,3 +479,89 @@ class Trapezoid1D(modeling.models.Trapezoid1D):
             w = list(zip(x1, x2, x3, x4))
 
         return np.asarray(w)
+
+
+# Functions below are for sampleset magic.
+
+def _get_sampleset(model):
+    """Return sampleset of a model or `None` if undefined.
+    Model could be a real model or evaluated sampleset."""
+    if isinstance(model, modeling.Model):
+        if hasattr(model, 'sampleset'):
+            w = model.sampleset()
+        else:
+            w = None
+    else:
+        w = model  # Already a sampleset
+    return w
+
+
+def _merge_sampleset(model1, model2):
+    """Simple merge of samplesets."""
+    w1 = _get_sampleset(model1)
+    w2 = _get_sampleset(model2)
+    return merge_wavelengths(w1, w2)
+
+
+def _shift_wavelengths(model1, model2):
+    """One of the models is either ``RedshiftScaleFactor`` or ``Scale``.
+
+    Possible combos::
+
+        RedshiftScaleFactor | Model
+        Scale | Model
+        Model | Scale
+
+    """
+    if isinstance(model1, modeling.models.RedshiftScaleFactor):
+        val = _get_sampleset(model2)
+        if val is None:
+            w = val
+        else:
+            w = model1.inverse(val)
+    elif isinstance(model1, modeling.models.Scale):
+        w = _get_sampleset(model2)
+    else:
+        w = _get_sampleset(model1)
+    return w
+
+
+WAVESET_OPERATORS = {
+    '+': _merge_sampleset,
+    '-': _merge_sampleset,
+    '*': _merge_sampleset,
+    '/': _merge_sampleset,
+    '**': _merge_sampleset,
+    '|': _shift_wavelengths,
+    '&': _merge_sampleset
+}
+
+
+def get_waveset(model):
+    """Get optimal wavelengths for sampling a given model.
+
+    Parameters
+    ----------
+    model : `~astropy.modeling.Model`
+        Model.
+
+    Returns
+    -------
+    waveset : array_like or `None`
+        Optimal wavelengths. `None` if undefined.
+
+    Raises
+    ------
+    synphot.exceptions.SynphotError
+        Invalid model.
+
+    """
+    if not isinstance(model, modeling.Model):
+        raise SynphotError('{0} is not a model.'.format(model))
+
+    if isinstance(model, modeling.core._CompoundModel):
+        waveset = model._tree.evaluate(WAVESET_OPERATORS, getter=None)
+    else:
+        waveset = _get_sampleset(model)
+
+    return waveset

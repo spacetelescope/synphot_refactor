@@ -23,16 +23,16 @@ from astropy import units as u
 from astropy.io import fits
 from astropy.modeling.models import (
     BrokenPowerLaw1D, Const1D, ExponentialCutoffPowerLaw1D, LogParabola1D,
-    PowerLaw1D, Redshift)
+    PowerLaw1D, RedshiftScaleFactor)
 from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
 from .test_units import _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
-from .. import exceptions, units, utils
+from .. import exceptions, units
 from ..models import (
     Box1D, ConstFlux1D, Empirical1D, Gaussian1D, GaussianAbsorption1D,
-    Lorentz1D, MexicanHat1D, PowerLawFlux1D)
+    Lorentz1D, MexicanHat1D, PowerLawFlux1D, get_waveset)
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
 
@@ -114,7 +114,7 @@ class TestEmpiricalSourceFromFile(object):
             self.sp.waverange.value, [3479.99902344, 10500.00097656])
 
     def test_call(self):
-        w = self.sp.model.x[5000:5004]
+        w = self.sp.model.x.value[5000:5004]
         y = units.convert_flux(w, self.sp(w), units.FLAM)
         np.testing.assert_allclose(
             w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
@@ -171,7 +171,7 @@ class TestEmpiricalBandpassFromFile(object):
             bp = SpectralElement(Empirical1D, x=_wave, y=_flux_photlam)
 
     def test_call(self):
-        w = self.bp.model.x[5000:5004]
+        w = self.bp.model.x.value[5000:5004]
         y = self.bp(w)
         np.testing.assert_allclose(
             w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
@@ -300,7 +300,7 @@ class TestBoxBandpass(object):
         with pytest.raises(exceptions.SynphotError):
             bp = SpectralElement(
                 Box1D, amplitude=[1, 1], x_0=[5000, 6000],
-                width=[100, 1])
+                width=[100, 1], n_models=2)
 
 
 class TestBlackBodySource(object):
@@ -331,12 +331,13 @@ class TestGaussianSource(object):
 
     def test_totalflux(self):
         # PHOTLAM
-        np.testing.assert_allclose(self.sp.integrate(), 1, rtol=1e-5)
+        val = self.sp.integrate().value
+        np.testing.assert_allclose(val, 1, rtol=1e-5)
 
         # FLAM
         sp2 = SourceSpectrum.from_gaussian(1, 400 * u.nm, 10 * u.nm)
-        np.testing.assert_allclose(
-            sp2.integrate(flux_unit=units.FLAM), 1, rtol=1e-3)
+        val = sp2.integrate(flux_unit=units.FLAM).value
+        np.testing.assert_allclose(val, 1, rtol=1e-3)
 
     def test_symmetry(self):
         np.testing.assert_allclose(self.sp(3950), self.sp(4050))
@@ -357,7 +358,7 @@ class TestPowerLawSource(object):
             rtol=1e-6)
 
     def test_normalization(self):
-        np.testing.assert_allclose(self.sp(600 * u.nm), 1, rtol=1e-6)
+        np.testing.assert_allclose(self.sp(600 * u.nm).value, 1)
 
 
 class TestBuildModels(object):
@@ -606,12 +607,15 @@ class TestWaveset(object):
         sp = SourceSpectrum.from_gaussian(1, 5000, 10)
         np.testing.assert_array_equal(sp.waveset.value, sp.model.sampleset())
 
-    def test_box1d_hack(self):
+    def test_box1d(self):
         bp = SpectralElement(Box1D, amplitude=1, x_0=5000, width=10)
-        w1 = bp.waveset.value
-        w2 = bp.model.sampleset()
-        np.testing.assert_allclose(w1[::w1.size-1], w2[::w2.size-1])
-        np.testing.assert_allclose(w1[1:] - w1[:-1], 0.01)
+        np.testing.assert_array_equal(bp.waveset.value, bp.model.sampleset())
+
+    def test_composite_none(self):
+        bp1 = SpectralElement(Box1D, amplitude=1, x_0=5000, width=10)
+        bp2 = SpectralElement(Const1D, amplitude=2)
+        bp = bp1 * bp2
+        np.testing.assert_array_equal(bp.waveset, bp1.waveset)
 
     def test_composite(self):
         sp = (SpectralElement(Box1D, amplitude=1, x_0=1000, width=1) *
@@ -620,13 +624,14 @@ class TestWaveset(object):
                SourceSpectrum.from_gaussian(1, 7500, 5)))
         np.testing.assert_allclose(
             sp.waveset.value[::100],
-            [999.49, 1000.49, 5020.38372321, 6703.83723207, 7509.97953115])
+            [999.49, 1000.49, 5018.26041871, 6635.89148805, 7504.45893945])
 
     def test_redshift(self):
         sp = SourceSpectrum.from_gaussian(1, 5000, 10)
         sp.z = 1.3
-        m = Redshift(z=1.3)
-        w_step25_z0 = [4978.76695499, 4989.3834775, 5000, 5010.6165225]
+        m = RedshiftScaleFactor(z=1.3)
+        w_step25_z0 = [4976.64365049, 4987.260173, 4997.8766955, 5008.493218,
+                       5019.10974051]
         np.testing.assert_allclose(sp.waveset.value[::25], m(w_step25_z0))
 
     def test_redshift_none(self):
@@ -635,7 +640,7 @@ class TestWaveset(object):
 
     def test_exceptions(self):
         with pytest.raises(exceptions.SynphotError):
-            utils.get_waveset('foo')
+            get_waveset('foo')
 
 
 class TestRedShift(object):

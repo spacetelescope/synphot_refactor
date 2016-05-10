@@ -1,9 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Test utils.py module.
-
-.. note:: ``get_waveset()`` is tested in test_spectrum.py.
-
-"""
+"""Test utils.py module."""
 from __future__ import absolute_import, division, print_function
 from astropy.extern import six
 
