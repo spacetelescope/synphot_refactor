@@ -239,21 +239,44 @@ class Empirical1D(modeling.Fittable1DModel):
         Convert negative ``y`` values to zeroes?
         This is to be consistent with ASTROLIB PYSYNPHOT.
 
+    kwargs : dict
+        Optional keywords for model creation or
+        :func:`~scipy.interpolate.interp1d`.
+
     """
     standard_broadcasting = False
     x = modeling.Parameter(default=[0, 0])
     y = modeling.Parameter(default=[0, 0])
 
-    def __init__(self, x, y, keep_neg=False, **kwargs):
+    def __init__(self, x, y, **kwargs):
         from scipy.interpolate import interp1d
 
         n_models = kwargs.get('n_models', 1)
         if n_models > 1:
             raise NotImplementedError('Only n_models=1 is supported')
 
+        keep_neg = kwargs.pop('keep_neg', False)
+        self._keep_neg = keep_neg
+        y = self._process_neg_flux(y)
+
+        # These keywords do not go into model init
+        kind = kwargs.pop('kind', 'nearest')
+        axis = kwargs.pop('axis', -1)
+        copy = kwargs.pop('copy', True)
+        bounds_error = kwargs.pop('bounds_error', False)
+        fill_value = kwargs.pop('fill_value', 0)
+        assume_sorted = kwargs.pop('assume_sorted', False)
+        self._f = interp1d(
+            x, y, kind=kind, axis=axis, copy=copy, bounds_error=bounds_error,
+            fill_value=fill_value, assume_sorted=assume_sorted)
+
+        super(Empirical1D, self).__init__(x=x, y=y, **kwargs)
+
+    def _process_neg_flux(self, y):
+        """Remove negative flux."""
         y = np.asarray(y)
 
-        if not keep_neg:
+        if not self._keep_neg:
             i = np.where(y < 0)
             n_neg = len(i[0])
             if n_neg > 0:
@@ -263,10 +286,7 @@ class Empirical1D(modeling.Fittable1DModel):
                 self._warnings = {'NegativeFlux': warn_str}
                 warnings.warn(warn_str, AstropyUserWarning)
 
-        #self._f = interp1d(x, y, fill_value='extrapolate')
-        self._f = interp1d(x, y, bounds_error=False, fill_value=0)
-
-        super(Empirical1D, self).__init__(x=x, y=y, **kwargs)
+        return y
 
     @property
     def warnings(self):
@@ -296,11 +316,11 @@ class Empirical1D(modeling.Fittable1DModel):
 
         Returns
         -------
-        resampled_result : number or ndarray
+        y : number or ndarray
             Flux or throughput in same unit as parameter ``y``.
 
         """
-        return self._f(x)
+        return self._process_neg_flux(self._f(x))
 
 
 class GaussianSampleset1DMixin(object):

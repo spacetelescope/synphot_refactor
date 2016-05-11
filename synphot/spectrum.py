@@ -73,7 +73,7 @@ class BaseSpectrum(object):
             'alpha_2': u.dimensionless_unscaled},
         'Const1D': {'amplitude': 'noconv'},
         'ConstFlux1D': {'amplitude': 'noconv'},
-        'Empirical1D': {'x': 'wave', 'y': 'flux', 'keep_neg': 'noconv'},
+        'Empirical1D': {'x': 'wave', 'y': 'flux'},
         'ExponentialCutoffPowerLaw1D': {
             'amplitude': 'flux', 'x_0': 'wave', 'x_cutoff': 'wave',
             'alpha': u.dimensionless_unscaled},
@@ -151,27 +151,27 @@ class BaseSpectrum(object):
         # Process wavelength needed for flux conversion first, if applicable.
         if modelname in self._model_fconv_wav:
             pname_wav = self._model_fconv_wav[modelname]
-            pval_wav = self._process_wave_param(kwargs[pname_wav])
+            pval_wav = self._process_wave_param(kwargs.pop(pname_wav))
             modargs[pname_wav] = pval_wav
         else:
             pname_wav = ''
             pval_wav = None
 
         # Process the rest of the parameters.
-        for pname, ptype in six.iteritems(self._model_param_dict[modelname]):
-            if pname not in kwargs:
-                continue
-            if pname == pname_wav:
-                continue
-            kval = kwargs[pname]
-            if ptype == 'wave':
-                pval = self._process_wave_param(kval)
-            elif ptype == 'flux':
-                pval = self._process_flux_param(kval, pval_wav)
-            elif ptype == 'noconv':
-                pval = kval
+        for pname, kval in six.iteritems(kwargs):
+            if pname in self._model_param_dict[modelname]:
+                ptype = self._model_param_dict[modelname][pname]
+                if ptype == 'wave':
+                    pval = self._process_wave_param(kval)
+                elif ptype == 'flux':
+                    pval = self._process_flux_param(kval, pval_wav)
+                elif ptype == 'noconv':
+                    pval = kval
+                else:
+                    pval = self._process_generic_param(kval, ptype)
             else:
-                pval = self._process_generic_param(kval, ptype)
+                pval = kval
+
             modargs[pname] = pval
 
         self._model = modelclass(**modargs)

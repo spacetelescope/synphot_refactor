@@ -684,7 +684,7 @@ class TestMathOperators(object):
             x=[3999.9, 4000.0, 5000.0, 6000.0, 6000.1],
             y=u.Quantity([0, 3.5e-14, 4e-14, 4.5e-14, 0], units.FLAM))
         self.sp_2 = SourceSpectrum(
-            Empirical1D, x=_wave, y=_flux_jy,
+            Empirical1D, x=_wave, y=_flux_jy, fill_value='extrapolate',
             metadata={'PHOTLAM': [9.7654e-3, 1.003896e-2, 9.78473e-3]})
         self.bp_1 = SpectralElement(
             Empirical1D,
