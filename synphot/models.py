@@ -1,37 +1,33 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Spectrum models not in `astropy.modeling`."""
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
+from astropy.extern.six.moves import map, zip
 
 # STDLIB
-import collections
 import warnings
+from functools import partial
 
 # THIRD-PARTY
 import numpy as np
 
 # ASTROPY
 from astropy import constants as const
-#from astropy import modeling
+from astropy import modeling
 from astropy import units as u
+from astropy.analytic_functions.blackbody import blackbody_nu
 from astropy.utils.exceptions import AstropyUserWarning
-
-# STSCI
-try:
-    from jwst_lib import modeling
-except ImportError:  # This is so RTD would build successfully
-    pass
 
 # LOCAL
 from . import units
-from .planck import bbfunc
+from .exceptions import SynphotError
+from .utils import merge_wavelengths
 
-__all__ = ['BlackBody1D', 'ConstFlux1D', 'Empirical1D', 'GaussianAbsorption1D',
-           'PowerLawFlux1D', 'Redshift']
+__all__ = ['BlackBody1D', 'Box1D', 'ConstFlux1D', 'Empirical1D', 'Gaussian1D',
+           'GaussianAbsorption1D', 'Lorentz1D', 'MexicanHat1D',
+           'PowerLawFlux1D', 'Trapezoid1D', 'get_waveset']
 
 
-# TODO: Use https://github.com/astropy/astropy/pull/1480 instead
-class BlackBody1D(modeling.Parametric1DModel):
+class BlackBody1D(modeling.Fittable1DModel):
     """Create a :ref:`blackbody spectrum <synphot-planck-law>`
     model with given temperature.
 
@@ -41,15 +37,7 @@ class BlackBody1D(modeling.Parametric1DModel):
         Blackbody temperature in Kelvin.
 
     """
-    temperature = modeling.Parameter('temperature')
-
-    def __init__(self, temperature, **constraints):
-        try:
-            param_dim = len(temperature)
-        except TypeError:
-            param_dim = 1
-        super(BlackBody1D, self).__init__(
-            param_dim=param_dim, temperature=temperature, **constraints)
+    temperature = modeling.Parameter(default=5000)
 
     @property
     def lambda_max(self):
@@ -58,22 +46,54 @@ class BlackBody1D(modeling.Parametric1DModel):
         return u.Quantity(const.b_wien.value / self.temperature, u.m).to(
             u.AA).value
 
-    @property
-    def sampleset(self):
-        """``x`` array that samples the feature."""
+    def bounding_box(self, factor=10.0):
+        """Tuple defining the default ``bounding_box`` limits,
+        ``(x_low, x_high)``.
+
+        .. math::
+
+            x_{\\textnormal{low}} = 0
+
+            x_{\\textnormal{high}} = \\log(\\lambda_{\\textnormal{max}} \\; (1 + \\textnormal{factor}))
+
+        Parameters
+        ----------
+        factor : float
+            Used to calculate ``x_high``.
+
+        """
         w0 = self.lambda_max
-        w2 = np.log10(w0 + 10 * w0)
-
-        if self.param_dim == 1:
-            w = np.logspace(0, w2, num=1000)
-        else:
-            w = np.array([np.logspace(0, w2[i], num=1000)
-                          for i in range(self.param_dim)]).T
-
-        return w
+        return (w0 * 0, np.log10(w0 + factor * w0))
 
     @staticmethod
-    def eval(x, temperature):
+    def _calc_sampleset(w1, w2, num):
+        """Calculate sampleset for each model."""
+        return np.logspace(w1, w2, num=num)
+
+    def sampleset(self, factor_bbox=10.0, num=1000):
+        """Return ``x`` array that samples the feature.
+
+        Parameters
+        ----------
+        factor_bbox : float
+            Factor for ``bounding_box`` calculations.
+
+        num : int
+            Number of points to generate.
+
+        """
+        w1, w2 = self.bounding_box(factor=factor_bbox)
+
+        if self._n_models == 1:
+            w = self._calc_sampleset(w1, w2, num)
+        else:
+            f = partial(self._calc_sampleset, num=num)
+            w = list(map(f, w1, w2))
+
+        return np.asarray(w)
+
+    @staticmethod
+    def evaluate(x, temperature):
         """Evaluate the model.
 
         Parameters
@@ -90,23 +110,66 @@ class BlackBody1D(modeling.Parametric1DModel):
             Blackbody radiation in PHOTLAM per steradian.
 
         """
+        # Silence Numpy
+        old_np_err_cfg = np.seterr(all='ignore')
+
         wave = u.Quantity(np.ascontiguousarray(x), unit=u.AA)
-        t = u.Quantity(temperature, unit=u.K)
-        bbflux = bbfunc(wave, t)
+        bbnu_flux = blackbody_nu(wave, temperature)
+        bbflux = (bbnu_flux * u.sr).to(
+            units.PHOTLAM, u.spectral_density(wave)) / u.sr  # PHOTLAM/sr
+
+        # Restore Numpy settings
+        dummy = np.seterr(**old_np_err_cfg)
+
         return bbflux.value
 
+
+class Box1D(modeling.models.Box1D):
+    """Same as `astropy.modeling.models.Box1D`, except with
+    ``sampleset`` defined.
+
+    """
     @staticmethod
-    def fit_deriv(x, temperature):
-        raise NotImplementedError('fit_deriv undefined BlackBody1D.')
+    def _calc_sampleset(w1, w2, step, minimal):
+        """Calculate sampleset for each model."""
+        if minimal:
+            arr = [w1 - step, w1, w2, w2 + step]
+        else:
+            arr = np.arange(w1 - step, w2 + step, step)
+
+        return arr
+
+    def sampleset(self, step=0.01, minimal=False):
+        """Return ``x`` array that samples the feature.
+
+        Parameters
+        ----------
+        step : float
+            Distance of first and last points w.r.t. bounding box.
+
+        minimal : bool
+            Only return the minimal points needed to define the box;
+            i.e., box edges and a point outside on each side.
+
+        """
+        w1, w2 = self.bounding_box
+
+        if self._n_models == 1:
+            w = self._calc_sampleset(w1, w2, step, minimal)
+        else:
+            f = partial(self._calc_sampleset, step=step, minimal=minimal)
+            w = list(map(f, w1, w2))
+
+        return np.asarray(w)
 
 
-class ConstFlux1D(modeling.Parametric1DModel):
+class ConstFlux1D(modeling.models.Const1D):
     """One dimensional constant flux model.
 
     Flux that is constant in a given unit might not be constant in
     another unit. During evaluation, flux is always converted to PHOTLAM.
 
-    For multiple ``param_dim``, this model only accepts amplitudes of the
+    For multiple ``n_models``, this model only accepts amplitudes of the
     same flux unit; e.g., ``[1, 2]`` or ``Quantity([1, 2], 'photlam')``.
 
     Parameters
@@ -116,14 +179,7 @@ class ConstFlux1D(modeling.Parametric1DModel):
         If not Quantity, assume the unit of PHOTLAM.
 
     """
-    amplitude = modeling.Parameter('amplitude')
-
-    def __init__(self, amplitude, **constraints):
-        try:
-            param_dim = len(amplitude)
-        except TypeError:
-            param_dim = 1
-
+    def __init__(self, amplitude, **kwargs):
         if not isinstance(amplitude, u.Quantity):
             amplitude = u.Quantity(amplitude, units.PHOTLAM)
 
@@ -141,10 +197,9 @@ class ConstFlux1D(modeling.Parametric1DModel):
             raise NotImplementedError('{0} not supported.'.format(in_unit_name))
 
         self._flux_unit = a.unit
-        super(ConstFlux1D, self).__init__(
-            param_dim=param_dim, amplitude=a.value, **constraints)
+        super(ConstFlux1D, self).__init__(amplitude=a.value, **kwargs)
 
-    def eval(self, x, *args):
+    def evaluate(self, x, *args):
         """One dimensional constant flux model function.
 
         Parameters
@@ -162,18 +217,15 @@ class ConstFlux1D(modeling.Parametric1DModel):
         y = units.convert_flux(x, a, units.PHOTLAM)
         return y.value
 
-    @staticmethod
-    def fit_deriv(x, amplitude):
-        """One dimensional constant flux model derivative."""
-        raise NotImplementedError('fit_deriv undefined ConstFlux1D.')
 
-
-class Empirical1D(modeling.Model):
+# TODO: Subclass from LookupTable (spacetelescope/gwcs#28)
+class Empirical1D(modeling.Fittable1DModel):
     """Empirical (sampled) spectrum or bandpass model.
 
     .. note::
 
-        Only supports ``param_dim=1``.
+        This model requires `SciPy <http://www.scipy.org>`_ 0.17
+        or later to be installed.
 
     Parameters
     ----------
@@ -187,13 +239,42 @@ class Empirical1D(modeling.Model):
         Convert negative ``y`` values to zeroes?
         This is to be consistent with ASTROLIB PYSYNPHOT.
 
-    """
-    x = modeling.Parameter('x')
-    y = modeling.Parameter('y')
+    kwargs : dict
+        Optional keywords for model creation or
+        :func:`~scipy.interpolate.interp1d`.
 
-    def __init__(self, x, y, keep_neg=False):
+    """
+    standard_broadcasting = False
+    x = modeling.Parameter(default=[0, 0])
+    y = modeling.Parameter(default=[0, 0])
+
+    def __init__(self, x, y, **kwargs):
+        n_models = kwargs.get('n_models', 1)
+        if n_models > 1:
+            raise NotImplementedError('Only n_models=1 is supported')
+
+        keep_neg = kwargs.pop('keep_neg', False)
+        self._keep_neg = keep_neg
+        y = self._process_neg_flux(y)
+
+        # Set interpolation default values
+        self._kind = 'linear'
+        self._axis = -1
+        self._copy = True
+        self._bounds_error = False
+        self._fill_value = 0
+        self._assume_sorted = False
+
+        # Filter out keywords that do not go into model init
+        kwargs = self._process_interp1d_options(x, y, **kwargs)
+
+        super(Empirical1D, self).__init__(x=x, y=y, **kwargs)
+
+    def _process_neg_flux(self, y):
+        """Remove negative flux."""
         y = np.asarray(y)
-        if not keep_neg:
+
+        if not self._keep_neg:
             i = np.where(y < 0)
             n_neg = len(i[0])
             if n_neg > 0:
@@ -202,22 +283,50 @@ class Empirical1D(modeling.Model):
                             'it/they will be set to zero.'.format(n_neg))
                 self._warnings = {'NegativeFlux': warn_str}
                 warnings.warn(warn_str, AstropyUserWarning)
-        self._x = x
-        self._y = y
-        super(Empirical1D, self).__init__(param_dim=1)
+
+        return y
+
+    def _process_interp1d_options(self, x, y, **kwargs):
+        """Override default interpolation options and return unused keywords."""
+        from scipy.interpolate import interp1d
+
+        self._kind = kwargs.pop('kind', self._kind)
+        self._axis = kwargs.pop('axis', self._axis)
+        self._copy = kwargs.pop('copy', self._copy)
+        self._bounds_error = kwargs.pop('bounds_error', self._bounds_error)
+        self._fill_value = kwargs.pop('fill_value', self._fill_value)
+        self._assume_sorted = kwargs.pop('assume_sorted', self._assume_sorted)
+        self._f = interp1d(
+            x, y, kind=self._kind, axis=self._axis, copy=self._copy,
+            bounds_error=self._bounds_error, fill_value=self._fill_value,
+            assume_sorted=self._assume_sorted)
+
+        return kwargs
+
+    def set_interp1d(self, **kwargs):
+        """Use given keywords with :func:`~scipy.interpolate.interp1d` to
+        evaluate model. Otherwise, use previously set values."""
+        self._process_interp1d_options(self.x.value, self.y.value, **kwargs)
 
     @property
     def warnings(self):
         """Dictionary of warning key-value pairs."""
         return self._warnings
 
+    # NOTE: It is forced to be property by core Model. The decorator
+    #       here is just to make this obvious.
     @property
-    def sampleset(self):
-        """``x`` array that samples the feature."""
-        return self._x
+    def bounding_box(self):
+        """Tuple defining the default ``bounding_box`` limits,
+        ``(x_low, x_high)``."""
+        x = self.x.value
+        return (min(x), max(x))
 
-    @modeling.core.format_input
-    def __call__(self, x):
+    def sampleset(self):
+        """Return ``x`` array that samples the feature."""
+        return self.x.value
+
+    def evaluate(self, x, *args):
         """Evaluate the model.
 
         Parameters
@@ -227,109 +336,128 @@ class Empirical1D(modeling.Model):
 
         Returns
         -------
-        resampled_result : number or ndarray
+        y : number or ndarray
             Flux or throughput in same unit as parameter ``y``.
 
         """
-        new_wave = np.ascontiguousarray(x)
-
-        # Check whether given wavelengths are in descending order
-        if np.isscalar(new_wave) or new_wave[0] < new_wave[-1]:
-            newasc = True
-        else:
-            new_wave = new_wave[::-1]
-            newasc = False
-
-        # Interpolation flux/throughput
-        if self._x[0] < self._x[-1]:
-            oldasc = True
-            resampled_result = np.interp(new_wave, self._x, self._y)
-        else:
-            oldasc = False
-            rev = np.interp(new_wave, self._x[::-1], self._y[::-1])
-            resampled_result = rev[::-1]
-
-        # If the new and old wavelengths do not have the same parity,
-        # the answer has to be flipped again.
-        if newasc != oldasc:
-            resampled_result = resampled_result[::-1]
-
-        return resampled_result
+        return self._process_neg_flux(self._f(x))
 
 
-# TODO: Use https://github.com/astropy/astropy/pull/2215 instead
-class GaussianAbsorption1D(modeling.Parametric1DModel):
-    """Gaussian absorption line model.
-
-    .. math::
-
-        f(x) = 1 - A e^{- \\frac{\\left(x - x_{0}\\right)^{2}}{2 \\sigma^{2}}}
-
-    Parameters
-    ----------
-    amplitude : float
-        Amplitude of the gaussian absorption.
-
-    mean : float
-        Mean of the gaussian.
-
-    stddev : float
-        Standard deviation of the gaussian.
+class GaussianSampleset1DMixin(object):
+    """Mixin class to define ``sampleset`` for Gaussian models.
+    Also used for Lorentz and MexicanHat due to similarities.
 
     """
-    amplitude = modeling.Parameter('amplitude')
-    mean = modeling.Parameter('mean')
-    stddev = modeling.Parameter('stddev')
+    @staticmethod
+    def _calc_sampleset(w1, w2, dw):
+        """Calculate sampleset for each model."""
+        return np.arange(w1, w2, dw)
 
-    def __init__(self, amplitude, mean, stddev, **constraints):
-        try:
-            param_dim = len(amplitude)
-        except TypeError:
-            param_dim = 1
-        super(GaussianAbsorption1D, self).__init__(
-            param_dim=param_dim, amplitude=amplitude, mean=mean, stddev=stddev,
-            **constraints)
+    def sampleset(self, factor_step=0.1, **kwargs):
+        """Return ``x`` array that samples the feature.
 
-    @property
-    def sampleset(self):
-        """``x`` array that samples the feature."""
-        n = 50
-        dw = 0.1 * self.stddev
-        w1 = self.mean - n * dw
-        w2 = self.mean + n * dw
+        Parameters
+        ----------
+        factor_step : float
+            Factor for sample step calculation. The step is calculated
+            using ``factor_step * self.stddev``.
 
-        if self.param_dim == 1:
-            w = np.arange(w1, w2, dw)
+        kwargs : dict
+            Keyword(s) for ``bounding_box`` calculation.
+
+        """
+        w1, w2 = self.bounding_box(**kwargs)
+        dw = factor_step * self.stddev
+
+        if self._n_models == 1:
+            w = self._calc_sampleset(w1, w2, dw)
         else:
-            w = np.array([np.arange(w1[i], w2[i], dw[i])
-                          for i in range(self.param_dim)]).T
+            w = list(map(self._calc_sampleset, w1, w2, dw))
 
-        return w
-
-    @staticmethod
-    def eval(x, amplitude, mean, stddev):
-        """GaussianAbsorption1D model function."""
-        return 1.0 - modeling.models.Gaussian1D.eval(x, amplitude, mean, stddev)
-
-    @staticmethod
-    def fit_deriv(x, amplitude, mean, stddev):
-        """GaussianAbsorption1D model function derivatives."""
-        import operator
-        return map(
-            operator.neg,
-            modeling.models.Gaussian1D.fit_deriv(x, amplitude, mean, stddev))
+        return np.asarray(w)
 
 
-class PowerLawFlux1D(modeling.Parametric1DModel):
+class Gaussian1D(modeling.models.Gaussian1D, GaussianSampleset1DMixin):
+    """Same as `astropy.modeling.models.Gaussian1D`, except with
+    ``sampleset`` defined.
+
+    """
+    pass
+
+
+class GaussianAbsorption1D(modeling.models.GaussianAbsorption1D,
+                           GaussianSampleset1DMixin):
+    """Same as `astropy.modeling.models.GaussianAbsorption1D`, except with
+    ``sampleset`` defined.
+
+    """
+    pass
+
+
+class Lorentz1D(modeling.models.Lorentz1D, GaussianSampleset1DMixin):
+    """Same as `astropy.modeling.models.Lorentz1D`, except with
+    ``sampleset`` defined.
+
+    """
+    # This is needed for sampleset()
+    @property
+    def stddev(self):
+        """Standard deviation based on FWHM."""
+        return self.fwhm * 0.5 / np.sqrt(2 * np.log(2))
+
+    def bounding_box(self, factor=25):
+        """Tuple defining the default ``bounding_box`` limits,
+        ``(x_low, x_high)``.
+
+        Parameters
+        ----------
+        factor : float
+            The multiple of `stddev` used to define the limits.
+            Similar to `Gaussian1D`.
+
+        """
+        x0 = self.x_0.value
+        dx = factor * self.stddev
+
+        return (x0 - dx, x0 + dx)
+
+
+class MexicanHat1D(modeling.models.MexicanHat1D, GaussianSampleset1DMixin):
+    """Same as `astropy.modeling.models.MexicanHat1D`, except with
+    ``sampleset`` defined.
+
+    """
+    # This is needed for sampletset()
+    @property
+    def stddev(self):
+        """Alias for ``sigma``."""
+        return self.sigma
+
+    def bounding_box(self, factor=5.5):
+        """Tuple defining the default ``bounding_box`` limits,
+        ``(x_low, x_high)``.
+
+        Parameters
+        ----------
+        factor : float
+            The multiple of ``sigma`` used to define the limits.
+            Similar to `Gaussian1D`.
+
+        """
+        x0 = self.x_0.value
+        dx = factor * self.sigma
+
+        return (x0 - dx, x0 + dx)
+
+
+class PowerLawFlux1D(modeling.models.PowerLaw1D):
     """One dimensional power law model with proper flux handling.
 
-    For multiple ``param_dim``, this model only accepts parameters of the
+    For multiple ``n_models``, this model only accepts parameters of the
     same unit; e.g., ``amplitude=[1, 2]`` or
     ``amplitude=Quantity([1, 2], 'photlam')``.
 
-    .. math::
-
-        f(x) = A (x / x_0) ^ {-\\alpha}
+    Also see `~astropy.modeling.models.powerlaws.PowerLaw1D`.
 
     Parameters
     ----------
@@ -345,16 +473,7 @@ class PowerLawFlux1D(modeling.Parametric1DModel):
         Power law index.
 
     """
-    amplitude = modeling.Parameter('amplitude')
-    x_0 = modeling.Parameter('x_0')
-    alpha = modeling.Parameter('alpha')
-
-    def __init__(self, amplitude, x_0, alpha, **constraints):
-        try:
-            param_dim = len(amplitude)
-        except TypeError:
-            param_dim = 1
-
+    def __init__(self, amplitude, x_0, alpha, **kwargs):
         if not isinstance(amplitude, u.Quantity):
             amplitude = u.Quantity(amplitude, units.PHOTLAM)
 
@@ -372,59 +491,117 @@ class PowerLawFlux1D(modeling.Parametric1DModel):
             x_0 = x_0.to(u.AA, u.spectral()).value
 
         super(PowerLawFlux1D, self).__init__(
-            param_dim=param_dim, amplitude=amplitude.value, x_0=x_0,
-            alpha=alpha, **constraints)
+            amplitude=amplitude.value, x_0=x_0, alpha=alpha, **kwargs)
 
-    def eval(self, x, *args):
-        """Return flux in PHOTLAM."""
+    def evaluate(self, x, *args):
+        """Return flux in PHOTLAM. Assume input wavelength is in Angstrom."""
         xx = x / self.x_0
         y = u.Quantity(self.amplitude * xx ** (-self.alpha), self._flux_unit)
         flux = units.convert_flux(x, y, units.PHOTLAM)
         return flux.value
 
-    @staticmethod
-    def fit_deriv(x, amplitude, x_0, alpha):
-        """One dimensional power law derivative with respect to parameters."""
-        raise NotImplementedError('fit_deriv undefined PowerLawFlux1D.')
+
+class Trapezoid1D(modeling.models.Trapezoid1D):
+    """Same as `astropy.modeling.models.Trapezoid1D`, except with
+    ``sampleset`` defined.
+
+    """
+    def sampleset(self):
+        """Return ``x`` array that samples the feature."""
+        x1, x4 = self.bounding_box
+        dw = self.width * 0.5
+        x2 = self.x_0 - dw
+        x3 = self.x_0 + dw
+
+        if self._n_models == 1:
+            w = [x1, x2, x3, x4]
+        else:
+            w = list(zip(x1, x2, x3, x4))
+
+        return np.asarray(w)
 
 
-# TODO: Use https://github.com/astropy/astropy/pull/2176 instead
-class Redshift(modeling.Parametric1DModel):
-    """Apply redshift to wavelength.
+# Functions below are for sampleset magic.
 
-    .. math::
+def _get_sampleset(model):
+    """Return sampleset of a model or `None` if undefined.
+    Model could be a real model or evaluated sampleset."""
+    if isinstance(model, modeling.Model):
+        if hasattr(model, 'sampleset'):
+            w = model.sampleset()
+        else:
+            w = None
+    else:
+        w = model  # Already a sampleset
+    return w
 
-        \\lambda_{obs} = (1 + z) \\lambda_{rest}
+
+def _merge_sampleset(model1, model2):
+    """Simple merge of samplesets."""
+    w1 = _get_sampleset(model1)
+    w2 = _get_sampleset(model2)
+    return merge_wavelengths(w1, w2)
+
+
+def _shift_wavelengths(model1, model2):
+    """One of the models is either ``RedshiftScaleFactor`` or ``Scale``.
+
+    Possible combos::
+
+        RedshiftScaleFactor | Model
+        Scale | Model
+        Model | Scale
+
+    """
+    if isinstance(model1, modeling.models.RedshiftScaleFactor):
+        val = _get_sampleset(model2)
+        if val is None:
+            w = val
+        else:
+            w = model1.inverse(val)
+    elif isinstance(model1, modeling.models.Scale):
+        w = _get_sampleset(model2)
+    else:
+        w = _get_sampleset(model1)
+    return w
+
+
+WAVESET_OPERATORS = {
+    '+': _merge_sampleset,
+    '-': _merge_sampleset,
+    '*': _merge_sampleset,
+    '/': _merge_sampleset,
+    '**': _merge_sampleset,
+    '|': _shift_wavelengths,
+    '&': _merge_sampleset
+}
+
+
+def get_waveset(model):
+    """Get optimal wavelengths for sampling a given model.
 
     Parameters
     ----------
-    z : float or a list of floats
-        Redshift value(s).
+    model : `~astropy.modeling.Model`
+        Model.
+
+    Returns
+    -------
+    waveset : array_like or `None`
+        Optimal wavelengths. `None` if undefined.
+
+    Raises
+    ------
+    synphot.exceptions.SynphotError
+        Invalid model.
 
     """
-    z = modeling.Parameter('z')
+    if not isinstance(model, modeling.Model):
+        raise SynphotError('{0} is not a model.'.format(model))
 
-    def __init__(self, z, **constraints):
-        if not isinstance(z, collections.Sequence):
-            param_dim = 1
-        else:
-            param_dim = len(z)
-        super(Redshift, self).__init__(param_dim=param_dim, z=z, **constraints)
+    if isinstance(model, modeling.core._CompoundModel):
+        waveset = model._tree.evaluate(WAVESET_OPERATORS, getter=None)
+    else:
+        waveset = _get_sampleset(model)
 
-    @staticmethod
-    def eval(x, z):
-        """One dimensional Redshift model function."""
-        return (1 + z) * x
-
-    @staticmethod
-    def fit_deriv(x, z):
-        """One dimensional Redshift model derivative."""
-        d_z = x
-        return [d_z]
-
-    def inverse(self):
-        """Inverse Redshift model."""
-        if self.param_dim == 1:
-            return Redshift(z=1.0 / (1.0 + self.z) - 1.0)
-        else:
-            return Redshift(z=[1.0 / (1.0 + z) - 1.0 for z in self.z])
+    return waveset

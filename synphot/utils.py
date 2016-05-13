@@ -1,76 +1,18 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Synthetic photometry utility functions."""
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 
 # THIRD-PARTY
 import numpy as np
 
 # ASTROPY
-#from astropy import modeling
 from astropy import units as u
-
-# STSCI
-try:
-    from jwst_lib import modeling
-except ImportError:  # This is so RTD would build successfully
-    pass
 
 # LOCAL
 from . import exceptions, units
 
-__all__ = ['get_waveset', 'overlap_status', 'validate_totalflux',
-           'validate_wavelengths', 'generate_wavelengths', 'merge_wavelengths']
-
-
-def get_waveset(model):
-    """Get optimal wavelengths for sampling a given model.
-
-    Parameters
-    ----------
-    model : `~astropy.modeling.core.Model`
-        Model.
-
-    Returns
-    -------
-    waveset : array_like or `None`
-        Optimal wavelengths. `None` if undefined.
-
-    Raises
-    ------
-    synphot.exceptions.SynphotError
-        Invalid model.
-
-    """
-    if not isinstance(model, modeling.Model):
-        raise exceptions.SynphotError('{0} is not a model.'.format(model))
-
-    if (isinstance(model, modeling.core.SerialCompositeModel) and
-            model._transforms[0].__class__.__name__ == 'Redshift'):
-        z = model._transforms[0].inverse()
-        w = get_waveset(model._transforms[1])
-        if w is None:
-            waveset = None
-        else:
-            waveset = z(w)
-
-    elif isinstance(model, modeling.core._CompositeModel):
-        w_list = [get_waveset(m) for m in model._transforms]
-        waveset = merge_wavelengths(w_list[0], w_list[1])
-        for cur_w in w_list[2:]:
-            waveset = merge_wavelengths(waveset, cur_w)
-
-    elif hasattr(model, 'sampleset'):
-        waveset = model.sampleset
-
-        # Hack Box1D waveset so its bandpar results are consistent with IRAF
-        if model.__class__.__name__ == 'Box1D':
-            waveset = np.arange(waveset[0], waveset[-1], 0.01)
-
-    else:
-        waveset = None
-
-    return waveset
+__all__ = ['overlap_status', 'validate_totalflux', 'validate_wavelengths',
+           'generate_wavelengths', 'merge_wavelengths']
 
 
 def overlap_status(a, b):
@@ -160,7 +102,12 @@ def validate_wavelengths(wavelengths):
         units.validate_wave_unit(wavelengths.unit)
         wave = wavelengths.value
     else:
-        wave = np.array(wavelengths)
+        wave = wavelengths
+
+    if np.isscalar(wave):
+        wave = [wave]
+
+    wave = np.asarray(wave)
 
     # Check for zeroes
     if np.any(wave <= 0):
@@ -268,7 +215,7 @@ def merge_wavelengths(waveset1, waveset2, threshold=1e-12):
     ----------
     waveset1, waveset2 : array_like or `None`
         Wavelength values, assumed to be in the same unit already.
-        Also see :func:`get_waveset`.
+        Also see :func:`~synphot.models.get_waveset`.
 
     threshold : float, optional
         Merged wavelength values are considered "too close together"

@@ -9,7 +9,7 @@ import os
 from setuptools import Extension
 
 # ASTROPY
-from astropy import setup_helpers
+from astropy_helpers import setup_helpers
 
 LOCALROOT = os.path.relpath(os.path.dirname(__file__))
 
@@ -122,3 +122,7 @@ def get_extensions():
     cfg = dict((str(key), val) for key, val in six.iteritems(cfg))
 
     return [Extension(str('synphot.synphot_utils'), **cfg)]
+
+
+def requires_2to3():
+    return False

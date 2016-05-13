@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module defines the different types of spectra."""
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 from astropy.extern import six
 
 # STDLIB
@@ -15,21 +14,17 @@ import numpy as np
 # ASTROPY
 from astropy import constants as const
 from astropy import log
-#from astropy import modeling
 from astropy import units as u
+from astropy.modeling import Model
+from astropy.modeling.models import RedshiftScaleFactor, Scale
 from astropy.utils.exceptions import AstropyUserWarning
-
-# STSCI
-try:
-    from jwst_lib import modeling
-except ImportError:  # This is so RTD would build successfully
-    pass
 
 # LOCAL
 from . import exceptions, specio, units, utils
 from .config import Conf, conf
 from .integrator import TrapezoidIntegrator, TrapezoidFluxIntegrator
-from .models import BlackBody1D, ConstFlux1D, Empirical1D, Redshift
+from .models import (BlackBody1D, ConstFlux1D, Empirical1D, Gaussian1D,
+                     get_waveset)
 
 __all__ = ['BaseSpectrum', 'BaseSourceSpectrum', 'SourceSpectrum',
            'BaseUnitlessSpectrum', 'SpectralElement']
@@ -78,7 +73,7 @@ class BaseSpectrum(object):
             'alpha_2': u.dimensionless_unscaled},
         'Const1D': {'amplitude': 'noconv'},
         'ConstFlux1D': {'amplitude': 'noconv'},
-        'Empirical1D': {'x': 'wave', 'y': 'flux', 'keep_neg': 'noconv'},
+        'Empirical1D': {'x': 'wave', 'y': 'flux'},
         'ExponentialCutoffPowerLaw1D': {
             'amplitude': 'flux', 'x_0': 'wave', 'x_cutoff': 'wave',
             'alpha': u.dimensionless_unscaled},
@@ -96,7 +91,10 @@ class BaseSpectrum(object):
             'alpha': u.dimensionless_unscaled},
         'PowerLawFlux1D': {
             'amplitude': 'noconv', 'x_0': 'noconv',
-            'alpha': u.dimensionless_unscaled}}
+            'alpha': u.dimensionless_unscaled},
+        'Trapezoid1D': {
+            'amplitude': 'flux', 'x_0': 'wave', 'width': 'wave',
+            'slope': u.dimensionless_unscaled}}
 
     # Flux conversion will use these wavelengths.
     _model_fconv_wav = {
@@ -109,7 +107,8 @@ class BaseSpectrum(object):
         'LogParabola1D': 'x_0',
         'Lorentz1D': 'x_0',
         'MexicanHat1D': 'x_0',
-        'PowerLaw1D': 'x_0'}
+        'PowerLaw1D': 'x_0',
+        'Trapezoid1D': 'x_0'}
 
     def __init__(self, modelclass, metadata={}, **kwargs):
         self._build_model(modelclass, **kwargs)
@@ -123,17 +122,22 @@ class BaseSpectrum(object):
     def _build_model(self, modelclass, **kwargs):
         """Build the model."""
 
+        # Does not handle multiple model sets for now; too complicated.
+        n_models = kwargs.pop('n_models', 1)
+        if n_models != 1:
+            raise exceptions.SynphotError('Model can only have n_models=1')
+
         # This is needed for internal math operations to build composite model.
         # Handles the model instance, not class. Assume it is already in the
-        # correct units and param_dim.
-        if isinstance(modelclass, modeling.core.Model):
+        # correct units and _n_models.
+        if isinstance(modelclass, Model):
             self._model = modelclass
             return
         if isinstance(modelclass, BaseSpectrum):
             self._model = modelclass.model
             return
 
-        if not issubclass(modelclass, modeling.core.Model):
+        if not issubclass(modelclass, Model):
             raise exceptions.SynphotError(
                 '{0} is not a valid model class.'.format(modelclass))
 
@@ -147,34 +151,30 @@ class BaseSpectrum(object):
         # Process wavelength needed for flux conversion first, if applicable.
         if modelname in self._model_fconv_wav:
             pname_wav = self._model_fconv_wav[modelname]
-            pval_wav = self._process_wave_param(kwargs[pname_wav])
+            pval_wav = self._process_wave_param(kwargs.pop(pname_wav))
             modargs[pname_wav] = pval_wav
         else:
             pname_wav = ''
             pval_wav = None
 
         # Process the rest of the parameters.
-        for pname, ptype in six.iteritems(self._model_param_dict[modelname]):
-            if pname not in kwargs:
-                continue
-            if pname == pname_wav:
-                continue
-            kval = kwargs[pname]
-            if ptype == 'wave':
-                pval = self._process_wave_param(kval)
-            elif ptype == 'flux':
-                pval = self._process_flux_param(kval, pval_wav)
-            elif ptype == 'noconv':
-                pval = kval
+        for pname, kval in six.iteritems(kwargs):
+            if pname in self._model_param_dict[modelname]:
+                ptype = self._model_param_dict[modelname][pname]
+                if ptype == 'wave':
+                    pval = self._process_wave_param(kval)
+                elif ptype == 'flux':
+                    pval = self._process_flux_param(kval, pval_wav)
+                elif ptype == 'noconv':
+                    pval = kval
+                else:
+                    pval = self._process_generic_param(kval, ptype)
             else:
-                pval = self._process_generic_param(kval, ptype)
+                pval = kval
+
             modargs[pname] = pval
 
-        model = modelclass(**modargs)
-        if model.param_dim != 1:
-            raise exceptions.SynphotError('Model can only have param_dim=1')
-
-        self._model = model
+        self._model = modelclass(**modargs)
 
     @staticmethod
     def _process_generic_param(pval, def_unit, equivalencies=[]):
@@ -240,7 +240,7 @@ class BaseSpectrum(object):
     @property
     def waveset(self):
         """Optimal wavelengths for sampling the spectrum or bandpass."""
-        w = utils.get_waveset(self.model)
+        w = get_waveset(self.model)
         if w is not None:
             utils.validate_wavelengths(w)
             w = u.Quantity(w, self._internal_wave_unit)
@@ -533,14 +533,24 @@ class BaseSpectrum(object):
 
         """
         x = self._validate_wavelengths(wavelengths)
+
+        # Calculate new end points for tapering
         w1 = x[0] ** 2 / x[1]
-        y1 = self(w1)
         w2 = x[-1] ** 2 / x[-2]
-        y2 = self(w2)
+
+        # Special handling for empirical data.
+        # This is to be compatible with ASTROLIB PYSYNPHOT behavior.
+        if isinstance(self._model, Empirical1D):
+            y1 = self._model.y.value[0]
+            y2 = self._model.y.value[-1]
+        # Other models can just evaluate at new end points
+        else:
+            y1 = self(w1)
+            y2 = self(w2)
 
         # Nothing to do
         if y1 == 0 and y2 == 0:
-            return self  # deepcopy?
+            return self  # Do we need a deepcopy here?
 
         y = self(x)
 
@@ -909,11 +919,11 @@ class SourceSpectrum(BaseSourceSpectrum):
         else:
             # wavelength
             if self._internal_wave_unit.physical_type == 'length':
-                rs = self._redshift_model.inverse()
+                rs = self._redshift_model.inverse
             # frequency or wavenumber
             else:  # pragma: no cover
                 rs = self._redshift_model
-            m = modeling.core.SerialCompositeModel([rs, self._model])
+            m = rs | self._model
         return m
 
     @property
@@ -928,7 +938,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             raise exceptions.SynphotError(
                 'Redshift must be a real scalar number.')
         self._z = float(what)
-        self._redshift_model = Redshift(self._z)
+        self._redshift_model = RedshiftScaleFactor(self._z)
 
     def __str__(self):
         """Descriptive information of the spectrum."""
@@ -966,7 +976,7 @@ class SourceSpectrum(BaseSourceSpectrum):
                 raise exceptions.IncompatibleSources(
                     'Can only operate on real scalar number.')
 
-            newcls = self.__class__(self.model * val)
+            newcls = self.__class__(self.model | Scale(val))
 
         elif isinstance(other, BaseUnitlessSpectrum):
             newcls = self.__class__(self.model * other.model)
@@ -1158,7 +1168,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             'expr': 'em({0:g}, {1:g}, {2:g}, {3})'.format(
                 x0, fh, tf, cls._internal_flux_unit)}
 
-        return cls(modeling.models.Gaussian1D, amplitude=amplitude, mean=x0,
+        return cls(Gaussian1D, amplitude=amplitude, mean=x0,
                    stddev=sigma, z=z, metadata=header)
 
     @classmethod
@@ -1237,7 +1247,7 @@ class BaseUnitlessSpectrum(BaseSpectrum):
                 raise exceptions.IncompatibleSources(
                     'Can only operate on real scalar number.')
 
-            newcls = self.__class__(self.model * val)
+            newcls = self.__class__(self.model | Scale(val))
 
         elif isinstance(other, BaseUnitlessSpectrum):
             newcls = self.__class__(self.model * other.model)

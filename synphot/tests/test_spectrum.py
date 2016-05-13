@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Test spectrum.py module and related functionalities."""
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 
 # STDLIB
 import os
@@ -11,21 +10,29 @@ import tempfile
 # THIRD-PARTY
 import numpy as np
 
+try:
+    import scipy  # pylint: disable=W0611
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
+
 # ASTROPY
+from astropy import modeling
 from astropy import units as u
 from astropy.io import fits
-#from astropy.modeling import models
+from astropy.modeling.models import (
+    BrokenPowerLaw1D, Const1D, ExponentialCutoffPowerLaw1D, LogParabola1D,
+    PowerLaw1D, RedshiftScaleFactor)
 from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
-# STSCI
-from jwst_lib.modeling import models
-
 # LOCAL
 from .test_units import _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
-from .. import exceptions, units, utils
-from ..models import (ConstFlux1D, Empirical1D, GaussianAbsorption1D,
-                      PowerLawFlux1D, Redshift)
+from .. import exceptions, units
+from ..models import (
+    Box1D, ConstFlux1D, Empirical1D, Gaussian1D, GaussianAbsorption1D,
+    Lorentz1D, MexicanHat1D, PowerLawFlux1D, get_waveset)
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
 
@@ -34,6 +41,7 @@ _vspec = None  # Loaded in test_load_vspec()
 
 
 @remote_data
+@pytest.mark.skipif('not HAS_SCIPY')
 def test_load_vspec():
     """Load VEGA spectrum once here to be used later."""
     global _vspec
@@ -41,6 +49,7 @@ def test_load_vspec():
 
 
 @remote_data
+@pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.parametrize(
     ('in_q', 'out_u', 'ans'),
     [(_flux_photlam, units.VEGAMAG, _flux_vegamag),
@@ -50,15 +59,16 @@ def test_load_vspec():
 def test_flux_conversion_vega(in_q, out_u, ans):
     """Test Vega spectrum object and flux conversion with VEGAMAG.
 
-    .. note:: 0.5% is good enough given Vega gets updated from time to time.
+    .. note:: 1% is good enough given Vega gets updated from time to time.
 
     """
     result = units.convert_flux(_wave, in_q, out_u, vegaspec=_vspec)
-    np.testing.assert_allclose(result.value, ans.value, rtol=5e-3)
+    np.testing.assert_allclose(result.value, ans.value, rtol=1e-2)
     assert result.unit == ans.unit
 
 
 @remote_data
+@pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.parametrize(
     'filtername',
     ['bessel_j', 'bessel_h', 'bessel_k', 'cousins_r', 'cousins_i',
@@ -83,6 +93,7 @@ def test_filter_exception():
         bp = SpectralElement.from_filter('foo')
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestEmpiricalSourceFromFile(object):
     """This is the most common model used in ASTROLIB PYSYNPHOT."""
     def setup_class(self):
@@ -147,6 +158,7 @@ class TestEmpiricalSourceFromFile(object):
             y.value, [0, 3.9135e-14, 4.0209e-14, 3.9169e-14, 0], rtol=1e-6)
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestEmpiricalBandpassFromFile(object):
     """This is the most common model used in ASTROLIB PYSYNPHOT."""
     def setup_class(self):
@@ -169,7 +181,7 @@ class TestEmpiricalBandpassFromFile(object):
     def test_integrate(self):
         # Whole range (same as EQUVW)
         f = self.bp.integrate()
-        np.testing.assert_equal(f.value, 272.01081629459344)
+        np.testing.assert_allclose(f.value, 272.01081629459344)
 
         # Given range
         f = self.bp.integrate(wavelengths=_wave)
@@ -269,8 +281,7 @@ class TestEmpiricalBandpassFromFile(object):
 class TestBoxBandpass(object):
     """Test bandpass with Box1D model."""
     def setup_class(self):
-        self.bp = SpectralElement(
-            models.Box1D, amplitude=1, x_0=5000, width=100)
+        self.bp = SpectralElement(Box1D, amplitude=1, x_0=5000, width=100)
 
     def test_eval(self):
         # Box: Outside, boundary, inside
@@ -279,17 +290,17 @@ class TestBoxBandpass(object):
 
     def test_conversion(self):
         bp2 = SpectralElement(
-            models.Box1D, amplitude=1, x_0=u.Quantity(500, u.nm),
+            Box1D, amplitude=1, x_0=u.Quantity(500, u.nm),
             width=u.Quantity(10, u.nm))
         y = bp2([4000, 4949.95, 5000])
         np.testing.assert_array_equal(y.value, [0, 0, 1])
 
-    def test_multi_param_dim(self):
+    def test_multi_n_models(self):
         """This is not allowed."""
         with pytest.raises(exceptions.SynphotError):
             bp = SpectralElement(
-                models.Box1D, amplitude=[1, 1], x_0=[5000, 6000],
-                width=[100, 1])
+                Box1D, amplitude=[1, 1], x_0=[5000, 6000],
+                width=[100, 1], n_models=2)
 
 
 class TestBlackBodySource(object):
@@ -320,12 +331,13 @@ class TestGaussianSource(object):
 
     def test_totalflux(self):
         # PHOTLAM
-        np.testing.assert_allclose(self.sp.integrate(), 1, rtol=1e-5)
+        val = self.sp.integrate().value
+        np.testing.assert_allclose(val, 1, rtol=1e-5)
 
         # FLAM
         sp2 = SourceSpectrum.from_gaussian(1, 400 * u.nm, 10 * u.nm)
-        np.testing.assert_allclose(
-            sp2.integrate(flux_unit=units.FLAM), 1, rtol=1e-3)
+        val = sp2.integrate(flux_unit=units.FLAM).value
+        np.testing.assert_allclose(val, 1, rtol=1e-3)
 
     def test_symmetry(self):
         np.testing.assert_allclose(self.sp(3950), self.sp(4050))
@@ -346,20 +358,20 @@ class TestPowerLawSource(object):
             rtol=1e-6)
 
     def test_normalization(self):
-        np.testing.assert_allclose(self.sp(600 * u.nm), 1, rtol=1e-6)
+        np.testing.assert_allclose(self.sp(600 * u.nm).value, 1)
 
 
 class TestBuildModels(object):
     """Test compatiblity with other models not tested above."""
     def test_BrokenPowerLaw1D(self):
         sp = SourceSpectrum(
-            models.BrokenPowerLaw1D, amplitude=1, x_break=6000, alpha_1=1,
+            BrokenPowerLaw1D, amplitude=1, x_break=6000, alpha_1=1,
             alpha_2=4)
         y = sp([5000, 6000, 7000])
         np.testing.assert_allclose(y.value, [1.2, 1, 0.53977509])
 
     def test_Const1D(self):
-        sp = SourceSpectrum(models.Const1D, amplitude=1)
+        sp = SourceSpectrum(Const1D, amplitude=1)
         y = sp([1, 1000, 1e6])
         np.testing.assert_array_equal(y.value, 1)
 
@@ -371,7 +383,7 @@ class TestBuildModels(object):
 
     def test_ExponentialCutoffPowerLaw1D(self):
         sp = SourceSpectrum(
-            models.ExponentialCutoffPowerLaw1D, amplitude=1, x_0=6000,
+            ExponentialCutoffPowerLaw1D, amplitude=1, x_0=6000,
             x_cutoff=10000, alpha=4)
         y = sp([5000, 6000, 10000])
         np.testing.assert_allclose(
@@ -386,29 +398,29 @@ class TestBuildModels(object):
 
     def test_LogParabola1D(self):
         sp = SourceSpectrum(
-            models.LogParabola1D, amplitude=1, x_0=6000, alpha=1, beta=4)
+            LogParabola1D, amplitude=1, x_0=6000, alpha=1, beta=4)
         y = sp([5000, 6000, 7000])
         np.testing.assert_allclose(y.value, [1.0505953, 1, 0.77942375])
 
     def test_Lorentz1D(self):
-        sp = SourceSpectrum(models.Lorentz1D, amplitude=1, x_0=6000, fwhm=100)
+        sp = SourceSpectrum(Lorentz1D, amplitude=1, x_0=6000, fwhm=100)
         y = sp([5000, 6000, 7000])
         np.testing.assert_allclose(
             y.value, [0.00249377, 1, 0.00249377], rtol=1e-5)
 
     def test_MexicanHat1D(self):
-        sp = SourceSpectrum(
-            models.MexicanHat1D, amplitude=1, x_0=6000, sigma=100)
+        sp = SourceSpectrum(MexicanHat1D, amplitude=1, x_0=6000, sigma=100)
         y = sp([5000, 6000, 7000])
         np.testing.assert_allclose(
             y.value, [-1.90946235e-20, 1, -1.90946235e-20])
 
     def test_PowerLaw1D(self):
-        sp = SourceSpectrum(models.PowerLaw1D, amplitude=1, x_0=6000, alpha=4)
+        sp = SourceSpectrum(PowerLaw1D, amplitude=1, x_0=6000, alpha=4)
         y = sp([5000, 6000, 7000])
         np.testing.assert_allclose(y.value, [2.0736, 1, 0.53977509])
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestCheckOverlap(object):
     """Test spectrum overlap check."""
     def setup_class(self):
@@ -444,12 +456,12 @@ class TestCheckOverlap(object):
 
     def test_special_cases(self):
         # Other has no waveset
-        bp = SpectralElement(models.Const1D, amplitude=1)
+        bp = SpectralElement(Const1D, amplitude=1)
         assert self.sp.check_overlap(bp) == 'full'
 
         # Self has no waveset
-        bp = SpectralElement(models.Box1D, amplitude=1, x_0=5000, width=10)
-        sp = SourceSpectrum(models.Const1D, amplitude=1)
+        bp = SpectralElement(Box1D, amplitude=1, x_0=5000, width=10)
+        sp = SourceSpectrum(Const1D, amplitude=1)
         assert sp.check_overlap(bp) == 'partial_notmost'
 
     def test_exceptions(self):
@@ -457,6 +469,7 @@ class TestCheckOverlap(object):
             self.sp.check_overlap(1)
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestNormalize(object):
     """Test source spectrum normalization."""
     def setup_class(self):
@@ -477,7 +490,7 @@ class TestNormalize(object):
 
         # Box bandpass
         self.abox = SpectralElement(
-            models.Box1D, amplitude=1, x_0=5500, width=1,
+            Box1D, amplitude=1, x_0=5500, width=1,
             metadata={'expr': 'box(5500,1)'})
 
     def _select_sp(self, sp_type):
@@ -564,7 +577,7 @@ class TestNormalize(object):
             rn_sp = self.bb.normalize(10, band=np.ones(10))
 
         # Disjoint passband
-        bp = SpectralElement(models.Box1D, amplitude=1, x_0=30000, width=1)
+        bp = SpectralElement(Box1D, amplitude=1, x_0=30000, width=1)
         with pytest.raises(exceptions.DisjointError):
             rn_sp = self.em.normalize(10, band=bp)
 
@@ -578,7 +591,7 @@ class TestNormalize(object):
                 u.Quantity(10, units.VEGAMAG), band=self.abox)
 
         # Zero flux
-        sp = SourceSpectrum(models.Const1D, amplitude=0)
+        sp = SourceSpectrum(Const1D, amplitude=0)
         with pytest.raises(exceptions.SynphotError):
             rn_sp = sp.normalize(
                 u.Quantity(100, u.ct), band=self.abox, area=_area)
@@ -587,43 +600,47 @@ class TestNormalize(object):
 class TestWaveset(object):
     """Tests related to spectrum waveset."""
     def test_none(self):
-        sp = SourceSpectrum(models.Const1D, amplitude=1)
+        sp = SourceSpectrum(Const1D, amplitude=1)
         assert sp.waveset is None
 
     def test_sampleset(self):
         sp = SourceSpectrum.from_gaussian(1, 5000, 10)
-        np.testing.assert_array_equal(sp.waveset.value, sp.model.sampleset)
+        np.testing.assert_array_equal(sp.waveset.value, sp.model.sampleset())
 
-    def test_box1d_hack(self):
-        bp = SpectralElement(models.Box1D, amplitude=1, x_0=5000, width=10)
-        w1 = bp.waveset.value
-        w2 = bp.model.sampleset
-        np.testing.assert_allclose(w1[::w1.size-1], w2[::w2.size-1])
-        np.testing.assert_allclose(w1[1:] - w1[:-1], 0.01)
+    def test_box1d(self):
+        bp = SpectralElement(Box1D, amplitude=1, x_0=5000, width=10)
+        np.testing.assert_array_equal(bp.waveset.value, bp.model.sampleset())
+
+    def test_composite_none(self):
+        bp1 = SpectralElement(Box1D, amplitude=1, x_0=5000, width=10)
+        bp2 = SpectralElement(Const1D, amplitude=2)
+        bp = bp1 * bp2
+        np.testing.assert_array_equal(bp.waveset, bp1.waveset)
 
     def test_composite(self):
-        sp = (SpectralElement(models.Box1D, amplitude=1, x_0=1000, width=1) *
+        sp = (SpectralElement(Box1D, amplitude=1, x_0=1000, width=1) *
               (SourceSpectrum.from_gaussian(1, 5000, 10) +
                SourceSpectrum.from_gaussian(1, 6500, 100) +
                SourceSpectrum.from_gaussian(1, 7500, 5)))
         np.testing.assert_allclose(
             sp.waveset.value[::100],
-            [999.49, 1000.49, 5020.38372321, 6703.83723207, 7509.97953115])
+            [999.49, 1000.49, 5018.26041871, 6635.89148805, 7504.45893945])
 
     def test_redshift(self):
         sp = SourceSpectrum.from_gaussian(1, 5000, 10)
         sp.z = 1.3
-        m = Redshift(z=1.3)
-        w_step25_z0 = [4978.76695499, 4989.3834775, 5000, 5010.6165225]
+        m = RedshiftScaleFactor(z=1.3)
+        w_step25_z0 = [4976.64365049, 4987.260173, 4997.8766955, 5008.493218,
+                       5019.10974051]
         np.testing.assert_allclose(sp.waveset.value[::25], m(w_step25_z0))
 
     def test_redshift_none(self):
-        sp = SourceSpectrum(models.Const1D, amplitude=1, z=1.3)
+        sp = SourceSpectrum(Const1D, amplitude=1, z=1.3)
         assert sp.waveset is None
 
     def test_exceptions(self):
         with pytest.raises(exceptions.SynphotError):
-            utils.get_waveset('foo')
+            get_waveset('foo')
 
 
 class TestRedShift(object):
@@ -643,8 +660,8 @@ class TestRedShift(object):
         assert self.sp_z0.z == 0
         assert self.sp.z == 1.3
 
-        assert isinstance(self.sp_z0.model, models.Gaussian1D)
-        assert isinstance(self.sp.model, models.SerialCompositeModel)
+        assert isinstance(self.sp_z0.model, Gaussian1D)
+        assert isinstance(self.sp.model, modeling.core._CompoundModel)
 
     def test_composite_redshift(self):
         sp2 = self.sp_z0 + self.sp  # centers: 5000, 11500
@@ -658,6 +675,7 @@ class TestRedShift(object):
         np.testing.assert_allclose(sp_z0(3000), sp(6900))
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestMathOperators(object):
     """Test spectrum math operators."""
     def setup_class(self):
@@ -667,6 +685,7 @@ class TestMathOperators(object):
             y=u.Quantity([0, 3.5e-14, 4e-14, 4.5e-14, 0], units.FLAM))
         self.sp_2 = SourceSpectrum(
             Empirical1D, x=_wave, y=_flux_jy,
+            fill_value='extrapolate', kind='nearest',
             metadata={'PHOTLAM': [9.7654e-3, 1.003896e-2, 9.78473e-3]})
         self.bp_1 = SpectralElement(
             Empirical1D,
@@ -783,6 +802,7 @@ class TestMathOperators(object):
             ans = self.bp_1 / self.bp_1
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestWriteSpec(object):
     """Test spectrum to_fits() method."""
     def setup_class(self):

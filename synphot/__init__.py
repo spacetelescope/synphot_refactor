@@ -3,6 +3,7 @@
 """
 This is an Astropy affiliated package.
 """
+from __future__ import absolute_import
 
 # Affiliated packages may add whatever they like to this file, but
 # should keep this content at the top.
@@ -12,13 +13,10 @@ from ._astropy_init import *
 
 # For egg_info test builds to pass, put package imports here.
 if not _ASTROPY_SETUP_:
-    #from example_mod import *
-    pass
-
-#------------#
-# SYNPHOT UI #
-#------------#
-from .spectrum import *
-from .observation import *
-from .reddening import *
-from .thermal import *
+    #------------#
+    # SYNPHOT UI #
+    #------------#
+    #from .spectrum import *  # Cause import error in Astropy?
+    from .observation import *
+    from .reddening import *
+    from .thermal import *

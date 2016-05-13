@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Test observation.py module."""
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 
 # STDLIB
 import os
@@ -9,19 +8,23 @@ import os
 # THIRD-PARTY
 import numpy as np
 
+try:
+    import scipy  # pylint: disable=W0611
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
+
 # ASTROPY
 from astropy import units as u
-#from astropy.modeling import models
+from astropy.modeling.models import Const1D
 from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
-
-# STSCI
-from jwst_lib.modeling import models
 
 # LOCAL
 from .test_units import _area
 from .. import exceptions, units
-from ..models import ConstFlux1D, Empirical1D
+from ..models import Box1D, ConstFlux1D, Empirical1D
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
 
@@ -32,6 +35,7 @@ _bandfile = get_pkg_data_filename(
     os.path.join('data', 'hst_acs_hrc_f555w.fits'))
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestObservation(object):
     """Test Observation (most of them)."""
     def setup_class(self):
@@ -131,12 +135,12 @@ class TestObservation(object):
 
     def test_default_binset_from_spectrum(self):
         sp = SourceSpectrum.from_gaussian(1, 5000, 10)
-        bp = SpectralElement(models.Const1D, amplitude=1)
+        bp = SpectralElement(Const1D, amplitude=1)
         obs2 = Observation(sp, bp, force='extrap')
         np.testing.assert_array_equal(obs2.binset, sp.waveset)
 
     def test_undefined_binset(self):
-        bp = SpectralElement(models.Const1D, amplitude=1)
+        bp = SpectralElement(Const1D, amplitude=1)
         with pytest.raises(exceptions.UndefinedBinset):
             obs2 = Observation(self.obs.spectrum, bp)
 
@@ -148,6 +152,7 @@ class TestObservation(object):
             sp1(sp1.waveset), sp2(sp2.waveset), rtol=1e-3)
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestInitWithForce(object):
     """Test forced initialization."""
     def setup_class(self):
@@ -178,7 +183,7 @@ class TestMathOperators(object):
     """Test Observation math operators."""
     def setup_class(self):
         sp = SourceSpectrum(ConstFlux1D, amplitude=1)
-        bp = SpectralElement(models.Box1D, amplitude=1, x_0=5000, width=100)
+        bp = SpectralElement(Box1D, amplitude=1, x_0=5000, width=100)
         w = np.arange(1000, 10000)
         self.obs = Observation(sp, bp, binset=w)
 
@@ -187,7 +192,7 @@ class TestMathOperators(object):
         if is_scalar:
             other = 2
         else:
-            other = SpectralElement(models.Const1D, amplitude=2)
+            other = SpectralElement(Const1D, amplitude=2)
 
         obs2 = self.obs * other
         np.testing.assert_allclose(obs2([1000, 5000]).value, [0, 2])
@@ -205,6 +210,7 @@ class TestMathOperators(object):
             obs2 = self.obs - self.obs
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestObsPar(object):
     """Test Observation values from IRAF SYNPHOT CALCPHOT,
     unless noted otherwise.
@@ -276,7 +282,7 @@ class TestObsPar(object):
 
     def test_effstim_analytic(self):
         sp = SourceSpectrum.from_blackbody(5000)
-        bp = SpectralElement(models.Box1D, amplitude=1, x_0=5500, width=1)
+        bp = SpectralElement(Box1D, amplitude=1, x_0=5500, width=1)
         obs = Observation(sp, bp)
         np.testing.assert_allclose(
             obs.effstim(flux_unit=units.FLAM).value, 2.03E-15, rtol=0.01)  # 1%
@@ -295,6 +301,7 @@ class TestObsPar(object):
             x = self.obs.effstim(flux_unit=units.VEGAMAG)
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestCountRate(object):
     """Test countrate with Observation with well-defined ranges.
 
@@ -351,6 +358,7 @@ class TestCountRate(object):
             x = self.obs.countrate(_area, waverange=[1020, 1030])
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestCountRateNegFlux(object):
     """Test countrate with files containing negative flux/throughput values."""
     def setup_class(self):

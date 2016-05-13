@@ -25,37 +25,42 @@ env:
         # overridden underneath. They are defined here in order to save having
         # to repeat them for all configurations.
         - NUMPY_VERSION=stable
-        - ASTROPY_VERSION=stable
+        #- ASTROPY_VERSION=stable
+        - ASTROPY_VERSION=development
         - SETUP_CMD='test'
         - PIP_DEPENDENCIES=''
         # For this package-template, we include examples of Cython modules,
         # so Cython is required for testing. If your package does not include
         # Cython code, you can set CONDA_DEPENDENCIES=''
         #- CONDA_DEPENDENCIES='Cython'
-        - CONDA_DEPENDENCIES=''
+        - CONDA_DEPENDENCIES='Cython jinja2 scipy'
     matrix:
+        # DISABLED - https://github.com/astropy/package-template/issues/164
         # Make sure that egg_info works without dependencies
-        - SETUP_CMD='egg_info'
+        #- SETUP_CMD='egg_info'
         # Try all python versions with the latest numpy
         - SETUP_CMD='test'
 
 matrix:
     include:
 
+        # DISABLED FOR NOW
         # Do a coverage test in Python 2.
         #- python: 2.7
         #  env: SETUP_CMD='test --coverage'
 
+        # DISABLED FOR NOW
         # Check for sphinx doc build warnings - we do this first because it
         # may run for a long time
-        - python: 2.7
-          env: SETUP_CMD='build_sphinx -w'
+        #- python: 2.7
+        #  env: SETUP_CMD='build_sphinx -w'
 
+        # DISABLED FOR NOW
         # Try Astropy development version
-        - python: 2.7
-          env: ASTROPY_VERSION=development
-        - python: 3.5
-          env: ASTROPY_VERSION=development
+        #- python: 2.7
+        #  env: ASTROPY_VERSION=development
+        #- python: 3.5
+        #  env: ASTROPY_VERSION=development
 
 before_install:
 

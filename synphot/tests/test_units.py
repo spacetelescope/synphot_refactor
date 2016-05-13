@@ -4,8 +4,7 @@
 .. note:: VEGAMAG conversion is tested in test_spectrum.py.
 
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 
 # THIRD-PARTY
 import numpy as np
@@ -98,7 +97,7 @@ def test_validate_unit_exceptions():
     ('in_val', 'out_u', 'eqv', 'ans'),
     [(100.0, units.AREA, [], 100.0),
      (u.Quantity(100.0, units.AREA), u.m * u.m, [], 0.01),
-     (_wave_angstrom, u.micron ** -1, u.spectral(), _wavenum_micron)])
+     (_wave_angstrom, u.micron ** -1, u.spectral(), _wavenum_micron.value)])
 def test_validate_quantity(in_val, out_u, eqv, ans):
     """Test quantity validation."""
     result = units.validate_quantity(in_val, out_u, equivalencies=eqv)

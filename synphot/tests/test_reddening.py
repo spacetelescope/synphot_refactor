@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Test reddening.py module."""
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 
 # STDLIB
 import os
@@ -10,6 +9,13 @@ import tempfile
 
 # THIRD-PARTY
 import numpy as np
+
+try:
+    import scipy  # pylint: disable=W0611
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
 
 # ASTROPY
 from astropy import units as u
@@ -24,6 +30,7 @@ from ..reddening import ReddeningLaw, ExtinctionCurve
 from ..spectrum import SourceSpectrum
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestExtinction(object):
     """Test ReddeningLaw and ExtinctionCurve classes (most methods)."""
     def setup_class(self):
@@ -64,6 +71,7 @@ class TestExtinction(object):
 
 
 @remote_data
+@pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.parametrize(
     'modelname',
     ['lmc30dor', 'lmcavg', 'mwavg', 'mwdense', 'mwrv21', 'mwrv40',
@@ -80,11 +88,13 @@ def test_redlaw_from_model(modelname):
     assert 'descrip' in redlaw.metadata
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 def test_redlaw_from_model_exception():
     with pytest.raises(exceptions.SynphotError):
         redlaw = ReddeningLaw.from_extinction_model('foo')
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestWriteReddeningLaw(object):
     """Test ReddeningLaw ``to_fits()`` method."""
     def setup_class(self):

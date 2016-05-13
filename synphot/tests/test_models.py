@@ -3,18 +3,26 @@
 
 .. note::
 
-    ``GaussianAbsorption1D`` and ``Redshift`` are already being
+    ``GaussianAbsorption1D`` and ``RedshiftScaleFactor`` are already being
     tested within existing Astropy PRs.
 
+    ``get_waveset()`` is tested in test_spectrum.py.
+
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 
 # STDLIB
 import os
 
 # THIRD-PARTY
 import numpy as np
+
+try:
+    import scipy  # pylint: disable=W0611
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
 
 # ASTROPY
 from astropy import units as u
@@ -30,32 +38,28 @@ class TestBlackBody1D(object):
     """Test BlackBody1D model."""
     def setup_class(self):
         self.m1 = BlackBody1D(temperature=5500)
-        self.m2 = BlackBody1D(temperature=[100, 10000])
 
     def test_lambda_max(self):
         np.testing.assert_allclose(self.m1.lambda_max, 5268.67, rtol=1e-5)
-        np.testing.assert_allclose(
-            self.m2.lambda_max, [2.8977685e5, 2897.7685], rtol=1e-5)
 
     def test_sampleset(self):
-        f1 = self.m1(self.m1.sampleset)
+        f1 = self.m1(self.m1.sampleset())
         assert f1[0] == 0
         assert f1[-1] < self.m1(self.m1.lambda_max) * 0.05
 
-        f2 = self.m2(self.m2.sampleset)
-        fmax2 = np.matrix(self.m2(self.m2.lambda_max)).diagonal().getA1()
-        np.testing.assert_array_equal(f2[0], 0)
-        assert np.all(f2[-1] < fmax2 * 0.05)
-
     def test_eval(self):
-        """This tests ``bbfunc()``."""
         np.testing.assert_allclose(
             self.m1(np.arange(3000, 3100, 10)),
             [1.20906423e+17, 1.22815123e+17, 1.24735543e+17, 1.26667499e+17,
              1.28610806e+17, 1.30565276e+17, 1.32530722e+17, 1.34506953e+17,
              1.36493780e+17, 1.38491010e+17])
+
+    def test_multi_n_models(self):
+        m2 = BlackBody1D(temperature=[100, 10000], n_models=2)
         np.testing.assert_allclose(
-            self.m2(20000), [2.14331496e-14, 3.55819086e+17])
+            m2.lambda_max, [2.8977685e5, 2897.7685], rtol=1e-5)
+        np.testing.assert_allclose(
+            m2(20000), [2.14331496e-14, 3.55819086e+17])
 
 
 class TestConstFlux1D(object):
@@ -92,8 +96,8 @@ class TestConstFlux1D(object):
             self.w, u.Quantity(m(self.w), units.PHOTLAM), out_unit)
         np.testing.assert_allclose(f.value, val, rtol=2.5e-4)
 
-    def test_multi_param_dim(self):
-        m = ConstFlux1D(amplitude=[1, 2])
+    def test_multi_n_models(self):
+        m = ConstFlux1D(amplitude=[1, 2], n_models=2)
         np.testing.assert_array_equal(m(1000), [1, 2])
 
     @pytest.mark.parametrize(
@@ -103,6 +107,7 @@ class TestConstFlux1D(object):
             m = ConstFlux1D(amplitude=u.Quantity(1, flux_unit))
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 class TestEmpirical1D(object):
     """Test Empirical1D model."""
     def setup_class(self):
@@ -112,10 +117,10 @@ class TestEmpirical1D(object):
         y = units.convert_flux(x, f, units.PHOTLAM)
         self.flux_flam = f.value
         self.w = x.value
-        self.m = Empirical1D(x=self.w, y=y.value)
+        self.m = Empirical1D(x=self.w, y=y.value, kind='linear')
 
     def test_sampleset(self):
-        np.testing.assert_array_equal(self.m.sampleset, self.w)
+        np.testing.assert_array_equal(self.m.sampleset(), self.w)
 
     def test_eval(self):
         # Sample at existing wavelength (no interpolation)
@@ -173,19 +178,18 @@ class TestPowerLawFlux1D(object):
     def test_normalization(self):
         assert self.m(self.m.x_0) == 1
 
-    def test_multi_param_dim(self):
-        w2 = np.vstack([self.w, self.w]).T
+    def test_multi_n_models(self):
         m2 = PowerLawFlux1D(
             amplitude=u.Quantity([1, 1], units.FLAM),
-            x_0=u.Quantity([0.3, 0.305], u.micron), alpha=[4, 1])
+            x_0=u.Quantity([0.3, 0.305], u.micron), alpha=[4, 1], n_models=2)
         y = units.convert_flux(
-            w2, u.Quantity(m2(w2), units.PHOTLAM), units.FLAM)
-        ans1 = [1, 0.98677704, 0.97377192, 0.96098034, 0.94839812,
-                0.93602115, 0.92384543, 0.91186704, 0.90008216, 0.88848705]
-        ans2 = [1.01666667, 1.01328904, 1.00993377, 1.00660066, 1.00328947,
-                1, 0.99673203, 0.99348534, 0.99025974, 0.98705502]
-        np.testing.assert_allclose(
-            y.value, np.vstack([ans1, ans2]).T, rtol=1e-6)
+            self.w, u.Quantity(m2(self.w, model_set_axis=False), units.PHOTLAM),
+            units.FLAM)
+        ans = [[1, 0.98677704, 0.97377192, 0.96098034, 0.94839812,
+                0.93602115, 0.92384543, 0.91186704, 0.90008216, 0.88848705],
+               [1.01666667, 1.01328904, 1.00993377, 1.00660066, 1.00328947,
+                1, 0.99673203, 0.99348534, 0.99025974, 0.98705502]]
+        np.testing.assert_allclose(y.value, ans, rtol=1e-6)
 
     @pytest.mark.parametrize(
         'flux_unit', [u.count, units.OBMAG, units.VEGAMAG, u.AA])

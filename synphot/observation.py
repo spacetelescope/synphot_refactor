@@ -3,8 +3,7 @@
 that has gone through a bandpass.
 
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 
 # STDLIB
 import warnings
@@ -106,6 +105,10 @@ class Observation(BaseSourceSpectrum):
                        'value for empirical model).')
                 warnings.warn(msg, AstropyUserWarning)
                 warn['PartialOverlap'] = msg
+
+                if isinstance(spec.model, Empirical1D):
+                    spec.model.set_interp1d(fill_value='extrapolate',
+                                            kind='nearest')
             else:
                 raise exceptions.SynphotError(
                     'force={0} is invalid, must be "none", "taper", '
@@ -251,7 +254,7 @@ class Observation(BaseSourceSpectrum):
         """
         x = self._validate_binned_wavelengths(wavelengths)
         i = np.searchsorted(self.binset, x)
-        if not np.allclose(self.binset[i], x):
+        if not np.allclose(self.binset[i].value, x.value):
             raise exceptions.InterpolationNotAllowed(
                 'Some or all wavelength values are not in binset.')
         y = self.binflux[i]

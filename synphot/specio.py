@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This modules handles synthetic photometry data formats."""
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from __future__ import absolute_import, division, print_function
 from astropy.extern import six
 
 # STDLIB
@@ -347,7 +346,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
     # so that they will still be sorted with no duplicates.
     if wave_precision == 'd' and precision == 'f':
         orig_size = wave_value.size
-        idx = np.abs(wave_value[1:] - wave_value[:-1]) > epsilon
+        idx = np.where(np.abs(wave_value[1:] - wave_value[:-1]) > epsilon)
         wave_value = np.append(wave_value[idx], wave_value[-1])
         flux_value = np.append(flux_value[idx], flux_value[-1])
         n_thrown = orig_size - wave_value.size
@@ -381,8 +380,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
         hdr_hdu.header[key] = val
 
     # Make the extension HDU and include user dictionary in extension header.
-    tab_hdu = fits.BinTableHDU(
-        data=fits.FITS_rec.from_columns(fits.ColDefs([cw, cf])))
+    tab_hdu = fits.BinTableHDU.from_columns(fits.ColDefs([cw, cf]))
     for key, val in ext_header.items():
         tab_hdu.header[key] = val
 
