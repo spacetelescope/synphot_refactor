@@ -59,11 +59,11 @@ def test_load_vspec():
 def test_flux_conversion_vega(in_q, out_u, ans):
     """Test Vega spectrum object and flux conversion with VEGAMAG.
 
-    .. note:: 0.5% is good enough given Vega gets updated from time to time.
+    .. note:: 1% is good enough given Vega gets updated from time to time.
 
     """
     result = units.convert_flux(_wave, in_q, out_u, vegaspec=_vspec)
-    np.testing.assert_allclose(result.value, ans.value, rtol=5e-3)
+    np.testing.assert_allclose(result.value, ans.value, rtol=1e-2)
     assert result.unit == ans.unit
 
 
@@ -661,7 +661,7 @@ class TestRedShift(object):
         assert self.sp.z == 1.3
 
         assert isinstance(self.sp_z0.model, Gaussian1D)
-        assert isinstance(self.sp.model, modeling.SerialCompositeModel)
+        assert isinstance(self.sp.model, modeling.core._CompoundModel)
 
     def test_composite_redshift(self):
         sp2 = self.sp_z0 + self.sp  # centers: 5000, 11500
@@ -684,7 +684,8 @@ class TestMathOperators(object):
             x=[3999.9, 4000.0, 5000.0, 6000.0, 6000.1],
             y=u.Quantity([0, 3.5e-14, 4e-14, 4.5e-14, 0], units.FLAM))
         self.sp_2 = SourceSpectrum(
-            Empirical1D, x=_wave, y=_flux_jy, fill_value='extrapolate',
+            Empirical1D, x=_wave, y=_flux_jy,
+            fill_value='extrapolate', kind='nearest',
             metadata={'PHOTLAM': [9.7654e-3, 1.003896e-2, 9.78473e-3]})
         self.bp_1 = SpectralElement(
             Empirical1D,

@@ -14,8 +14,8 @@ import numpy as np
 # ASTROPY
 from astropy import constants as const
 from astropy import log
-from astropy import modeling
 from astropy import units as u
+from astropy.modeling import Model
 from astropy.modeling.models import RedshiftScaleFactor, Scale
 from astropy.utils.exceptions import AstropyUserWarning
 
@@ -130,14 +130,14 @@ class BaseSpectrum(object):
         # This is needed for internal math operations to build composite model.
         # Handles the model instance, not class. Assume it is already in the
         # correct units and _n_models.
-        if isinstance(modelclass, modeling.Model):
+        if isinstance(modelclass, Model):
             self._model = modelclass
             return
         if isinstance(modelclass, BaseSpectrum):
             self._model = modelclass.model
             return
 
-        if not issubclass(modelclass, modeling.Model):
+        if not issubclass(modelclass, Model):
             raise exceptions.SynphotError(
                 '{0} is not a valid model class.'.format(modelclass))
 

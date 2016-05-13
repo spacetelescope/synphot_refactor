@@ -105,6 +105,10 @@ class Observation(BaseSourceSpectrum):
                        'value for empirical model).')
                 warnings.warn(msg, AstropyUserWarning)
                 warn['PartialOverlap'] = msg
+
+                if isinstance(spec.model, Empirical1D):
+                    spec.model.set_interp1d(fill_value='extrapolate',
+                                            kind='nearest')
             else:
                 raise exceptions.SynphotError(
                     'force={0} is invalid, must be "none", "taper", '

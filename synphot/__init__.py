@@ -3,6 +3,7 @@
 """
 This is an Astropy affiliated package.
 """
+from __future__ import absolute_import
 
 # Affiliated packages may add whatever they like to this file, but
 # should keep this content at the top.
@@ -15,7 +16,7 @@ if not _ASTROPY_SETUP_:
     #------------#
     # SYNPHOT UI #
     #------------#
-    from .spectrum import *
+    #from .spectrum import *  # Cause import error in Astropy?
     from .observation import *
     from .reddening import *
     from .thermal import *

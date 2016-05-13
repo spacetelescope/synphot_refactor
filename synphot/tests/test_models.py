@@ -117,7 +117,7 @@ class TestEmpirical1D(object):
         y = units.convert_flux(x, f, units.PHOTLAM)
         self.flux_flam = f.value
         self.w = x.value
-        self.m = Empirical1D(x=self.w, y=y.value)
+        self.m = Empirical1D(x=self.w, y=y.value, kind='linear')
 
     def test_sampleset(self):
         np.testing.assert_array_equal(self.m.sampleset(), self.w)

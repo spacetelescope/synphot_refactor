@@ -48,7 +48,7 @@ class TestThermalSpectralElement(object):
         np.testing.assert_allclose(
             sp([6800, 7800, 8800, 17920, 18920, 19920]).value,
             [1.246735e-30, 6.63655885e-26, 2.80933935e-22, 2.76427032e-08,
-             1.33011769e-07, 5.40857951e-07])
+             1.33011769e-07, 5.40857951e-07], rtol=1e-5)
 
     def test_from_file_exceptions(self):
         # Non-FITS file

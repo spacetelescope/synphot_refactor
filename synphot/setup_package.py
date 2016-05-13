@@ -122,3 +122,7 @@ def get_extensions():
     cfg = dict((str(key), val) for key, val in six.iteritems(cfg))
 
     return [Extension(str('synphot.synphot_utils'), **cfg)]
+
+
+def requires_2to3():
+    return False

@@ -249,8 +249,6 @@ class Empirical1D(modeling.Fittable1DModel):
     y = modeling.Parameter(default=[0, 0])
 
     def __init__(self, x, y, **kwargs):
-        from scipy.interpolate import interp1d
-
         n_models = kwargs.get('n_models', 1)
         if n_models > 1:
             raise NotImplementedError('Only n_models=1 is supported')
@@ -259,16 +257,16 @@ class Empirical1D(modeling.Fittable1DModel):
         self._keep_neg = keep_neg
         y = self._process_neg_flux(y)
 
-        # These keywords do not go into model init
-        kind = kwargs.pop('kind', 'nearest')
-        axis = kwargs.pop('axis', -1)
-        copy = kwargs.pop('copy', True)
-        bounds_error = kwargs.pop('bounds_error', False)
-        fill_value = kwargs.pop('fill_value', 0)
-        assume_sorted = kwargs.pop('assume_sorted', False)
-        self._f = interp1d(
-            x, y, kind=kind, axis=axis, copy=copy, bounds_error=bounds_error,
-            fill_value=fill_value, assume_sorted=assume_sorted)
+        # Set interpolation default values
+        self._kind = 'linear'
+        self._axis = -1
+        self._copy = True
+        self._bounds_error = False
+        self._fill_value = 0
+        self._assume_sorted = False
+
+        # Filter out keywords that do not go into model init
+        kwargs = self._process_interp1d_options(x, y, **kwargs)
 
         super(Empirical1D, self).__init__(x=x, y=y, **kwargs)
 
@@ -287,6 +285,28 @@ class Empirical1D(modeling.Fittable1DModel):
                 warnings.warn(warn_str, AstropyUserWarning)
 
         return y
+
+    def _process_interp1d_options(self, x, y, **kwargs):
+        """Override default interpolation options and return unused keywords."""
+        from scipy.interpolate import interp1d
+
+        self._kind = kwargs.pop('kind', self._kind)
+        self._axis = kwargs.pop('axis', self._axis)
+        self._copy = kwargs.pop('copy', self._copy)
+        self._bounds_error = kwargs.pop('bounds_error', self._bounds_error)
+        self._fill_value = kwargs.pop('fill_value', self._fill_value)
+        self._assume_sorted = kwargs.pop('assume_sorted', self._assume_sorted)
+        self._f = interp1d(
+            x, y, kind=self._kind, axis=self._axis, copy=self._copy,
+            bounds_error=self._bounds_error, fill_value=self._fill_value,
+            assume_sorted=self._assume_sorted)
+
+        return kwargs
+
+    def set_interp1d(self, **kwargs):
+        """Use given keywords with :func:`~scipy.interpolate.interp1d` to
+        evaluate model. Otherwise, use previously set values."""
+        self._process_interp1d_options(self.x.value, self.y.value, **kwargs)
 
     @property
     def warnings(self):
@@ -379,7 +399,7 @@ class Lorentz1D(modeling.models.Lorentz1D, GaussianSampleset1DMixin):
     ``sampleset`` defined.
 
     """
-    # This is needed for sampletset()
+    # This is needed for sampleset()
     @property
     def stddev(self):
         """Standard deviation based on FWHM."""
