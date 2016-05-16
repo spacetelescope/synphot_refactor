@@ -1,7 +1,7 @@
 synphot
 =======
 
-**DO NOT USE! Work in progress...***
+**DO NOT USE! Work in progress...**
 
 .. image:: https://travis-ci.org/spacetelescope/synphot_refactor.svg?branch=master
     :target: https://travis-ci.org/spacetelescope/synphot_refactor
