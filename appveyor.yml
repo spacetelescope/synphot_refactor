@@ -13,7 +13,8 @@ environment:
       # For this package-template, we include examples of Cython modules,
       # so Cython is required for testing. If your package does not include
       # Cython code, you can set CONDA_DEPENDENCIES=''
-      CONDA_DEPENDENCIES: "Cython"
+      #CONDA_DEPENDENCIES: "Cython"
+      CONDA_DEPENDENCIES: "Cython jinja2 scipy"
 
   matrix:
 
@@ -22,12 +23,12 @@ environment:
       # the latest Python 3 release.
 
       - PYTHON_VERSION: "2.6"
-        ASTROPY_VERSION: "1.0"
-        NUMPY_VERSION: "1.9.1"
+        ASTROPY_VERSION: "development"
+        NUMPY_VERSION: "stable"
 
       - PYTHON_VERSION: "3.5"
-        ASTROPY_VERSION: "1.0"
-        NUMPY_VERSION: "1.9.1"
+        ASTROPY_VERSION: "development"
+        NUMPY_VERSION: "stable"
 
 platform:
     -x64
