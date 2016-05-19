@@ -39,7 +39,7 @@ install:
 
     # Upgrade to the latest version of pip to avoid it displaying warnings
     # about it being out of date.
-    - "pip install --upgrade pip"
+    - "pip install --user --upgrade pip"
 
 # Not a .NET project, we build the package in the install step instead
 build: false
