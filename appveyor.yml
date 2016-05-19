@@ -18,11 +18,9 @@ environment:
 
   matrix:
 
-      # We test Python 2.6 and 3.5 because 2.6 is most likely to have issues in
-      # Python 2 (if 2.6 passes, 2.7 virtually always passes) and Python 3.5 is
-      # the latest Python 3 release.
+      # We test Python 2.7 and 3.5
 
-      - PYTHON_VERSION: "2.6"
+      - PYTHON_VERSION: "2.7"
         ASTROPY_VERSION: "development"
         NUMPY_VERSION: "stable"
 
