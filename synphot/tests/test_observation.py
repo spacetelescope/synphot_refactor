@@ -24,7 +24,7 @@ from astropy.utils.data import get_pkg_data_filename
 # LOCAL
 from .test_units import _area
 from .. import exceptions, units
-from ..models import Box1D, ConstFlux1D, Empirical1D
+from ..models import Box1D, ConstFlux1D, Empirical1D, GaussianFlux1D
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
 
@@ -134,7 +134,11 @@ class TestObservation(object):
         np.testing.assert_array_equal(obs2.binset, self.obs.bandpass.waveset)
 
     def test_default_binset_from_spectrum(self):
-        sp = SourceSpectrum.from_gaussian(1, 5000, 10)
+        x0 = 5000  # Angstrom
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM).value
+
+        sp = SourceSpectrum(GaussianFlux1D, mean=x0, total_flux=totflux,
+                            fwhm=10)
         bp = SpectralElement(Const1D, amplitude=1)
         obs2 = Observation(sp, bp, force='extrap')
         np.testing.assert_array_equal(obs2.binset, sp.waveset)

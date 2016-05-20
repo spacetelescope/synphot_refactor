@@ -22,8 +22,8 @@ from astropy import modeling
 from astropy import units as u
 from astropy.io import fits
 from astropy.modeling.models import (
-    BrokenPowerLaw1D, Const1D, ExponentialCutoffPowerLaw1D, LogParabola1D,
-    PowerLaw1D, RedshiftScaleFactor)
+    BrokenPowerLaw1D, Const1D, ExponentialCutoffPowerLaw1D, GaussianFlux1D,
+    LogParabola1D, PowerLaw1D, RedshiftScaleFactor)
 from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
@@ -319,10 +319,10 @@ class TestBlackBodySource(object):
 
 
 class TestGaussianSource(object):
-    """Test source spectrum with Gaussian1D model."""
+    """Test source spectrum with GaussianFlux1D model."""
     def setup_class(self):
-        self.sp = SourceSpectrum.from_gaussian(
-            u.Quantity(1, units.PHOTLAM), 4000, 100)
+        self.sp = SourceSpectrum(
+            GaussianFlux1D, total_flux=1, mean=4000, fwhm=100)
 
     def test_eval(self):
         y = self.sp([3900, 4000, 4060])
@@ -335,7 +335,11 @@ class TestGaussianSource(object):
         np.testing.assert_allclose(val, 1, rtol=1e-5)
 
         # FLAM
-        sp2 = SourceSpectrum.from_gaussian(1, 400 * u.nm, 10 * u.nm)
+        x0 = (400 * u.nm).to(u.AA).value
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM).value
+        fwhm = (10 * u.nm).to(u.AA)
+        sp2 = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=fwhm)
         val = sp2.integrate(flux_unit=units.FLAM).value
         np.testing.assert_allclose(val, 1, rtol=1e-3)
 
@@ -479,7 +483,11 @@ class TestNormalize(object):
         self.bb.metadata['expr'] = 'bb(5000)'
 
         # Gaussian emission line
-        self.em = SourceSpectrum.from_gaussian(1e-13, 5500, 250)
+        x0 = 5500
+        totflux = units.convert_flux(
+            x0, 1e-13 * units.FLAM, units.PHOTLAM).value
+        self.em = SourceSpectrum(GaussianFlux1D, mean=x0, total_flux=totflux,
+                                 fwhm=250)
         self.em.metadata['expr'] = 'em(5500, 250, 1e-13, flam)'
 
         # ACS bandpass
@@ -604,7 +612,10 @@ class TestWaveset(object):
         assert sp.waveset is None
 
     def test_sampleset(self):
-        sp = SourceSpectrum.from_gaussian(1, 5000, 10)
+        x0 = 5000
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM).value
+        sp = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=10)
         np.testing.assert_array_equal(sp.waveset.value, sp.model.sampleset())
 
     def test_box1d(self):
@@ -618,16 +629,32 @@ class TestWaveset(object):
         np.testing.assert_array_equal(bp.waveset, bp1.waveset)
 
     def test_composite(self):
+        x0 = 5000
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM)
+        g1 = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=10)
+
+        x0 = 6500
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM)
+        g2 = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=100)
+
+        x0 = 7500
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM)
+        g3 = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=5)
+
         sp = (SpectralElement(Box1D, amplitude=1, x_0=1000, width=1) *
-              (SourceSpectrum.from_gaussian(1, 5000, 10) +
-               SourceSpectrum.from_gaussian(1, 6500, 100) +
-               SourceSpectrum.from_gaussian(1, 7500, 5)))
+              (g1 + g2 + g3))
         np.testing.assert_allclose(
             sp.waveset.value[::100],
             [999.49, 1000.49, 5018.26041871, 6635.89148805, 7504.45893945])
 
     def test_redshift(self):
-        sp = SourceSpectrum.from_gaussian(1, 5000, 10)
+        x0 = 5000
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM)
+        sp = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=10)
         sp.z = 1.3
         m = RedshiftScaleFactor(z=1.3)
         w_step25_z0 = [4976.64365049, 4987.260173, 4997.8766955, 5008.493218,
@@ -650,8 +677,14 @@ class TestRedShift(object):
 
     """
     def setup_class(self):
-        self.sp_z0 = SourceSpectrum.from_gaussian(1 * u.Jy, 5000, 100)
-        self.sp = SourceSpectrum.from_gaussian(1 * u.Jy, 5000, 100, z=1.3)
+        x0 = 5000
+        totflux = units.convert_flux(x0, 1 * u.Jy, units.PHOTLAM)
+        fwhm = 100
+        self.sp_z0 = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=fwhm)
+        self.sp = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=fwhm)
+        self.sp.z = 1.3
 
     def test_property(self):
         with pytest.raises(exceptions.SynphotError):

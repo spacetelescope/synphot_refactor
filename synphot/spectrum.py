@@ -1118,60 +1118,6 @@ class SourceSpectrum(BaseSourceSpectrum):
         return cls(Empirical1D, x=wavelengths, y=fluxes, metadata=header)
 
     @classmethod
-    def from_gaussian(cls, total_flux, center, fwhm, z=0, **kwargs):
-        """Create a spectrum from a :ref:`Gaussian source <synphot-gaussian>`.
-
-        Parameters
-        ----------
-        total_flux : float or `~astropy.units.quantity.Quantity`
-            Total flux under Gaussian. If not a Quantity, assumed
-            to be in FLAM.
-
-        center : float or `~astropy.units.quantity.Quantity`
-            Central wavelength of Gaussian.
-            If not a Quantity, assumed to be in Angstrom.
-
-        fwhm : float or `~astropy.units.quantity.Quantity`
-            Full-width-at-half-maximum (FWHM) of Gaussian.
-            If not a Quantity, assumed to be in Angstrom.
-
-        z : number
-            Redshift to apply to model.
-
-        kwargs : dict
-            Keywords acceptable by :func:`~synphot.units.convert_flux`.
-
-        Returns
-        -------
-        gspec : `SourceSpectrum`
-            ``Gaussian1D`` spectrum.
-
-        """
-        if isinstance(center, u.Quantity):
-            x0 = center.to(cls._internal_wave_unit, u.spectral()).value
-        else:
-            x0 = center
-
-        if isinstance(fwhm, u.Quantity):
-            fh = fwhm.to(cls._internal_wave_unit, u.spectral()).value
-        else:
-            fh = fwhm
-
-        if not isinstance(total_flux, u.Quantity):
-            total_flux = u.Quantity(total_flux, units.FLAM)
-
-        tf = units.convert_flux(
-            x0, total_flux, cls._internal_flux_unit, **kwargs).value
-        sigma = fh / np.sqrt(8.0 * np.log(2.0))
-        amplitude = tf / (np.sqrt(2.0 * np.pi) * sigma)
-        header = {
-            'expr': 'em({0:g}, {1:g}, {2:g}, {3})'.format(
-                x0, fh, tf, cls._internal_flux_unit)}
-
-        return cls(Gaussian1D, amplitude=amplitude, mean=x0,
-                   stddev=sigma, z=z, metadata=header)
-
-    @classmethod
     def from_blackbody(cls, temperature, r=const.R_sun, d=const.kpc, z=0):
         """Create a :ref:`blackbody spectrum <synphot-planck-law>`
         with given temperature and solid angle (:math:`\\Omega`).
