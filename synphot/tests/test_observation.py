@@ -24,7 +24,8 @@ from astropy.utils.data import get_pkg_data_filename
 # LOCAL
 from .test_units import _area
 from .. import exceptions, units
-from ..models import Box1D, ConstFlux1D, Empirical1D, GaussianFlux1D
+from ..models import (BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D,
+                      GaussianFlux1D)
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
 
@@ -285,7 +286,7 @@ class TestObsPar(object):
             ans, rtol=0.01)  # 1%
 
     def test_effstim_analytic(self):
-        sp = SourceSpectrum.from_blackbody(5000)
+        sp = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
         bp = SpectralElement(Box1D, amplitude=1, x_0=5500, width=1)
         obs = Observation(sp, bp)
         np.testing.assert_allclose(

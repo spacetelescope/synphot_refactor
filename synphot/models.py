@@ -45,7 +45,7 @@ class BlackBody1D(Fittable1DModel):
 
     def __init__(self, *args, **kwargs):
         super(BlackBody1D, self).__init__(*args, **kwargs)
-        self.meta['expr'] = 'bb({0})'.format(temperature)
+        self.meta['expr'] = 'bb({0})'.format(self.temperature)
 
     @property
     def lambda_max(self):
@@ -477,7 +477,7 @@ class GaussianFlux1D(Gaussian1D):
             self.amplitude = total_flux / gaussian_amp_to_totflux
 
         self.meta['expr'] = 'em({0:g}, {1:g}, {2:g}, PHOTLAM)'.format(
-            self.mean, fwhm, total_flux)
+            self.mean.value, fwhm, total_flux)
 
 
 class Lorentz1D(_models.Lorentz1D, GaussianSampleset1DMixin):

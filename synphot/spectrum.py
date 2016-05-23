@@ -66,6 +66,7 @@ class BaseSpectrum(object):
     # For handling of units with models.
     _model_param_dict = {
         'BlackBody1D': {'temperature': u.K},
+        'BlackBodyNorm1D': {'temperature': u.K},
         'Box1D': {'amplitude': 'flux', 'x_0': 'wave', 'width': 'wave'},
         'BrokenPowerLaw1D': {
             'amplitude': 'flux', 'x_break': 'wave',
@@ -80,6 +81,8 @@ class BaseSpectrum(object):
         'Gaussian1D': {'amplitude': 'flux', 'mean': 'wave', 'stddev': 'wave'},
         'GaussianAbsorption1D': {
             'amplitude': 'flux', 'mean': 'wave', 'stddev': 'wave'},
+        'GaussianFlux1D': {'total_flux': 'flux', 'amplitude': 'flux',
+                           'mean': 'wave', 'stddev': 'wave', 'fwhm': 'wave'},
         'LogParabola1D': {
             'amplitude': 'flux', 'x_0': 'wave',
             'alpha': u.dimensionless_unscaled,
@@ -104,6 +107,7 @@ class BaseSpectrum(object):
         'ExponentialCutoffPowerLaw1D': 'x_0',
         'Gaussian1D': 'mean',
         'GaussianAbsorption1D': 'mean',
+        'GaussianFlux1D': 'mean',
         'LogParabola1D': 'x_0',
         'Lorentz1D': 'x_0',
         'MexicanHat1D': 'x_0',

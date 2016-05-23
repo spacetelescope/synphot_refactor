@@ -22,8 +22,8 @@ from astropy import modeling
 from astropy import units as u
 from astropy.io import fits
 from astropy.modeling.models import (
-    BlackBodyNorm1D, BrokenPowerLaw1D, Const1D, ExponentialCutoffPowerLaw1D,
-    GaussianFlux1D, LogParabola1D, PowerLaw1D, RedshiftScaleFactor)
+    BrokenPowerLaw1D, Const1D, ExponentialCutoffPowerLaw1D, LogParabola1D,
+    PowerLaw1D, RedshiftScaleFactor)
 from astropy.tests.helper import pytest, remote_data
 from astropy.utils.data import get_pkg_data_filename
 
@@ -31,8 +31,9 @@ from astropy.utils.data import get_pkg_data_filename
 from .test_units import _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
 from .. import exceptions, units
 from ..models import (
-    Box1D, ConstFlux1D, Empirical1D, Gaussian1D, GaussianAbsorption1D,
-    Lorentz1D, MexicanHat1D, PowerLawFlux1D, get_waveset)
+    BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, Gaussian1D,
+    GaussianAbsorption1D, GaussianFlux1D, Lorentz1D, MexicanHat1D,
+    PowerLawFlux1D, get_waveset)
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
 
@@ -306,7 +307,7 @@ class TestBoxBandpass(object):
 class TestBlackBodySource(object):
     """Test source spectrum with BlackBody1D model."""
     def setup_class(self):
-        self.sp = BlackBodyNorm1D(5500)
+        self.sp = SourceSpectrum(BlackBodyNorm1D, temperature=5500)
 
     def test_eval(self):
         w = np.arange(3000, 3100, 10)
@@ -479,7 +480,7 @@ class TestNormalize(object):
     def setup_class(self):
         """``expr`` stores the equivalent IRAF SYNPHOT command."""
         # Blackbody
-        self.bb = BlackBodyNorm1D(5000)
+        self.bb = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
         self.bb.metadata['expr'] = 'bb(5000)'
 
         # Gaussian emission line
