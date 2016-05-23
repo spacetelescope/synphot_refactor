@@ -87,7 +87,7 @@ install:
 
     # Upgrade to the latest version of pip to avoid it displaying warnings
     # about it being out of date.
-    - pip install --upgrade pip
+    #- pip install --upgrade pip
 
     # As described above, using ci-helpers, you should be able to set up an
     # environment with dependencies installed using conda and pip, but in some
