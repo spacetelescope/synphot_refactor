@@ -1117,47 +1117,6 @@ class SourceSpectrum(BaseSourceSpectrum):
         header['filename'] = filename
         return cls(Empirical1D, x=wavelengths, y=fluxes, metadata=header)
 
-    @classmethod
-    def from_blackbody(cls, temperature, r=const.R_sun, d=const.kpc, z=0):
-        """Create a :ref:`blackbody spectrum <synphot-planck-law>`
-        with given temperature and solid angle (:math:`\\Omega`).
-
-        .. math::
-
-            \\Omega = \\frac{\\pi r^{2}}{d^{2}}
-
-        Parameters
-        ----------
-        temperature : float or `~astropy.units.quantity.Quantity`
-            Blackbody temperature. If not a Quantity, assumed to be in Kelvin.
-
-        r : float or `~astropy.units.quantity.Quantity`
-            Radius of the star. If not a Quantity, assumed to be in meter.
-            Default is a solar radius.
-
-        d : float or `~astropy.units.quantity.Quantity`
-            Distance to the star. If not a Quantity, assumed to be in the
-            same unit as ``r``. Default is 1 kpc.
-
-        z : number
-            Redshift to apply to model.
-
-        Returns
-        -------
-        bbspec : `SourceSpectrum`
-            Normalized ``BlackBody1D`` spectrum.
-
-        """
-        if not isinstance(r, u.Quantity):  # pragma: no cover
-            r = u.Quantity(r, u.m)
-
-        d = units.validate_quantity(d, r.unit)
-        fac = np.pi * (r.value / d.value) ** 2  # steradian
-        bbmodel = cls(BlackBody1D, temperature=temperature, z=z) * fac
-        bbmodel.metadata['expr'] = 'bb({0})'.format(temperature)
-
-        return bbmodel
-
 
 class BaseUnitlessSpectrum(BaseSpectrum):
     """Base class to handle unitless spectrum like bandpass, reddening, etc."""

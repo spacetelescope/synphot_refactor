@@ -25,9 +25,10 @@ from . import units
 from .exceptions import SynphotError
 from .utils import merge_wavelengths
 
-__all__ = ['BlackBody1D', 'Box1D', 'ConstFlux1D', 'Empirical1D', 'Gaussian1D',
-           'GaussianAbsorption1D', 'GaussianFlux1D', 'Lorentz1D',
-           'MexicanHat1D', 'PowerLawFlux1D', 'Trapezoid1D', 'get_waveset']
+__all__ = ['BlackBody1D', 'BlackBodyNorm1D', 'Box1D', 'ConstFlux1D',
+           'Empirical1D', 'Gaussian1D', 'GaussianAbsorption1D',
+           'GaussianFlux1D', 'Lorentz1D', 'MexicanHat1D', 'PowerLawFlux1D',
+           'Trapezoid1D', 'get_waveset']
 
 
 class BlackBody1D(Fittable1DModel):
@@ -41,6 +42,10 @@ class BlackBody1D(Fittable1DModel):
 
     """
     temperature = Parameter(default=5000)
+
+    def __init__(self, *args, **kwargs):
+        super(BlackBody1D, self).__init__(*args, **kwargs)
+        self.meta['expr'] = 'bb({0})'.format(temperature)
 
     @property
     def lambda_max(self):
@@ -125,6 +130,48 @@ class BlackBody1D(Fittable1DModel):
         dummy = np.seterr(**old_np_err_cfg)
 
         return bbflux.value
+
+
+class BlackBodyNorm1D(BlackBody1D):
+    """Create a normalized :ref:`blackbody spectrum <synphot-planck-law>`
+    with given temperature.
+
+    It is normalized by multiplying `BlackBody1D` result with a solid angle,
+    :math:`\\Omega`, as defined below, where :math:`d` is 1 kpc:
+
+    .. math::
+
+        \\Omega = \\frac{\\pi R_{\\textnormal{Sun}}^{2}}{d^{2}}
+
+    Parameters
+    ----------
+    temperature : float
+        Blackbody temperature in Kelvin.
+
+    """
+    def __init__(self, *args, **kwargs):
+        super(BlackBodyNorm1D, self).__init__(*args, **kwargs)
+        self._omega = np.pi * (const.R_sun / const.kpc).value ** 2  # steradian
+
+    def evaluate(self, x, temperature):
+        """Evaluate the model.
+
+        Parameters
+        ----------
+        x : number or ndarray
+            Wavelengths in Angstrom.
+
+        temperature : number
+            Temperature in Kelvin.
+
+        Returns
+        -------
+        y : number or ndarray
+            Blackbody radiation in PHOTLAM.
+
+        """
+        bbflux = super(BlackBodyNorm1D, self).evaluate(x, temperature)
+        return bbflux * self._omega
 
 
 class Box1D(_models.Box1D):
