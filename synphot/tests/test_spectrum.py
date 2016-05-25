@@ -85,7 +85,7 @@ def test_filter(filtername):
     """
     bp = SpectralElement.from_filter(filtername, encoding='binary')
     assert isinstance(bp.model, Empirical1D)
-    assert filtername in bp.metadata['expr']
+    assert filtername in bp.meta['expr']
 
 
 def test_filter_exception():
@@ -108,7 +108,7 @@ class TestEmpiricalSourceFromFile(object):
 
     def test_metadata(self):
         assert 'SourceSpectrum' in str(self.sp)
-        assert self.sp.metadata['SIMPLE']  # From FITS header
+        assert self.sp.meta['header']['SIMPLE']  # From FITS header
         assert self.sp.warnings == {}
         assert self.sp.z == 0
         np.testing.assert_allclose(
@@ -479,28 +479,23 @@ class TestNormalize(object):
     """Test source spectrum normalization."""
     def setup_class(self):
         """``expr`` stores the equivalent IRAF SYNPHOT command."""
-        # Blackbody
+        # Blackbody: bb(5000)
         self.bb = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
-        self.bb.metadata['expr'] = 'bb(5000)'
 
-        # Gaussian emission line
+        # Gaussian emission line: em(5500, 250, 1e-13, flam)
         x0 = 5500
         totflux = units.convert_flux(
             x0, 1e-13 * units.FLAM, units.PHOTLAM).value
         self.em = SourceSpectrum(GaussianFlux1D, mean=x0, total_flux=totflux,
                                  fwhm=250)
-        self.em.metadata['expr'] = 'em(5500, 250, 1e-13, flam)'
 
-        # ACS bandpass
+        # ACS bandpass: band(acs,hrc,f555w)
         bandfile = get_pkg_data_filename(
             os.path.join('data', 'hst_acs_hrc_f555w.fits'))
         self.acs = SpectralElement.from_file(bandfile)
-        self.acs.metadata['expr'] = 'band(acs,hrc,f555w)'
 
-        # Box bandpass
-        self.abox = SpectralElement(
-            Box1D, amplitude=1, x_0=5500, width=1,
-            metadata={'expr': 'box(5500,1)'})
+        # Box bandpass: box(5500,1)
+        self.abox = SpectralElement(Box1D, amplitude=1, x_0=5500, width=1)
 
     def _select_sp(self, sp_type):
         if sp_type == 'bb':
@@ -720,7 +715,7 @@ class TestMathOperators(object):
         self.sp_2 = SourceSpectrum(
             Empirical1D, x=_wave, y=_flux_jy,
             fill_value='extrapolate', kind='nearest',
-            metadata={'PHOTLAM': [9.7654e-3, 1.003896e-2, 9.78473e-3]})
+            meta={'PHOTLAM': [9.7654e-3, 1.003896e-2, 9.78473e-3]})
         self.bp_1 = SpectralElement(
             Empirical1D,
             x=u.Quantity([399.99, 400.01, 500.0, 590.0, 600.1], u.nm),
@@ -795,13 +790,13 @@ class TestMathOperators(object):
 
     def test_bandpass_addsub(self):
         """Not supported."""
-        with pytest.raises(TypeError):
+        with pytest.raises(NotImplementedError):
             ans = self.bp_1 + self.bp_1
-        with pytest.raises(TypeError):
+        with pytest.raises(NotImplementedError):
             ans = self.bp_1 + 2.0
-        with pytest.raises(TypeError):
+        with pytest.raises(NotImplementedError):
             ans = self.bp_1 - self.bp_1
-        with pytest.raises(TypeError):
+        with pytest.raises(NotImplementedError):
             ans = self.bp_1 - 2.0
 
     @pytest.mark.parametrize('x', [2.0, u.Quantity(2.0)])
@@ -842,9 +837,9 @@ class TestWriteSpec(object):
     def setup_class(self):
         self.outdir = tempfile.mkdtemp()
         self.sp = SourceSpectrum(Empirical1D, x=_wave, y=_flux_photlam,
-                                 metadata={'expr': 'Test source'})
+                                 meta={'expr': 'Test source'})
         self.bp = SpectralElement(Empirical1D, x=_wave, y=np.ones(_wave.shape),
-                                  metadata={'expr': 'Test bandpass'})
+                                  meta={'expr': 'Test bandpass'})
 
     @pytest.mark.parametrize(
         ('is_sp', 'ext_hdr'),

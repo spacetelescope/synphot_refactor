@@ -83,9 +83,9 @@ def test_redlaw_from_model(modelname):
 
     """
     redlaw = ReddeningLaw.from_extinction_model(modelname, encoding='binary')
-    assert modelname in redlaw.metadata['expr']
-    assert 'filename' in redlaw.metadata
-    assert 'descrip' in redlaw.metadata
+    assert modelname in redlaw.meta['expr']
+    assert 'filename' in redlaw.meta['header']
+    assert 'descrip' in redlaw.meta['header']
 
 
 @pytest.mark.skipif('not HAS_SCIPY')

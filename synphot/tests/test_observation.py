@@ -42,9 +42,9 @@ class TestObservation(object):
     def setup_class(self):
         sp = SourceSpectrum(
             ConstFlux1D, amplitude=u.Quantity(1, units.FLAM),
-            metadata={'warnings': {'w1': 'spec warn', 'w2': 'foo'}})
+            meta={'warnings': {'w1': 'spec warn', 'w2': 'foo'}})
         bp = SpectralElement.from_file(_bandfile)
-        bp.metadata['warnings'] = {'w1': 'band warn'}
+        bp.warnings = {'w1': 'band warn'}
         w = np.arange(1000, 11001, dtype=np.float64)
         self.obs = Observation(sp, bp, binset=w)
 
@@ -164,7 +164,7 @@ class TestInitWithForce(object):
         x = np.arange(3000, 4000)
         y = np.ones_like(x) * 0.75
         self.sp = SourceSpectrum(
-            Empirical1D, x=x, y=y, metadata={'expr': 'short flat'})
+            Empirical1D, x=x, y=y, meta={'expr': 'short flat'})
         self.bp = SpectralElement(
             Empirical1D, x=[3949.9, 3950, 4050, 4050.1], y=[0, 1, 1, 0])
 
@@ -209,9 +209,9 @@ class TestMathOperators(object):
             obs2 = self.obs / 2
 
     def test_addsub(self):
-        with pytest.raises(TypeError):
+        with pytest.raises(NotImplementedError):
             obs2 = self.obs + self.obs
-        with pytest.raises(TypeError):
+        with pytest.raises(NotImplementedError):
             obs2 = self.obs - self.obs
 
 
@@ -317,10 +317,10 @@ class TestCountRate(object):
         x = np.arange(1000, 1100, 0.5)
         y = units.convert_flux(
             x, u.Quantity(x - 1000, u.count), units.PHOTLAM, area=_area).value
-        sp = SourceSpectrum(Empirical1D, x=x, y=y, metadata={'expr': 'slope1'})
+        sp = SourceSpectrum(Empirical1D, x=x, y=y, meta={'expr': 'slope1'})
         bp = SpectralElement(
             Empirical1D, x=[1009.95, 1010, 1030, 1030.05],
-            y=[0, 1, 1, 0], metadata={'expr': 'handmade_box'})
+            y=[0, 1, 1, 0], meta={'expr': 'handmade_box'})
         self.obs = Observation(sp, bp, binset=np.arange(1000, 1020))
 
     @pytest.mark.parametrize(

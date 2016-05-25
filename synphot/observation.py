@@ -79,8 +79,6 @@ class Observation(BaseSourceSpectrum):
 
         # Inherit input warnings like ASTROLIB PYSYNPHOT
         warn = {}
-        warn.update(spec.warnings)
-        warn.update(band.warnings)
 
         # Validate overlap
         force = force.lower()
@@ -118,11 +116,13 @@ class Observation(BaseSourceSpectrum):
                 'Overlap result of {0} is unexpected'.format(stat))
 
         # Create composite spectrum
-        super(Observation, self).__init__(
-            spec * band, metadata={'warnings': warn})
+        super(Observation, self).__init__(spec * band)
         self._spec = spec
         self._band = band
         self._force = force
+
+        # Merge in other warnings
+        self.warnings = warn
 
         # Initialize bins
         self._init_bins(binset)
@@ -208,8 +208,9 @@ class Observation(BaseSourceSpectrum):
     def __mul__(self, other):
         """Multiply self and other."""
         sp = self.spectrum * other
-        return self.__class__(
+        obs = self.__class__(
             sp, self.bandpass, binset=self.binset, force=self._force)
+        return obs
 
     def taper(self, **kwargs):
         """Tapering is disabled."""
@@ -672,6 +673,5 @@ class Observation(BaseSourceSpectrum):
         else:
             w, y = self._get_arrays(wavelengths, self._internal_flux_unit)
 
-        return SourceSpectrum(
-            Empirical1D, x=w, y=y,
-            metadata={'observation': str(self), 'binned': binned})
+        header = {'observation': str(self), 'binned': binned}
+        return SourceSpectrum(Empirical1D, x=w, y=y, meta={'header': header})

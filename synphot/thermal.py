@@ -29,7 +29,7 @@ class ThermalSpectralElement(BaseUnitlessSpectrum):
 
     Parameters
     ----------
-    modelclass, metadata, kwargs
+    modelclass, kwargs
         See `~synphot.spectrum.BaseSpectrum`.
 
     temperature : float or `~astropy.units.quantity.Quantity`
@@ -87,8 +87,8 @@ class ThermalSpectralElement(BaseUnitlessSpectrum):
         """
         sp = (SourceSpectrum(BlackBody1D, temperature=self.temperature) *
               units.SR_PER_ARCSEC2 * self.beam_fill_factor * self)
-        sp.metadata['temperature'] = self.temperature
-        sp.metadata['beam_fill_factor'] = self.beam_fill_factor
+        sp.meta['temperature'] = self.temperature
+        sp.meta['beam_fill_factor'] = self.beam_fill_factor
         return sp
 
     @classmethod
@@ -146,4 +146,4 @@ class ThermalSpectralElement(BaseUnitlessSpectrum):
 
         header, wavelengths, em = specio.read_spec(filename, **kwargs)
         return cls(Empirical1D, temperature, beam_fill_factor=beam_fill_factor,
-                   x=wavelengths, y=em, metadata=header)
+                   x=wavelengths, y=em, meta={'header': header})

@@ -5,6 +5,8 @@ from astropy.extern.six.moves import map, zip
 
 # STDLIB
 import warnings
+from collections import defaultdict
+from copy import deepcopy
 from functools import partial
 
 # THIRD-PARTY
@@ -18,6 +20,7 @@ from astropy.modeling import Fittable1DModel, Model, Parameter
 from astropy.modeling import models as _models
 from astropy.modeling.core import _CompoundModel
 from astropy.stats.funcs import gaussian_fwhm_to_sigma, gaussian_sigma_to_fwhm
+from astropy.utils import metadata
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
@@ -28,7 +31,7 @@ from .utils import merge_wavelengths
 __all__ = ['BlackBody1D', 'BlackBodyNorm1D', 'Box1D', 'ConstFlux1D',
            'Empirical1D', 'Gaussian1D', 'GaussianAbsorption1D',
            'GaussianFlux1D', 'Lorentz1D', 'MexicanHat1D', 'PowerLawFlux1D',
-           'Trapezoid1D', 'get_waveset']
+           'Trapezoid1D', 'get_waveset', 'get_metadata']
 
 
 class BlackBody1D(Fittable1DModel):
@@ -318,6 +321,11 @@ class Empirical1D(Fittable1DModel):
         # Filter out keywords that do not go into model init
         kwargs = self._process_interp1d_options(x, y, **kwargs)
 
+        # Manually insert user metadata here as not to overwrite warning
+        # from self._process_neg_flux()
+        meta = kwargs.pop('meta', {})
+        self.meta.update(meta)
+
         super(Empirical1D, self).__init__(x=x, y=y, **kwargs)
 
     def _process_neg_flux(self, y):
@@ -331,7 +339,7 @@ class Empirical1D(Fittable1DModel):
                 y[i] = 0
                 warn_str = ('{0} bin(s) contained negative flux or throughput; '
                             'it/they will be set to zero.'.format(n_neg))
-                self._warnings = {'NegativeFlux': warn_str}
+                self.meta['warnings'] = {'NegativeFlux': warn_str}
                 warnings.warn(warn_str, AstropyUserWarning)
 
         return y
@@ -357,11 +365,6 @@ class Empirical1D(Fittable1DModel):
         """Use given keywords with :func:`~scipy.interpolate.interp1d` to
         evaluate model. Otherwise, use previously set values."""
         self._process_interp1d_options(self.x.value, self.y.value, **kwargs)
-
-    @property
-    def warnings(self):
-        """Dictionary of warning key-value pairs."""
-        return self._warnings
 
     # NOTE: It is forced to be property by core Model. The decorator
     #       here is just to make this obvious.
@@ -691,3 +694,56 @@ def get_waveset(model):
         waveset = _get_sampleset(model)
 
     return waveset
+
+
+# Functions below are for meta magic.
+
+# This is for joining metadata in a compound model.
+METADATA_OPERATORS = defaultdict(lambda: _merge_meta)
+
+
+def _get_meta(model):
+    """Return metadata of a model.
+    Model could be a real model or evaluated metadata."""
+    if isinstance(model, Model):
+        w = model.meta
+    else:
+        w = model  # Already metadata
+    return w
+
+
+def _merge_meta(model1, model2):
+    """Simple merge of samplesets."""
+    w1 = _get_meta(model1)
+    w2 = _get_meta(model2)
+    return metadata.merge(w1, w2)
+
+
+def get_metadata(model):
+    """Get metadata for a given model.
+
+    Parameters
+    ----------
+    model : `~astropy.modeling.Model`
+        Model.
+
+    Returns
+    -------
+    metadata : dict
+        Metadata for the model.
+
+    Raises
+    ------
+    synphot.exceptions.SynphotError
+        Invalid model.
+
+    """
+    if not isinstance(model, Model):
+        raise SynphotError('{0} is not a model.'.format(model))
+
+    if isinstance(model, _CompoundModel):
+        metadata = model._tree.evaluate(METADATA_OPERATORS, getter=None)
+    else:
+        metadata = deepcopy(model.meta)
+
+    return metadata

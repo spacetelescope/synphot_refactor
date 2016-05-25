@@ -55,8 +55,9 @@ class TrapezoidIntegrator(BaseIntegrator):
     --------
     >>> from synphot import models
     >>> source = models.Box1D(amplitude=1, x_0=5000, width=100)
-    >>> TrapezoidIntegrator()(source, source.sampleset())
-    100.01
+    >>> result = TrapezoidIntegrator()(source, source.sampleset())
+    >>> print('{0:.4f}'.format(result))
+    100.0000
 
     """
     @staticmethod

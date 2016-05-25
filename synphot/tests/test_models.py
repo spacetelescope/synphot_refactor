@@ -158,7 +158,7 @@ class TestEmpirical1D(object):
         m2 = Empirical1D(x=[1, 2, 3], y=[-1.1, 0, 1.1], keep_neg=keep_neg)
         np.testing.assert_array_equal(m2([1, 2, 3]), ans)
         if not keep_neg:
-            assert 'NegativeFlux' in m2.warnings
+            assert 'NegativeFlux' in m2.meta['warnings']
 
 
 class TestPowerLawFlux1D(object):
