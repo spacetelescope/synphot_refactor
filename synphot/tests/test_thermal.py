@@ -43,8 +43,8 @@ class TestThermalSpectralElement(object):
 
     def test_thermal_source(self):
         sp = self.th.thermal_source()
-        assert sp.metadata['temperature'] == self.th.temperature
-        assert sp.metadata['beam_fill_factor'] == self.th.beam_fill_factor
+        assert sp.meta['temperature'] == self.th.temperature
+        assert sp.meta['beam_fill_factor'] == self.th.beam_fill_factor
         np.testing.assert_allclose(
             sp([6800, 7800, 8800, 17920, 18920, 19920]).value,
             [1.246735e-30, 6.63655885e-26, 2.80933935e-22, 2.76427032e-08,

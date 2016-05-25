@@ -31,8 +31,9 @@ from astropy.utils.data import get_pkg_data_filename
 from .test_units import _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
 from .. import exceptions, units
 from ..models import (
-    Box1D, ConstFlux1D, Empirical1D, Gaussian1D, GaussianAbsorption1D,
-    Lorentz1D, MexicanHat1D, PowerLawFlux1D, get_waveset)
+    BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, Gaussian1D,
+    GaussianAbsorption1D, GaussianFlux1D, Lorentz1D, MexicanHat1D,
+    PowerLawFlux1D, get_waveset)
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
 
@@ -84,7 +85,7 @@ def test_filter(filtername):
     """
     bp = SpectralElement.from_filter(filtername, encoding='binary')
     assert isinstance(bp.model, Empirical1D)
-    assert filtername in bp.metadata['expr']
+    assert filtername in bp.meta['expr']
 
 
 def test_filter_exception():
@@ -107,7 +108,7 @@ class TestEmpiricalSourceFromFile(object):
 
     def test_metadata(self):
         assert 'SourceSpectrum' in str(self.sp)
-        assert self.sp.metadata['SIMPLE']  # From FITS header
+        assert self.sp.meta['header']['SIMPLE']  # From FITS header
         assert self.sp.warnings == {}
         assert self.sp.z == 0
         np.testing.assert_allclose(
@@ -306,7 +307,7 @@ class TestBoxBandpass(object):
 class TestBlackBodySource(object):
     """Test source spectrum with BlackBody1D model."""
     def setup_class(self):
-        self.sp = SourceSpectrum.from_blackbody(5500)
+        self.sp = SourceSpectrum(BlackBodyNorm1D, temperature=5500)
 
     def test_eval(self):
         w = np.arange(3000, 3100, 10)
@@ -319,10 +320,10 @@ class TestBlackBodySource(object):
 
 
 class TestGaussianSource(object):
-    """Test source spectrum with Gaussian1D model."""
+    """Test source spectrum with GaussianFlux1D model."""
     def setup_class(self):
-        self.sp = SourceSpectrum.from_gaussian(
-            u.Quantity(1, units.PHOTLAM), 4000, 100)
+        self.sp = SourceSpectrum(
+            GaussianFlux1D, total_flux=1, mean=4000, fwhm=100)
 
     def test_eval(self):
         y = self.sp([3900, 4000, 4060])
@@ -335,7 +336,11 @@ class TestGaussianSource(object):
         np.testing.assert_allclose(val, 1, rtol=1e-5)
 
         # FLAM
-        sp2 = SourceSpectrum.from_gaussian(1, 400 * u.nm, 10 * u.nm)
+        x0 = (400 * u.nm).to(u.AA).value
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM).value
+        fwhm = (10 * u.nm).to(u.AA)
+        sp2 = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=fwhm)
         val = sp2.integrate(flux_unit=units.FLAM).value
         np.testing.assert_allclose(val, 1, rtol=1e-3)
 
@@ -474,24 +479,23 @@ class TestNormalize(object):
     """Test source spectrum normalization."""
     def setup_class(self):
         """``expr`` stores the equivalent IRAF SYNPHOT command."""
-        # Blackbody
-        self.bb = SourceSpectrum.from_blackbody(5000)
-        self.bb.metadata['expr'] = 'bb(5000)'
+        # Blackbody: bb(5000)
+        self.bb = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
 
-        # Gaussian emission line
-        self.em = SourceSpectrum.from_gaussian(1e-13, 5500, 250)
-        self.em.metadata['expr'] = 'em(5500, 250, 1e-13, flam)'
+        # Gaussian emission line: em(5500, 250, 1e-13, flam)
+        x0 = 5500
+        totflux = units.convert_flux(
+            x0, 1e-13 * units.FLAM, units.PHOTLAM).value
+        self.em = SourceSpectrum(GaussianFlux1D, mean=x0, total_flux=totflux,
+                                 fwhm=250)
 
-        # ACS bandpass
+        # ACS bandpass: band(acs,hrc,f555w)
         bandfile = get_pkg_data_filename(
             os.path.join('data', 'hst_acs_hrc_f555w.fits'))
         self.acs = SpectralElement.from_file(bandfile)
-        self.acs.metadata['expr'] = 'band(acs,hrc,f555w)'
 
-        # Box bandpass
-        self.abox = SpectralElement(
-            Box1D, amplitude=1, x_0=5500, width=1,
-            metadata={'expr': 'box(5500,1)'})
+        # Box bandpass: box(5500,1)
+        self.abox = SpectralElement(Box1D, amplitude=1, x_0=5500, width=1)
 
     def _select_sp(self, sp_type):
         if sp_type == 'bb':
@@ -604,7 +608,10 @@ class TestWaveset(object):
         assert sp.waveset is None
 
     def test_sampleset(self):
-        sp = SourceSpectrum.from_gaussian(1, 5000, 10)
+        x0 = 5000
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM).value
+        sp = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=10)
         np.testing.assert_array_equal(sp.waveset.value, sp.model.sampleset())
 
     def test_box1d(self):
@@ -618,16 +625,32 @@ class TestWaveset(object):
         np.testing.assert_array_equal(bp.waveset, bp1.waveset)
 
     def test_composite(self):
+        x0 = 5000
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM)
+        g1 = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=10)
+
+        x0 = 6500
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM)
+        g2 = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=100)
+
+        x0 = 7500
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM)
+        g3 = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=5)
+
         sp = (SpectralElement(Box1D, amplitude=1, x_0=1000, width=1) *
-              (SourceSpectrum.from_gaussian(1, 5000, 10) +
-               SourceSpectrum.from_gaussian(1, 6500, 100) +
-               SourceSpectrum.from_gaussian(1, 7500, 5)))
+              (g1 + g2 + g3))
         np.testing.assert_allclose(
             sp.waveset.value[::100],
             [999.49, 1000.49, 5018.26041871, 6635.89148805, 7504.45893945])
 
     def test_redshift(self):
-        sp = SourceSpectrum.from_gaussian(1, 5000, 10)
+        x0 = 5000
+        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM)
+        sp = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=10)
         sp.z = 1.3
         m = RedshiftScaleFactor(z=1.3)
         w_step25_z0 = [4976.64365049, 4987.260173, 4997.8766955, 5008.493218,
@@ -650,8 +673,14 @@ class TestRedShift(object):
 
     """
     def setup_class(self):
-        self.sp_z0 = SourceSpectrum.from_gaussian(1 * u.Jy, 5000, 100)
-        self.sp = SourceSpectrum.from_gaussian(1 * u.Jy, 5000, 100, z=1.3)
+        x0 = 5000
+        totflux = units.convert_flux(x0, 1 * u.Jy, units.PHOTLAM)
+        fwhm = 100
+        self.sp_z0 = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=fwhm)
+        self.sp = SourceSpectrum(
+            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=fwhm)
+        self.sp.z = 1.3
 
     def test_property(self):
         with pytest.raises(exceptions.SynphotError):
@@ -686,7 +715,7 @@ class TestMathOperators(object):
         self.sp_2 = SourceSpectrum(
             Empirical1D, x=_wave, y=_flux_jy,
             fill_value='extrapolate', kind='nearest',
-            metadata={'PHOTLAM': [9.7654e-3, 1.003896e-2, 9.78473e-3]})
+            meta={'PHOTLAM': [9.7654e-3, 1.003896e-2, 9.78473e-3]})
         self.bp_1 = SpectralElement(
             Empirical1D,
             x=u.Quantity([399.99, 400.01, 500.0, 590.0, 600.1], u.nm),
@@ -761,13 +790,13 @@ class TestMathOperators(object):
 
     def test_bandpass_addsub(self):
         """Not supported."""
-        with pytest.raises(TypeError):
+        with pytest.raises(NotImplementedError):
             ans = self.bp_1 + self.bp_1
-        with pytest.raises(TypeError):
+        with pytest.raises(NotImplementedError):
             ans = self.bp_1 + 2.0
-        with pytest.raises(TypeError):
+        with pytest.raises(NotImplementedError):
             ans = self.bp_1 - self.bp_1
-        with pytest.raises(TypeError):
+        with pytest.raises(NotImplementedError):
             ans = self.bp_1 - 2.0
 
     @pytest.mark.parametrize('x', [2.0, u.Quantity(2.0)])
@@ -808,9 +837,9 @@ class TestWriteSpec(object):
     def setup_class(self):
         self.outdir = tempfile.mkdtemp()
         self.sp = SourceSpectrum(Empirical1D, x=_wave, y=_flux_photlam,
-                                 metadata={'expr': 'Test source'})
+                                 meta={'expr': 'Test source'})
         self.bp = SpectralElement(Empirical1D, x=_wave, y=np.ones(_wave.shape),
-                                  metadata={'expr': 'Test bandpass'})
+                                  meta={'expr': 'Test bandpass'})
 
     @pytest.mark.parametrize(
         ('is_sp', 'ext_hdr'),

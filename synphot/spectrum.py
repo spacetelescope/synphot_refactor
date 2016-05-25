@@ -7,6 +7,7 @@ from astropy.extern import six
 import numbers
 import os
 import warnings
+from copy import deepcopy
 
 # THIRD-PARTY
 import numpy as np
@@ -16,22 +17,23 @@ from astropy import constants as const
 from astropy import log
 from astropy import units as u
 from astropy.modeling import Model
+from astropy.modeling.core import _CompoundModel
 from astropy.modeling.models import RedshiftScaleFactor, Scale
 from astropy.utils.exceptions import AstropyUserWarning
+from astropy.utils import metadata
 
 # LOCAL
 from . import exceptions, specio, units, utils
 from .config import Conf, conf
 from .integrator import TrapezoidIntegrator, TrapezoidFluxIntegrator
 from .models import (BlackBody1D, ConstFlux1D, Empirical1D, Gaussian1D,
-                     get_waveset)
+                     get_waveset, get_metadata)
 
 __all__ = ['BaseSpectrum', 'BaseSourceSpectrum', 'SourceSpectrum',
            'BaseUnitlessSpectrum', 'SpectralElement']
 
 
-# TODO: Update model logic when astropy.modeling supports
-#       Quantity or metadata.
+# TODO: Update model logic when astropy.modeling supports Quantity.
 class BaseSpectrum(object):
     """Base class to handle spectrum or bandpass.
 
@@ -43,16 +45,18 @@ class BaseSpectrum(object):
     Parameters
     ----------
     modelclass : cls
-        Model class from `astropy.modeling`.
-
-    metadata : dict
-        Metadata associated with the spectrum or bandpass
-        (warnings, legacy SYNPHOT expression, FITS header, etc).
+        Model class from `astropy.modeling.models`.
 
     kwargs : dict
         Model parameters accepted by ``modelclass``. Each parameter can
         be either a Quantity or number. If the latter, assume pre-defined
         internal units.
+
+    Attributes
+    ----------
+    meta : dict
+        Metadata associated with the spectrum or bandpass model
+        (warnings, legacy SYNPHOT expression, FITS header, etc).
 
     Raises
     ------
@@ -66,6 +70,7 @@ class BaseSpectrum(object):
     # For handling of units with models.
     _model_param_dict = {
         'BlackBody1D': {'temperature': u.K},
+        'BlackBodyNorm1D': {'temperature': u.K},
         'Box1D': {'amplitude': 'flux', 'x_0': 'wave', 'width': 'wave'},
         'BrokenPowerLaw1D': {
             'amplitude': 'flux', 'x_break': 'wave',
@@ -80,6 +85,8 @@ class BaseSpectrum(object):
         'Gaussian1D': {'amplitude': 'flux', 'mean': 'wave', 'stddev': 'wave'},
         'GaussianAbsorption1D': {
             'amplitude': 'flux', 'mean': 'wave', 'stddev': 'wave'},
+        'GaussianFlux1D': {'total_flux': 'flux', 'amplitude': 'flux',
+                           'mean': 'wave', 'stddev': 'wave', 'fwhm': 'wave'},
         'LogParabola1D': {
             'amplitude': 'flux', 'x_0': 'wave',
             'alpha': u.dimensionless_unscaled,
@@ -104,77 +111,130 @@ class BaseSpectrum(object):
         'ExponentialCutoffPowerLaw1D': 'x_0',
         'Gaussian1D': 'mean',
         'GaussianAbsorption1D': 'mean',
+        'GaussianFlux1D': 'mean',
         'LogParabola1D': 'x_0',
         'Lorentz1D': 'x_0',
         'MexicanHat1D': 'x_0',
         'PowerLaw1D': 'x_0',
         'Trapezoid1D': 'x_0'}
 
-    def __init__(self, modelclass, metadata={}, **kwargs):
-        self._build_model(modelclass, **kwargs)
-
-        self.metadata = metadata
-        if 'warnings' not in self.metadata:
-            self.metadata['warnings'] = {}
-        if hasattr(self.model, 'warnings'):
-            self.metadata['warnings'].update(self.model.warnings)
-
-    def _build_model(self, modelclass, **kwargs):
-        """Build the model."""
+    def __init__(self, modelclass, **kwargs):
 
         # Does not handle multiple model sets for now; too complicated.
         n_models = kwargs.pop('n_models', 1)
         if n_models != 1:
             raise exceptions.SynphotError('Model can only have n_models=1')
 
+        other_meta = {}
+        clean_meta = False
+
         # This is needed for internal math operations to build composite model.
         # Handles the model instance, not class. Assume it is already in the
         # correct units and _n_models.
         if isinstance(modelclass, Model):
             self._model = modelclass
-            return
-        if isinstance(modelclass, BaseSpectrum):
-            self._model = modelclass.model
-            return
 
-        if not issubclass(modelclass, Model):
+            if isinstance(modelclass, _CompoundModel):
+                clean_meta = True
+
+        elif isinstance(modelclass, BaseSpectrum):
+            other_meta = modelclass.meta  # External metadata
+            self._model = modelclass.model
+
+        elif not issubclass(modelclass, Model):
             raise exceptions.SynphotError(
                 '{0} is not a valid model class.'.format(modelclass))
 
-        modelname = modelclass.__name__
-        if modelname not in self._model_param_dict:
-            raise exceptions.SynphotError(
-                '{0} is not supported.'.format(modelname))
-
-        modargs = {}
-
-        # Process wavelength needed for flux conversion first, if applicable.
-        if modelname in self._model_fconv_wav:
-            pname_wav = self._model_fconv_wav[modelname]
-            pval_wav = self._process_wave_param(kwargs.pop(pname_wav))
-            modargs[pname_wav] = pval_wav
         else:
-            pname_wav = ''
-            pval_wav = None
+            modelname = modelclass.__name__
+            if modelname not in self._model_param_dict:
+                raise exceptions.SynphotError(
+                    '{0} is not supported.'.format(modelname))
 
-        # Process the rest of the parameters.
-        for pname, kval in six.iteritems(kwargs):
-            if pname in self._model_param_dict[modelname]:
-                ptype = self._model_param_dict[modelname][pname]
-                if ptype == 'wave':
-                    pval = self._process_wave_param(kval)
-                elif ptype == 'flux':
-                    pval = self._process_flux_param(kval, pval_wav)
-                elif ptype == 'noconv':
-                    pval = kval
-                else:
-                    pval = self._process_generic_param(kval, ptype)
+            modargs = {}
+
+            # Process wavelength needed for flux conversion first, if applicable.
+            if modelname in self._model_fconv_wav:
+                pname_wav = self._model_fconv_wav[modelname]
+                pval_wav = self._process_wave_param(kwargs.pop(pname_wav))
+                modargs[pname_wav] = pval_wav
             else:
-                pval = kval
+                pname_wav = ''
+                pval_wav = None
 
-            modargs[pname] = pval
+            # Process the rest of the parameters.
+            for pname, kval in six.iteritems(kwargs):
+                if pname in self._model_param_dict[modelname]:
+                    ptype = self._model_param_dict[modelname][pname]
+                    if ptype == 'wave':
+                        pval = self._process_wave_param(kval)
+                    elif ptype == 'flux':
+                        pval = self._process_flux_param(kval, pval_wav)
+                    elif ptype == 'noconv':
+                        pval = kval
+                    else:
+                        pval = self._process_generic_param(kval, ptype)
+                else:
+                    pval = kval
 
-        self._model = modelclass(**modargs)
+                modargs[pname] = pval
+
+            self._model = modelclass(**modargs)
+
+        # NOTE: This does not pick up any later changes to model metadata!
+        # Start with model metadata. Others can be added later as needed
+        # without affecting model metadata.
+        m_meta = get_metadata(self._model)  # Merge compound model meta
+        self.meta = {}
+        self._merge_meta(m_meta, other_meta, self, clean=clean_meta)
+
+    @staticmethod
+    def _get_meta(obj):
+        """Extract metadata, if any, from given object."""
+        if hasattr(obj, 'meta'):  # Spectrum or model
+            meta = deepcopy(obj.meta)
+        elif isinstance(obj, dict):  # Metadata
+            meta = deepcopy(obj)
+        else:  # Number
+            meta = {}
+        return meta
+
+    @staticmethod
+    def _merge_meta(left, right, result, clean=True):
+        """Merge metadata from left and right onto results.
+
+        This is used during class initialization.
+        This should also be used by operators to merge metadata after
+        creating a new instance but before returning it.
+        Result's metadata is modified in-place.
+
+        Parameters
+        ----------
+        left, right : number, `BaseSpectrum`, or `~astropy.modeling.models`
+            Inputs of an operation.
+
+        result : `BaseSpectrum`
+            Output spectrum object.
+
+        clean : bool
+            Remove ``'header'`` and ``'expr'`` entries from inputs.
+
+        """
+        # Copies are returned because they need some clean-up below.
+        left = BaseSpectrum._get_meta(left)
+        right = BaseSpectrum._get_meta(right)
+
+        # Remove these from going into result to avoid mess.
+        #   header = FITS header metadata
+        #   expr = ASTROLIB PYSYNPHOT expression
+        if clean:
+            for key in ('header', 'expr'):
+                for d in (left, right):
+                    if key in d:
+                        del d[key]
+
+        mid = metadata.merge(left, right)
+        result.meta = metadata.merge(result.meta, mid)
 
     @staticmethod
     def _process_generic_param(pval, def_unit, equivalencies=[]):
@@ -235,7 +295,13 @@ class BaseSpectrum(object):
     def warnings(self):
         """Dictionary of warning key-value pairs related to spectrum/bandpass.
         """
-        return self.metadata['warnings']
+        return self.meta.get('warnings', {})
+
+    @warnings.setter
+    def warnings(self, val):
+        if 'warnings' not in self.meta:
+            self.meta['warnings'] = {}
+        self.meta['warnings'].update(val)
 
     @property
     def waveset(self):
@@ -294,9 +360,19 @@ class BaseSpectrum(object):
         w = self._validate_wavelengths(wavelengths)
         return u.Quantity(self.model(w.value), unit=self._internal_flux_unit)
 
+    # Operators are to be implemented by subclasses, where applicable.
+
+    def __add__(self, other):
+        """Add self and other."""
+        raise NotImplementedError('This operation is not supported.')
+
+    def __sub__(self, other):
+        """Subtract other from self."""
+        raise NotImplementedError('This operation is not supported.')
+
     def __mul__(self, other):
         """Multiply self and other."""
-        raise NotImplementedError('To be implemented by subclasses.')
+        raise NotImplementedError('This operation is not supported.')
 
     def __rmul__(self, other):
         """This is only called if ``other.__mul__`` cannot operate."""
@@ -304,7 +380,7 @@ class BaseSpectrum(object):
 
     def __truediv__(self, other):
         """Divide self by other."""
-        raise NotImplementedError('To be implemented by subclasses.')
+        raise NotImplementedError('This operation is not supported.')
 
     def __div__(self, other):
         """Same as :func:`__truediv__`."""
@@ -881,7 +957,7 @@ class BaseSourceSpectrum(BaseSpectrum):
             const = renorm_val.value * (stdflux / totalflux.value)
             newsp = self.__mul__(const)
 
-        newsp.metadata['warnings'].update(warndict)
+        newsp.warnings = warndict
         return newsp
 
 
@@ -890,7 +966,7 @@ class SourceSpectrum(BaseSourceSpectrum):
 
     Parameters
     ----------
-    modelclass, metadata, kwargs
+    modelclass, kwargs
         See `BaseSpectrum`.
 
     z : number
@@ -954,12 +1030,16 @@ class SourceSpectrum(BaseSourceSpectrum):
     def __add__(self, other):
         """Add ``self`` with ``other``."""
         self._validate_other_add_sub(other)
-        return self.__class__(self.model + other.model)
+        result = self.__class__(self.model + other.model)
+        self._merge_meta(self, other, result)
+        return result
 
     def __sub__(self, other):
         """Subtract other from self."""
         self._validate_other_add_sub(other)
-        return self.__class__(self.model - other.model)
+        result = self.__class__(self.model - other.model)
+        self._merge_meta(self, other, result)
+        return result
 
     def __mul__(self, other):
         """Multiply self and other."""
@@ -986,11 +1066,8 @@ class SourceSpectrum(BaseSourceSpectrum):
                 'Can only operate on scalar number/Quantity or '
                 'unitless spectrum.')
 
+        self._merge_meta(self, other, newcls)
         return newcls
-
-    def __truediv__(self, other):
-        """Divide self by other (unavailable in ASTROLIB PYSYNPHOT)."""
-        raise NotImplementedError('Currently unsupported.')
 
     def plot(self, wavelengths=None, flux_unit=units.PHOTLAM, area=None,
              vegaspec=None, **kwargs):  # pragma: no cover
@@ -1055,8 +1132,8 @@ class SourceSpectrum(BaseSourceSpectrum):
         # to the extension header.
         bkeys = {'tdisp1': 'G15.7', 'tdisp2': 'G15.7'}
 
-        if 'expr' in self.metadata:
-            bkeys['expr'] = (self.metadata['expr'], 'synphot expression')
+        if 'expr' in self.meta:
+            bkeys['expr'] = (self.meta['expr'], 'synphot expression')
 
         if 'ext_header' in kwargs:
             kwargs['ext_header'].update(bkeys)
@@ -1093,7 +1170,7 @@ class SourceSpectrum(BaseSourceSpectrum):
         """
         header, wavelengths, fluxes = specio.read_spec(filename, **kwargs)
         return cls(Empirical1D, x=wavelengths, y=fluxes, keep_neg=keep_neg,
-                   metadata=header)
+                   meta={'header': header})
 
     @classmethod
     def from_vega(cls, **kwargs):
@@ -1113,104 +1190,10 @@ class SourceSpectrum(BaseSourceSpectrum):
         filename = conf.vega_file
         header, wavelengths, fluxes = specio.read_remote_spec(
             filename, **kwargs)
-        header['expr'] = 'Vega from {0}'.format(os.path.basename(filename))
         header['filename'] = filename
-        return cls(Empirical1D, x=wavelengths, y=fluxes, metadata=header)
-
-    @classmethod
-    def from_gaussian(cls, total_flux, center, fwhm, z=0, **kwargs):
-        """Create a spectrum from a :ref:`Gaussian source <synphot-gaussian>`.
-
-        Parameters
-        ----------
-        total_flux : float or `~astropy.units.quantity.Quantity`
-            Total flux under Gaussian. If not a Quantity, assumed
-            to be in FLAM.
-
-        center : float or `~astropy.units.quantity.Quantity`
-            Central wavelength of Gaussian.
-            If not a Quantity, assumed to be in Angstrom.
-
-        fwhm : float or `~astropy.units.quantity.Quantity`
-            Full-width-at-half-maximum (FWHM) of Gaussian.
-            If not a Quantity, assumed to be in Angstrom.
-
-        z : number
-            Redshift to apply to model.
-
-        kwargs : dict
-            Keywords acceptable by :func:`~synphot.units.convert_flux`.
-
-        Returns
-        -------
-        gspec : `SourceSpectrum`
-            ``Gaussian1D`` spectrum.
-
-        """
-        if isinstance(center, u.Quantity):
-            x0 = center.to(cls._internal_wave_unit, u.spectral()).value
-        else:
-            x0 = center
-
-        if isinstance(fwhm, u.Quantity):
-            fh = fwhm.to(cls._internal_wave_unit, u.spectral()).value
-        else:
-            fh = fwhm
-
-        if not isinstance(total_flux, u.Quantity):
-            total_flux = u.Quantity(total_flux, units.FLAM)
-
-        tf = units.convert_flux(
-            x0, total_flux, cls._internal_flux_unit, **kwargs).value
-        sigma = fh / np.sqrt(8.0 * np.log(2.0))
-        amplitude = tf / (np.sqrt(2.0 * np.pi) * sigma)
-        header = {
-            'expr': 'em({0:g}, {1:g}, {2:g}, {3})'.format(
-                x0, fh, tf, cls._internal_flux_unit)}
-
-        return cls(Gaussian1D, amplitude=amplitude, mean=x0,
-                   stddev=sigma, z=z, metadata=header)
-
-    @classmethod
-    def from_blackbody(cls, temperature, r=const.R_sun, d=const.kpc, z=0):
-        """Create a :ref:`blackbody spectrum <synphot-planck-law>`
-        with given temperature and solid angle (:math:`\\Omega`).
-
-        .. math::
-
-            \\Omega = \\frac{\\pi r^{2}}{d^{2}}
-
-        Parameters
-        ----------
-        temperature : float or `~astropy.units.quantity.Quantity`
-            Blackbody temperature. If not a Quantity, assumed to be in Kelvin.
-
-        r : float or `~astropy.units.quantity.Quantity`
-            Radius of the star. If not a Quantity, assumed to be in meter.
-            Default is a solar radius.
-
-        d : float or `~astropy.units.quantity.Quantity`
-            Distance to the star. If not a Quantity, assumed to be in the
-            same unit as ``r``. Default is 1 kpc.
-
-        z : number
-            Redshift to apply to model.
-
-        Returns
-        -------
-        bbspec : `SourceSpectrum`
-            Normalized ``BlackBody1D`` spectrum.
-
-        """
-        if not isinstance(r, u.Quantity):  # pragma: no cover
-            r = u.Quantity(r, u.m)
-
-        d = units.validate_quantity(d, r.unit)
-        fac = np.pi * (r.value / d.value) ** 2  # steradian
-        bbmodel = cls(BlackBody1D, temperature=temperature, z=z) * fac
-        bbmodel.metadata['expr'] = 'bb({0})'.format(temperature)
-
-        return bbmodel
+        meta = {'header': header,
+                'expr': 'Vega from {0}'.format(os.path.basename(filename))}
+        return cls(Empirical1D, x=wavelengths, y=fluxes, meta=meta)
 
 
 class BaseUnitlessSpectrum(BaseSpectrum):
@@ -1234,6 +1217,8 @@ class BaseUnitlessSpectrum(BaseSpectrum):
 
     def __mul__(self, other):
         """Multiply self and other."""
+        do_meta_merge = True
+
         if isinstance(other, (u.Quantity, numbers.Number)):
             if isinstance(other, u.Quantity):
                 if other.unit.decompose() != u.dimensionless_unscaled:
@@ -1253,17 +1238,17 @@ class BaseUnitlessSpectrum(BaseSpectrum):
             newcls = self.__class__(self.model * other.model)
 
         elif isinstance(other, SourceSpectrum):
+            do_meta_merge = False
             newcls = other.__mul__(self)
 
         else:
             raise exceptions.IncompatibleSources(
                 'Can only operate on scalar number/Quantity or spectrum.')
 
-        return newcls
+        if do_meta_merge:
+            self._merge_meta(self, other, newcls)
 
-    def __truediv__(self, other):
-        """Divide self by other (unavailable in ASTROLIB PYSYNPHOT)."""
-        raise NotImplementedError('Currently unsupported.')
+        return newcls
 
 
 class SpectralElement(BaseUnitlessSpectrum):
@@ -1271,7 +1256,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
     Parameters
     ----------
-    modelclass, metadata, kwargs
+    modelclass, kwargs
         See `BaseSpectrum`.
 
     """
@@ -1634,8 +1619,8 @@ class SpectralElement(BaseUnitlessSpectrum):
         # to the extension header.
         bkeys = {'tdisp1': 'G15.7', 'tdisp2': 'G15.7'}
 
-        if 'expr' in self.metadata:
-            bkeys['expr'] = (self.metadata['expr'], 'synphot expression')
+        if 'expr' in self.meta:
+            bkeys['expr'] = (self.meta['expr'], 'synphot expression')
 
         if 'ext_header' in kwargs:
             kwargs['ext_header'].update(bkeys)
@@ -1675,7 +1660,8 @@ class SpectralElement(BaseUnitlessSpectrum):
             kwargs['flux_col'] = 'THROUGHPUT'
 
         header, wavelengths, throughput = specio.read_spec(filename, **kwargs)
-        return cls(Empirical1D, x=wavelengths, y=throughput, metadata=header)
+        return cls(Empirical1D, x=wavelengths, y=throughput,
+                   meta={'header': header})
 
     @classmethod
     def from_filter(cls, filtername, **kwargs):
@@ -1742,8 +1728,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         header, wavelengths, throughput = specio.read_remote_spec(
             filename, **kwargs)
-        header['expr'] = filtername
         header['filename'] = filename
         header['descrip'] = cfgitem.description
-
-        return cls(Empirical1D, x=wavelengths, y=throughput, metadata=header)
+        meta = {'header': header, 'expr': filtername}
+        return cls(Empirical1D, x=wavelengths, y=throughput, meta=meta)

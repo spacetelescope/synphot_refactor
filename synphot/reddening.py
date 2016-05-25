@@ -22,7 +22,7 @@ class ReddeningLaw(BaseUnitlessSpectrum):
 
     Parameters
     ----------
-    modelclass, metadata, kwargs
+    modelclass, kwargs
         See `~synphot.spectrum.BaseSpectrum`.
 
     """
@@ -65,9 +65,9 @@ class ReddeningLaw(BaseUnitlessSpectrum):
         y = 10 ** (-0.4 * self(x).value * ebv)
         header = {
             'E(B-V)': ebv,
-            'ReddeningLaw': self.metadata.get('expr', 'unknown')}
+            'ReddeningLaw': self.meta.get('expr', 'unknown')}
 
-        return ExtinctionCurve(Empirical1D, x=x, y=y, metadata=header)
+        return ExtinctionCurve(Empirical1D, x=x, y=y, meta={'header': header})
 
     def to_fits(self, filename, wavelengths=None, **kwargs):
         """Write the reddening law to a FITS file.
@@ -103,8 +103,8 @@ class ReddeningLaw(BaseUnitlessSpectrum):
         # to the extension header.
         bkeys = {'tdisp1': 'G15.7', 'tdisp2': 'G15.7'}
 
-        if 'expr' in self.metadata:
-            bkeys['expr'] = (self.metadata['expr'], 'synphot expression')
+        if 'expr' in self.meta:
+            bkeys['expr'] = (self.meta['expr'], 'synphot expression')
 
         if 'ext_header' in kwargs:
             kwargs['ext_header'].update(bkeys)
@@ -144,7 +144,7 @@ class ReddeningLaw(BaseUnitlessSpectrum):
             kwargs['flux_col'] = 'Av/E(B-V)'
 
         header, wavelengths, rvs = specio.read_spec(filename, **kwargs)
-        return cls(Empirical1D, x=wavelengths, y=rvs, metadata=header)
+        return cls(Empirical1D, x=wavelengths, y=rvs, meta={'header': header})
 
     @classmethod
     def from_extinction_model(cls, modelname, **kwargs):
@@ -202,11 +202,10 @@ class ReddeningLaw(BaseUnitlessSpectrum):
             kwargs['flux_col'] = 'Av/E(B-V)'
 
         header, wavelengths, rvs = specio.read_remote_spec(filename, **kwargs)
-        header['expr'] = modelname
         header['filename'] = filename
         header['descrip'] = cfgitem.description
-
-        return cls(Empirical1D, x=wavelengths, y=rvs, metadata=header)
+        meta = {'header': header, 'expr': modelname}
+        return cls(Empirical1D, x=wavelengths, y=rvs, meta=meta)
 
 
 class ExtinctionCurve(BaseUnitlessSpectrum):
@@ -214,7 +213,7 @@ class ExtinctionCurve(BaseUnitlessSpectrum):
 
     Parameters
     ----------
-    modelclass, metadata, kwargs
+    modelclass, kwargs
         See `~synphot.spectrum.BaseSpectrum`.
 
     """

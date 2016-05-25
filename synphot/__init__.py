@@ -16,7 +16,7 @@ if not _ASTROPY_SETUP_:
     #------------#
     # SYNPHOT UI #
     #------------#
-    #from .spectrum import *  # Cause import error in Astropy?
     from .observation import *
     from .reddening import *
     from .thermal import *
+    from .spectrum import SourceSpectrum, SpectralElement

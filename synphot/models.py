@@ -5,6 +5,8 @@ from astropy.extern.six.moves import map, zip
 
 # STDLIB
 import warnings
+from collections import defaultdict
+from copy import deepcopy
 from functools import partial
 
 # THIRD-PARTY
@@ -12,9 +14,13 @@ import numpy as np
 
 # ASTROPY
 from astropy import constants as const
-from astropy import modeling
 from astropy import units as u
 from astropy.analytic_functions.blackbody import blackbody_nu
+from astropy.modeling import Fittable1DModel, Model, Parameter
+from astropy.modeling import models as _models
+from astropy.modeling.core import _CompoundModel
+from astropy.stats.funcs import gaussian_fwhm_to_sigma, gaussian_sigma_to_fwhm
+from astropy.utils import metadata
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
@@ -22,12 +28,13 @@ from . import units
 from .exceptions import SynphotError
 from .utils import merge_wavelengths
 
-__all__ = ['BlackBody1D', 'Box1D', 'ConstFlux1D', 'Empirical1D', 'Gaussian1D',
-           'GaussianAbsorption1D', 'Lorentz1D', 'MexicanHat1D',
-           'PowerLawFlux1D', 'Trapezoid1D', 'get_waveset']
+__all__ = ['BlackBody1D', 'BlackBodyNorm1D', 'Box1D', 'ConstFlux1D',
+           'Empirical1D', 'Gaussian1D', 'GaussianAbsorption1D',
+           'GaussianFlux1D', 'Lorentz1D', 'MexicanHat1D', 'PowerLawFlux1D',
+           'Trapezoid1D', 'get_waveset', 'get_metadata']
 
 
-class BlackBody1D(modeling.Fittable1DModel):
+class BlackBody1D(Fittable1DModel):
     """Create a :ref:`blackbody spectrum <synphot-planck-law>`
     model with given temperature.
 
@@ -37,7 +44,11 @@ class BlackBody1D(modeling.Fittable1DModel):
         Blackbody temperature in Kelvin.
 
     """
-    temperature = modeling.Parameter(default=5000)
+    temperature = Parameter(default=5000)
+
+    def __init__(self, *args, **kwargs):
+        super(BlackBody1D, self).__init__(*args, **kwargs)
+        self.meta['expr'] = 'bb({0})'.format(self.temperature)
 
     @property
     def lambda_max(self):
@@ -124,7 +135,49 @@ class BlackBody1D(modeling.Fittable1DModel):
         return bbflux.value
 
 
-class Box1D(modeling.models.Box1D):
+class BlackBodyNorm1D(BlackBody1D):
+    """Create a normalized :ref:`blackbody spectrum <synphot-planck-law>`
+    with given temperature.
+
+    It is normalized by multiplying `BlackBody1D` result with a solid angle,
+    :math:`\\Omega`, as defined below, where :math:`d` is 1 kpc:
+
+    .. math::
+
+        \\Omega = \\frac{\\pi R_{\\textnormal{Sun}}^{2}}{d^{2}}
+
+    Parameters
+    ----------
+    temperature : float
+        Blackbody temperature in Kelvin.
+
+    """
+    def __init__(self, *args, **kwargs):
+        super(BlackBodyNorm1D, self).__init__(*args, **kwargs)
+        self._omega = np.pi * (const.R_sun / const.kpc).value ** 2  # steradian
+
+    def evaluate(self, x, temperature):
+        """Evaluate the model.
+
+        Parameters
+        ----------
+        x : number or ndarray
+            Wavelengths in Angstrom.
+
+        temperature : number
+            Temperature in Kelvin.
+
+        Returns
+        -------
+        y : number or ndarray
+            Blackbody radiation in PHOTLAM.
+
+        """
+        bbflux = super(BlackBodyNorm1D, self).evaluate(x, temperature)
+        return bbflux * self._omega
+
+
+class Box1D(_models.Box1D):
     """Same as `astropy.modeling.models.Box1D`, except with
     ``sampleset`` defined.
 
@@ -163,7 +216,7 @@ class Box1D(modeling.models.Box1D):
         return np.asarray(w)
 
 
-class ConstFlux1D(modeling.models.Const1D):
+class ConstFlux1D(_models.Const1D):
     """One dimensional constant flux model.
 
     Flux that is constant in a given unit might not be constant in
@@ -219,7 +272,7 @@ class ConstFlux1D(modeling.models.Const1D):
 
 
 # TODO: Subclass from LookupTable (spacetelescope/gwcs#28)
-class Empirical1D(modeling.Fittable1DModel):
+class Empirical1D(Fittable1DModel):
     """Empirical (sampled) spectrum or bandpass model.
 
     .. note::
@@ -245,8 +298,8 @@ class Empirical1D(modeling.Fittable1DModel):
 
     """
     standard_broadcasting = False
-    x = modeling.Parameter(default=[0, 0])
-    y = modeling.Parameter(default=[0, 0])
+    x = Parameter(default=[0, 0])
+    y = Parameter(default=[0, 0])
 
     def __init__(self, x, y, **kwargs):
         n_models = kwargs.get('n_models', 1)
@@ -268,6 +321,11 @@ class Empirical1D(modeling.Fittable1DModel):
         # Filter out keywords that do not go into model init
         kwargs = self._process_interp1d_options(x, y, **kwargs)
 
+        # Manually insert user metadata here as not to overwrite warning
+        # from self._process_neg_flux()
+        meta = kwargs.pop('meta', {})
+        self.meta.update(meta)
+
         super(Empirical1D, self).__init__(x=x, y=y, **kwargs)
 
     def _process_neg_flux(self, y):
@@ -281,7 +339,7 @@ class Empirical1D(modeling.Fittable1DModel):
                 y[i] = 0
                 warn_str = ('{0} bin(s) contained negative flux or throughput; '
                             'it/they will be set to zero.'.format(n_neg))
-                self._warnings = {'NegativeFlux': warn_str}
+                self.meta['warnings'] = {'NegativeFlux': warn_str}
                 warnings.warn(warn_str, AstropyUserWarning)
 
         return y
@@ -307,11 +365,6 @@ class Empirical1D(modeling.Fittable1DModel):
         """Use given keywords with :func:`~scipy.interpolate.interp1d` to
         evaluate model. Otherwise, use previously set values."""
         self._process_interp1d_options(self.x.value, self.y.value, **kwargs)
-
-    @property
-    def warnings(self):
-        """Dictionary of warning key-value pairs."""
-        return self._warnings
 
     # NOTE: It is forced to be property by core Model. The decorator
     #       here is just to make this obvious.
@@ -377,7 +430,7 @@ class GaussianSampleset1DMixin(object):
         return np.asarray(w)
 
 
-class Gaussian1D(modeling.models.Gaussian1D, GaussianSampleset1DMixin):
+class Gaussian1D(_models.Gaussian1D, GaussianSampleset1DMixin):
     """Same as `astropy.modeling.models.Gaussian1D`, except with
     ``sampleset`` defined.
 
@@ -385,7 +438,7 @@ class Gaussian1D(modeling.models.Gaussian1D, GaussianSampleset1DMixin):
     pass
 
 
-class GaussianAbsorption1D(modeling.models.GaussianAbsorption1D,
+class GaussianAbsorption1D(_models.GaussianAbsorption1D,
                            GaussianSampleset1DMixin):
     """Same as `astropy.modeling.models.GaussianAbsorption1D`, except with
     ``sampleset`` defined.
@@ -394,7 +447,43 @@ class GaussianAbsorption1D(modeling.models.GaussianAbsorption1D,
     pass
 
 
-class Lorentz1D(modeling.models.Lorentz1D, GaussianSampleset1DMixin):
+class GaussianFlux1D(Gaussian1D):
+    """Same as `Gaussian1D` but accepts extra keywords below.
+
+    Parameters
+    ----------
+    fwhm : float
+        Full width at half maximum of the Gaussian in Angstrom.
+        If given, this overrides ``stddev``.
+
+    total_flux : float
+        Total flux under the Gaussian in PHOTLAM.
+        If given, this overrides ``amplitude``.
+
+    """
+    def __init__(self, *args, **kwargs):
+        fwhm = kwargs.pop('fwhm', None)
+        total_flux = kwargs.pop('total_flux', None)
+
+        super(GaussianFlux1D, self).__init__(*args, **kwargs)
+
+        if fwhm is None:
+            fwhm = self.stddev * gaussian_sigma_to_fwhm
+        else:
+            self.stddev = fwhm * gaussian_fwhm_to_sigma
+
+        gaussian_amp_to_totflux = np.sqrt(2.0 * np.pi) * self.stddev
+
+        if total_flux is None:
+            total_flux = self.amplitude * gaussian_amp_to_totflux
+        else:
+            self.amplitude = total_flux / gaussian_amp_to_totflux
+
+        self.meta['expr'] = 'em({0:g}, {1:g}, {2:g}, PHOTLAM)'.format(
+            self.mean.value, fwhm, total_flux)
+
+
+class Lorentz1D(_models.Lorentz1D, GaussianSampleset1DMixin):
     """Same as `astropy.modeling.models.Lorentz1D`, except with
     ``sampleset`` defined.
 
@@ -422,7 +511,7 @@ class Lorentz1D(modeling.models.Lorentz1D, GaussianSampleset1DMixin):
         return (x0 - dx, x0 + dx)
 
 
-class MexicanHat1D(modeling.models.MexicanHat1D, GaussianSampleset1DMixin):
+class MexicanHat1D(_models.MexicanHat1D, GaussianSampleset1DMixin):
     """Same as `astropy.modeling.models.MexicanHat1D`, except with
     ``sampleset`` defined.
 
@@ -450,7 +539,7 @@ class MexicanHat1D(modeling.models.MexicanHat1D, GaussianSampleset1DMixin):
         return (x0 - dx, x0 + dx)
 
 
-class PowerLawFlux1D(modeling.models.PowerLaw1D):
+class PowerLawFlux1D(_models.PowerLaw1D):
     """One dimensional power law model with proper flux handling.
 
     For multiple ``n_models``, this model only accepts parameters of the
@@ -501,7 +590,7 @@ class PowerLawFlux1D(modeling.models.PowerLaw1D):
         return flux.value
 
 
-class Trapezoid1D(modeling.models.Trapezoid1D):
+class Trapezoid1D(_models.Trapezoid1D):
     """Same as `astropy.modeling.models.Trapezoid1D`, except with
     ``sampleset`` defined.
 
@@ -526,7 +615,7 @@ class Trapezoid1D(modeling.models.Trapezoid1D):
 def _get_sampleset(model):
     """Return sampleset of a model or `None` if undefined.
     Model could be a real model or evaluated sampleset."""
-    if isinstance(model, modeling.Model):
+    if isinstance(model, Model):
         if hasattr(model, 'sampleset'):
             w = model.sampleset()
         else:
@@ -553,13 +642,13 @@ def _shift_wavelengths(model1, model2):
         Model | Scale
 
     """
-    if isinstance(model1, modeling.models.RedshiftScaleFactor):
+    if isinstance(model1, _models.RedshiftScaleFactor):
         val = _get_sampleset(model2)
         if val is None:
             w = val
         else:
             w = model1.inverse(val)
-    elif isinstance(model1, modeling.models.Scale):
+    elif isinstance(model1, _models.Scale):
         w = _get_sampleset(model2)
     else:
         w = _get_sampleset(model1)
@@ -596,12 +685,65 @@ def get_waveset(model):
         Invalid model.
 
     """
-    if not isinstance(model, modeling.Model):
+    if not isinstance(model, Model):
         raise SynphotError('{0} is not a model.'.format(model))
 
-    if isinstance(model, modeling.core._CompoundModel):
+    if isinstance(model, _CompoundModel):
         waveset = model._tree.evaluate(WAVESET_OPERATORS, getter=None)
     else:
         waveset = _get_sampleset(model)
 
     return waveset
+
+
+# Functions below are for meta magic.
+
+# This is for joining metadata in a compound model.
+METADATA_OPERATORS = defaultdict(lambda: _merge_meta)
+
+
+def _get_meta(model):
+    """Return metadata of a model.
+    Model could be a real model or evaluated metadata."""
+    if isinstance(model, Model):
+        w = model.meta
+    else:
+        w = model  # Already metadata
+    return w
+
+
+def _merge_meta(model1, model2):
+    """Simple merge of samplesets."""
+    w1 = _get_meta(model1)
+    w2 = _get_meta(model2)
+    return metadata.merge(w1, w2)
+
+
+def get_metadata(model):
+    """Get metadata for a given model.
+
+    Parameters
+    ----------
+    model : `~astropy.modeling.Model`
+        Model.
+
+    Returns
+    -------
+    metadata : dict
+        Metadata for the model.
+
+    Raises
+    ------
+    synphot.exceptions.SynphotError
+        Invalid model.
+
+    """
+    if not isinstance(model, Model):
+        raise SynphotError('{0} is not a model.'.format(model))
+
+    if isinstance(model, _CompoundModel):
+        metadata = model._tree.evaluate(METADATA_OPERATORS, getter=None)
+    else:
+        metadata = deepcopy(model.meta)
+
+    return metadata
