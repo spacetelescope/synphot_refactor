@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-from astropy.extern import six
 
 # STDLIB
 import io
@@ -11,7 +10,11 @@ from setuptools import Extension
 # ASTROPY
 from astropy_helpers import setup_helpers
 
+# LOCAL
+from .extern import six
+
 LOCALROOT = os.path.relpath(os.path.dirname(__file__))
+
 
 if six.PY2:
     def string_escape(s):
