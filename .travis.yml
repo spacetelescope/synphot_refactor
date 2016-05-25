@@ -25,6 +25,7 @@ env:
         # overridden underneath. They are defined here in order to save having
         # to repeat them for all configurations.
         - NUMPY_VERSION=stable
+        - MAIN_CMD='python setup.py'
         #- ASTROPY_VERSION=stable
         - ASTROPY_VERSION=development
         - SETUP_CMD='test'
@@ -101,7 +102,7 @@ install:
     # other dependencies.
 
 script:
-    - python setup.py $SETUP_CMD
+    - $MAIN_CMD $SETUP_CMD
 
 after_success:
     # If coveralls.io is set up for this package, uncomment the line
