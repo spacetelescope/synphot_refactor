@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module defines the different types of spectra."""
 from __future__ import absolute_import, division, print_function
-from astropy.extern import six
+from .extern import six
 
 # STDLIB
 import numbers
@@ -153,7 +153,8 @@ class BaseSpectrum(object):
 
             modargs = {}
 
-            # Process wavelength needed for flux conversion first, if applicable.
+            # Process wavelength needed for flux conversion first,
+            # if applicable.
             if modelname in self._model_fconv_wav:
                 pname_wav = self._model_fconv_wav[modelname]
                 pval_wav = self._process_wave_param(kwargs.pop(pname_wav))
@@ -951,7 +952,8 @@ class BaseSourceSpectrum(BaseSpectrum):
 
         # Renormalize in magnitudes
         if renorm_val.unit.decompose() == u.mag:
-            const = renorm_val.value + 2.5 * np.log10(totalflux.value / stdflux)
+            const = renorm_val.value + (2.5 *
+                                        np.log10(totalflux.value / stdflux))
             newsp = self.__mul__(10**(-0.4 * const))
         # Renormalize in linear flux units
         else:
@@ -1670,8 +1672,10 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        filtername : {'bessel_j', 'bessel_h', 'bessel_k', 'cousins_r', 'cousins_i', 'johnson_u', 'johnson_b', 'johnson_v', 'johnson_r', 'johnson_i', 'johnson_j', 'johnson_k'}
-            Filter name.
+        filtername : str
+            Filter name. Choose from 'bessel_j', 'bessel_h', 'bessel_k',
+            'cousins_r', 'cousins_i', 'johnson_u', 'johnson_b', 'johnson_v',
+            'johnson_r', 'johnson_i', 'johnson_j', or 'johnson_k'.
 
         kwargs : dict
             Keywords acceptable by :func:`~synphot.specio.read_remote_spec`.

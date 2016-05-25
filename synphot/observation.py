@@ -146,8 +146,8 @@ class Observation(BaseSourceSpectrum):
                          'Using source spectrum waveset instead.')
             else:
                 raise exceptions.UndefinedBinset(
-                    'Both source spectrum and bandpass have undefined waveset; '
-                    'Provide binset manually.')
+                    'Both source spectrum and bandpass have undefined '
+                    'waveset; Provide binset manually.')
         else:
             self._binset = self._validate_wavelengths(binset)
 
@@ -421,7 +421,7 @@ class Observation(BaseSourceSpectrum):
         area, vegaspec
             See :func:`~synphot.units.convert_flux`.
 
-        waverange : tuple of float, `~astropy.units.quantity.Quantity`, or `None`
+        waverange : tuple of float, Quantity, or `None`
             Lower and upper limits of the desired wavelength range.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, the full range is used.

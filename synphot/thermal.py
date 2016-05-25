@@ -67,7 +67,8 @@ class ThermalSpectralElement(BaseUnitlessSpectrum):
 
     def taper(self, **kwargs):
         """Tapering is disabled."""
-        raise NotImplementedError('Thermal spectral element cannot be tapered.')
+        raise NotImplementedError(
+            'Thermal spectral element cannot be tapered.')
 
     def thermal_source(self):
         """Apply emissivity to an existing beam to produce a thermal

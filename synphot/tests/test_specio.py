@@ -88,7 +88,8 @@ class TestReadWriteFITS(object):
 
         # Compare data
         np.testing.assert_allclose(
-            wave.value, [1000.0, 2000.0 + self.epsilon, 3000.0, 4000.0, 5000.0],
+            wave.value,
+            [1000.0, 2000.0 + self.epsilon, 3000.0, 4000.0, 5000.0],
             rtol=1e-06)
         np.testing.assert_allclose(flux.value, [0.1, 10.0, 0.0, 6.5, 1.2])
         assert wave.unit == self.wave.unit

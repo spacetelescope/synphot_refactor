@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This modules handles synthetic photometry data formats."""
 from __future__ import absolute_import, division, print_function
-from astropy.extern import six
+from .extern import six
 
 # STDLIB
 import os
@@ -221,9 +221,9 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
     return header, wavelengths, fluxes
 
 
-def write_fits_spec(filename, wavelengths, fluxes, pri_header={}, ext_header={},
-                    clobber=False, trim_zero=True, pad_zero_ends=True,
-                    precision=None, epsilon=0.00032,
+def write_fits_spec(filename, wavelengths, fluxes, pri_header={},
+                    ext_header={}, clobber=False, trim_zero=True,
+                    pad_zero_ends=True, precision=None, epsilon=0.00032,
                     wave_col='WAVELENGTH', flux_col='FLUX',
                     wave_unit=u.AA, flux_unit=units.FLAM):
     """Write FITS spectrum.

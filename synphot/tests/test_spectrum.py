@@ -351,7 +351,8 @@ class TestGaussianSource(object):
 class TestPowerLawSource(object):
     """Test source spectrum with PowerLawFlux1D model."""
     def setup_class(self):
-        self.sp = SourceSpectrum(PowerLawFlux1D, amplitude=1, x_0=6000, alpha=4)
+        self.sp = SourceSpectrum(PowerLawFlux1D, amplitude=1, x_0=6000,
+                                 alpha=4)
 
     def test_eval(self):
         w = np.arange(3000, 3100, 10)

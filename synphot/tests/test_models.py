@@ -183,7 +183,8 @@ class TestPowerLawFlux1D(object):
             amplitude=u.Quantity([1, 1], units.FLAM),
             x_0=u.Quantity([0.3, 0.305], u.micron), alpha=[4, 1], n_models=2)
         y = units.convert_flux(
-            self.w, u.Quantity(m2(self.w, model_set_axis=False), units.PHOTLAM),
+            self.w,
+            u.Quantity(m2(self.w, model_set_axis=False), units.PHOTLAM),
             units.FLAM)
         ans = [[1, 0.98677704, 0.97377192, 0.96098034, 0.94839812,
                 0.93602115, 0.92384543, 0.91186704, 0.90008216, 0.88848705],

@@ -32,7 +32,8 @@ _flux_flam = u.Quantity([3.9135e-14, 4.0209e-14, 3.9169e-14], units.FLAM)
 _flux_fnu = u.Quantity(
     [3.20735792e-25, 3.29903646e-25, 3.21727226e-25], units.FNU)
 _flux_jy = u.Quantity([3.20735792e-2, 3.29903646e-2, 3.21727226e-2], u.Jy)
-_flux_count = u.Quantity([1214.88479883, 1248.91795446, 1217.28946691], u.count)
+_flux_count = u.Quantity([1214.88479883, 1248.91795446, 1217.28946691],
+                         u.count)
 _flux_stmag = u.Quantity([12.41858665, 12.38919182, 12.41764379], units.STMAG)
 _flux_abmag = u.Quantity([12.63463143, 12.60403221, 12.63128047], units.ABMAG)
 _flux_obmag = u.Quantity([-7.71133775, -7.74133477, -7.71348466], units.OBMAG)

@@ -59,4 +59,5 @@ class TestThermalSpectralElement(object):
         thfile = get_pkg_data_filename(
             os.path.join('data', 'hst_acs_hrc_f555w.fits'))
         with pytest.raises(exceptions.SynphotError):
-            th = ThermalSpectralElement.from_file(thfile, flux_col='THROUGHPUT')
+            th = ThermalSpectralElement.from_file(
+                thfile, flux_col='THROUGHPUT')
