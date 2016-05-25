@@ -306,6 +306,13 @@ class Empirical1D(Fittable1DModel):
         if n_models > 1:
             raise NotImplementedError('Only n_models=1 is supported')
 
+        # Manually insert user metadata here to accomodate any warning
+        # from self._process_neg_flux()
+        meta = kwargs.pop('meta', {})
+        self.meta = meta
+        if 'warnings' not in self.meta:
+            self.meta['warnings'] = {}
+
         keep_neg = kwargs.pop('keep_neg', False)
         self._keep_neg = keep_neg
         y = self._process_neg_flux(y)
@@ -321,11 +328,6 @@ class Empirical1D(Fittable1DModel):
         # Filter out keywords that do not go into model init
         kwargs = self._process_interp1d_options(x, y, **kwargs)
 
-        # Manually insert user metadata here as not to overwrite warning
-        # from self._process_neg_flux()
-        meta = kwargs.pop('meta', {})
-        self.meta.update(meta)
-
         super(Empirical1D, self).__init__(x=x, y=y, **kwargs)
 
     def _process_neg_flux(self, y):
@@ -339,7 +341,7 @@ class Empirical1D(Fittable1DModel):
                 y[i] = 0
                 warn_str = ('{0} bin(s) contained negative flux or throughput; '
                             'it/they will be set to zero.'.format(n_neg))
-                self.meta['warnings'] = {'NegativeFlux': warn_str}
+                self.meta['warnings'].update({'NegativeFlux': warn_str})
                 warnings.warn(warn_str, AstropyUserWarning)
 
         return y
