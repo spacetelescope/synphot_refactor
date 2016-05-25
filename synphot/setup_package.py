@@ -13,20 +13,19 @@ from astropy_helpers import setup_helpers
 
 LOCALROOT = os.path.relpath(os.path.dirname(__file__))
 
-
-if six.PY3:
+if six.PY2:
+    def string_escape(s):
+        # string_escape has subtle differences with the escaping done in
+        # Python 3 so correct for those too
+        s = s.encode('string_escape')
+        s = s.replace(r'\x00', r'\0')
+        return s.replace(r"\'", "'")
+else:
     def string_escape(s):
         s = s.decode('ascii').encode('ascii', 'backslashreplace')
         s = s.replace(b'\n', b'\\n')
         s = s.replace(b'\0', b'\\0')
         return s.decode('ascii')
-else:
-    def string_escape(s):
-        # string_escape has subtle differences with the escaping done in Python
-        # 3 so correct for those too
-        s = s.encode('string_escape')
-        s = s.replace(r'\x00', r'\0')
-        return s.replace(r"\'", "'")
 
 
 def generate_c_docstrings():

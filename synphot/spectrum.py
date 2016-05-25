@@ -233,8 +233,9 @@ class BaseSpectrum(object):
                     if key in d:
                         del d[key]
 
-        mid = metadata.merge(left, right)
-        result.meta = metadata.merge(result.meta, mid)
+        mid = metadata.merge(left, right, metadata_conflicts='silent')
+        result.meta = metadata.merge(result.meta, mid,
+                                     metadata_conflicts='silent')
 
     @staticmethod
     def _process_generic_param(pval, def_unit, equivalencies=[]):

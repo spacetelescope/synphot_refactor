@@ -35,19 +35,17 @@ env:
         #- CONDA_DEPENDENCIES='Cython'
         - CONDA_DEPENDENCIES='Cython jinja2 scipy'
     matrix:
-        # DISABLED - https://github.com/astropy/package-template/issues/164
         # Make sure that egg_info works without dependencies
-        #- SETUP_CMD='egg_info'
+        - SETUP_CMD='egg_info' CONDA_DEPENDENCIES='Cython jinja2 scipy astropy'
         # Try all python versions with the latest numpy
-        - SETUP_CMD='test'
+        - SETUP_CMD='test --open-files'
 
 matrix:
     include:
 
-        # DISABLED FOR NOW
         # Do a coverage test in Python 2.
-        #- python: 2.7
-        #  env: SETUP_CMD='test --coverage'
+        - python: 2.7
+          env: SETUP_CMD='test --coverage'
 
         # DISABLED FOR NOW
         # Check for sphinx doc build warnings - we do this first because it
@@ -61,6 +59,10 @@ matrix:
         #  env: ASTROPY_VERSION=development
         #- python: 3.5
         #  env: ASTROPY_VERSION=development
+
+        # Do a PEP8 test
+        - python: 2.7
+          env: MAIN_CMD='pep8 synphot --count' SETUP_CMD='' CONDA_DEPENDENCIES='Cython jinja2 scipy astropy'
 
 before_install:
 
@@ -105,4 +107,4 @@ after_success:
     # If coveralls.io is set up for this package, uncomment the line
     # below and replace "packagename" with the name of your package.
     # The coveragerc file may be customized as needed for your package.
-    # - if [[ $SETUP_CMD == 'test --coverage' ]]; then coveralls --rcfile='synphot/tests/coveragerc'; fi
+    - if [[ $SETUP_CMD == 'test --coverage' ]]; then coveralls --rcfile='synphot/tests/coveragerc'; fi
