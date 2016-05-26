@@ -37,7 +37,7 @@ env:
         - CONDA_DEPENDENCIES='Cython jinja2 scipy'
     matrix:
         # Make sure that egg_info works without dependencies
-        - SETUP_CMD='egg_info' CONDA_DEPENDENCIES='Cython jinja2 scipy astropy'
+        - SETUP_CMD='egg_info'
         # Try all python versions with the latest numpy
         - SETUP_CMD='test --open-files'
 
