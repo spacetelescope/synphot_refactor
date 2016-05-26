@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Utilities related to wavelength bin calculations."""
 from __future__ import absolute_import, division, print_function
-from astropy.extern import six
+from .extern import six
 
 # THIRD-PARTY
 import numpy as np
@@ -276,7 +276,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
         if frac1 >= 0:
             # end is somewhere greater than binset[0] so we can just
             # interpolate between two neighboring values going with upper edge
-            wave1 = bins[int1:int1+2].mean()
+            wave1 = bins[int1:int1 + 2].mean()
         else:
             # end is below the lowest binset value, but not by enough to
             # trigger an exception
@@ -286,7 +286,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
         if int2 < bins.shape[0] - 1:
             # end is somewhere below binset[-1] so we can just interpolate
             # between two neighboring values, going with the upper edge.
-            wave2 = bins[int2:int2+2].mean()
+            wave2 = bins[int2:int2 + 2].mean()
         else:
             # end is above highest binset value but not by enough to
             # trigger an exception
@@ -296,10 +296,10 @@ def wave_range(bins, cenwave, npix, mode='round'):
         # Lower end of wavelength range
         if frac1 <= 0.5 and int1 < bins.shape[0] - 1:
             # not at the lowest possible edge and pixel i included
-            wave1 = bins[int1:int1+2].mean()
+            wave1 = bins[int1:int1 + 2].mean()
         elif frac1 > 0.5 and int1 < bins.shape[0] - 2:
             # not at the lowest possible edge and pixel i not included
-            wave1 = bins[int1+1:int1+3].mean()
+            wave1 = bins[int1 + 1:int1 + 3].mean()
         elif frac1 == -0.5:
             # at the lowest possible edge
             wave1 = bins[0] - (bins[0:2].mean() - bins[0])
@@ -311,10 +311,10 @@ def wave_range(bins, cenwave, npix, mode='round'):
         # Upper end of wavelength range
         if frac2 >= 0.5 and int2 < bins.shape[0] - 1:
             # not out at the end and pixel i included
-            wave2 = bins[int2:int2+2].mean()
+            wave2 = bins[int2:int2 + 2].mean()
         elif frac2 < 0.5 and int2 < bins.shape[0]:
             # not out at end and pixel i not included
-            wave2 = bins[int2-1:int2+1].mean()
+            wave2 = bins[int2 - 1:int2 + 1].mean()
         elif frac2 == 0.5 and int2 == bins.shape[0] - 1:
             # at the very end
             wave2 = bins[-1] + (bins[-1] - bins[-2:].mean())
@@ -327,10 +327,10 @@ def wave_range(bins, cenwave, npix, mode='round'):
         # Lower end of wavelength range
         if frac1 < 0.5 and int1 < bins.shape[0]:
             # not at the lowest possible edge and pixel i included
-            wave1 = bins[int1-1:int1+1].mean()
+            wave1 = bins[int1 - 1:int1 + 1].mean()
         elif frac1 >= 0.5 and int1 < bins.shape[0] - 1:
             # not at the lowest possible edge and pixel i not included
-            wave1 = bins[int1:int1+2].mean()
+            wave1 = bins[int1:int1 + 2].mean()
         elif frac1 == -0.5:
             # at the lowest possible edge
             wave1 = bins[0] - (bins[0:2].mean() - bins[0])
@@ -342,10 +342,10 @@ def wave_range(bins, cenwave, npix, mode='round'):
         # Upper end of wavelength range
         if frac2 > 0.5 and int2 < bins.shape[0] - 2:
             # not out at the end and pixel i included
-            wave2 = bins[int2+1:int2+3].mean()
+            wave2 = bins[int2 + 1:int2 + 3].mean()
         elif frac2 <= 0.5 and int2 < bins.shape[0] - 1:
             # not out at end and pixel i not included
-            wave2 = bins[int2:int2+2].mean()
+            wave2 = bins[int2:int2 + 2].mean()
         elif frac2 == 0.5 and int2 == bins.shape[0] - 1:
             # at the very end
             wave2 = bins[-1] + (bins[-1] - bins[-2:].mean())
@@ -451,13 +451,13 @@ def pixel_range(bins, waverange, mode='round'):
     elif mode == 'min':
         # for ind1, figure out if pixel ind1 is wholly included or not.
         # do this by figuring out where wave1 is between ind1 and ind1-1.
-        frac = (bins[ind1] - wave1) / (bins[ind1] - bins[ind1-1])
+        frac = (bins[ind1] - wave1) / (bins[ind1] - bins[ind1 - 1])
         if frac < 0.5:
             # ind1 is only partially included
             ind1 += 1
 
         # similar but reversed procedure for ind2
-        frac = (wave2 - bins[ind2-1]) / (bins[ind2] - bins[ind2-1])
+        frac = (wave2 - bins[ind2 - 1]) / (bins[ind2] - bins[ind2 - 1])
         if frac < 0.5:
             # ind2 is only partially included
             ind2 -= 1
@@ -467,13 +467,13 @@ def pixel_range(bins, waverange, mode='round'):
     elif mode == 'max':
         # for ind1, figure out if pixel ind1-1 is partially included or not.
         # do this by figuring out where wave1 is between ind1 and ind1-1.
-        frac = (wave1 - bins[ind1-1]) / (bins[ind1] - bins[ind1-1])
+        frac = (wave1 - bins[ind1 - 1]) / (bins[ind1] - bins[ind1 - 1])
         if frac < 0.5:
             # ind1 is partially included
             ind1 -= 1
 
         # similar but reversed procedure for ind2
-        frac = (bins[ind2] - wave2) / (bins[ind2] - bins[ind2-1])
+        frac = (bins[ind2] - wave2) / (bins[ind2] - bins[ind2 - 1])
         if frac < 0.5:
             # ind2 is partially included
             ind2 += 1
@@ -482,8 +482,8 @@ def pixel_range(bins, waverange, mode='round'):
 
     else:  # mode == 'none'
         # calculate fractional indices
-        frac1 = ind1 - (bins[ind1] - wave1) / (bins[ind1] - bins[ind1-1])
-        frac2 = ind2 - (bins[ind2] - wave2) / (bins[ind2] - bins[ind2-1])
+        frac1 = ind1 - (bins[ind1] - wave1) / (bins[ind1] - bins[ind1 - 1])
+        frac2 = ind2 - (bins[ind2] - wave2) / (bins[ind2] - bins[ind2 - 1])
         npix = frac2 - frac1
 
     return npix

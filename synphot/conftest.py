@@ -2,16 +2,17 @@
 # by importing them here in conftest.py they are discoverable by py.test
 # no matter how it is invoked within the source tree.
 
+import os
 from astropy.tests.pytest_plugins import *
 
-## Uncomment the following line to treat all DeprecationWarnings as
-## exceptions
+# Uncomment the following line to treat all DeprecationWarnings as
+# exceptions
 enable_deprecations_as_exceptions()
 
-## Uncomment and customize the following lines to add/remove entries
-## from the list of packages for which version numbers are displayed
-## when running the tests. Making it pass for KeyError is essential in
-## some cases when the package uses other astropy affiliated packages.
+# Uncomment and customize the following lines to add/remove entries
+# from the list of packages for which version numbers are displayed
+# when running the tests. Making it pass for KeyError is essential in
+# some cases when the package uses other astropy affiliated packages.
 try:
     PYTEST_HEADER_MODULES['Astropy'] = 'astropy'
     PYTEST_HEADER_MODULES['scikit-image'] = 'skimage'
@@ -19,13 +20,12 @@ try:
 except (NameError, KeyError):  # NameError is needed to support Astropy < 1.0
     pass
 
-## Uncomment the following lines to display the version number of the
-## package rather than the version number of Astropy in the top line when
-## running the tests.
-import os
+# Uncomment the following lines to display the version number of the
+# package rather than the version number of Astropy in the top line when
+# running the tests.
 
-## This is to figure out the affiliated package version, rather than
-## using Astropy's
+# This is to figure out the affiliated package version, rather than
+# using Astropy's
 try:
     from .version import version
 except ImportError:

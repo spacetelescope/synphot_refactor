@@ -233,7 +233,8 @@ class TestObsPar(object):
 
     def test_barlam(self):
         """Tested for PHOTLAM only; no binning."""
-        np.testing.assert_allclose(self.obs.barlam().value, 5286.685, rtol=1e-5)
+        np.testing.assert_allclose(
+            self.obs.barlam().value, 5286.685, rtol=1e-5)
 
     def test_pivot(self):
         """Tested with value from ASTROLIB PYSYNPHOT; no binning."""

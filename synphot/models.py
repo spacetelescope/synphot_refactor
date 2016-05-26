@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Spectrum models not in `astropy.modeling`."""
 from __future__ import absolute_import, division, print_function
-from astropy.extern.six.moves import map, zip
+from .extern.six.moves import map, zip
 
 # STDLIB
 import warnings
@@ -65,7 +65,8 @@ class BlackBody1D(Fittable1DModel):
 
             x_{\\textnormal{low}} = 0
 
-            x_{\\textnormal{high}} = \\log(\\lambda_{\\textnormal{max}} \\; (1 + \\textnormal{factor}))
+            x_{\\textnormal{high}} = \\log(\\lambda_{\\textnormal{max}} \\;\
+            (1 + \\textnormal{factor}))
 
         Parameters
         ----------
@@ -247,7 +248,8 @@ class ConstFlux1D(_models.Const1D):
                'photon flux density', 'photon flux density wav')):
             a = amplitude
         else:
-            raise NotImplementedError('{0} not supported.'.format(in_unit_name))
+            raise NotImplementedError(
+                '{0} not supported.'.format(in_unit_name))
 
         self._flux_unit = a.unit
         super(ConstFlux1D, self).__init__(amplitude=a.value, **kwargs)
@@ -339,15 +341,16 @@ class Empirical1D(Fittable1DModel):
             n_neg = len(i[0])
             if n_neg > 0:
                 y[i] = 0
-                warn_str = ('{0} bin(s) contained negative flux or throughput; '
-                            'it/they will be set to zero.'.format(n_neg))
+                warn_str = ('{0} bin(s) contained negative flux or throughput'
+                            '; it/they will be set to zero.'.format(n_neg))
                 self.meta['warnings'].update({'NegativeFlux': warn_str})
                 warnings.warn(warn_str, AstropyUserWarning)
 
         return y
 
     def _process_interp1d_options(self, x, y, **kwargs):
-        """Override default interpolation options and return unused keywords."""
+        """Override default interpolation options and return unused
+        keywords."""
         from scipy.interpolate import interp1d
 
         self._kind = kwargs.pop('kind', self._kind)
@@ -718,7 +721,7 @@ def _merge_meta(model1, model2):
     """Simple merge of samplesets."""
     w1 = _get_meta(model1)
     w2 = _get_meta(model2)
-    return metadata.merge(w1, w2)
+    return metadata.merge(w1, w2, metadata_conflicts='silent')
 
 
 def get_metadata(model):

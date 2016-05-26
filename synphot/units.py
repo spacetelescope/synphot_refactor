@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module handles photometry units that are not in `astropy.units`."""
 from __future__ import absolute_import, division, print_function
-from astropy.extern import six
+from .extern import six
 
 # THIRD-PARTY
 import numpy as np
@@ -19,18 +19,18 @@ __all__ = ['H', 'C', 'HC', 'SR_PER_ARCSEC2', 'AREA', 'THROUGHPUT', 'PHOTLAM',
            'spectral_density_count', 'convert_flux', 'validate_unit',
            'validate_wave_unit', 'validate_quantity']
 
-#-------------------#
+# ----------------- #
 # General constants #
-#-------------------#
+# ----------------- #
 
 H = const.h.cgs  # Planck's constant in erg * sec
 C = const.c.to('AA/s')  # Speed of light in Angstrom/sec
 HC = H * C
 SR_PER_ARCSEC2 = u.rad.to(u.arcsec) ** -2  # steradian per arcsec^2
 
-#---------------#
+# ------------- #
 # synphot units #
-#---------------#
+# ------------- #
 
 # Default unit of area covered by flux
 AREA = u.cm * u.cm
@@ -43,13 +43,13 @@ PHOTLAM = u.def_unit(
     'photlam', u.photon / (u.cm**2 * u.s * u.AA),
     format={'generic': 'PHOTLAM', 'console': 'PHOTLAM'})
 PHOTNU = u.def_unit(
-    'photnu',  u.photon / (u.cm**2 * u.s * u.Hz),
+    'photnu', u.photon / (u.cm**2 * u.s * u.Hz),
     format={'generic': 'PHOTNU', 'console': 'PHOTNU'})
 FLAM = u.def_unit(
     'flam', u.erg / (u.cm**2 * u.s * u.AA),
     format={'generic': 'FLAM', 'console': 'FLAM'})
 FNU = u.def_unit(
-    'fnu',  u.erg / (u.cm**2 * u.s * u.Hz),
+    'fnu', u.erg / (u.cm**2 * u.s * u.Hz),
     format={'generic': 'FNU', 'console': 'FNU'})
 STMAG = u.def_unit(
     'stmag', u.mag, format={'generic': 'STMAG', 'console': 'STMAG'})
@@ -63,9 +63,9 @@ VEGAMAG = u.def_unit(
 # Register with astropy units
 u.add_enabled_units([PHOTLAM, PHOTNU, FLAM, FNU, STMAG, ABMAG, OBMAG, VEGAMAG])
 
-#-----------------#
+# --------------- #
 # Flux conversion #
-#-----------------#
+# --------------- #
 
 ABZERO = u.Quantity(-48.6, unit=u.mag)
 STZERO = u.Quantity(-21.1, unit=u.mag)
@@ -274,7 +274,8 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
     return out_flux
 
 
-def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None, vegaspec=None):
+def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
+                  vegaspec=None):
     """Flux conversion for PHOTLAM <-> X."""
     flux_unit_names = (fluxes.unit.to_string(), out_flux_unit.to_string())
 
@@ -327,9 +328,9 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None, vegaspec=None):
     return u.Quantity(out_flux, unit=out_flux_unit)
 
 
-#--------------------#
-# Utility functions  #
-#--------------------#
+# ----------------- #
+# Utility functions #
+# ----------------- #
 
 def validate_unit(input_unit):
     """Validate unit.
@@ -364,7 +365,8 @@ def validate_unit(input_unit):
             output_unit = u.AA
         elif input_unit_lowcase == 'inversemicrons':
             output_unit = u.micron ** -1
-        elif input_unit_lowcase in ('transmission', 'extinction', 'emissivity'):
+        elif input_unit_lowcase in ('transmission', 'extinction',
+                                    'emissivity'):
             output_unit = THROUGHPUT
         else:
             try:  # astropy.units is case-sensitive

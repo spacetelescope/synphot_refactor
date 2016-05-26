@@ -117,7 +117,7 @@ class TestBinRange(object):
          (5004, 2, (5003.5, 5004.5), 'min'),
          (5004, 3, (5002.5, 5005.5), 'min'),
          (5006.25, 4, (5004.5, 5007.5), 'min'),
-         (5006.25, 5,  (5004.5, 5008.5), 'min'),
+         (5006.25, 5, (5004.5, 5008.5), 'min'),
          (5006.5, 6, (5003.5, 5009.5), 'min'),
          (5006.5, 7, (5003.5, 5009.5), 'min'),
          (5004, 1, (5003.5, 5004.5), 'max'),
@@ -179,7 +179,8 @@ class TestBinRange(object):
         np.testing.assert_allclose(npix, ans)
 
     def test_pixel_range_descending_order(self):
-        """Make sure calculations are correct for inputs in descending order."""
+        """Make sure calculations are correct for inputs in descending
+        order."""
         waverange = np.array([4999.6, 5008.8])
         assert (binning.pixel_range(self.bins, waverange) ==
                 binning.pixel_range(self.bins[::-1], waverange))
@@ -241,6 +242,6 @@ def test_calcbinflux():
     # Flux values are inherited from old test, compare at 0.01% relative diff.
     flux_ans = np.array(
         [0.12265425, 0.12226972, 0.12184207, 0.12141429, 0.12098646, 0.1205586,
-         0.1201307, 0.11970269, 0.11927488,  0.11884699])
+         0.1201307, 0.11970269, 0.11927488, 0.11884699])
     np.testing.assert_allclose(binflux_py, flux_ans, rtol=1e-4)
     np.testing.assert_array_equal(intwave_py, np.ones(bins.size))

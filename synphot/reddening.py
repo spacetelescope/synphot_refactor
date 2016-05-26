@@ -152,8 +152,9 @@ class ReddeningLaw(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        modelname : {'lmc30dor', 'lmcavg', 'mwavg', 'mwdense', 'mwrv21', 'mwrv40', 'smcbar', 'xgalsb'}
-            Extinction model name.
+        modelname : str
+            Extinction model name. Choose from 'lmc30dor', 'lmcavg', 'mwavg',
+            'mwdense', 'mwrv21', 'mwrv40', 'smcbar', or 'xgalsb'.
 
         kwargs : dict
             Keywords acceptable by :func:`~synphot.specio.read_remote_spec`.
