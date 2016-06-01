@@ -296,6 +296,12 @@ class TestBoxBandpass(object):
         y = bp2([4000, 4949.95, 5000])
         np.testing.assert_array_equal(y.value, [0, 0, 1])
 
+    def test_fwhm(self):
+        # You would think FWHM of a box is the width but
+        # not according to IRAF SYNPHOT.
+        np.testing.assert_allclose(self.bp.fwhm().value, 67.977,
+                                   rtol=1e-3)  # 0.1%
+
     def test_multi_n_models(self):
         """This is not allowed."""
         with pytest.raises(exceptions.SynphotError):
@@ -346,6 +352,13 @@ class TestGaussianSource(object):
 
     def test_symmetry(self):
         np.testing.assert_allclose(self.sp(3950), self.sp(4050))
+
+    def test_fwhm(self):
+        """Should round-trip back to the same bandpass FWHM."""
+        m = self.sp.model
+        bp = SpectralElement(
+            Gaussian1D, mean=m.mean, amplitude=m.amplitude, stddev=m.stddev)
+        np.testing.assert_allclose(bp.fwhm().value, 100, rtol=1e-3)  # 0.1%
 
 
 class TestPowerLawSource(object):
