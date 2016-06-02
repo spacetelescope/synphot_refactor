@@ -239,9 +239,9 @@ class ConstFlux1D(_models.Const1D):
 
         in_unit_name = amplitude.unit.to_string()
 
-        if in_unit_name == units.STMAG.to_string():
+        if in_unit_name == u.STmag.to_string():
             a = units.convert_flux(1, amplitude, units.FLAM)
-        elif in_unit_name == units.ABMAG.to_string():
+        elif in_unit_name == u.ABmag.to_string():
             a = units.convert_flux(1, amplitude, units.FNU)
         elif (amplitude.unit.physical_type in
               ('spectral flux density', 'spectral flux density wav',
@@ -571,11 +571,9 @@ class PowerLawFlux1D(_models.PowerLaw1D):
         if not isinstance(amplitude, u.Quantity):
             amplitude = u.Quantity(amplitude, units.PHOTLAM)
 
-        if ((amplitude.unit.to_string() in
-             (units.STMAG.to_string(), units.ABMAG.to_string())) or
-            (amplitude.unit.physical_type in
-             ('spectral flux density', 'spectral flux density wav',
-              'photon flux density', 'photon flux density wav'))):
+        if (amplitude.unit.physical_type in
+                ('spectral flux density', 'spectral flux density wav',
+                 'photon flux density', 'photon flux density wav')):
             self._flux_unit = amplitude.unit
         else:
             raise NotImplementedError(

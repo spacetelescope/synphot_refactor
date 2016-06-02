@@ -34,8 +34,8 @@ _flux_fnu = u.Quantity(
 _flux_jy = u.Quantity([3.20735792e-2, 3.29903646e-2, 3.21727226e-2], u.Jy)
 _flux_count = u.Quantity([1214.88479883, 1248.91795446, 1217.28946691],
                          u.count)
-_flux_stmag = u.Quantity([12.41858665, 12.38919182, 12.41764379], units.STMAG)
-_flux_abmag = u.Quantity([12.63463143, 12.60403221, 12.63128047], units.ABMAG)
+_flux_stmag = u.Quantity([12.41858665, 12.38919182, 12.41764379], u.STmag)
+_flux_abmag = u.Quantity([12.63463143, 12.60403221, 12.63128047], u.ABmag)
 _flux_obmag = u.Quantity([-7.71133775, -7.74133477, -7.71348466], units.OBMAG)
 _flux_vegamag = u.Quantity(
     [12.72810665, 12.69861694, 12.72605148], units.VEGAMAG)
@@ -46,8 +46,6 @@ def test_implicit_assumptions():
     assert units.HC.unit == u.AA * u.erg
     assert units.AREA.physical_type == 'area'
     assert units.THROUGHPUT.physical_type == 'dimensionless'
-    assert units.ABZERO.unit.decompose() == u.mag
-    assert units.STZERO.unit.decompose() == u.mag
     np.testing.assert_allclose(units.SR_PER_ARCSEC2, 2.3504430539097885e-11)
 
 
@@ -63,8 +61,8 @@ def test_implicit_assumptions():
      ('photnu', units.PHOTNU),
      ('flam', units.FLAM),
      ('fnu', units.FNU),
-     ('stmag', units.STMAG),
-     ('abmag', units.ABMAG),
+     ('stmag', u.STmag),
+     ('abmag', u.ABmag),
      ('obmag', units.OBMAG),
      ('vegamag', units.VEGAMAG),
      ('Kelvin', u.K),
@@ -132,19 +130,19 @@ def test_wave_conversion(in_q, out_u, ans):
      (_flux_obmag, u.count, _flux_count),
      (_flux_photlam, units.FLAM, _flux_flam),
      (_flux_flam, units.PHOTLAM, _flux_photlam),
-     (_flux_photlam, units.STMAG, _flux_stmag),
+     (_flux_photlam, u.STmag, _flux_stmag),
      (_flux_stmag, units.PHOTLAM, _flux_photlam),
-     (_flux_flam, units.STMAG, _flux_stmag),
+     (_flux_flam, u.STmag, _flux_stmag),
      (_flux_stmag, units.FLAM, _flux_flam),
      (_flux_photlam, units.PHOTNU, _flux_photnu),
      (_flux_photnu, units.PHOTLAM, _flux_photlam),
      (_flux_photlam, units.FNU, _flux_fnu),
      (_flux_fnu, units.PHOTLAM, _flux_photlam),
-     (_flux_photlam, units.ABMAG, _flux_abmag),
+     (_flux_photlam, u.ABmag, _flux_abmag),
      (_flux_abmag, units.PHOTLAM, _flux_photlam),
-     (_flux_fnu, units.ABMAG, _flux_abmag),
+     (_flux_fnu, u.ABmag, _flux_abmag),
      (_flux_abmag, units.FNU, _flux_fnu),
-     (_flux_fnu, units.STMAG, _flux_stmag),
+     (_flux_fnu, u.STmag, _flux_stmag),
      (_flux_fnu, u.mJy, _flux_jy.to(u.mJy)),
      (_flux_photlam, u.Jy, _flux_jy),
      (_flux_jy, units.PHOTLAM, _flux_photlam),
