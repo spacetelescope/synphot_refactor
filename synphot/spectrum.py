@@ -917,7 +917,8 @@ class BaseSourceSpectrum(BaseSpectrum):
         renorm_unit_name = renorm_val.unit.to_string()
         w = sp._validate_wavelengths(wavelengths)
 
-        if renorm_unit_name in (u.count.to_string(), units.OBMAG.to_string()):
+        if (renorm_val.unit == u.count or
+                renorm_unit_name == units.OBMAG.to_string()):
             # Special handling for non-density units
             flux_tmp = units.convert_flux(w, sp(w), u.count, area=area)
             totalflux = flux_tmp.sum()

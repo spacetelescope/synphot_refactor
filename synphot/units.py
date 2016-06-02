@@ -283,7 +283,7 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
             equivalencies=spectral_density_vega(wavelengths, flux_vega))
 
     # OBMAG or count
-    elif (u.count.to_string() in flux_unit_names or
+    elif (u.count in (fluxes.unit, out_flux_unit) or
           OBMAG.to_string() in flux_unit_names):
         if area is None:
             raise exceptions.SynphotError(

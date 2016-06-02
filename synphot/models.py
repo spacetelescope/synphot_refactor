@@ -237,11 +237,9 @@ class ConstFlux1D(_models.Const1D):
         if not isinstance(amplitude, u.Quantity):
             amplitude = u.Quantity(amplitude, units.PHOTLAM)
 
-        in_unit_name = amplitude.unit.to_string()
-
-        if in_unit_name == u.STmag.to_string():
+        if amplitude.unit == u.STmag:
             a = units.convert_flux(1, amplitude, units.FLAM)
-        elif in_unit_name == u.ABmag.to_string():
+        elif amplitude.unit == u.ABmag:
             a = units.convert_flux(1, amplitude, units.FNU)
         elif (amplitude.unit.physical_type in
               ('spectral flux density', 'spectral flux density wav',
@@ -249,7 +247,7 @@ class ConstFlux1D(_models.Const1D):
             a = amplitude
         else:
             raise NotImplementedError(
-                '{0} not supported.'.format(in_unit_name))
+                '{0} not supported.'.format(amplitude.unit))
 
         self._flux_unit = a.unit
         super(ConstFlux1D, self).__init__(amplitude=a.value, **kwargs)
