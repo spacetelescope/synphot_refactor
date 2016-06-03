@@ -265,9 +265,9 @@ class TestObsPar(object):
     @pytest.mark.parametrize(
         ('flux_unit', 'ans'),
         [(units.FLAM, 3.05E-14),
-         (units.STMAG, 12.68878),
+         (u.STmag, 12.68878),
          (units.FNU, 2.92E-25),
-         (units.ABMAG, 12.73669),
+         (u.ABmag, 12.73669),
          (units.PHOTLAM, 0.008245),
          (units.PHOTNU, 7.82E-14),
          (u.count, 101462.5),

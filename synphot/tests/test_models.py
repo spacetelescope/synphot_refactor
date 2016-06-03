@@ -88,8 +88,8 @@ class TestConstFlux1D(object):
 
     @pytest.mark.parametrize(
         ('in_unit', 'out_unit', 'val'),
-        [(units.STMAG, units.FLAM, 3.63e-9),
-         (units.ABMAG, units.FNU, 3.63e-20)])
+        [(u.STmag, units.FLAM, 3.63e-9),
+         (u.ABmag, units.FNU, 3.63e-20)])
     def test_mag(self, in_unit, out_unit, val):
         m = ConstFlux1D(amplitude=u.Quantity(0, in_unit))
         f = units.convert_flux(
@@ -191,6 +191,12 @@ class TestPowerLawFlux1D(object):
                [1.01666667, 1.01328904, 1.00993377, 1.00660066, 1.00328947,
                 1, 0.99673203, 0.99348534, 0.99025974, 0.98705502]]
         np.testing.assert_allclose(y.value, ans, rtol=1e-6)
+
+    @pytest.mark.parametrize('flux_unit', [u.STmag, u.ABmag])
+    def test_valid_mag(self, flux_unit):
+        m = PowerLawFlux1D(amplitude=1 * flux_unit, x_0=6000, alpha=4)
+        assert m.amplitude == 1
+        assert m._flux_unit == flux_unit
 
     @pytest.mark.parametrize(
         'flux_unit', [u.count, units.OBMAG, units.VEGAMAG, u.AA])

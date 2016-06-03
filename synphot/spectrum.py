@@ -917,7 +917,8 @@ class BaseSourceSpectrum(BaseSpectrum):
         renorm_unit_name = renorm_val.unit.to_string()
         w = sp._validate_wavelengths(wavelengths)
 
-        if renorm_unit_name in (u.count.to_string(), units.OBMAG.to_string()):
+        if (renorm_val.unit == u.count or
+                renorm_unit_name == units.OBMAG.to_string()):
             # Special handling for non-density units
             flux_tmp = units.convert_flux(w, sp(w), u.count, area=area)
             totalflux = flux_tmp.sum()
@@ -931,12 +932,10 @@ class BaseSourceSpectrum(BaseSpectrum):
                         'Vega spectrum is missing.')
                 stdspec = vegaspec
             # Magnitude flux-density units
-            elif renorm_unit_name == units.STMAG.to_string():
+            elif renorm_val.unit in (u.STmag, u.ABmag):
                 stdspec = SourceSpectrum(
-                    ConstFlux1D, amplitude=u.Quantity(0, units.STMAG))
-            elif renorm_unit_name == units.ABMAG.to_string():
-                stdspec = SourceSpectrum(
-                    ConstFlux1D, amplitude=u.Quantity(0, units.ABMAG))
+                    ConstFlux1D, amplitude=u.Quantity(0, renorm_val.unit))
+
             # Linear flux-density units
             else:
                 stdspec = SourceSpectrum(
@@ -951,7 +950,8 @@ class BaseSourceSpectrum(BaseSpectrum):
         utils.validate_totalflux(totalflux.value)
 
         # Renormalize in magnitudes
-        if renorm_val.unit.decompose() == u.mag:
+        if (renorm_val.unit.decompose() == u.mag or
+                isinstance(renorm_val.unit, u.LogUnit)):
             const = renorm_val.value + (2.5 *
                                         np.log10(totalflux.value / stdflux))
             newsp = self.__mul__(10**(-0.4 * const))

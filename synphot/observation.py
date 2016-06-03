@@ -455,10 +455,10 @@ class Observation(BaseSourceSpectrum):
         # Calculation is actually done in this unit
         if flux_unit_name == units.OBMAG.to_string():
             eff_flux_unit = u.count
-        elif flux_unit_name in (units.STMAG.to_string(),
-                                units.VEGAMAG.to_string()):
+        elif (flux_unit == u.STmag or
+              flux_unit_name == units.VEGAMAG.to_string()):
             eff_flux_unit = units.FLAM
-        elif flux_unit_name == units.ABMAG.to_string():
+        elif flux_unit == u.ABmag:
             eff_flux_unit = units.FNU
         elif flux_unit.decompose() != u.mag:
             eff_flux_unit = flux_unit
@@ -534,7 +534,7 @@ class Observation(BaseSourceSpectrum):
                 influx = y[mask]
 
         # Special handling for non-density units
-        if flux_unit_name in (u.count.to_string(), units.OBMAG.to_string()):
+        if flux_unit == u.count or flux_unit_name == units.OBMAG.to_string():
             val = influx.sum()
             utils.validate_totalflux(val)
 
@@ -558,8 +558,7 @@ class Observation(BaseSourceSpectrum):
             val = num / den
 
             # Convert back to mag, if needed
-            if flux_unit_name in (units.STMAG.to_string(),
-                                  units.ABMAG.to_string()):
+            if flux_unit in (u.STmag, u.ABmag):
                 eff_stim = units.convert_flux(
                     1, u.Quantity(val, eff_flux_unit), flux_unit)
             elif flux_unit_name == units.VEGAMAG.to_string():

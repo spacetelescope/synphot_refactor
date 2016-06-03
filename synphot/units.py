@@ -14,8 +14,8 @@ from astropy import units as u
 from . import exceptions
 
 __all__ = ['H', 'C', 'HC', 'SR_PER_ARCSEC2', 'AREA', 'THROUGHPUT', 'PHOTLAM',
-           'PHOTNU', 'FLAM', 'FNU', 'STMAG', 'ABMAG', 'OBMAG', 'VEGAMAG',
-           'ABZERO', 'STZERO', 'spectral_density_mag', 'spectral_density_vega',
+           'PHOTNU', 'FLAM', 'FNU', 'OBMAG', 'VEGAMAG',
+           'spectral_density_mag', 'spectral_density_vega',
            'spectral_density_count', 'convert_flux', 'validate_unit',
            'validate_wave_unit', 'validate_quantity']
 
@@ -51,27 +51,21 @@ FLAM = u.def_unit(
 FNU = u.def_unit(
     'fnu', u.erg / (u.cm**2 * u.s * u.Hz),
     format={'generic': 'FNU', 'console': 'FNU'})
-STMAG = u.def_unit(
-    'stmag', u.mag, format={'generic': 'STMAG', 'console': 'STMAG'})
-ABMAG = u.def_unit(
-    'abmag', u.mag, format={'generic': 'ABMAG', 'console': 'ABMAG'})
 OBMAG = u.def_unit(
     'obmag', u.mag, format={'generic': 'OBMAG', 'console': 'OBMAG'})
 VEGAMAG = u.def_unit(
     'vegamag', u.mag, format={'generic': 'VEGAMAG', 'console': 'VEGAMAG'})
 
 # Register with astropy units
-u.add_enabled_units([PHOTLAM, PHOTNU, FLAM, FNU, STMAG, ABMAG, OBMAG, VEGAMAG])
+u.add_enabled_units([PHOTLAM, PHOTNU, FLAM, FNU, OBMAG, VEGAMAG])
+
 
 # --------------- #
 # Flux conversion #
 # --------------- #
 
-ABZERO = u.Quantity(-48.6, unit=u.mag)
-STZERO = u.Quantity(-21.1, unit=u.mag)
-
-
-def spectral_density_mag(wav, magname):
+# Replace with https://github.com/astropy/astropy/pull/5012
+def spectral_density_mag(wav):
     """Flux equivalencies between PHOTLAM and ABMAG/STMAG.
 
     Parameters
@@ -80,39 +74,29 @@ def spectral_density_mag(wav, magname):
         Quantity associated with values being converted
         (e.g., wavelength or frequency).
 
-    magname : {'abmag', 'stmag'}
-        Indicates ABMAG or STMAG. Case-insensitive.
-        This is needed because `astropy.units` cannot distinguish
-        between different types of magnitudes.
-
     Returns
     -------
     eqv : list
         List of equivalencies.
 
-    Raises
-    ------
-    astropy.units.core.UnitsError
-        Invalid magnitude system.
-
     """
-    magname = magname.lower()
-    wav = wav.to(u.AA, equivalencies=u.spectral()).value
+    wav = wav.to(u.AA, u.spectral()).value
 
-    if magname == 'abmag':
-        eqv = [
-            (PHOTLAM, ABMAG,
-             lambda x: -2.5 * np.log10(H.value * x * wav) + ABZERO.value,
-             lambda x: 10**(-0.4 * (x - ABZERO.value)) / (H.value * wav))]
-    elif magname == 'stmag':
-        eqv = [
-            (PHOTLAM, STMAG,
-             lambda x: -2.5 * np.log10(HC.value * x / wav) + STZERO.value,
-             lambda x: wav * 10**(-0.4 * (x - STZERO.value)) / HC.value)]
-    else:
-        raise u.UnitsError('{0} is not supported.'.format(magname))
+    def converter_photlam_stmag(x):
+        return -2.5 * np.log10(HC.value * (x / wav)) - 21.1
 
-    return eqv
+    def iconverter_photlam_stmag(x):
+        return wav * 10 ** (-0.4 * (x.value + 21.1)) / HC.value
+
+    def converter_photlam_abmag(x):
+        return -2.5 * np.log10(H.value * x * wav) - 48.6
+
+    def iconverter_photlam_abmag(x):
+        return 10 ** (-0.4 * (x.value + 48.6)) / (H.value * wav)
+
+    return [
+        (PHOTLAM, u.STmag, converter_photlam_stmag, iconverter_photlam_stmag),
+        (PHOTLAM, u.ABmag, converter_photlam_abmag, iconverter_photlam_abmag)]
 
 
 def spectral_density_vega(wav, vegaflux):
@@ -247,29 +231,31 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
     if not isinstance(wavelengths, u.Quantity):
         wavelengths = u.Quantity(wavelengths, unit=u.AA)
 
+    eqv = u.spectral_density(wavelengths) + spectral_density_mag(wavelengths)
+
     # Use built-in astropy equivalencies
-    if in_flux_type != 'unknown' and out_flux_type != 'unknown':
-        return fluxes.to(
-            out_flux_unit, equivalencies=u.spectral_density(wavelengths))
+    try:
+        out_flux = fluxes.to(out_flux_unit, eqv)
 
-    # Convert input unit to PHOTLAM
-    if fluxes.unit == PHOTLAM:
-        flux_photlam = fluxes
-    elif in_flux_type != 'unknown':
-        flux_photlam = fluxes.to(
-            PHOTLAM, equivalencies=u.spectral_density(wavelengths))
-    else:
-        flux_photlam = _convert_flux(wavelengths, fluxes, PHOTLAM, **kwargs)
+    # Use PHOTLAM as in-between unit
+    except u.UnitConversionError:
+        # Convert input unit to PHOTLAM
+        if fluxes.unit == PHOTLAM:
+            flux_photlam = fluxes
+        elif in_flux_type != 'unknown':
+            flux_photlam = fluxes.to(PHOTLAM, eqv)
+        else:
+            flux_photlam = _convert_flux(
+                wavelengths, fluxes, PHOTLAM, **kwargs)
 
-    # Convert PHOTLAM to output unit
-    if out_flux_unit == PHOTLAM:
-        out_flux = flux_photlam
-    elif out_flux_type != 'unknown':
-        out_flux = flux_photlam.to(
-            out_flux_unit, equivalencies=u.spectral_density(wavelengths))
-    else:
-        out_flux = _convert_flux(
-            wavelengths, flux_photlam, out_flux_unit, **kwargs)
+        # Convert PHOTLAM to output unit
+        if out_flux_unit == PHOTLAM:
+            out_flux = flux_photlam
+        elif out_flux_type != 'unknown':
+            out_flux = flux_photlam.to(out_flux_unit, eqv)
+        else:
+            out_flux = _convert_flux(
+                wavelengths, flux_photlam, out_flux_unit, **kwargs)
 
     return out_flux
 
@@ -297,7 +283,7 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
             equivalencies=spectral_density_vega(wavelengths, flux_vega))
 
     # OBMAG or count
-    elif (u.count.to_string() in flux_unit_names or
+    elif (u.count in (fluxes.unit, out_flux_unit) or
           OBMAG.to_string() in flux_unit_names):
         if area is None:
             raise exceptions.SynphotError(
@@ -308,18 +294,6 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
         out_flux = fluxes.to(
             out_flux_unit,
             equivalencies=spectral_density_count(wavelengths, area))
-
-    # STMAG
-    elif STMAG.to_string() in flux_unit_names:
-        out_flux = fluxes.to(
-            out_flux_unit,
-            equivalencies=spectral_density_mag(wavelengths, 'stmag'))
-
-    # ABMAG
-    elif ABMAG.to_string() in flux_unit_names:
-        out_flux = fluxes.to(
-            out_flux_unit,
-            equivalencies=spectral_density_mag(wavelengths, 'abmag'))
 
     else:
         raise u.UnitsError('{0} and {1} are not convertible'.format(
@@ -361,6 +335,7 @@ def validate_unit(input_unit):
     if isinstance(input_unit, six.string_types):
         input_unit_lowcase = input_unit.lower()
 
+        # Backward-compatibility
         if input_unit_lowcase == 'angstroms':
             output_unit = u.AA
         elif input_unit_lowcase == 'inversemicrons':
@@ -368,13 +343,20 @@ def validate_unit(input_unit):
         elif input_unit_lowcase in ('transmission', 'extinction',
                                     'emissivity'):
             output_unit = THROUGHPUT
+
+        # Work around mag unit limitations
+        elif input_unit_lowcase in ('stmag', 'mag(st)'):
+            output_unit = u.STmag
+        elif input_unit_lowcase in ('abmag', 'mag(ab)'):
+            output_unit = u.ABmag
+
         else:
             try:  # astropy.units is case-sensitive
                 output_unit = u.Unit(input_unit)
             except ValueError:  # synphot is case-insensitive
                 output_unit = u.Unit(input_unit_lowcase)
 
-    elif isinstance(input_unit, u.UnitBase):
+    elif isinstance(input_unit, (u.UnitBase, u.LogUnit)):
         output_unit = input_unit
 
     else:
