@@ -14,7 +14,7 @@ from ..spectrum import SourceSpectrum
 
 # TODO: Replace this with model with actual analytic integral when it
 #       exists in Astropy.
-class DummyModel(Box1D):
+class Const1D(Box1D):
     """Fake source with its own analytic integral."""
     @property
     def integral(self):
@@ -24,7 +24,7 @@ class DummyModel(Box1D):
 # TODO: Update test when Astropy models have integral.
 def test_analytic_source():
     """Test integration using built-in analytic integral."""
-    sp = SourceSpectrum(DummyModel)
+    sp = SourceSpectrum(Const1D)
     assert_allclose(sp.integrate([1000, 1010, 1020]).value, 20)
 
 

@@ -441,8 +441,8 @@ class BaseSpectrum(object):
                     'Analytic integral not available and default integrator '
                     '{0} is not supported'.format(conf.default_integrator))
         else:  # pragma: no cover
-            start = x[0]
-            stop = x[-1]
+            start = x[0].value
+            stop = x[-1].value
             result = u.Quantity(m(stop) - m(start), self._internal_flux_unit)
 
         return result
@@ -858,8 +858,8 @@ class BaseSourceSpectrum(BaseSpectrum):
                     'Analytic integral not available and default integrator '
                     '{0} is not supported'.format(conf.default_integrator))
         else:
-            start = x[0]
-            stop = x[-1]
+            start = x[0].value
+            stop = x[-1].value
             result = u.Quantity(m(stop) - m(start), self._internal_flux_unit)
 
         return result
