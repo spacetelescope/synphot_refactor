@@ -25,7 +25,7 @@ from astropy.utils import metadata
 # LOCAL
 from . import exceptions, specio, units, utils
 from .config import Conf, conf
-from .integrator import TrapezoidIntegrator, TrapezoidFluxIntegrator
+from .integrator import trapezoid_integrator
 from .models import (BlackBody1D, ConstFlux1D, Empirical1D, Gaussian1D,
                      get_waveset, get_metadata)
 
@@ -55,7 +55,7 @@ class BaseSpectrum(object):
     Attributes
     ----------
     meta : dict
-        Metadata associated with the spectrum or bandpass model
+        Metadata associated with the spectrum or bandpass model \
         (warnings, legacy SYNPHOT expression, FITS header, etc).
 
     Raises
@@ -389,10 +389,19 @@ class BaseSpectrum(object):
         return self.__truediv__(other)
 
     def integrate(self, wavelengths=None):
-        """Perform trapezoid integration.
+        """Perform integration.
+
+        This uses any analytical integral that the
+        underlying model has (i.e., ``self.model.integral``).
+        If unavailable, it uses the default fall-back integrator
+        set in the ``default_integrator`` configuration item.
 
         If wavelengths are provided, flux is first resampled.
-        Otherwise, `waveset` is used.
+        This is useful when user wants to integrate at specific end points
+        or use custom spacing; In that case, user can pass in desired
+        sampling array generated with :func:`numpy.linspace`,
+        :func:`numpy.logspace`, etc.
+        If not provided, then `waveset` is used.
 
         Parameters
         ----------
@@ -408,12 +417,36 @@ class BaseSpectrum(object):
 
         Raises
         ------
+        NotImplementedError
+            Invalid default integrator.
+
         synphot.exceptions.SynphotError
             `waveset` is needed but undefined.
 
         """
         x = self._validate_wavelengths(wavelengths)
-        return TrapezoidIntegrator()(self, x.value)
+
+        # TODO: When astropy.modeling.models supports this, need to
+        #       make sure that this actually works, and gives correct unit.
+        # https://github.com/astropy/astropy/issues/5033
+        # https://github.com/astropy/astropy/pull/5108
+        try:
+            m = self.model.integral
+        except (AttributeError, NotImplementedError):
+            if conf.default_integrator == 'trapezoid':
+                y = self(x)
+                result = u.Quantity(trapezoid_integrator(x.value, y.value),
+                                    y.unit)
+            else:  # pragma: no cover
+                raise NotImplementedError(
+                    'Analytic integral not available and default integrator '
+                    '{0} is not supported'.format(conf.default_integrator))
+        else:  # pragma: no cover
+            start = x[0]
+            stop = x[-1]
+            result = u.Quantity(m(stop) - m(start), self._internal_flux_unit)
+
+        return result
 
     def avgwave(self, wavelengths=None):
         """Calculate the :ref:`average wavelength <synphot-formula-avgwv>`.
@@ -433,16 +466,15 @@ class BaseSpectrum(object):
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        t = TrapezoidIntegrator()
-        num = t._raw_math(x, y * x)
-        den = t._raw_math(x, y)
+        num = trapezoid_integrator(x, y * x)
+        den = trapezoid_integrator(x, y)
 
         if den == 0:  # pragma: no cover
             avg_wave = 0.0
         else:
             avg_wave = num / den
 
-        return u.Quantity(avg_wave, unit=self._internal_wave_unit)
+        return u.Quantity(avg_wave, self._internal_wave_unit)
 
     def barlam(self, wavelengths=None):
         """Calculate :ref:`mean log wavelength <synphot-formula-barlam>`.
@@ -462,16 +494,15 @@ class BaseSpectrum(object):
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        t = TrapezoidIntegrator()
-        num = t._raw_math(x, y * np.log(x) / x)
-        den = t._raw_math(x, y / x)
+        num = trapezoid_integrator(x, y * np.log(x) / x)
+        den = trapezoid_integrator(x, y / x)
 
         if num == 0 or den == 0:  # pragma: no cover
             bar_lam = 0.0
         else:
             bar_lam = np.exp(num / den)
 
-        return u.Quantity(bar_lam, unit=self._internal_wave_unit)
+        return u.Quantity(bar_lam, self._internal_wave_unit)
 
     def pivot(self, wavelengths=None):
         """Calculate :ref:`pivot wavelength <synphot-formula-pivwv>`.
@@ -491,9 +522,8 @@ class BaseSpectrum(object):
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        t = TrapezoidIntegrator()
-        num = t._raw_math(x, y * x)
-        den = t._raw_math(x, y / x)
+        num = trapezoid_integrator(x, y * x)
+        den = trapezoid_integrator(x, y / x)
 
         if den == 0:  # pragma: no cover
             pivwv = 0.0
@@ -773,10 +803,19 @@ class BaseSourceSpectrum(BaseSpectrum):
         return new_unit
 
     def integrate(self, wavelengths=None, flux_unit=units.PHOTLAM, **kwargs):
-        """Perform trapezoid integration.
+        """Perform integration.
+
+        This uses any analytical integral that the
+        underlying model has (i.e., ``self.model.analytic_integral()``).
+        If unavailable, it uses the default fall-back integrator
+        set in the ``default_integrator`` configuration item.
 
         If wavelengths are provided, flux is first resampled.
-        Otherwise, ``self.waveset`` is used.
+        This is useful when user wants to integrate at specific end points
+        or use custom spacing; In that case, user can pass in desired
+        sampling array generated with :func:`numpy.linspace`,
+        :func:`numpy.logspace`, etc.
+        If not provided, then `waveset` is used.
 
         Parameters
         ----------
@@ -799,14 +838,36 @@ class BaseSourceSpectrum(BaseSpectrum):
 
         Raises
         ------
+        NotImplementedError
+            Invalid default integrator.
+
         synphot.exceptions.SynphotError
             ``self.waveset`` is needed but undefined.
 
         """
         x = self._validate_wavelengths(wavelengths)
-        result = TrapezoidFluxIntegrator()(
-            self, x.value, flux_unit=flux_unit, **kwargs)
-        return u.Quantity(result, unit=flux_unit)
+
+        # TODO: When astropy.modeling.models supports this, need to
+        #       make sure that this actually works, and gives correct unit.
+        # https://github.com/astropy/astropy/issues/5033
+        # https://github.com/astropy/astropy/pull/5108
+        try:
+            m = self.model.integral
+        except (AttributeError, NotImplementedError):
+            if conf.default_integrator == 'trapezoid':
+                y = units.convert_flux(x, self(x), flux_unit, **kwargs)
+                result = u.Quantity(trapezoid_integrator(x.value, y.value),
+                                    flux_unit)
+            else:  # pragma: no cover
+                raise NotImplementedError(
+                    'Analytic integral not available and default integrator '
+                    '{0} is not supported'.format(conf.default_integrator))
+        else:
+            start = x[0]
+            stop = x[-1]
+            result = u.Quantity(m(stop) - m(start), self._internal_flux_unit)
+
+        return result
 
     def _get_arrays(self, wavelengths, flux_unit, area=None, vegaspec=None):
         """Get sampled spectrum or bandpass in user units."""
@@ -1291,7 +1352,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         x = self._validate_wavelengths(wavelengths).value
 
         y = self(x).value * x
-        int_val = TrapezoidIntegrator()._raw_math(x, y)
+        int_val = trapezoid_integrator(x, y)
         uresp = units.HC / (a.cgs * int_val)
 
         return u.Quantity(uresp.value, unit=units.FLAM)
@@ -1344,9 +1405,8 @@ class SpectralElement(BaseUnitlessSpectrum):
             thru = y[mask]
 
         a = self.avgwave(wavelengths=wavelengths).value
-        t = TrapezoidIntegrator()
-        num = t._raw_math(wave, (wave - a) ** 2 * thru)
-        den = t._raw_math(wave, thru)
+        num = trapezoid_integrator(wave, (wave - a) ** 2 * thru)
+        den = trapezoid_integrator(wave, thru)
 
         if den == 0:  # pragma: no cover
             rms_width = 0.0
@@ -1411,9 +1471,9 @@ class SpectralElement(BaseUnitlessSpectrum):
         if a == 0:
             bandw = 0.0
         else:
-            t = TrapezoidIntegrator()
-            num = t._raw_math(wave, thru * np.log(wave / a) ** 2 / wave)
-            den = t._raw_math(wave, thru / wave)
+            num = trapezoid_integrator(
+                wave, thru * np.log(wave / a) ** 2 / wave)
+            den = trapezoid_integrator(wave, thru / wave)
 
             if den == 0:  # pragma: no cover
                 bandw = 0.0
@@ -1564,7 +1624,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        qtlam = TrapezoidIntegrator()._raw_math(x, y / x)
+        qtlam = trapezoid_integrator(x, y / x)
         return u.Quantity(qtlam, u.dimensionless_unscaled)
 
     def emflx(self, area, wavelengths=None):
