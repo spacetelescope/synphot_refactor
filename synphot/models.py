@@ -677,7 +677,7 @@ def get_waveset(model):
 
     Returns
     -------
-    waveset : array_like or `None`
+    waveset : array-like or `None`
         Optimal wavelengths. `None` if undefined.
 
     Raises

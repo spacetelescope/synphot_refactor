@@ -19,22 +19,22 @@ Parameters
 len_binwave : int
     Number of wavelength bin centers.
 
-i_beg, i_end : array_like
+i_beg, i_end : array-like
     Locations of bin edges in ``deltaw``.
 
-avflux : array_like
+avflux : array-like
     Average flux associated with ``deltaw``.
 
-deltaw : array_like
+deltaw : array-like
     Delta of merge wavelengths (native + centers + edges).
     Values are in ascending order.
 
 Returns
 -------
-binflux : array_like
+binflux : array-like
     Integrated flux associated with given bins in ascending order.
 
-intwave : array_like
+intwave : array-like
     Integrated delta wavelength associated with ``binflux``.
 
 """

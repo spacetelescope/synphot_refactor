@@ -40,7 +40,7 @@ class ReddeningLaw(BaseUnitlessSpectrum):
         ebv : float or `~astropy.units.quantity.Quantity`
             :math:`E(B-V)` value in magnitude.
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -79,7 +79,7 @@ class ReddeningLaw(BaseUnitlessSpectrum):
         filename : str
             Output filename.
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.

@@ -59,7 +59,7 @@ def calculate_bin_edges(centers):
 
     Parameters
     ----------
-    centers : array_like or `~astropy.units.quantity.Quantity`
+    centers : array-like or `~astropy.units.quantity.Quantity`
         Sequence of bin centers. Must be 1D and have at least two values.
         If not a Quantity, assumed to be in Angstrom.
 
@@ -100,7 +100,7 @@ def calculate_bin_widths(edges):
 
     Parameters
     ----------
-    edges : array_like or `~astropy.units.quantity.Quantity`
+    edges : array-like or `~astropy.units.quantity.Quantity`
         Sequence of bin edges. Must be 1D and have at least two values.
         If not a Quantity, assumed to be in Angstrom.
 
@@ -134,7 +134,7 @@ def calculate_bin_centers(edges):
 
     Parameters
     ----------
-    edges : array_like or `~astropy.units.quantity.Quantity`
+    edges : array-like or `~astropy.units.quantity.Quantity`
         Sequence of bin edges. Must be 1D and have at least two values.
         If not a Quantity, assumed to be in Angstrom.
 
@@ -175,7 +175,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
 
     Parameters
     ----------
-    bins : array_like
+    bins : array-like
         Wavelengths at bin centers, each centered on a pixel.
         Must be 1D array.
 
@@ -367,7 +367,7 @@ def pixel_range(bins, waverange, mode='round'):
 
     Parameters
     ----------
-    bins : array_like
+    bins : array-like
         Wavelengths at bin centers, each centered on a pixel.
         Must be 1D array.
 

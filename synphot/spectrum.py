@@ -25,7 +25,6 @@ from astropy.utils import metadata
 # LOCAL
 from . import exceptions, specio, units, utils
 from .config import Conf, conf
-from .integrator import TrapezoidIntegrator, TrapezoidFluxIntegrator
 from .models import (BlackBody1D, ConstFlux1D, Empirical1D, Gaussian1D,
                      get_waveset, get_metadata)
 
@@ -55,7 +54,7 @@ class BaseSpectrum(object):
     Attributes
     ----------
     meta : dict
-        Metadata associated with the spectrum or bandpass model
+        Metadata associated with the spectrum or bandpass model \
         (warnings, legacy SYNPHOT expression, FITS header, etc).
 
     Raises
@@ -347,7 +346,7 @@ class BaseSpectrum(object):
 
         Parameters
         ----------
-        wavelengths : array_like or `~astropy.units.quantity.Quantity`
+        wavelengths : array-like or `~astropy.units.quantity.Quantity`
             Wavelength values for sampling. If not a Quantity,
             assumed to be in Angstrom.
 
@@ -389,14 +388,23 @@ class BaseSpectrum(object):
         return self.__truediv__(other)
 
     def integrate(self, wavelengths=None):
-        """Perform trapezoid integration.
+        """Perform integration.
+
+        This uses any analytical integral that the
+        underlying model has (i.e., ``self.model.integral``).
+        If unavailable, it uses the default fall-back integrator
+        set in the ``default_integrator`` configuration item.
 
         If wavelengths are provided, flux is first resampled.
-        Otherwise, `waveset` is used.
+        This is useful when user wants to integrate at specific end points
+        or use custom spacing; In that case, user can pass in desired
+        sampling array generated with :func:`numpy.linspace`,
+        :func:`numpy.logspace`, etc.
+        If not provided, then `waveset` is used.
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for integration.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -408,19 +416,43 @@ class BaseSpectrum(object):
 
         Raises
         ------
+        NotImplementedError
+            Invalid default integrator.
+
         synphot.exceptions.SynphotError
             `waveset` is needed but undefined.
 
         """
         x = self._validate_wavelengths(wavelengths)
-        return TrapezoidIntegrator()(self, x.value)
+
+        # TODO: When astropy.modeling.models supports this, need to
+        #       make sure that this actually works, and gives correct unit.
+        # https://github.com/astropy/astropy/issues/5033
+        # https://github.com/astropy/astropy/pull/5108
+        try:
+            m = self.model.integral
+        except (AttributeError, NotImplementedError):
+            if conf.default_integrator == 'trapezoid':
+                y = self(x)
+                result = u.Quantity(abs(np.trapz(y.value, x=x.value)),
+                                    y.unit)
+            else:  # pragma: no cover
+                raise NotImplementedError(
+                    'Analytic integral not available and default integrator '
+                    '{0} is not supported'.format(conf.default_integrator))
+        else:  # pragma: no cover
+            start = x[0].value
+            stop = x[-1].value
+            result = u.Quantity(m(stop) - m(start), self._internal_flux_unit)
+
+        return result
 
     def avgwave(self, wavelengths=None):
         """Calculate the :ref:`average wavelength <synphot-formula-avgwv>`.
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -433,23 +465,22 @@ class BaseSpectrum(object):
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        t = TrapezoidIntegrator()
-        num = t._raw_math(x, y * x)
-        den = t._raw_math(x, y)
+        num = np.trapz(y * x, x=x)
+        den = np.trapz(y, x=x)
 
         if den == 0:  # pragma: no cover
             avg_wave = 0.0
         else:
-            avg_wave = num / den
+            avg_wave = abs(num / den)
 
-        return u.Quantity(avg_wave, unit=self._internal_wave_unit)
+        return u.Quantity(avg_wave, self._internal_wave_unit)
 
     def barlam(self, wavelengths=None):
         """Calculate :ref:`mean log wavelength <synphot-formula-barlam>`.
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -462,23 +493,22 @@ class BaseSpectrum(object):
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        t = TrapezoidIntegrator()
-        num = t._raw_math(x, y * np.log(x) / x)
-        den = t._raw_math(x, y / x)
+        num = np.trapz(y * np.log(x) / x, x=x)
+        den = np.trapz(y / x, x=x)
 
         if num == 0 or den == 0:  # pragma: no cover
             bar_lam = 0.0
         else:
-            bar_lam = np.exp(num / den)
+            bar_lam = np.exp(abs(num / den))
 
-        return u.Quantity(bar_lam, unit=self._internal_wave_unit)
+        return u.Quantity(bar_lam, self._internal_wave_unit)
 
     def pivot(self, wavelengths=None):
         """Calculate :ref:`pivot wavelength <synphot-formula-pivwv>`.
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -491,18 +521,13 @@ class BaseSpectrum(object):
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        t = TrapezoidIntegrator()
-        num = t._raw_math(x, y * x)
-        den = t._raw_math(x, y / x)
+        num = np.trapz(y * x, x=x)
+        den = np.trapz(y / x, x=x)
 
         if den == 0:  # pragma: no cover
             pivwv = 0.0
         else:
-            val = num / den
-            if val < 0:  # pragma: no cover
-                pivwv = 0.0
-            else:
-                pivwv = np.sqrt(val)
+            pivwv = np.sqrt(abs(num / den))
 
         return u.Quantity(pivwv, self._internal_wave_unit)
 
@@ -516,7 +541,7 @@ class BaseSpectrum(object):
         ----------
         other : `BaseSpectrum`
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for integration.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -598,7 +623,7 @@ class BaseSpectrum(object):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for tapering.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -714,7 +739,7 @@ class BaseSpectrum(object):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for integration.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -773,14 +798,23 @@ class BaseSourceSpectrum(BaseSpectrum):
         return new_unit
 
     def integrate(self, wavelengths=None, flux_unit=units.PHOTLAM, **kwargs):
-        """Perform trapezoid integration.
+        """Perform integration.
+
+        This uses any analytical integral that the
+        underlying model has (i.e., ``self.model.analytic_integral()``).
+        If unavailable, it uses the default fall-back integrator
+        set in the ``default_integrator`` configuration item.
 
         If wavelengths are provided, flux is first resampled.
-        Otherwise, ``self.waveset`` is used.
+        This is useful when user wants to integrate at specific end points
+        or use custom spacing; In that case, user can pass in desired
+        sampling array generated with :func:`numpy.linspace`,
+        :func:`numpy.logspace`, etc.
+        If not provided, then `waveset` is used.
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for integration.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -799,14 +833,36 @@ class BaseSourceSpectrum(BaseSpectrum):
 
         Raises
         ------
+        NotImplementedError
+            Invalid default integrator.
+
         synphot.exceptions.SynphotError
             ``self.waveset`` is needed but undefined.
 
         """
         x = self._validate_wavelengths(wavelengths)
-        result = TrapezoidFluxIntegrator()(
-            self, x.value, flux_unit=flux_unit, **kwargs)
-        return u.Quantity(result, unit=flux_unit)
+
+        # TODO: When astropy.modeling.models supports this, need to
+        #       make sure that this actually works, and gives correct unit.
+        # https://github.com/astropy/astropy/issues/5033
+        # https://github.com/astropy/astropy/pull/5108
+        try:
+            m = self.model.integral
+        except (AttributeError, NotImplementedError):
+            if conf.default_integrator == 'trapezoid':
+                y = units.convert_flux(x, self(x), flux_unit, **kwargs)
+                result = u.Quantity(abs(np.trapz(y.value, x=x.value)),
+                                    flux_unit)
+            else:  # pragma: no cover
+                raise NotImplementedError(
+                    'Analytic integral not available and default integrator '
+                    '{0} is not supported'.format(conf.default_integrator))
+        else:
+            start = x[0].value
+            stop = x[-1].value
+            result = u.Quantity(m(stop) - m(start), self._internal_flux_unit)
+
+        return result
 
     def _get_arrays(self, wavelengths, flux_unit, area=None, vegaspec=None):
         """Get sampled spectrum or bandpass in user units."""
@@ -834,7 +890,7 @@ class BaseSourceSpectrum(BaseSpectrum):
         band : `SpectralElement`
            Bandpass to use in renormalization.
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for renormalization.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1080,7 +1136,7 @@ class SourceSpectrum(BaseSourceSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for integration.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1113,7 +1169,7 @@ class SourceSpectrum(BaseSourceSpectrum):
         filename : str
             Output filename.
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1273,7 +1329,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             Area that flux covers. If not a Quantity, assumed to be in
             :math:`cm^{2}`.
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1291,7 +1347,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         x = self._validate_wavelengths(wavelengths).value
 
         y = self(x).value * x
-        int_val = TrapezoidIntegrator()._raw_math(x, y)
+        int_val = abs(np.trapz(y, x=x))
         uresp = units.HC / (a.cgs * int_val)
 
         return u.Quantity(uresp.value, unit=units.FLAM)
@@ -1305,7 +1361,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1344,18 +1400,13 @@ class SpectralElement(BaseUnitlessSpectrum):
             thru = y[mask]
 
         a = self.avgwave(wavelengths=wavelengths).value
-        t = TrapezoidIntegrator()
-        num = t._raw_math(wave, (wave - a) ** 2 * thru)
-        den = t._raw_math(wave, thru)
+        num = np.trapz((wave - a) ** 2 * thru, x=wave)
+        den = np.trapz(thru, x=wave)
 
         if den == 0:  # pragma: no cover
             rms_width = 0.0
         else:
-            val = num / den
-            if val < 0:  # pragma: no cover
-                rms_width = 0.0
-            else:
-                rms_width = np.sqrt(val)
+            rms_width = np.sqrt(abs(num / den))
 
         return u.Quantity(rms_width, self._internal_wave_unit)
 
@@ -1368,7 +1419,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1411,18 +1462,13 @@ class SpectralElement(BaseUnitlessSpectrum):
         if a == 0:
             bandw = 0.0
         else:
-            t = TrapezoidIntegrator()
-            num = t._raw_math(wave, thru * np.log(wave / a) ** 2 / wave)
-            den = t._raw_math(wave, thru / wave)
+            num = np.trapz(thru * np.log(wave / a) ** 2 / wave, x=wave)
+            den = np.trapz(thru / wave, x=wave)
 
             if den == 0:  # pragma: no cover
                 bandw = 0.0
             else:
-                val = num / den
-                if val < 0:  # pragma: no cover
-                    bandw = 0.0
-                else:
-                    bandw = a * np.sqrt(val)
+                bandw = a * np.sqrt(abs(num / den))
 
         return u.Quantity(bandw, self._internal_wave_unit)
 
@@ -1464,7 +1510,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1487,7 +1533,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1506,7 +1552,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1525,7 +1571,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1551,7 +1597,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1564,7 +1610,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        qtlam = TrapezoidIntegrator()._raw_math(x, y / x)
+        qtlam = abs(np.trapz(y / x, x=x))
         return u.Quantity(qtlam, u.dimensionless_unscaled)
 
     def emflx(self, area, wavelengths=None):
@@ -1604,7 +1650,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         filename : str
             Output filename.
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.

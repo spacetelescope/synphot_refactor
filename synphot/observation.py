@@ -18,7 +18,6 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from . import binning, exceptions, specio, units, utils
-from .integrator import TrapezoidIntegrator
 from .models import Empirical1D
 from .spectrum import BaseSourceSpectrum, SourceSpectrum, SpectralElement
 
@@ -41,7 +40,7 @@ class Observation(BaseSourceSpectrum):
     band : `~synphot.spectrum.SpectralElement`
         Bandpass.
 
-    binset : array_like, `~astropy.units.quantity.Quantity`, or `None`
+    binset : array-like, `~astropy.units.quantity.Quantity`, or `None`
         Center of binned wavelengths.
         If not a Quantity, assumed to be in Angstrom.
         If `None`, input ``self.waveset`` values are used.
@@ -231,7 +230,7 @@ class Observation(BaseSourceSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `binset` is used.
@@ -343,7 +342,7 @@ class Observation(BaseSourceSpectrum):
             Sample data in native wavelengths if `False`.
             Else, sample binned data (default).
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` or `binset` is used, depending
@@ -384,14 +383,13 @@ class Observation(BaseSourceSpectrum):
             x = self._validate_wavelengths(wavelengths).value
             y = units.convert_flux(x, self(x), flux_unit).value
 
-        t = TrapezoidIntegrator()
-        num = t._raw_math(x, y * x ** 2)
-        den = t._raw_math(x, y * x)
+        num = np.trapz(y * x ** 2, x=x)
+        den = np.trapz(y * x, x=x)
 
         if den == 0.0:  # pragma: no cover
             eff_lam = 0.0
         else:
-            eff_lam = num / den
+            eff_lam = abs(num / den)
 
         return u.Quantity(eff_lam, self._internal_wave_unit)
 
@@ -408,7 +406,7 @@ class Observation(BaseSourceSpectrum):
             Sample data in native wavelengths if `False` (default).
             Else, sample binned data.
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` or `binset` is used, depending
@@ -550,9 +548,8 @@ class Observation(BaseSourceSpectrum):
             y_band = self.bandpass(x_band).value
 
             # Integrate
-            t = TrapezoidIntegrator()
-            num = t._raw_math(inwave, inwave * influx)
-            den = t._raw_math(x_band, x_band * y_band)
+            num = abs(np.trapz(inwave * influx, x=inwave))
+            den = abs(np.trapz(x_band * y_band, x=x_band))
             utils.validate_totalflux(num)
             utils.validate_totalflux(den)
             val = num / den
@@ -608,7 +605,7 @@ class Observation(BaseSourceSpectrum):
             Plot data in native wavelengths if `False`.
             Else, plot binned data (default).
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` or `binset` is used, depending
@@ -654,7 +651,7 @@ class Observation(BaseSourceSpectrum):
             Write out data in native wavelengths if `False`.
             Else, write binned data (default).
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` or `binset` is used, depending

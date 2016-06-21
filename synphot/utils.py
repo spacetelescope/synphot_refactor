@@ -20,7 +20,7 @@ def overlap_status(a, b):
 
     Parameters
     ----------
-    a, b : array_like
+    a, b : array-like
         Arrays to check. Assumed to be in the same unit.
 
     Returns
@@ -80,7 +80,7 @@ def validate_wavelengths(wavelengths):
 
     Parameters
     ----------
-    wavelengths : array_like or `~astropy.units.quantity.Quantity`
+    wavelengths : array-like or `~astropy.units.quantity.Quantity`
         Wavelength values.
 
     Raises
@@ -213,7 +213,7 @@ def merge_wavelengths(waveset1, waveset2, threshold=1e-12):
 
     Parameters
     ----------
-    waveset1, waveset2 : array_like or `None`
+    waveset1, waveset2 : array-like or `None`
         Wavelength values, assumed to be in the same unit already.
         Also see :func:`~synphot.models.get_waveset`.
 
@@ -224,7 +224,7 @@ def merge_wavelengths(waveset1, waveset2, threshold=1e-12):
 
     Returns
     -------
-    out_wavelengths : array_like or `None`
+    out_wavelengths : array-like or `None`
         Merged wavelengths. `None` if undefined.
 
     """

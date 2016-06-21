@@ -17,6 +17,11 @@ __all__ = ['conf']
 class Conf(ConfigNamespace):
     """Configuration parameters."""
 
+    # TODO: Add more options here in the future
+    default_integrator = ConfigItem(
+        ['trapezoid'],
+        'Default integrator to use when analytical integration is unavailable')
+
     # STANDARD STARS
     vega_file = ConfigItem(
         'ftp://ftp.stsci.edu/cdbs/calspec/alpha_lyr_stis_008.fits', 'Vega')
