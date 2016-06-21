@@ -1,13 +1,13 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Test integrator.py module."""
+"""Test different integration methods."""
 from __future__ import absolute_import, division, print_function
 
 # THIRD-PARTY
+import numpy as np
 from astropy.modeling.models import Polynomial1D
 from numpy.testing import assert_allclose
 
 # LOCAL
-from ..integrator import trapezoid_integrator
 from ..models import Box1D
 from ..spectrum import SourceSpectrum
 
@@ -37,11 +37,11 @@ def test_trapz_spec():
 
 def test_trapz_box1d():
     m = Box1D(amplitude=1, x_0=5000, width=10)
-    x = m.sampleset()
 
     # Ascending.
-    assert_allclose(trapezoid_integrator(x, m(x)), 10)
+    x = m.sampleset()
+    assert_allclose(np.trapz(m(x), x=x), 10)
 
     # Descending.
     x2 = x[::-1]
-    assert_allclose(trapezoid_integrator(x2, m(x2)), 10)
+    assert_allclose(abs(np.trapz(m(x2), x=x2)), 10)

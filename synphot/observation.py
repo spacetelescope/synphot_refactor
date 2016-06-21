@@ -18,7 +18,6 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from . import binning, exceptions, specio, units, utils
-from .integrator import trapezoid_integrator
 from .models import Empirical1D
 from .spectrum import BaseSourceSpectrum, SourceSpectrum, SpectralElement
 
@@ -384,13 +383,13 @@ class Observation(BaseSourceSpectrum):
             x = self._validate_wavelengths(wavelengths).value
             y = units.convert_flux(x, self(x), flux_unit).value
 
-        num = trapezoid_integrator(x, y * x ** 2)
-        den = trapezoid_integrator(x, y * x)
+        num = np.trapz(y * x ** 2, x=x)
+        den = np.trapz(y * x, x=x)
 
         if den == 0.0:  # pragma: no cover
             eff_lam = 0.0
         else:
-            eff_lam = num / den
+            eff_lam = abs(num / den)
 
         return u.Quantity(eff_lam, self._internal_wave_unit)
 
@@ -549,8 +548,8 @@ class Observation(BaseSourceSpectrum):
             y_band = self.bandpass(x_band).value
 
             # Integrate
-            num = trapezoid_integrator(inwave, inwave * influx)
-            den = trapezoid_integrator(x_band, x_band * y_band)
+            num = abs(np.trapz(inwave * influx, x=inwave))
+            den = abs(np.trapz(x_band * y_band, x=x_band))
             utils.validate_totalflux(num)
             utils.validate_totalflux(den)
             val = num / den

@@ -25,7 +25,6 @@ from astropy.utils import metadata
 # LOCAL
 from . import exceptions, specio, units, utils
 from .config import Conf, conf
-from .integrator import trapezoid_integrator
 from .models import (BlackBody1D, ConstFlux1D, Empirical1D, Gaussian1D,
                      get_waveset, get_metadata)
 
@@ -435,7 +434,7 @@ class BaseSpectrum(object):
         except (AttributeError, NotImplementedError):
             if conf.default_integrator == 'trapezoid':
                 y = self(x)
-                result = u.Quantity(trapezoid_integrator(x.value, y.value),
+                result = u.Quantity(abs(np.trapz(y.value, x=x.value)),
                                     y.unit)
             else:  # pragma: no cover
                 raise NotImplementedError(
@@ -466,13 +465,13 @@ class BaseSpectrum(object):
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        num = trapezoid_integrator(x, y * x)
-        den = trapezoid_integrator(x, y)
+        num = np.trapz(y * x, x=x)
+        den = np.trapz(y, x=x)
 
         if den == 0:  # pragma: no cover
             avg_wave = 0.0
         else:
-            avg_wave = num / den
+            avg_wave = abs(num / den)
 
         return u.Quantity(avg_wave, self._internal_wave_unit)
 
@@ -494,13 +493,13 @@ class BaseSpectrum(object):
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        num = trapezoid_integrator(x, y * np.log(x) / x)
-        den = trapezoid_integrator(x, y / x)
+        num = np.trapz(y * np.log(x) / x, x=x)
+        den = np.trapz(y / x, x=x)
 
         if num == 0 or den == 0:  # pragma: no cover
             bar_lam = 0.0
         else:
-            bar_lam = np.exp(num / den)
+            bar_lam = np.exp(abs(num / den))
 
         return u.Quantity(bar_lam, self._internal_wave_unit)
 
@@ -522,17 +521,13 @@ class BaseSpectrum(object):
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        num = trapezoid_integrator(x, y * x)
-        den = trapezoid_integrator(x, y / x)
+        num = np.trapz(y * x, x=x)
+        den = np.trapz(y / x, x=x)
 
         if den == 0:  # pragma: no cover
             pivwv = 0.0
         else:
-            val = num / den
-            if val < 0:  # pragma: no cover
-                pivwv = 0.0
-            else:
-                pivwv = np.sqrt(val)
+            pivwv = np.sqrt(abs(num / den))
 
         return u.Quantity(pivwv, self._internal_wave_unit)
 
@@ -856,7 +851,7 @@ class BaseSourceSpectrum(BaseSpectrum):
         except (AttributeError, NotImplementedError):
             if conf.default_integrator == 'trapezoid':
                 y = units.convert_flux(x, self(x), flux_unit, **kwargs)
-                result = u.Quantity(trapezoid_integrator(x.value, y.value),
+                result = u.Quantity(abs(np.trapz(y.value, x=x.value)),
                                     flux_unit)
             else:  # pragma: no cover
                 raise NotImplementedError(
@@ -1352,7 +1347,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         x = self._validate_wavelengths(wavelengths).value
 
         y = self(x).value * x
-        int_val = trapezoid_integrator(x, y)
+        int_val = abs(np.trapz(y, x=x))
         uresp = units.HC / (a.cgs * int_val)
 
         return u.Quantity(uresp.value, unit=units.FLAM)
@@ -1405,17 +1400,13 @@ class SpectralElement(BaseUnitlessSpectrum):
             thru = y[mask]
 
         a = self.avgwave(wavelengths=wavelengths).value
-        num = trapezoid_integrator(wave, (wave - a) ** 2 * thru)
-        den = trapezoid_integrator(wave, thru)
+        num = np.trapz((wave - a) ** 2 * thru, x=wave)
+        den = np.trapz(thru, x=wave)
 
         if den == 0:  # pragma: no cover
             rms_width = 0.0
         else:
-            val = num / den
-            if val < 0:  # pragma: no cover
-                rms_width = 0.0
-            else:
-                rms_width = np.sqrt(val)
+            rms_width = np.sqrt(abs(num / den))
 
         return u.Quantity(rms_width, self._internal_wave_unit)
 
@@ -1471,18 +1462,13 @@ class SpectralElement(BaseUnitlessSpectrum):
         if a == 0:
             bandw = 0.0
         else:
-            num = trapezoid_integrator(
-                wave, thru * np.log(wave / a) ** 2 / wave)
-            den = trapezoid_integrator(wave, thru / wave)
+            num = np.trapz(thru * np.log(wave / a) ** 2 / wave, x=wave)
+            den = np.trapz(thru / wave, x=wave)
 
             if den == 0:  # pragma: no cover
                 bandw = 0.0
             else:
-                val = num / den
-                if val < 0:  # pragma: no cover
-                    bandw = 0.0
-                else:
-                    bandw = a * np.sqrt(val)
+                bandw = a * np.sqrt(abs(num / den))
 
         return u.Quantity(bandw, self._internal_wave_unit)
 
@@ -1624,7 +1610,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        qtlam = trapezoid_integrator(x, y / x)
+        qtlam = abs(np.trapz(y / x, x=x))
         return u.Quantity(qtlam, u.dimensionless_unscaled)
 
     def emflx(self, area, wavelengths=None):
