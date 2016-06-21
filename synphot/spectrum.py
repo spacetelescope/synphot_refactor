@@ -346,7 +346,7 @@ class BaseSpectrum(object):
 
         Parameters
         ----------
-        wavelengths : array_like or `~astropy.units.quantity.Quantity`
+        wavelengths : array-like or `~astropy.units.quantity.Quantity`
             Wavelength values for sampling. If not a Quantity,
             assumed to be in Angstrom.
 
@@ -404,7 +404,7 @@ class BaseSpectrum(object):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for integration.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -452,7 +452,7 @@ class BaseSpectrum(object):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -480,7 +480,7 @@ class BaseSpectrum(object):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -508,7 +508,7 @@ class BaseSpectrum(object):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -541,7 +541,7 @@ class BaseSpectrum(object):
         ----------
         other : `BaseSpectrum`
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for integration.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -623,7 +623,7 @@ class BaseSpectrum(object):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for tapering.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -739,7 +739,7 @@ class BaseSpectrum(object):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for integration.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
@@ -814,7 +814,7 @@ class BaseSourceSpectrum(BaseSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for integration.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -890,7 +890,7 @@ class BaseSourceSpectrum(BaseSpectrum):
         band : `SpectralElement`
            Bandpass to use in renormalization.
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for renormalization.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1136,7 +1136,7 @@ class SourceSpectrum(BaseSourceSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for integration.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1169,7 +1169,7 @@ class SourceSpectrum(BaseSourceSpectrum):
         filename : str
             Output filename.
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1329,7 +1329,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             Area that flux covers. If not a Quantity, assumed to be in
             :math:`cm^{2}`.
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1361,7 +1361,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1419,7 +1419,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1510,7 +1510,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1533,7 +1533,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1552,7 +1552,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1571,7 +1571,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1597,7 +1597,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
@@ -1650,7 +1650,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         filename : str
             Output filename.
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.

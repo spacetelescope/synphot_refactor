@@ -40,7 +40,7 @@ class Observation(BaseSourceSpectrum):
     band : `~synphot.spectrum.SpectralElement`
         Bandpass.
 
-    binset : array_like, `~astropy.units.quantity.Quantity`, or `None`
+    binset : array-like, `~astropy.units.quantity.Quantity`, or `None`
         Center of binned wavelengths.
         If not a Quantity, assumed to be in Angstrom.
         If `None`, input ``self.waveset`` values are used.
@@ -230,7 +230,7 @@ class Observation(BaseSourceSpectrum):
 
         Parameters
         ----------
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `binset` is used.
@@ -342,7 +342,7 @@ class Observation(BaseSourceSpectrum):
             Sample data in native wavelengths if `False`.
             Else, sample binned data (default).
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` or `binset` is used, depending
@@ -406,7 +406,7 @@ class Observation(BaseSourceSpectrum):
             Sample data in native wavelengths if `False` (default).
             Else, sample binned data.
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` or `binset` is used, depending
@@ -605,7 +605,7 @@ class Observation(BaseSourceSpectrum):
             Plot data in native wavelengths if `False`.
             Else, plot binned data (default).
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` or `binset` is used, depending
@@ -651,7 +651,7 @@ class Observation(BaseSourceSpectrum):
             Write out data in native wavelengths if `False`.
             Else, write binned data (default).
 
-        wavelengths : array_like, `~astropy.units.quantity.Quantity`, or `None`
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` or `binset` is used, depending

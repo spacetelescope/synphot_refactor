@@ -180,11 +180,11 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
 
     Parameters
     ----------
-    wavelengths : array_like or `~astropy.units.quantity.Quantity`
+    wavelengths : array-like or `~astropy.units.quantity.Quantity`
         Wavelength values. If not a Quantity, assumed to be in
         Angstrom.
 
-    fluxes : array_like or `~astropy.units.quantity.Quantity`
+    fluxes : array-like or `~astropy.units.quantity.Quantity`
         Flux values. If not a Quantity, assumed to be in PHOTLAM.
 
     out_flux_unit : str or `~astropy.units.core.Unit`
@@ -389,7 +389,7 @@ def validate_quantity(input_value, output_unit, equivalencies=[]):
 
     Parameters
     ----------
-    input_value : number, array_like, or `~astropy.units.quantity.Quantity`
+    input_value : number, array-like, or `~astropy.units.quantity.Quantity`
         Quantity to validate. If not a Quantity, assumed to be
         already in output unit.
 

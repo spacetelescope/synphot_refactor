@@ -238,7 +238,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={},
     filename : str
         Output spectrum filename.
 
-    wavelengths, fluxes : array_like or `~astropy.units.quantity.Quantity`
+    wavelengths, fluxes : array-like or `~astropy.units.quantity.Quantity`
         Wavelength and flux of the spectrum.
 
     pri_header, ext_header : dict
