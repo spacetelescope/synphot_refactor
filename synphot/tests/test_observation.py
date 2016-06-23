@@ -265,17 +265,14 @@ class TestObsPar(object):
     @pytest.mark.parametrize(
         ('flux_unit', 'ans'),
         [(units.FLAM, 3.05E-14),
-         (u.STmag, 12.68878),
          (units.FNU, 2.92E-25),
-         (u.ABmag, 12.73669),
          (units.PHOTLAM, 0.008245),
          (units.PHOTNU, 7.82E-14),
          (u.count, 101462.5),
-         (units.OBMAG, -12.5158),
          (u.Jy, 0.029196),
          (u.mJy, 29.19613)])
     def test_effstim(self, flux_unit, ans):
-        """Test EFFSTIM for all supported flux units except VEGAMAG.
+        """Test EFFSTIM for all supported non-mag flux units.
 
         .. note::
 
@@ -285,6 +282,17 @@ class TestObsPar(object):
         np.testing.assert_allclose(
             self.obs.effstim(flux_unit=flux_unit, area=_area).value,
             ans, rtol=0.01)  # 1%
+
+    @pytest.mark.parametrize(
+        ('flux_unit', 'ans'),
+        [(u.STmag, 12.68878),
+         (u.ABmag, 12.73669),
+         (units.OBMAG, -12.5158)])
+    def test_effstim_mag(self, flux_unit, ans):
+        """Test mag separately because 1% tolerance test is different."""
+        np.testing.assert_allclose(
+            self.obs.effstim(flux_unit=flux_unit, area=_area).value,
+            ans, atol=0.01, rtol=0)  # 1%
 
     def test_effstim_analytic(self):
         sp = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
@@ -298,7 +306,7 @@ class TestObsPar(object):
         vspec = SourceSpectrum.from_vega(encoding='binary')
         np.testing.assert_allclose(
             self.obs.effstim(flux_unit=units.VEGAMAG, vegaspec=vspec).value,
-            12.74661, rtol=0.01)  # 1%
+            12.74661, atol=0.01, rtol=0)  # 1%
 
     def test_effstim_exceptions(self):
         with pytest.raises(exceptions.SynphotError):
