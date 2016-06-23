@@ -393,7 +393,7 @@ class Observation(BaseSourceSpectrum):
 
         return u.Quantity(eff_lam, self._internal_wave_unit)
 
-    def effstim(self, binned=False, wavelengths=None, flux_unit=units.PHOTLAM,
+    def effstim(self, flux_unit=units.PHOTLAM, wavelengths=None, binned=False,
                 area=None, vegaspec=None, waverange=None, force=False):
         """Calculate :ref:`effective stimulus <synphot-formula-effstim>`.
 
@@ -402,9 +402,9 @@ class Observation(BaseSourceSpectrum):
 
         Parameters
         ----------
-        binned : bool
-            Sample data in native wavelengths if `False` (default).
-            Else, sample binned data.
+        flux_unit : str or `~astropy.units.core.Unit`
+            The unit of effective stimulus.
+            COUNT gives result in count/s.
 
         wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
@@ -412,9 +412,9 @@ class Observation(BaseSourceSpectrum):
             If `None`, ``self.waveset`` or `binset` is used, depending
             on ``binned``.
 
-        flux_unit : str or `~astropy.units.core.Unit`
-            The unit of effective stimulus.
-            COUNT gives result in count/s.
+        binned : bool
+            Sample data in native wavelengths if `False` (default).
+            Else, sample binned data.
 
         area, vegaspec
             See :func:`~synphot.units.convert_flux`.
@@ -590,7 +590,7 @@ class Observation(BaseSourceSpectrum):
 
         """
         return self.effstim(
-            binned=binned, wavelengths=wavelengths, flux_unit=u.count,
+            flux_unit=u.count, wavelengths=wavelengths, binned=binned,
             area=area, waverange=waverange, force=force)
 
     def plot(self, binned=True, wavelengths=None, flux_unit=units.PHOTLAM,
