@@ -15,9 +15,8 @@ from . import exceptions
 
 __all__ = ['H', 'C', 'HC', 'SR_PER_ARCSEC2', 'AREA', 'THROUGHPUT', 'PHOTLAM',
            'PHOTNU', 'FLAM', 'FNU', 'OBMAG', 'VEGAMAG',
-           'spectral_density_mag', 'spectral_density_vega',
-           'spectral_density_count', 'convert_flux', 'validate_unit',
-           'validate_wave_unit', 'validate_quantity']
+           'spectral_density_vega', 'spectral_density_count', 'convert_flux',
+           'validate_unit', 'validate_wave_unit', 'validate_quantity']
 
 # ----------------- #
 # General constants #
@@ -63,41 +62,6 @@ u.add_enabled_units([PHOTLAM, PHOTNU, FLAM, FNU, OBMAG, VEGAMAG])
 # --------------- #
 # Flux conversion #
 # --------------- #
-
-# Replace with https://github.com/astropy/astropy/pull/5012
-def spectral_density_mag(wav):
-    """Flux equivalencies between PHOTLAM and ABMAG/STMAG.
-
-    Parameters
-    ----------
-    wav : `~astropy.units.quantity.Quantity`
-        Quantity associated with values being converted
-        (e.g., wavelength or frequency).
-
-    Returns
-    -------
-    eqv : list
-        List of equivalencies.
-
-    """
-    wav = wav.to(u.AA, u.spectral()).value
-
-    def converter_photlam_stmag(x):
-        return -2.5 * np.log10(HC.value * (x / wav)) - 21.1
-
-    def iconverter_photlam_stmag(x):
-        return wav * 10 ** (-0.4 * (x.value + 21.1)) / HC.value
-
-    def converter_photlam_abmag(x):
-        return -2.5 * np.log10(H.value * x * wav) - 48.6
-
-    def iconverter_photlam_abmag(x):
-        return 10 ** (-0.4 * (x.value + 48.6)) / (H.value * wav)
-
-    return [
-        (PHOTLAM, u.STmag, converter_photlam_stmag, iconverter_photlam_stmag),
-        (PHOTLAM, u.ABmag, converter_photlam_abmag, iconverter_photlam_abmag)]
-
 
 def spectral_density_vega(wav, vegaflux):
     """Flux equivalencies between PHOTLAM and VEGAMAG.
@@ -231,7 +195,7 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
     if not isinstance(wavelengths, u.Quantity):
         wavelengths = u.Quantity(wavelengths, unit=u.AA)
 
-    eqv = u.spectral_density(wavelengths) + spectral_density_mag(wavelengths)
+    eqv = u.spectral_density(wavelengths)
 
     # Use built-in astropy equivalencies
     try:
