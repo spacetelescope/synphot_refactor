@@ -19,6 +19,7 @@ from astropy.analytic_functions.blackbody import blackbody_nu
 from astropy.modeling import Fittable1DModel, Model, Parameter
 from astropy.modeling import models as _models
 from astropy.modeling.core import _CompoundModel
+from astropy.modeling.models import Tabular1D
 from astropy.stats.funcs import gaussian_fwhm_to_sigma, gaussian_sigma_to_fwhm
 from astropy.utils import metadata
 from astropy.utils.exceptions import AstropyUserWarning
@@ -270,40 +271,103 @@ class ConstFlux1D(_models.Const1D):
         return y.value
 
 
-# TODO: Subclass from LookupTable (spacetelescope/gwcs#28)
-class Empirical1D(Fittable1DModel):
+# Ideally, this should be absorbed into Tabular base class in Astropy. There
+# is no 1D or 2D specific functionality here but inherits 1D for convenience.
+from astropy.utils import minversion
+
+try:
+    import scipy
+    from scipy.interpolate import interpn
+    has_scipy = True
+except ImportError:
+    has_scipy = False
+
+if has_scipy and not minversion(scipy, '0.14'):
+    has_scipy = False
+
+
+class CustomTabular1D(Tabular1D):
+    """Like `~astropy.modeling.models.Tabular1D` but with extra stuff."""
+
+    def __init__(self, **kwargs):
+        n_models = kwargs.get('n_models', 1)
+        if n_models > 1:
+            raise NotImplementedError('Only n_models=1 is supported')
+
+        super(CustomTabular1D, self).__init__(**kwargs)
+
+    @property
+    def points(self):
+        """The points defining the regular grid."""
+        return np.squeeze(self._points)
+
+    @property
+    def bounding_box(self):
+        """Tuple defining the default ``bounding_box`` limits,
+        ``(points_low, points_high)``.
+
+        Examples
+        --------
+        >>> from astropy.modeling.models import Tabular1D, Tabular2D
+        >>> t1 = Tabular1D([1,2,3], [10, 20, 30])
+        >>> t1.bounding_box
+        (1, 3)
+        >>> t2 = Tabular2D([[1,2,3],[2,3,4]], [[10,20,30],[20,30,40]])
+        >>> t2.bounding_box
+        ((2, 4), (1, 3))
+
+        """
+        bbox = [(min(p), max(p)) for p in self.points][::-1]
+        if len(bbox) == 1:
+            bbox = bbox[0]
+        return tuple(bbox)
+
+    def __repr__(self):
+        return self._format_repr(kwargs={
+            'points': self.points, 'lookup_table': self.lookup_table})
+
+    def __str__(self):
+        return self._format_str(keywords=[
+            ('points', self.points), ('lookup_table', self.lookup_table)])
+
+    # Same as Tabular except using self._points
+    def evaluate(self, *inputs):
+        """Return the interpolated values at the input coordinates.
+
+        Parameters
+        ----------
+        inputs : list of scalars or ndarrays
+            Input coordinates. The number of inputs must be equal
+            to the dimensions of the lookup table.
+        """
+        inputs = np.array(inputs[: self.n_inputs]).T
+        if not has_scipy:
+            raise ImportError('This model requires scipy >= v0.14')
+        return interpn(self._points, self.lookup_table, inputs,
+                       method=self.method, bounds_error=self.bounds_error,
+                       fill_value=self.fill_value)
+
+
+class Empirical1D(CustomTabular1D):
     """Empirical (sampled) spectrum or bandpass model.
 
     .. note::
 
-        This model requires `SciPy <http://www.scipy.org>`_ 0.17
+        This model requires `SciPy <http://www.scipy.org>`_ 0.14
         or later to be installed.
 
     Parameters
     ----------
-    x : ndarray
-        Wavelengths.
-
-    y : ndarray
-        Flux or throughput.
-
     keep_neg : bool
-        Convert negative ``y`` values to zeroes?
+        Convert negative ``lookup_table`` values to zeroes?
         This is to be consistent with ASTROLIB PYSYNPHOT.
 
     kwargs : dict
-        Optional keywords for model creation or
-        :func:`~scipy.interpolate.interp1d`.
+        Keywords for `~astropy.modeling.models.Tabular` model
+        creation or :func:`~scipy.interpolate.interpn`.
 
     """
-    standard_broadcasting = False
-    x = Parameter(default=[0, 0])
-    y = Parameter(default=[0, 0])
-
-    def __init__(self, x, y, **kwargs):
-        n_models = kwargs.get('n_models', 1)
-        if n_models > 1:
-            raise NotImplementedError('Only n_models=1 is supported')
+    def __init__(self, **kwargs):
 
         # Manually insert user metadata here to accomodate any warning
         # from self._process_neg_flux()
@@ -312,22 +376,26 @@ class Empirical1D(Fittable1DModel):
         if 'warnings' not in self.meta:
             self.meta['warnings'] = {}
 
+        x = kwargs['points']
+        y = kwargs['lookup_table']
+
+        # Points can only be ascending for interpn()
+        if x[-1] < x[0]:
+            x = x[::-1]
+            y = y[::-1]
+            kwargs['points'] = x
+
+        # Handle negative flux
         keep_neg = kwargs.pop('keep_neg', False)
         self._keep_neg = keep_neg
         y = self._process_neg_flux(y)
 
-        # Set interpolation default values
-        self._kind = 'linear'
-        self._axis = -1
-        self._copy = True
-        self._bounds_error = False
-        self._fill_value = 0
-        self._assume_sorted = False
+        kwargs['lookup_table'] = y
+        super(Empirical1D, self).__init__(**kwargs)
 
-        # Filter out keywords that do not go into model init
-        kwargs = self._process_interp1d_options(x, y, **kwargs)
-
-        super(Empirical1D, self).__init__(x=x, y=y, **kwargs)
+        # Set non-default interpolation default values
+        self.bounds_error = kwargs.get('bounds_error', False)
+        self.fill_value = kwargs.get('fill_value', 0)
 
     def _process_neg_flux(self, y):
         """Remove negative flux."""
@@ -345,57 +413,26 @@ class Empirical1D(Fittable1DModel):
 
         return y
 
-    def _process_interp1d_options(self, x, y, **kwargs):
-        """Override default interpolation options and return unused
-        keywords."""
-        from scipy.interpolate import interp1d
-
-        self._kind = kwargs.pop('kind', self._kind)
-        self._axis = kwargs.pop('axis', self._axis)
-        self._copy = kwargs.pop('copy', self._copy)
-        self._bounds_error = kwargs.pop('bounds_error', self._bounds_error)
-        self._fill_value = kwargs.pop('fill_value', self._fill_value)
-        self._assume_sorted = kwargs.pop('assume_sorted', self._assume_sorted)
-        self._f = interp1d(
-            x, y, kind=self._kind, axis=self._axis, copy=self._copy,
-            bounds_error=self._bounds_error, fill_value=self._fill_value,
-            assume_sorted=self._assume_sorted)
-
-        return kwargs
-
-    def set_interp1d(self, **kwargs):
-        """Use given keywords with :func:`~scipy.interpolate.interp1d` to
-        evaluate model. Otherwise, use previously set values."""
-        self._process_interp1d_options(self.x.value, self.y.value, **kwargs)
-
-    # NOTE: It is forced to be property by core Model. The decorator
-    #       here is just to make this obvious.
-    @property
-    def bounding_box(self):
-        """Tuple defining the default ``bounding_box`` limits,
-        ``(x_low, x_high)``."""
-        x = self.x.value
-        return (min(x), max(x))
-
     def sampleset(self):
-        """Return ``x`` array that samples the feature."""
-        return self.x.value
+        """Return ``points`` array that samples the feature."""
+        return self.points
 
-    def evaluate(self, x, *args):
+    def evaluate(self, inputs):
         """Evaluate the model.
 
         Parameters
         ----------
-        x : number or ndarray
-            Wavelengths in same unit as parameter ``x``.
+        inputs : number or ndarray
+            Wavelengths in same unit as ``points``.
 
         Returns
         -------
         y : number or ndarray
-            Flux or throughput in same unit as parameter ``y``.
+            Flux or throughput in same unit as ``lookup_table``.
 
         """
-        return self._process_neg_flux(self._f(x))
+        y = super(Empirical1D, self).evaluate(inputs)
+        return self._process_neg_flux(y)
 
 
 class GaussianSampleset1DMixin(object):

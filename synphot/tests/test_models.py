@@ -115,7 +115,8 @@ class TestEmpirical1D(object):
         y = units.convert_flux(x, f, units.PHOTLAM)
         self.flux_flam = f.value
         self.w = x.value
-        self.m = Empirical1D(x=self.w, y=y.value, kind='linear')
+        self.m = Empirical1D(
+            points=self.w, lookup_table=y.value, method='linear')
 
     def test_sampleset(self):
         np.testing.assert_array_equal(self.m.sampleset(), self.w)
@@ -142,7 +143,7 @@ class TestEmpirical1D(object):
             rtol=1e-6)
 
         # New model with descending order
-        m2 = Empirical1D(x=w2, y=f2)
+        m2 = Empirical1D(points=w2, lookup_table=f2)
         y = units.convert_flux(w, m2(w), units.FLAM)
         np.testing.assert_allclose(
             y.value, [8.57166622e-15, 8.86174843e-15, 8.68707743e-15],
@@ -153,7 +154,8 @@ class TestEmpirical1D(object):
         [(True, [-1.1, 0, 1.1]),
          (False, [0, 0, 1.1])])
     def test_neg(self, keep_neg, ans):
-        m2 = Empirical1D(x=[1, 2, 3], y=[-1.1, 0, 1.1], keep_neg=keep_neg)
+        m2 = Empirical1D(points=[1, 2, 3], lookup_table=[-1.1, 0, 1.1],
+                         keep_neg=keep_neg)
         np.testing.assert_array_equal(m2([1, 2, 3]), ans)
         if not keep_neg:
             assert 'NegativeFlux' in m2.meta['warnings']

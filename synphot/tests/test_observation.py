@@ -61,7 +61,8 @@ class TestObservation(object):
     def test_disjoint_spec(self):
         """The rest of overlap logic is tested in `TestInitWithForce`."""
         sp = SourceSpectrum(
-            Empirical1D, x=[39999.9, 40000, 40001, 40001.1], y=[0, 1, 1, 0])
+            Empirical1D, points=[39999.9, 40000, 40001, 40001.1],
+            lookup_table=[0, 1, 1, 0])
         with pytest.raises(exceptions.DisjointError):
             obs2 = Observation(sp, self.obs.bandpass)
 
@@ -164,9 +165,10 @@ class TestInitWithForce(object):
         x = np.arange(3000, 4000)
         y = np.ones_like(x) * 0.75
         self.sp = SourceSpectrum(
-            Empirical1D, x=x, y=y, meta={'expr': 'short flat'})
+            Empirical1D, points=x, lookup_table=y, meta={'expr': 'short flat'})
         self.bp = SpectralElement(
-            Empirical1D, x=[3949.9, 3950, 4050, 4050.1], y=[0, 1, 1, 0])
+            Empirical1D, points=[3949.9, 3950, 4050, 4050.1],
+            lookup_table=[0, 1, 1, 0])
 
     @pytest.mark.parametrize(
         ('force_type', 'ans'),
@@ -326,10 +328,11 @@ class TestCountRate(object):
         x = np.arange(1000, 1100, 0.5)
         y = units.convert_flux(
             x, (x - 1000) * u.count, units.PHOTLAM, area=_area).value
-        sp = SourceSpectrum(Empirical1D, x=x, y=y, meta={'expr': 'slope1'})
+        sp = SourceSpectrum(Empirical1D, points=x, lookup_table=y,
+                            meta={'expr': 'slope1'})
         bp = SpectralElement(
-            Empirical1D, x=[1009.95, 1010, 1030, 1030.05],
-            y=[0, 1, 1, 0], meta={'expr': 'handmade_box'})
+            Empirical1D, points=[1009.95, 1010, 1030, 1030.05],
+            lookup_table=[0, 1, 1, 0], meta={'expr': 'handmade_box'})
         self.obs = Observation(sp, bp, binset=np.arange(1000, 1020))
 
     @pytest.mark.parametrize(

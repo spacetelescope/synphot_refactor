@@ -47,10 +47,10 @@ class TestExtinction(object):
         w = self.redlaw.waveset[48:53]
         np.testing.assert_allclose(
             w.to(u.micron ** -1, u.spectral()).value,
-            [5.03399992, 5.12949991, 5.2249999, 5.3204999, 5.41599989])
+            [5.41599989, 5.3204999, 5.2249999, 5.12949991, 5.03399992])
         np.testing.assert_allclose(
             self.redlaw(w).value,
-            [8.69231796, 8.40150452, 8.17892265, 8.01734924, 7.90572977])
+            [7.90572977, 8.01734924, 8.17892265, 8.40150452, 8.69231796])
 
     def test_extcurve_call(self):
         w = self.extcurve.waveset
@@ -101,7 +101,8 @@ class TestWriteReddeningLaw(object):
         self.outdir = tempfile.mkdtemp()
         self.x = np.linspace(1000, 5000, 5)
         self.y = np.linspace(1, 5, 5) * 0.1
-        self.redlaw = ReddeningLaw(Empirical1D, x=self.x, y=self.y)
+        self.redlaw = ReddeningLaw(
+            Empirical1D, points=self.x, lookup_table=self.y)
 
     @pytest.mark.parametrize('ext_hdr', [None, {'foo': 'foo'}])
     def test_write(self, ext_hdr):

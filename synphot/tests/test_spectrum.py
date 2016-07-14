@@ -104,7 +104,8 @@ class TestEmpiricalSourceFromFile(object):
 
     def test_invalid_flux_unit(self):
         with pytest.raises(exceptions.SynphotError):
-            sp = SourceSpectrum(Empirical1D, x=_wave, y=_flux_vegamag)
+            sp = SourceSpectrum(Empirical1D, points=_wave,
+                                lookup_table=_flux_vegamag)
 
     def test_invalid_models(self):
         # Test not a Model subclass
@@ -124,7 +125,7 @@ class TestEmpiricalSourceFromFile(object):
             self.sp.waverange.value, [3479.99902344, 10500.00097656])
 
     def test_call(self):
-        w = self.sp.model.x.value[5000:5004]
+        w = self.sp.model.points[5000:5004]
         y = units.convert_flux(w, self.sp(w), units.FLAM)
         np.testing.assert_allclose(
             w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
@@ -134,7 +135,8 @@ class TestEmpiricalSourceFromFile(object):
 
     def test_neg_flux(self):
         w = [1000, 5000, 9000]
-        sp = SourceSpectrum(Empirical1D, x=w, y=[100, -45, 5e-17])
+        sp = SourceSpectrum(
+            Empirical1D, points=w, lookup_table=[100, -45, 5e-17])
         np.testing.assert_array_equal(sp(w).value, [100, 0, 5e-17])
         assert 'NegativeFlux' in sp.warnings
 
@@ -159,7 +161,8 @@ class TestEmpiricalSourceFromFile(object):
         assert sp is self.sp
 
         # Tapering is done
-        sp2 = SourceSpectrum(Empirical1D, x=_wave, y=_flux_photlam)
+        sp2 = SourceSpectrum(
+            Empirical1D, points=_wave, lookup_table=_flux_photlam)
         sp = sp2.taper()
         x, y = sp._get_arrays(None, flux_unit=units.FLAM)
         np.testing.assert_allclose(
@@ -178,10 +181,11 @@ class TestEmpiricalBandpassFromFile(object):
 
     def test_invalid_flux_unit(self):
         with pytest.raises(u.UnitsError):
-            bp = SpectralElement(Empirical1D, x=_wave, y=_flux_photlam)
+            bp = SpectralElement(Empirical1D, points=_wave,
+                                 lookup_table=_flux_photlam)
 
     def test_call(self):
-        w = self.bp.model.x.value[5000:5004]
+        w = self.bp.model.points[5000:5004]
         y = self.bp(w)
         np.testing.assert_allclose(
             w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
@@ -462,33 +466,39 @@ class TestCheckOverlap(object):
     """Test spectrum overlap check."""
     def setup_class(self):
         self.sp = SourceSpectrum(
-            Empirical1D, x=[2999.9, 3000, 6000, 6000.1], y=[0, 1, 1, 0])
+            Empirical1D, points=[2999.9, 3000, 6000, 6000.1],
+            lookup_table=[0, 1, 1, 0])
 
     def test_full(self):
         bp = SpectralElement(
-            Empirical1D, x=[999.9, 1000, 9000, 9000.1], y=[0, 1, 1, 0])
+            Empirical1D, points=[999.9, 1000, 9000, 9000.1],
+            lookup_table=[0, 1, 1, 0])
         assert self.sp.check_overlap(bp) == 'full'
 
     def test_partial_most(self):
         bp = SpectralElement(
-            Empirical1D, x=[3000, 3001, 6000.1, 6000.2], y=[0, 1, 1, 0])
+            Empirical1D, points=[3000, 3001, 6000.1, 6000.2],
+            lookup_table=[0, 1, 1, 0])
         assert self.sp.check_overlap(bp) == 'partial_most'
 
     def test_partial_notmost(self):
         bp = SpectralElement(
-            Empirical1D, x=[3999.9, 4000, 4500, 4500.1], y=[0, 1, 1, 0])
+            Empirical1D, points=[3999.9, 4000, 4500, 4500.1],
+            lookup_table=[0, 1, 1, 0])
         assert self.sp.check_overlap(bp) == 'partial_notmost'
 
         # Ensure zeroes in passband are not taken into account
         bp2 = SpectralElement(
-            Empirical1D, x=[3000, 3001, 6000.1, 6000.2], y=[0, 1, 1, 0])
+            Empirical1D, points=[3000, 3001, 6000.1, 6000.2],
+            lookup_table=[0, 1, 1, 0])
         bp3 = bp2 * bp
         assert self.sp.check_overlap(bp2) == 'partial_most'
         assert self.sp.check_overlap(bp3) == 'partial_notmost'
 
     def test_none(self):
         bp = SpectralElement(
-            Empirical1D, x=[99.9, 100, 2999.9, 3000], y=[0, 1, 1, 0])
+            Empirical1D, points=[99.9, 100, 2999.9, 3000],
+            lookup_table=[0, 1, 1, 0])
         assert self.sp.check_overlap(bp) == 'none'
 
     def test_special_cases(self):
@@ -752,15 +762,15 @@ class TestMathOperators(object):
     """Test spectrum math operators."""
     def setup_class(self):
         self.sp_1 = SourceSpectrum(
-            Empirical1D, x=[3999.9, 4000.0, 5000.0, 6000.0, 6000.1],
-            y=[0, 3.5e-14, 4e-14, 4.5e-14, 0] * units.FLAM)
+            Empirical1D, points=[3999.9, 4000.0, 5000.0, 6000.0, 6000.1],
+            lookup_table=[0, 3.5e-14, 4e-14, 4.5e-14, 0] * units.FLAM)
         self.sp_2 = SourceSpectrum(
-            Empirical1D, x=_wave, y=_flux_jy,
-            fill_value='extrapolate', kind='nearest',
+            Empirical1D, points=_wave, lookup_table=_flux_jy,
+            fill_value=None, method='nearest',
             meta={'PHOTLAM': [9.7654e-3, 1.003896e-2, 9.78473e-3]})
         self.bp_1 = SpectralElement(
-            Empirical1D, x=[399.99, 400.01, 500.0, 590.0, 600.1] * u.nm,
-            y=[0, 0.1, 0.2, 0.3, 0])
+            Empirical1D, points=[399.99, 400.01, 500.0, 590.0, 600.1] * u.nm,
+            lookup_table=[0, 0.1, 0.2, 0.3, 0])
 
     def test_source_add(self):
         """Compare with ASTROLIB PYSYNPHOT."""
@@ -877,10 +887,12 @@ class TestWriteSpec(object):
     """Test spectrum to_fits() method."""
     def setup_class(self):
         self.outdir = tempfile.mkdtemp()
-        self.sp = SourceSpectrum(Empirical1D, x=_wave, y=_flux_photlam,
-                                 meta={'expr': 'Test source'})
-        self.bp = SpectralElement(Empirical1D, x=_wave, y=np.ones(_wave.shape),
-                                  meta={'expr': 'Test bandpass'})
+        self.sp = SourceSpectrum(
+            Empirical1D, points=_wave, lookup_table=_flux_photlam,
+            meta={'expr': 'Test source'})
+        self.bp = SpectralElement(
+            Empirical1D, points=_wave, lookup_table=np.ones(_wave.shape),
+            meta={'expr': 'Test bandpass'})
 
     @pytest.mark.parametrize(
         ('is_sp', 'ext_hdr'),

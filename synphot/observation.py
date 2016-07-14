@@ -104,8 +104,8 @@ class Observation(BaseSourceSpectrum):
                 warn['PartialOverlap'] = msg
 
                 if isinstance(spec.model, Empirical1D):
-                    spec.model.set_interp1d(fill_value='extrapolate',
-                                            kind='nearest')
+                    spec.model.method = 'nearest'
+                    spec.model.fill_value = None
             else:
                 raise exceptions.SynphotError(
                     'force={0} is invalid, must be "none", "taper", '
@@ -684,4 +684,5 @@ class Observation(BaseSourceSpectrum):
                 wavelengths, flux_unit=self._internal_flux_unit)
 
         header = {'observation': str(self), 'binned': binned}
-        return SourceSpectrum(Empirical1D, x=w, y=y, meta={'header': header})
+        return SourceSpectrum(Empirical1D, points=w, lookup_table=y,
+                              meta={'header': header})
