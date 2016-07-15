@@ -197,7 +197,7 @@ def generate_wavelengths(minwave=500, maxwave=26000, num=10000, delta=None,
         else:
             waveset = np.arange(minwave, maxwave, delta)
 
-    return u.Quantity(waveset, unit=wave_unit, dtype=np.float64), waveset_str
+    return waveset.astype(np.float64) * wave_unit, waveset_str
 
 
 def merge_wavelengths(waveset1, waveset2, threshold=1e-12):

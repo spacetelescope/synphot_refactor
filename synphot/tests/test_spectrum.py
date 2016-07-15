@@ -130,7 +130,7 @@ class TestEmpiricalSourceFromFile(object):
         assert 'NegativeFlux' in sp.warnings
 
     def test_conversion(self):
-        x = u.Quantity(0.60451641, u.micron)
+        x = 0.60451641 * u.micron
         w, y = self.sp._get_arrays(x, units.FNU)
         np.testing.assert_allclose(x.value, w.value)
         np.testing.assert_allclose(y.value, 2.282950185743497e-26, rtol=1e-6)
@@ -213,12 +213,12 @@ class TestEmpiricalBandpassFromFile(object):
         w = self.bp.rmswidth()
         np.testing.assert_allclose(w.value, 359.55954282883687, rtol=1e-4)
 
-        w = self.bp.rmswidth(threshold=u.Quantity(0.01))
+        w = self.bp.rmswidth(threshold=0.01*u.dimensionless_unscaled)
         np.testing.assert_allclose(w.value, 357.43298216917754, rtol=1e-4)
 
         # Invalid threshold must raise exception
         with pytest.raises(exceptions.SynphotError):
-            w = self.bp.rmswidth(threshold=u.Quantity(0.01, u.AA))
+            w = self.bp.rmswidth(threshold=0.01*u.AA)
         with pytest.raises(exceptions.SynphotError):
             w = self.bp.rmswidth(threshold=[0.01, 0.02])
         with pytest.raises(exceptions.SynphotError):
@@ -229,7 +229,7 @@ class TestEmpiricalBandpassFromFile(object):
         w = self.bp.fwhm()
         np.testing.assert_allclose(w.value, 841.09, rtol=2.5e-5)
 
-        w = self.bp.fwhm(threshold=u.Quantity(0.01))
+        w = self.bp.fwhm(threshold=0.01*u.dimensionless_unscaled)
         np.testing.assert_allclose(w.value, 836.2879507505378, rtol=2.5e-5)
 
         # Zero value
@@ -238,7 +238,7 @@ class TestEmpiricalBandpassFromFile(object):
 
         # Invalid threshold must raise exception
         with pytest.raises(exceptions.SynphotError):
-            w = self.bp.fwhm(threshold=u.Quantity(0.01, u.AA))
+            w = self.bp.fwhm(threshold=0.01*u.AA)
         with pytest.raises(exceptions.SynphotError):
             w = self.bp.fwhm(threshold=[0.01, 0.02])
         with pytest.raises(exceptions.SynphotError):
@@ -290,9 +290,7 @@ class TestBoxBandpass(object):
         np.testing.assert_array_equal(y.value, [0, 0, 1])
 
     def test_conversion(self):
-        bp2 = SpectralElement(
-            Box1D, amplitude=1, x_0=u.Quantity(500, u.nm),
-            width=u.Quantity(10, u.nm))
+        bp2 = SpectralElement(Box1D, amplitude=1, x_0=500*u.nm, width=10*u.nm)
         y = bp2([4000, 4949.95, 5000])
         np.testing.assert_array_equal(y.value, [0, 0, 1])
 
@@ -395,7 +393,7 @@ class TestBuildModels(object):
         np.testing.assert_array_equal(y.value, 1)
 
     def test_ConstFlux1D(self):
-        sp = SourceSpectrum(ConstFlux1D, amplitude=u.Quantity(1, u.Jy))
+        sp = SourceSpectrum(ConstFlux1D, amplitude=1*u.Jy)
         w = [1, 1000, 1e6]
         y = units.convert_flux(w, sp(w), u.Jy)
         np.testing.assert_allclose(y.value, 1)
@@ -532,21 +530,21 @@ class TestNormalize(object):
     @pytest.mark.parametrize(
         ('sp_type', 'rn_val', 'ans_countrate'),
         [('bb', 1e-5, 117.9167),
-         ('bb', u.Quantity(1e-16, units.PHOTNU), 116.8613),
-         ('bb', u.Quantity(1e-16, units.FLAM), 326.4773),
-         ('bb', u.Quantity(20, u.STmag), 118.5366),
-         ('bb', u.Quantity(1e-27, units.FNU), 323.5549),
-         ('bb', u.Quantity(20, u.ABmag), 117.4757),
-         ('bb', u.Quantity(1e-4, u.Jy), 323.5547),
-         ('bb', u.Quantity(0.1, u.mJy), 323.5548),
+         ('bb', 1e-16 * units.PHOTNU, 116.8613),
+         ('bb', 1e-16 * units.FLAM, 326.4773),
+         ('bb', 20 * u.STmag, 118.5366),
+         ('bb', 1e-27 * units.FNU, 323.5549),
+         ('bb', 20 * u.ABmag, 117.4757),
+         ('bb', 1e-4 * u.Jy, 323.5547),
+         ('bb', 0.1 * u.mJy, 323.5548),
          ('em', 1e-4, 277.4368),
-         ('em', u.Quantity(1e-15, units.PHOTNU), 274.9537),
-         ('em', u.Quantity(1e-16, units.FLAM), 76.81425),
-         ('em', u.Quantity(18, u.STmag), 175.9712),
-         ('em', u.Quantity(1e-27, units.FNU), 76.12671),
-         ('em', u.Quantity(18, u.ABmag), 174.3967),
-         ('em', u.Quantity(1e-3, u.Jy), 761.2667),
-         ('em', u.Quantity(1, u.mJy), 761.2666)])
+         ('em', 1e-15 * units.PHOTNU, 274.9537),
+         ('em', 1e-16 * units.FLAM, 76.81425),
+         ('em', 18 * u.STmag, 175.9712),
+         ('em', 1e-27 * units.FNU, 76.12671),
+         ('em', 18 * u.ABmag, 174.3967),
+         ('em', 1e-3 * u.Jy, 761.2667),
+         ('em', 1 * u.mJy, 761.2666)])
     def test_renorm_density(self, sp_type, rn_val, ans_countrate):
         sp = self._select_sp(sp_type)
         rn_sp = sp.normalize(rn_val, band=self.abox)
@@ -554,10 +552,10 @@ class TestNormalize(object):
 
     @pytest.mark.parametrize(
         ('sp_type', 'rn_val', 'ans_countrate'),
-        [('bb', u.Quantity(2, u.count), 2),
-         ('bb', u.Quantity(-1, units.OBMAG), 2.511886),
-         ('em', u.Quantity(2, u.count), 2),
-         ('em', u.Quantity(-1, units.OBMAG), 2.511888)])
+        [('bb', 2 * u.count, 2),
+         ('bb', -1 * units.OBMAG, 2.511886),
+         ('em', 2 * u.count, 2),
+         ('em', -1 * units.OBMAG, 2.511888)])
     def test_renorm_nondensity(self, sp_type, rn_val, ans_countrate):
         """This also tests force=True for 'partial_notmost' overlap."""
         sp = self._select_sp(sp_type)
@@ -575,8 +573,8 @@ class TestNormalize(object):
          ('em', 27.2856)])
     def test_renorm_vegamag(self, sp_type, ans_countrate):
         sp = self._select_sp(sp_type)
-        rn_sp = sp.normalize(
-            u.Quantity(20, units.VEGAMAG), band=self.abox, vegaspec=_vspec)
+        rn_sp = sp.normalize(20 * units.VEGAMAG, band=self.abox,
+                             vegaspec=_vspec)
         self._compare_countrate(rn_sp, ans_countrate)
 
     def test_renorm_noband(self):
@@ -584,7 +582,7 @@ class TestNormalize(object):
         but can be indirectly calculated using a very large box as bandpass.
 
         """
-        rn_sp = self.em.normalize(u.Quantity(1, u.ct), area=_area)
+        rn_sp = self.em.normalize(1 * u.ct, area=_area)
         x = rn_sp.integrate(flux_unit=u.ct, area=_area)
         ans = 10.615454634451927
         np.testing.assert_allclose(x.value, ans, rtol=1e-3)
@@ -605,14 +603,12 @@ class TestNormalize(object):
 
         # Missing Vega spectrum
         with pytest.raises(exceptions.SynphotError):
-            rn_sp = self.bb.normalize(
-                u.Quantity(10, units.VEGAMAG), band=self.abox)
+            rn_sp = self.bb.normalize(10 * units.VEGAMAG, band=self.abox)
 
         # Zero flux
         sp = SourceSpectrum(Const1D, amplitude=0)
         with pytest.raises(exceptions.SynphotError):
-            rn_sp = sp.normalize(
-                u.Quantity(100, u.ct), band=self.abox, area=_area)
+            rn_sp = sp.normalize(100 * u.ct, band=self.abox, area=_area)
 
 
 class TestWaveset(object):
@@ -723,16 +719,14 @@ class TestMathOperators(object):
     """Test spectrum math operators."""
     def setup_class(self):
         self.sp_1 = SourceSpectrum(
-            Empirical1D,
-            x=[3999.9, 4000.0, 5000.0, 6000.0, 6000.1],
-            y=u.Quantity([0, 3.5e-14, 4e-14, 4.5e-14, 0], units.FLAM))
+            Empirical1D, x=[3999.9, 4000.0, 5000.0, 6000.0, 6000.1],
+            y=[0, 3.5e-14, 4e-14, 4.5e-14, 0] * units.FLAM)
         self.sp_2 = SourceSpectrum(
             Empirical1D, x=_wave, y=_flux_jy,
             fill_value='extrapolate', kind='nearest',
             meta={'PHOTLAM': [9.7654e-3, 1.003896e-2, 9.78473e-3]})
         self.bp_1 = SpectralElement(
-            Empirical1D,
-            x=u.Quantity([399.99, 400.01, 500.0, 590.0, 600.1], u.nm),
+            Empirical1D, x=[399.99, 400.01, 500.0, 590.0, 600.1] * u.nm,
             y=[0, 0.1, 0.2, 0.3, 0])
 
     def test_source_add(self):
@@ -761,7 +755,7 @@ class TestMathOperators(object):
         with pytest.raises(exceptions.IncompatibleSources):
             ans = self.sp_1 + self.bp_1
 
-    @pytest.mark.parametrize('x', [2, u.Quantity(2)])
+    @pytest.mark.parametrize('x', [2, 2 * u.dimensionless_unscaled])
     def test_source_mul_scalar(self, x):
         w = self.sp_1.waveset.value
         ans1 = self.sp_1 * x
@@ -793,7 +787,7 @@ class TestMathOperators(object):
         with pytest.raises(exceptions.IncompatibleSources):
             ans = self.sp_1 * (1 - 1j)
         with pytest.raises(exceptions.IncompatibleSources):
-            ans = self.sp_1 * u.Quantity(1, u.AA)
+            ans = self.sp_1 * (1 * u.AA)
 
     def test_source_div(self):
         """Put real tests here when ``__truediv__`` is implemented."""
@@ -813,7 +807,7 @@ class TestMathOperators(object):
         with pytest.raises(NotImplementedError):
             ans = self.bp_1 - 2.0
 
-    @pytest.mark.parametrize('x', [2.0, u.Quantity(2.0)])
+    @pytest.mark.parametrize('x', [2.0, 2.0 * u.dimensionless_unscaled])
     def test_bandpass_mul_scalar(self, x):
         w = self.bp_1.waveset.value
         ans1 = self.bp_1 * x
@@ -835,7 +829,7 @@ class TestMathOperators(object):
         with pytest.raises(exceptions.IncompatibleSources):
             ans = self.bp_1 * (1 - 1j)
         with pytest.raises(exceptions.IncompatibleSources):
-            ans = self.bp_1 * u.Quantity(1, u.AA)
+            ans = self.bp_1 * (1 * u.AA)
 
     def test_bandpass_div(self):
         """Put real tests here when ``__truediv__`` is implemented."""

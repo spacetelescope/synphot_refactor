@@ -55,7 +55,7 @@ def test_calculate_bin_centers(in_arr, out_arr):
 
 def test_center_edge_center_roundtrip():
     """Test that we get back the same centers."""
-    centers = u.Quantity([1, 2, 4, 10, 20], u.micron)
+    centers = [1, 2, 4, 10, 20] * u.micron
     calc_centers = binning.calculate_bin_centers(
         binning.calculate_bin_edges(centers))
     np.testing.assert_array_equal(calc_centers.value, centers.value)
@@ -63,7 +63,7 @@ def test_center_edge_center_roundtrip():
 
 
 @pytest.mark.parametrize(
-    ('arr'), [u.Quantity(1, u.AA), u.Quantity(np.array([1]), u.AA)])
+    ('arr'), [1 * u.AA, np.array([1]) * u.AA])
 def test_calculate_bin_exceptions(arr):
     """Test binning.py raising appropriate exceptions."""
     with pytest.raises(exceptions.SynphotError):

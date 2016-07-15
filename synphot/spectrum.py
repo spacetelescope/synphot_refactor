@@ -310,7 +310,7 @@ class BaseSpectrum(object):
         w = get_waveset(self.model)
         if w is not None:
             utils.validate_wavelengths(w)
-            w = u.Quantity(w, self._internal_wave_unit)
+            w = w * self._internal_wave_unit
         return w
 
     @property
@@ -337,7 +337,7 @@ class BaseSpectrum(object):
         else:
             w = self._process_wave_param(wave)
             utils.validate_wavelengths(w)
-            wavelengths = u.Quantity(w, self._internal_wave_unit)
+            wavelengths = w * self._internal_wave_unit
 
         return wavelengths
 
@@ -359,7 +359,7 @@ class BaseSpectrum(object):
 
         """
         w = self._validate_wavelengths(wavelengths)
-        return u.Quantity(self.model(w.value), unit=self._internal_flux_unit)
+        return self.model(w.value) * self._internal_flux_unit
 
     # Operators are to be implemented by subclasses, where applicable.
 
@@ -434,8 +434,7 @@ class BaseSpectrum(object):
         except (AttributeError, NotImplementedError):
             if conf.default_integrator == 'trapezoid':
                 y = self(x)
-                result = u.Quantity(abs(np.trapz(y.value, x=x.value)),
-                                    y.unit)
+                result = abs(np.trapz(y.value, x=x.value)) * y.unit
             else:  # pragma: no cover
                 raise NotImplementedError(
                     'Analytic integral not available and default integrator '
@@ -443,7 +442,7 @@ class BaseSpectrum(object):
         else:  # pragma: no cover
             start = x[0].value
             stop = x[-1].value
-            result = u.Quantity(m(stop) - m(start), self._internal_flux_unit)
+            result = (m(stop) - m(start)) * self._internal_flux_unit
 
         return result
 
@@ -473,7 +472,7 @@ class BaseSpectrum(object):
         else:
             avg_wave = abs(num / den)
 
-        return u.Quantity(avg_wave, self._internal_wave_unit)
+        return avg_wave * self._internal_wave_unit
 
     def barlam(self, wavelengths=None):
         """Calculate :ref:`mean log wavelength <synphot-formula-barlam>`.
@@ -501,7 +500,7 @@ class BaseSpectrum(object):
         else:
             bar_lam = np.exp(abs(num / den))
 
-        return u.Quantity(bar_lam, self._internal_wave_unit)
+        return bar_lam * self._internal_wave_unit
 
     def pivot(self, wavelengths=None):
         """Calculate :ref:`pivot wavelength <synphot-formula-pivwv>`.
@@ -529,7 +528,7 @@ class BaseSpectrum(object):
         else:
             pivwv = np.sqrt(abs(num / den))
 
-        return u.Quantity(pivwv, self._internal_wave_unit)
+        return pivwv * self._internal_wave_unit
 
     def check_overlap(self, other, wavelengths=None, threshold=0.01):
         """Check for wavelength overlap between two spectra.
@@ -851,8 +850,7 @@ class BaseSourceSpectrum(BaseSpectrum):
         except (AttributeError, NotImplementedError):
             if conf.default_integrator == 'trapezoid':
                 y = units.convert_flux(x, self(x), flux_unit, **kwargs)
-                result = u.Quantity(abs(np.trapz(y.value, x=x.value)),
-                                    flux_unit)
+                result = abs(np.trapz(y.value, x=x.value)) * flux_unit
             else:  # pragma: no cover
                 raise NotImplementedError(
                     'Analytic integral not available and default integrator '
@@ -860,7 +858,7 @@ class BaseSourceSpectrum(BaseSpectrum):
         else:
             start = x[0].value
             stop = x[-1].value
-            result = u.Quantity(m(stop) - m(start), self._internal_flux_unit)
+            result = (m(stop) - m(start)) * self._internal_flux_unit
 
         return result
 
@@ -968,7 +966,7 @@ class BaseSourceSpectrum(BaseSpectrum):
             sp = self.__mul__(band)
 
         if not isinstance(renorm_val, u.Quantity):
-            renorm_val = u.Quantity(renorm_val, unit=self._internal_flux_unit)
+            renorm_val = renorm_val * self._internal_flux_unit
 
         renorm_unit_name = renorm_val.unit.to_string()
         w = sp._validate_wavelengths(wavelengths)
@@ -990,12 +988,12 @@ class BaseSourceSpectrum(BaseSpectrum):
             # Magnitude flux-density units
             elif renorm_val.unit in (u.STmag, u.ABmag):
                 stdspec = SourceSpectrum(
-                    ConstFlux1D, amplitude=u.Quantity(0, renorm_val.unit))
+                    ConstFlux1D, amplitude=0*renorm_val.unit)
 
             # Linear flux-density units
             else:
                 stdspec = SourceSpectrum(
-                    ConstFlux1D, amplitude=u.Quantity(1, renorm_val.unit))
+                    ConstFlux1D, amplitude=1*renorm_val.unit)
 
             if band is None:
                 stdflux = stdspec.integrate(wavelengths=w).value
@@ -1350,7 +1348,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         int_val = abs(np.trapz(y, x=x))
         uresp = units.HC / (a.cgs * int_val)
 
-        return u.Quantity(uresp.value, unit=units.FLAM)
+        return uresp.value * units.FLAM
 
     def rmswidth(self, wavelengths=None, threshold=None):
         """Calculate the bandpass RMS width.
@@ -1408,7 +1406,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         else:
             rms_width = np.sqrt(abs(num / den))
 
-        return u.Quantity(rms_width, self._internal_wave_unit)
+        return rms_width * self._internal_wave_unit
 
     def photbw(self, wavelengths=None, threshold=None):
         """Calculate the
@@ -1470,7 +1468,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             else:
                 bandw = a * np.sqrt(abs(num / den))
 
-        return u.Quantity(bandw, self._internal_wave_unit)
+        return bandw * self._internal_wave_unit
 
     def fwhm(self, **kwargs):
         """Calculate :ref:`synphot-formula-fwhm` of equivalent gaussian.
@@ -1563,8 +1561,8 @@ class SpectralElement(BaseUnitlessSpectrum):
             Bandpass equivalent width.
 
         """
-        return u.Quantity(self.integrate(wavelengths=wavelengths).value,
-                          self._internal_wave_unit)
+        return (self.integrate(wavelengths=wavelengths).value *
+                self._internal_wave_unit)
 
     def rectwidth(self, wavelengths=None):
         """Calculate :ref:`bandpass rectangular width <synphot-formula-rectw>`.
@@ -1586,7 +1584,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         tpeak = self.tpeak(wavelengths=wavelengths)
 
         if tpeak.value == 0:  # pragma: no cover
-            rectw = u.Quantity(0.0, self._internal_wave_unit)
+            rectw = 0.0 * self._internal_wave_unit
         else:
             rectw = equvw / tpeak
 
@@ -1611,7 +1609,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
         qtlam = abs(np.trapz(y / x, x=x))
-        return u.Quantity(qtlam, u.dimensionless_unscaled)
+        return qtlam * u.dimensionless_unscaled
 
     def emflx(self, area, wavelengths=None):
         """Calculate
@@ -1631,7 +1629,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         t_lambda = self.tlambda(wavelengths=wavelengths)
 
         if t_lambda == 0:  # pragma: no cover
-            em_flux = u.Quantity(0.0, units.FLAM)
+            em_flux = 0.0 * units.FLAM
         else:
             uresp = self.unit_response(area, wavelengths=wavelengths)
             rectw = self.rectwidth(wavelengths=wavelengths).value

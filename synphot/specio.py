@@ -143,9 +143,8 @@ def read_ascii_spec(filename, wave_unit=u.AA, flux_unit=units.FLAM, **kwargs):
     wave_unit = units.validate_unit(wave_unit)
     flux_unit = units.validate_unit(flux_unit)
 
-    wavelengths = u.Quantity(dat.columns[0].data.astype(np.float64),
-                             unit=wave_unit)
-    fluxes = u.Quantity(dat.columns[1].data.astype(np.float64), unit=flux_unit)
+    wavelengths = dat.columns[0].data.astype(np.float64) * wave_unit
+    fluxes = dat.columns[1].data.astype(np.float64) * flux_unit
 
     return header, wavelengths, fluxes
 
@@ -212,8 +211,8 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
     wave_unit = units.validate_unit(wave_unit)
     flux_unit = units.validate_unit(flux_unit)
 
-    wavelengths = u.Quantity(wave_dat, unit=wave_unit)
-    fluxes = u.Quantity(flux_dat, unit=flux_unit)
+    wavelengths = wave_dat * wave_unit
+    fluxes = flux_dat * flux_unit
 
     if isinstance(filename, six.string_types):
         fs.close()
