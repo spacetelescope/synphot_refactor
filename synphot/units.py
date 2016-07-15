@@ -178,7 +178,7 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
 
     """
     if not isinstance(fluxes, u.Quantity):
-        fluxes = u.Quantity(fluxes, unit=PHOTLAM)
+        fluxes = fluxes * PHOTLAM
 
     out_flux_unit = validate_unit(out_flux_unit)
     out_flux_unit_name = out_flux_unit.to_string()
@@ -193,7 +193,7 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
 
     # Wavelengths must Quantity
     if not isinstance(wavelengths, u.Quantity):
-        wavelengths = u.Quantity(wavelengths, unit=u.AA)
+        wavelengths = wavelengths * u.AA
 
     eqv = u.spectral_density(wavelengths)
 
@@ -242,6 +242,7 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
             raise exceptions.SynphotError('Vega spectrum is missing.')
 
         flux_vega = vegaspec(wavelengths)
+
         out_flux = fluxes.to(
             out_flux_unit,
             equivalencies=spectral_density_vega(wavelengths, flux_vega))
@@ -253,7 +254,7 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
             raise exceptions.SynphotError(
                 'Area is compulsory for conversion involving count or OBMAG.')
         elif not isinstance(area, u.Quantity):
-            area = u.Quantity(area, unit=AREA)
+            area = area * AREA
 
         out_flux = fluxes.to(
             out_flux_unit,
@@ -263,7 +264,7 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
         raise u.UnitsError('{0} and {1} are not convertible'.format(
             fluxes.unit, out_flux_unit))
 
-    return u.Quantity(out_flux, unit=out_flux_unit)
+    return out_flux
 
 
 # ----------------- #
@@ -374,6 +375,6 @@ def validate_quantity(input_value, output_unit, equivalencies=[]):
     if isinstance(input_value, u.Quantity):
         output_value = input_value.to(output_unit, equivalencies=equivalencies)
     else:
-        output_value = u.Quantity(input_value, unit=output_unit)
+        output_value = input_value * output_unit
 
     return output_value

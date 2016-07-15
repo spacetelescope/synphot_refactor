@@ -63,12 +63,10 @@ class TestReadWriteFITS(object):
     def setup_class(self):
         self.epsilon = 0.00031
         self.outdir = tempfile.mkdtemp()
-        self.wave = u.Quantity(
-            [1000.0, 2000.0, 2000.0 + self.epsilon, 3000.0, 4000.0, 5000.0],
-            unit=u.AA, dtype=np.float64)
-        self.flux = u.Quantity(
-            [0.1, 100.2, 10.0, 0.0, 6.5, 1.2],
-            unit=units.PHOTLAM, dtype=np.float64)
+        self.wave = np.array([1000.0, 2000.0, 2000.0 + self.epsilon, 3000.0,
+                              4000.0, 5000.0], dtype=np.float64) * u.AA
+        self.flux = np.array([0.1, 100.2, 10.0, 0.0, 6.5, 1.2],
+                             dtype=np.float64) * units.PHOTLAM
         self.prihdr = {'PEDIGREE': 'DUMMY'}
         self.scihdr = {'SPEC_SRC': 'RANDOM'}
 

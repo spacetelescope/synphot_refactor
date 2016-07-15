@@ -51,11 +51,11 @@ def test_validate_wavelengths():
 
     # Valid wavelengths (descending)
     a = a[::-1]
-    wave = utils.validate_wavelengths(u.Quantity(a, u.micron))
+    wave = utils.validate_wavelengths(a * u.micron)
 
     # Invalid wavelengths
     with pytest.raises(exceptions.SynphotError):
-        utils.validate_wavelengths(u.Quantity(1.0, u.K))
+        utils.validate_wavelengths(1.0 * u.K)
     with pytest.raises(exceptions.ZeroWavelength):
         utils.validate_wavelengths(np.arange(10))
     with pytest.raises(exceptions.UnsortedWavelength):

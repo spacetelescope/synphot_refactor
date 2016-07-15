@@ -38,7 +38,7 @@ class TestThermalSpectralElement(object):
             th2 = self.th.taper()
 
     def test_properties(self):
-        assert self.th.temperature == u.Quantity(237.3, u.K)
+        assert self.th.temperature == 237.3 * u.K
         assert self.th.beam_fill_factor == 1
 
     def test_thermal_source(self):

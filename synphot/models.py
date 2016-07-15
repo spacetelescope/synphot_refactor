@@ -54,8 +54,7 @@ class BlackBody1D(Fittable1DModel):
     def lambda_max(self):
         """Peak wavelength in Angstrom when the curve is expressed as
         power density."""
-        return u.Quantity(const.b_wien.value / self.temperature, u.m).to(
-            u.AA).value
+        return ((const.b_wien.value / self.temperature) * u.m).to(u.AA).value
 
     def bounding_box(self, factor=10.0):
         """Tuple defining the default ``bounding_box`` limits,
@@ -125,7 +124,7 @@ class BlackBody1D(Fittable1DModel):
         # Silence Numpy
         old_np_err_cfg = np.seterr(all='ignore')
 
-        wave = u.Quantity(np.ascontiguousarray(x), unit=u.AA)
+        wave = np.ascontiguousarray(x) * u.AA
         bbnu_flux = blackbody_nu(wave, temperature)
         bbflux = (bbnu_flux * u.sr).to(
             units.PHOTLAM, u.spectral_density(wave)) / u.sr  # PHOTLAM/sr
@@ -235,7 +234,7 @@ class ConstFlux1D(_models.Const1D):
     """
     def __init__(self, amplitude, **kwargs):
         if not isinstance(amplitude, u.Quantity):
-            amplitude = u.Quantity(amplitude, units.PHOTLAM)
+            amplitude = amplitude * units.PHOTLAM
 
         if amplitude.unit == u.STmag:
             a = units.convert_flux(1, amplitude, units.FLAM)
@@ -266,7 +265,7 @@ class ConstFlux1D(_models.Const1D):
             Flux in PHOTLAM.
 
         """
-        a = u.Quantity(self.amplitude * np.ones_like(x), self._flux_unit)
+        a = (self.amplitude * np.ones_like(x)) * self._flux_unit
         y = units.convert_flux(x, a, units.PHOTLAM)
         return y.value
 
@@ -567,7 +566,7 @@ class PowerLawFlux1D(_models.PowerLaw1D):
     """
     def __init__(self, amplitude, x_0, alpha, **kwargs):
         if not isinstance(amplitude, u.Quantity):
-            amplitude = u.Quantity(amplitude, units.PHOTLAM)
+            amplitude = amplitude * units.PHOTLAM
 
         if (amplitude.unit.physical_type in
                 ('spectral flux density', 'spectral flux density wav',
@@ -586,7 +585,7 @@ class PowerLawFlux1D(_models.PowerLaw1D):
     def evaluate(self, x, *args):
         """Return flux in PHOTLAM. Assume input wavelength is in Angstrom."""
         xx = x / self.x_0
-        y = u.Quantity(self.amplitude * xx ** (-self.alpha), self._flux_unit)
+        y = (self.amplitude * xx ** (-self.alpha)) * self._flux_unit
         flux = units.convert_flux(x, y, units.PHOTLAM)
         return flux.value
 

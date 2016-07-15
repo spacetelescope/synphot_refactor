@@ -177,7 +177,7 @@ class Observation(BaseSourceSpectrum):
         binflux, intwave = binning.calcbinflux(
             self._binset.size, i_beg, i_end, avflux, deltaw)
 
-        self._binflux = u.Quantity(binflux, flux.unit)
+        self._binflux = binflux * flux.unit
 
     @property
     def spectrum(self):
@@ -300,14 +300,13 @@ class Observation(BaseSourceSpectrum):
         """
         # Calculation is done in the unit of cenwave.
         if not isinstance(cenwave, u.Quantity):
-            cenwave = u.Quantity(cenwave, self._internal_wave_unit)
+            cenwave = cenwave * self._internal_wave_unit
 
         bin_wave = units.validate_quantity(
             self.binset, cenwave.unit, equivalencies=u.spectral())
 
-        return u.Quantity(
-            binning.wave_range(bin_wave.value, cenwave.value, npix, **kwargs),
-            cenwave.unit)
+        return binning.wave_range(
+            bin_wave.value, cenwave.value, npix, **kwargs) * cenwave.unit
 
     def binned_pixelrange(self, waverange, **kwargs):
         """Calculate the number of pixels within the given wavelength
@@ -391,7 +390,7 @@ class Observation(BaseSourceSpectrum):
         else:
             eff_lam = abs(num / den)
 
-        return u.Quantity(eff_lam, self._internal_wave_unit)
+        return eff_lam * self._internal_wave_unit
 
     def effstim(self, flux_unit=units.PHOTLAM, wavelengths=None, binned=False,
                 area=None, vegaspec=None, waverange=None, force=False):
@@ -537,9 +536,9 @@ class Observation(BaseSourceSpectrum):
             utils.validate_totalflux(val)
 
             if flux_unit.decompose() == u.mag:
-                eff_stim = u.Quantity(-2.5 * np.log10(val), flux_unit)
+                eff_stim = (-2.5 * np.log10(val)) * flux_unit
             else:
-                eff_stim = u.Quantity(val, u.count / u.s)
+                eff_stim = val * (u.count / u.s)
 
         # Density flux units and VEGAMAG
         else:
@@ -556,12 +555,12 @@ class Observation(BaseSourceSpectrum):
 
             # Convert back to mag, if needed
             if flux_unit in (u.STmag, u.ABmag):
-                eff_stim = units.convert_flux(
-                    1, u.Quantity(val, eff_flux_unit), flux_unit)
+                eff_stim = units.convert_flux(1, val * eff_flux_unit,
+                                              flux_unit)
             elif flux_unit_name == units.VEGAMAG.to_string():
-                eff_stim = u.Quantity(-2.5 * np.log10(val), flux_unit)
+                eff_stim = (-2.5 * np.log10(val)) * flux_unit
             else:
-                eff_stim = u.Quantity(val, flux_unit)
+                eff_stim = val * flux_unit
 
         return eff_stim
 

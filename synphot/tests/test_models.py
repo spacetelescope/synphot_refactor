@@ -69,8 +69,8 @@ class TestConstFlux1D(object):
 
     @pytest.mark.parametrize(
         'amplitude',
-        [1, u.Quantity(1, units.PHOTNU), u.Quantity(1, units.FLAM),
-         u.Quantity(1, units.FNU), u.Quantity(1, u.Jy), u.Quantity(1, u.mJy)])
+        [1, 1 * units.PHOTNU, 1 * units.FLAM, 1 * units.FNU,
+         1 * u.Jy, 1 * u.mJy])
     def test_linear(self, amplitude):
         if isinstance(amplitude, u.Quantity):
             ans = amplitude.value
@@ -80,8 +80,7 @@ class TestConstFlux1D(object):
             flux_unit = units.PHOTLAM
 
         m = ConstFlux1D(amplitude=amplitude)
-        f = units.convert_flux(
-            self.w, u.Quantity(m(self.w), units.PHOTLAM), flux_unit)
+        f = units.convert_flux(self.w, m(self.w) * units.PHOTLAM, flux_unit)
 
         assert m._flux_unit == flux_unit
         np.testing.assert_allclose(f.value, ans)
@@ -91,9 +90,8 @@ class TestConstFlux1D(object):
         [(u.STmag, units.FLAM, 3.63e-9),
          (u.ABmag, units.FNU, 3.63e-20)])
     def test_mag(self, in_unit, out_unit, val):
-        m = ConstFlux1D(amplitude=u.Quantity(0, in_unit))
-        f = units.convert_flux(
-            self.w, u.Quantity(m(self.w), units.PHOTLAM), out_unit)
+        m = ConstFlux1D(amplitude=0*in_unit)
+        f = units.convert_flux(self.w, m(self.w) * units.PHOTLAM, out_unit)
         np.testing.assert_allclose(f.value, val, rtol=2.5e-4)
 
     def test_multi_n_models(self):
@@ -104,7 +102,7 @@ class TestConstFlux1D(object):
         'flux_unit', [u.count, units.OBMAG, units.VEGAMAG, u.AA])
     def test_invalid_units(self, flux_unit):
         with pytest.raises(NotImplementedError):
-            m = ConstFlux1D(amplitude=u.Quantity(1, flux_unit))
+            m = ConstFlux1D(amplitude=1*flux_unit)
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -180,11 +178,10 @@ class TestPowerLawFlux1D(object):
 
     def test_multi_n_models(self):
         m2 = PowerLawFlux1D(
-            amplitude=u.Quantity([1, 1], units.FLAM),
-            x_0=u.Quantity([0.3, 0.305], u.micron), alpha=[4, 1], n_models=2)
+            amplitude=[1, 1]*units.FLAM, x_0=[0.3, 0.305]*u.micron,
+            alpha=[4, 1], n_models=2)
         y = units.convert_flux(
-            self.w,
-            u.Quantity(m2(self.w, model_set_axis=False), units.PHOTLAM),
+            self.w, m2(self.w, model_set_axis=False) * units.PHOTLAM,
             units.FLAM)
         ans = [[1, 0.98677704, 0.97377192, 0.96098034, 0.94839812,
                 0.93602115, 0.92384543, 0.91186704, 0.90008216, 0.88848705],
@@ -202,5 +199,4 @@ class TestPowerLawFlux1D(object):
         'flux_unit', [u.count, units.OBMAG, units.VEGAMAG, u.AA])
     def test_invalid_units(self, flux_unit):
         with pytest.raises(NotImplementedError):
-            m = PowerLawFlux1D(
-                amplitude=u.Quantity(1, flux_unit), x_0=5000, alpha=4)
+            m = PowerLawFlux1D(amplitude=1*flux_unit, x_0=5000, alpha=4)

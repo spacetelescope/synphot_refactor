@@ -76,7 +76,7 @@ def calculate_bin_edges(centers):
 
     """
     if not isinstance(centers, u.Quantity):
-        centers = u.Quantity(centers, unit=u.AA)
+        centers = centers * u.AA
 
     if centers.ndim != 1:
         raise exceptions.SynphotError('Bin centers must be 1D array.')
@@ -92,7 +92,7 @@ def calculate_bin_edges(centers):
     edges[0] = 2.0 * centers.value[0] - edges[1]
     edges[-1] = 2.0 * centers.value[-1] - edges[-2]
 
-    return u.Quantity(edges, unit=centers.unit)
+    return edges * centers.unit
 
 
 def calculate_bin_widths(edges):
@@ -117,7 +117,7 @@ def calculate_bin_widths(edges):
 
     """
     if not isinstance(edges, u.Quantity):
-        edges = u.Quantity(edges, unit=u.AA)
+        edges = edges * u.AA
 
     if edges.ndim != 1:
         raise exceptions.SynphotError('Bin edges must be 1D array.')
@@ -151,7 +151,7 @@ def calculate_bin_centers(edges):
 
     """
     if not isinstance(edges, u.Quantity):
-        edges = u.Quantity(edges, unit=u.AA)
+        edges = edges * u.AA
 
     if edges.ndim != 1:
         raise exceptions.SynphotError('Bin edges must be 1D array.')
@@ -166,7 +166,7 @@ def calculate_bin_centers(edges):
     for i in six.moves.range(1, centers.size):
         centers[i] = 2.0 * edges.value[i] - centers[i - 1]
 
-    return u.Quantity(centers, unit=edges.unit)
+    return centers * edges.unit
 
 
 def wave_range(bins, cenwave, npix, mode='round'):

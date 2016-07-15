@@ -41,7 +41,7 @@ class TestObservation(object):
     """Test Observation (most of them)."""
     def setup_class(self):
         sp = SourceSpectrum(
-            ConstFlux1D, amplitude=u.Quantity(1, units.FLAM),
+            ConstFlux1D, amplitude=1*units.FLAM,
             meta={'warnings': {'w1': 'spec warn', 'w2': 'foo'}})
         bp = SpectralElement.from_file(_bandfile)
         bp.warnings = {'w1': 'band warn'}
@@ -325,7 +325,7 @@ class TestCountRate(object):
     def setup_class(self):
         x = np.arange(1000, 1100, 0.5)
         y = units.convert_flux(
-            x, u.Quantity(x - 1000, u.count), units.PHOTLAM, area=_area).value
+            x, (x - 1000) * u.count, units.PHOTLAM, area=_area).value
         sp = SourceSpectrum(Empirical1D, x=x, y=y, meta={'expr': 'slope1'})
         bp = SpectralElement(
             Empirical1D, x=[1009.95, 1010, 1030, 1030.05],

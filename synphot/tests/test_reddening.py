@@ -65,7 +65,7 @@ class TestExtinction(object):
         """
         sp = SourceSpectrum(ConstFlux1D, amplitude=1)
         sp2 = self.extcurve * sp
-        w = u.Quantity(5.03399992, u.micron ** -1)
+        w = 5.03399992 * (u.micron ** -1)
         ans = self.extcurve(w).value
         np.testing.assert_allclose(sp2(w).value, ans, rtol=1e-6)
 
