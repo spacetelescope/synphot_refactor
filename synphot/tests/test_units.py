@@ -148,10 +148,7 @@ def test_flux_conversion(in_q, out_u, ans):
     """Test flux conversion, except VEGAMAG."""
     result = units.convert_flux(_wave, in_q, out_u, area=_area)
     np.testing.assert_allclose(result.value, ans.value, rtol=1e-6)
-    try:
-        assert result.unit == ans.unit
-    except AssertionError:  # For STMAG and ABMAG (astropy/astropy#5178)
-        assert result.unit.to_string() == ans.unit.to_string()
+    assert result.unit == ans.unit
 
 
 def test_flux_conversion_exceptions():
