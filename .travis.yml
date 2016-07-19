@@ -62,9 +62,9 @@ matrix:
         #- python: 3.5
         #  env: ASTROPY_VERSION=development
 
-        # Do a PEP8 test
-        - python: 2.7
-          env: MAIN_CMD='pep8 synphot --count' SETUP_CMD=''
+        # Do a PEP8 test with pycodestyle
+        - python: 3.5
+          env: MAIN_CMD='pycodestyle synphot --count' SETUP_CMD=''
 
 before_install:
 
