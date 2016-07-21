@@ -163,6 +163,9 @@ class Observation(BaseSourceSpectrum):
         if self.waveset is not None:
             spwave = utils.merge_wavelengths(spwave, self.waveset.value)
 
+        # Throw out invalid wavelengths after merging.
+        spwave = spwave[spwave > 0]
+
         # Compute indices associated to each endpoint.
         indices = np.searchsorted(spwave, self._bin_edges.value)
         i_beg = indices[:-1]
