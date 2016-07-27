@@ -382,7 +382,7 @@ class BaseSpectrum(object):
         """Divide self by other."""
         raise NotImplementedError('This operation is not supported.')
 
-    def __div__(self, other):
+    def __div__(self, other):  # pragma: no cover
         """Same as :func:`__truediv__`."""
         return self.__truediv__(other)
 
@@ -930,7 +930,7 @@ class BaseSourceSpectrum(BaseSpectrum):
         if (renorm_val.unit == u.count or
                 renorm_unit_name == units.OBMAG.to_string()):
             # Special handling for non-density units
-            flux_tmp = units.convert_flux(w, sp(w), u.count, area=area)
+            flux_tmp = sp(w, flux_unit=u.count, area=area)
             totalflux = flux_tmp.sum()
             stdflux = 1.0
         else:
@@ -952,7 +952,10 @@ class BaseSourceSpectrum(BaseSpectrum):
                     ConstFlux1D, amplitude=1*renorm_val.unit)
 
             if band is None:
-                stdflux = stdspec.integrate(wavelengths=w).value
+                # TODO: Cannot get this to agree with results
+                # from using a very large box bandpass.
+                #stdflux = stdspec.integrate(wavelengths=w).value  # noqa
+                raise NotImplementedError('Must provide a bandpass')
             else:
                 up = stdspec * band
                 stdflux = up.integrate(wavelengths=wavelengths).value
@@ -1220,7 +1223,7 @@ class BaseUnitlessSpectrum(BaseSpectrum):
         return self._process_generic_param(pval, self._internal_flux_unit)
 
     @staticmethod
-    def _validate_flux_unit(new_unit):
+    def _validate_flux_unit(new_unit):  # pragma: no cover
         """Make sure flux unit is valid."""
         new_unit = units.validate_unit(new_unit)
 
