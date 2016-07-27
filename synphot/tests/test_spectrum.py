@@ -106,6 +106,15 @@ class TestEmpiricalSourceFromFile(object):
         with pytest.raises(exceptions.SynphotError):
             sp = SourceSpectrum(Empirical1D, x=_wave, y=_flux_vegamag)
 
+    def test_invalid_models(self):
+        # Test not a Model subclass
+        with pytest.raises(exceptions.SynphotError):
+            sp = SourceSpectrum(fits.HDUList)
+
+        # Test unsupported model
+        with pytest.raises(exceptions.SynphotError):
+            sp = SourceSpectrum(RedshiftScaleFactor)
+
     def test_metadata(self):
         assert 'SourceSpectrum' in str(self.sp)
         assert self.sp.meta['header']['SIMPLE']  # From FITS header
@@ -131,7 +140,7 @@ class TestEmpiricalSourceFromFile(object):
 
     def test_conversion(self):
         x = 0.60451641 * u.micron
-        w, y = self.sp._get_arrays(x, units.FNU)
+        w, y = self.sp._get_arrays(x, flux_unit=units.FNU)
         np.testing.assert_allclose(x.value, w.value)
         np.testing.assert_allclose(y.value, 2.282950185743497e-26, rtol=1e-6)
 
@@ -152,7 +161,7 @@ class TestEmpiricalSourceFromFile(object):
         # Tapering is done
         sp2 = SourceSpectrum(Empirical1D, x=_wave, y=_flux_photlam)
         sp = sp2.taper()
-        x, y = sp._get_arrays(None, units.FLAM)
+        x, y = sp._get_arrays(None, flux_unit=units.FLAM)
         np.testing.assert_allclose(
             x.value, [4954.05152484, 4956.8, 4959.55, 4962.3, 4965.05152484])
         np.testing.assert_allclose(
@@ -300,6 +309,11 @@ class TestBoxBandpass(object):
         np.testing.assert_allclose(self.bp.fwhm().value, 67.977,
                                    rtol=1e-3)  # 0.1%
 
+    def test_taper(self):
+        bp2 = self.bp.taper(np.arange(499, 501.01, 0.01) * u.nm)
+        y = bp2([498.9, 499, 500, 501, 501.1] * u.nm)
+        np.testing.assert_allclose(y.value, [0, 1, 1, 1, 0])
+
     def test_multi_n_models(self):
         """This is not allowed."""
         with pytest.raises(exceptions.SynphotError):
@@ -364,6 +378,12 @@ class TestPowerLawSource(object):
     def setup_class(self):
         self.sp = SourceSpectrum(PowerLawFlux1D, amplitude=1, x_0=6000,
                                  alpha=4)
+
+    def test_no_default_wave(self):
+        assert self.sp.waverange == [None, None]
+
+        with pytest.raises(exceptions.SynphotError):
+            self.sp(None)
 
     def test_eval(self):
         w = np.arange(3000, 3100, 10)
@@ -577,7 +597,7 @@ class TestNormalize(object):
                              vegaspec=_vspec)
         self._compare_countrate(rn_sp, ans_countrate)
 
-    def test_renorm_noband(self):
+    def test_renorm_noband_count(self):
         """No bandpass. This option is not offered by ASTROLIB PYSYNPHOT
         but can be indirectly calculated using a very large box as bandpass.
 
@@ -586,6 +606,19 @@ class TestNormalize(object):
         x = rn_sp.integrate(flux_unit=u.ct, area=_area)
         ans = 10.615454634451927
         np.testing.assert_allclose(x.value, ans, rtol=1e-3)
+
+    def test_renorm_noband_jy(self):
+        """Replace this with real test when it is implemented."""
+        with pytest.raises(NotImplementedError):
+            rn_sp = self.em.normalize(1e-23 * u.Jy)
+
+    def test_renorm_partial_most(self):
+        """Test 'partial_most' overlap."""
+        bp = SpectralElement(Box1D, amplitude=1, x_0=5600, width=970)
+        rn_sp = self.em.normalize(1e-23 * u.Jy, band=bp)
+        assert 'PartialRenorm' in rn_sp.warnings
+        assert 'PartialRenorm' not in self.em.warnings
+        assert '99%' in rn_sp.warnings['PartialRenorm']
 
     def test_exceptions(self):
         # Invalid passband

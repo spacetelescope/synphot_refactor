@@ -266,7 +266,7 @@ class TestObsPar(object):
         ('flux_unit', 'ans'),
         [(units.FLAM, 3.05E-14),
          (units.FNU, 2.92E-25),
-         (units.PHOTLAM, 0.008245),
+         (None, 0.008245),
          (units.PHOTNU, 7.82E-14),
          (u.count, 101462.5),
          (u.Jy, 0.029196),

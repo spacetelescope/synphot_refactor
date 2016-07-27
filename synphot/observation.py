@@ -225,8 +225,7 @@ class Observation(BaseSourceSpectrum):
             wavelengths = self._validate_wavelengths(wave)
         return wavelengths
 
-    def sample_binned(self, wavelengths=None, flux_unit=units.PHOTLAM,
-                      **kwargs):
+    def sample_binned(self, wavelengths=None, flux_unit=None, **kwargs):
         """Sample binned observation without interpolation.
 
         To sample unbinned data, use ``__call__``.
@@ -238,8 +237,9 @@ class Observation(BaseSourceSpectrum):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `binset` is used.
 
-        flux_unit : str or `~astropy.units.core.Unit`
+        flux_unit : str or `~astropy.units.core.Unit` or `None`
             Flux is converted to this unit.
+            If not given, internal unit is used.
 
         kwargs : dict
             Keywords acceptable by :func:`~synphot.units.convert_flux`.
@@ -261,7 +261,13 @@ class Observation(BaseSourceSpectrum):
             raise exceptions.InterpolationNotAllowed(
                 'Some or all wavelength values are not in binset.')
         y = self.binflux[i]
-        return units.convert_flux(x, y, flux_unit, **kwargs)
+
+        if flux_unit is None:
+            flux = y
+        else:
+            flux = units.convert_flux(x, y, flux_unit, **kwargs)
+
+        return flux
 
     def _get_binned_arrays(self, wavelengths, flux_unit, area=None,
                            vegaspec=None):
@@ -395,7 +401,7 @@ class Observation(BaseSourceSpectrum):
 
         return eff_lam * self._internal_wave_unit
 
-    def effstim(self, flux_unit=units.PHOTLAM, wavelengths=None, binned=False,
+    def effstim(self, flux_unit=None, wavelengths=None, binned=False,
                 area=None, vegaspec=None, waverange=None, force=False):
         """Calculate :ref:`effective stimulus <synphot-formula-effstim>`.
 
@@ -404,9 +410,10 @@ class Observation(BaseSourceSpectrum):
 
         Parameters
         ----------
-        flux_unit : str or `~astropy.units.core.Unit`
+        flux_unit : str or `~astropy.units.core.Unit` or `None`
             The unit of effective stimulus.
             COUNT gives result in count/s.
+            If not given, internal unit is used.
 
         wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for sampling.
@@ -449,6 +456,9 @@ class Observation(BaseSourceSpectrum):
             Calculation failed.
 
         """
+        if flux_unit is None:
+            flux_unit = self._internal_flux_unit
+
         flux_unit = units.validate_unit(flux_unit)
         flux_unit_name = flux_unit.to_string()
 
@@ -595,8 +605,8 @@ class Observation(BaseSourceSpectrum):
             flux_unit=u.count, wavelengths=wavelengths, binned=binned,
             area=area, waverange=waverange, force=force)
 
-    def plot(self, binned=True, wavelengths=None, flux_unit=units.PHOTLAM,
-             area=None, vegaspec=None, **kwargs):  # pragma: no cover
+    def plot(self, binned=True, wavelengths=None, flux_unit=None, area=None,
+             vegaspec=None, **kwargs):  # pragma: no cover
         """Plot the observation.
 
         .. note:: Uses ``matplotlib``.
@@ -613,8 +623,9 @@ class Observation(BaseSourceSpectrum):
             If `None`, ``self.waveset`` or `binset` is used, depending
             on ``binned``.
 
-        flux_unit : str or `~astropy.units.core.Unit`
+        flux_unit : str or `~astropy.units.core.Unit` or `None`
             Flux is converted to this unit for plotting.
+            If not given, internal unit is used.
 
         area, vegaspec
             See :func:`~synphot.units.convert_flux`.
@@ -632,8 +643,8 @@ class Observation(BaseSourceSpectrum):
             w, y = self._get_binned_arrays(wavelengths, flux_unit, area=area,
                                            vegaspec=vegaspec)
         else:
-            w, y = self._get_arrays(wavelengths, flux_unit, area=area,
-                                    vegaspec=vegaspec)
+            w, y = self._get_arrays(wavelengths, flux_unit=flux_unit,
+                                    area=area, vegaspec=vegaspec)
         self._do_plot(w, y, **kwargs)
 
     def as_spectrum(self, binned=True, wavelengths=None):
@@ -669,7 +680,8 @@ class Observation(BaseSourceSpectrum):
             w, y = self._get_binned_arrays(
                 wavelengths, self._internal_flux_unit)
         else:
-            w, y = self._get_arrays(wavelengths, self._internal_flux_unit)
+            w, y = self._get_arrays(
+                wavelengths, flux_unit=self._internal_flux_unit)
 
         header = {'observation': str(self), 'binned': binned}
         return SourceSpectrum(Empirical1D, x=w, y=y, meta={'header': header})
