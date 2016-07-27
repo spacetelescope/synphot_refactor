@@ -353,8 +353,7 @@ class BaseSpectrum(object):
         Returns
         -------
         sampled_result : `~astropy.units.quantity.Quantity`
-            Sampled flux or throughput in pre-defined internal unit
-            that is in-sync with given wavelengths.
+            Sampled flux or throughput in pre-defined internal unit.
             Might have negative values.
 
         """
@@ -665,10 +664,10 @@ class BaseSpectrum(object):
 
         return self.__class__(Empirical1D, x=x, y=y)
 
-    def _get_arrays(self, wavelengths):
+    def _get_arrays(self, wavelengths, **kwargs):
         """Get sampled spectrum or bandpass in user units."""
         x = self._validate_wavelengths(wavelengths)
-        y = self(x)
+        y = self(x, **kwargs)
 
         if isinstance(wavelengths, u.Quantity):
             w = x.to(wavelengths.unit, u.spectral())
@@ -862,18 +861,32 @@ class BaseSourceSpectrum(BaseSpectrum):
 
         return result
 
-    def _get_arrays(self, wavelengths, flux_unit, area=None, vegaspec=None):
-        """Get sampled spectrum or bandpass in user units."""
-        x = self._validate_wavelengths(wavelengths)
-        y = units.convert_flux(x, self(x), flux_unit,
-                               area=area, vegaspec=vegaspec)
+    def __call__(self, wavelengths, flux_unit=self._internal_flux_unit,
+                 **kwargs):
+        """Sample the spectrum.
 
-        if isinstance(wavelengths, u.Quantity):
-            w = x.to(wavelengths.unit, u.spectral())
-        else:
-            w = x
+        Parameters
+        ----------
+        wavelengths : array-like or `~astropy.units.quantity.Quantity`
+            Wavelength values for sampling. If not a Quantity,
+            assumed to be in Angstrom.
 
-        return w, y
+        flux_unit : str or `~astropy.units.core.Unit`
+            Flux is converted to this unit.
+
+        kwargs : dict
+            Keywords acceptable by :func:`~synphot.units.convert_flux`.
+
+        Returns
+        -------
+        sampled_result : `~astropy.units.quantity.Quantity`
+            Sampled flux in the given unit.
+            Might have negative values.
+
+        """
+        w = self._validate_wavelengths(wavelengths)
+        y = self.model(w.value) * self._internal_flux_unit
+        return units.convert_flux(w, y, flux_unit, **kwargs)
 
     def normalize(self, renorm_val, band=None, wavelengths=None, force=False,
                   area=None, vegaspec=None):
@@ -1154,7 +1167,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             Invalid inputs.
 
         """
-        w, y = self._get_arrays(wavelengths, flux_unit, area=area,
+        w, y = self._get_arrays(wavelengths, flux_unit=flux_unit, area=area,
                                 vegaspec=vegaspec)
         self._do_plot(w, y, **kwargs)
 
@@ -1182,7 +1195,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             Keywords accepted by :func:`~synphot.specio.write_fits_spec`.
 
         """
-        w, y = self._get_arrays(wavelengths, flux_unit, area=area,
+        w, y = self._get_arrays(wavelengths, flux_unit=flux_unit, area=area,
                                 vegaspec=vegaspec)
 
         # There are some standard keywords that should be added

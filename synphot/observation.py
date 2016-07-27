@@ -632,8 +632,8 @@ class Observation(BaseSourceSpectrum):
             w, y = self._get_binned_arrays(wavelengths, flux_unit, area=area,
                                            vegaspec=vegaspec)
         else:
-            w, y = self._get_arrays(wavelengths, flux_unit, area=area,
-                                    vegaspec=vegaspec)
+            w, y = self._get_arrays(wavelengths, flux_unit=flux_unit,
+                                    area=area, vegaspec=vegaspec)
         self._do_plot(w, y, **kwargs)
 
     def as_spectrum(self, binned=True, wavelengths=None):
@@ -669,7 +669,8 @@ class Observation(BaseSourceSpectrum):
             w, y = self._get_binned_arrays(
                 wavelengths, self._internal_flux_unit)
         else:
-            w, y = self._get_arrays(wavelengths, self._internal_flux_unit)
+            w, y = self._get_arrays(
+                wavelengths, flux_unit=self._internal_flux_unit)
 
         header = {'observation': str(self), 'binned': binned}
         return SourceSpectrum(Empirical1D, x=w, y=y, meta={'header': header})
