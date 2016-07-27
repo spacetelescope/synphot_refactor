@@ -131,7 +131,7 @@ class TestEmpiricalSourceFromFile(object):
 
     def test_conversion(self):
         x = 0.60451641 * u.micron
-        w, y = self.sp._get_arrays(x, units.FNU)
+        w, y = self.sp._get_arrays(x, flux_unit=units.FNU)
         np.testing.assert_allclose(x.value, w.value)
         np.testing.assert_allclose(y.value, 2.282950185743497e-26, rtol=1e-6)
 
@@ -152,7 +152,7 @@ class TestEmpiricalSourceFromFile(object):
         # Tapering is done
         sp2 = SourceSpectrum(Empirical1D, x=_wave, y=_flux_photlam)
         sp = sp2.taper()
-        x, y = sp._get_arrays(None, units.FLAM)
+        x, y = sp._get_arrays(None, flux_unit=units.FLAM)
         np.testing.assert_allclose(
             x.value, [4954.05152484, 4956.8, 4959.55, 4962.3, 4965.05152484])
         np.testing.assert_allclose(

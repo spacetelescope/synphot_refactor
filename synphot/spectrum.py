@@ -386,7 +386,7 @@ class BaseSpectrum(object):
         """Same as :func:`__truediv__`."""
         return self.__truediv__(other)
 
-    def integrate(self, wavelengths=None):
+    def integrate(self, wavelengths=None, **kwargs):
         """Perform integration.
 
         This uses any analytical integral that the
@@ -394,7 +394,7 @@ class BaseSpectrum(object):
         If unavailable, it uses the default fall-back integrator
         set in the ``default_integrator`` configuration item.
 
-        If wavelengths are provided, flux is first resampled.
+        If wavelengths are provided, flux or throughput is first resampled.
         This is useful when user wants to integrate at specific end points
         or use custom spacing; In that case, user can pass in desired
         sampling array generated with :func:`numpy.linspace`,
@@ -408,10 +408,13 @@ class BaseSpectrum(object):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
 
+        kwargs : dict
+            Optional keywords to ``__call__`` for sampling.
+
         Returns
         -------
         result : `~astropy.units.quantity.Quantity`
-            Integrated result in pre-defined internal unit.
+            Integrated result.
 
         Raises
         ------
@@ -432,7 +435,7 @@ class BaseSpectrum(object):
             m = self.model.integral
         except (AttributeError, NotImplementedError):
             if conf.default_integrator == 'trapezoid':
-                y = self(x)
+                y = self(x, **kwargs)
                 result = abs(np.trapz(y.value, x=x.value)) * y.unit
             else:  # pragma: no cover
                 raise NotImplementedError(
@@ -795,74 +798,7 @@ class BaseSourceSpectrum(BaseSpectrum):
 
         return new_unit
 
-    def integrate(self, wavelengths=None, flux_unit=units.PHOTLAM, **kwargs):
-        """Perform integration.
-
-        This uses any analytical integral that the
-        underlying model has (i.e., ``self.model.analytic_integral()``).
-        If unavailable, it uses the default fall-back integrator
-        set in the ``default_integrator`` configuration item.
-
-        If wavelengths are provided, flux is first resampled.
-        This is useful when user wants to integrate at specific end points
-        or use custom spacing; In that case, user can pass in desired
-        sampling array generated with :func:`numpy.linspace`,
-        :func:`numpy.logspace`, etc.
-        If not provided, then `waveset` is used.
-
-        Parameters
-        ----------
-        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
-            Wavelength values for integration.
-            If not a Quantity, assumed to be in Angstrom.
-            If `None`, ``self.waveset`` is used.
-
-        flux_unit : str or `~astropy.units.core.Unit`
-            Flux is converted to this unit first prior to integration.
-
-        kwargs : dict
-            Keywords accepted by :func:`~synphot.units.convert_flux`.
-
-        Returns
-        -------
-        result : `~astropy.units.quantity.Quantity`
-            Integrated result in the given flux unit.
-            It is zero if calculations failed.
-
-        Raises
-        ------
-        NotImplementedError
-            Invalid default integrator.
-
-        synphot.exceptions.SynphotError
-            ``self.waveset`` is needed but undefined.
-
-        """
-        x = self._validate_wavelengths(wavelengths)
-
-        # TODO: When astropy.modeling.models supports this, need to
-        #       make sure that this actually works, and gives correct unit.
-        # https://github.com/astropy/astropy/issues/5033
-        # https://github.com/astropy/astropy/pull/5108
-        try:
-            m = self.model.integral
-        except (AttributeError, NotImplementedError):
-            if conf.default_integrator == 'trapezoid':
-                y = units.convert_flux(x, self(x), flux_unit, **kwargs)
-                result = abs(np.trapz(y.value, x=x.value)) * flux_unit
-            else:  # pragma: no cover
-                raise NotImplementedError(
-                    'Analytic integral not available and default integrator '
-                    '{0} is not supported'.format(conf.default_integrator))
-        else:
-            start = x[0].value
-            stop = x[-1].value
-            result = (m(stop) - m(start)) * self._internal_flux_unit
-
-        return result
-
-    def __call__(self, wavelengths, flux_unit=self._internal_flux_unit,
-                 **kwargs):
+    def __call__(self, wavelengths, flux_unit=None, **kwargs):
         """Sample the spectrum.
 
         Parameters
@@ -871,8 +807,9 @@ class BaseSourceSpectrum(BaseSpectrum):
             Wavelength values for sampling. If not a Quantity,
             assumed to be in Angstrom.
 
-        flux_unit : str or `~astropy.units.core.Unit`
+        flux_unit : str or `~astropy.units.core.Unit` or `None`
             Flux is converted to this unit.
+            If not given, internal unit is used.
 
         kwargs : dict
             Keywords acceptable by :func:`~synphot.units.convert_flux`.
@@ -886,7 +823,13 @@ class BaseSourceSpectrum(BaseSpectrum):
         """
         w = self._validate_wavelengths(wavelengths)
         y = self.model(w.value) * self._internal_flux_unit
-        return units.convert_flux(w, y, flux_unit, **kwargs)
+
+        if flux_unit is None:
+            sampled_result = y
+        else:
+            sampled_result = units.convert_flux(w, y, flux_unit, **kwargs)
+
+        return sampled_result
 
     def normalize(self, renorm_val, band=None, wavelengths=None, force=False,
                   area=None, vegaspec=None):
@@ -1139,8 +1082,8 @@ class SourceSpectrum(BaseSourceSpectrum):
         self._merge_meta(self, other, newcls)
         return newcls
 
-    def plot(self, wavelengths=None, flux_unit=units.PHOTLAM, area=None,
-             vegaspec=None, **kwargs):  # pragma: no cover
+    def plot(self, wavelengths=None, flux_unit=None, area=None, vegaspec=None,
+             **kwargs):  # pragma: no cover
         """Plot the spectrum.
 
         .. note:: Uses :mod:`matplotlib`.
@@ -1152,8 +1095,9 @@ class SourceSpectrum(BaseSourceSpectrum):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
 
-        flux_unit : str or `~astropy.units.core.Unit`
+        flux_unit : str or `~astropy.units.core.Unit` or `None`
             Flux is converted to this unit for plotting.
+            If not given, internal unit is used.
 
         area, vegaspec
             See :func:`~synphot.units.convert_flux`.
@@ -1171,8 +1115,8 @@ class SourceSpectrum(BaseSourceSpectrum):
                                 vegaspec=vegaspec)
         self._do_plot(w, y, **kwargs)
 
-    def to_fits(self, filename, wavelengths=None, flux_unit=units.PHOTLAM,
-                area=None, vegaspec=None, **kwargs):
+    def to_fits(self, filename, wavelengths=None, flux_unit=None, area=None,
+                vegaspec=None, **kwargs):
         """Write the spectrum to a FITS file.
 
         Parameters
@@ -1185,8 +1129,9 @@ class SourceSpectrum(BaseSourceSpectrum):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
 
-        flux_unit : str or `~astropy.units.core.Unit`
+        flux_unit : str or `~astropy.units.core.Unit` or `None`
             Flux is converted to this unit before written out.
+            If not given, internal unit is used.
 
         area, vegaspec
             See :func:`~synphot.units.convert_flux`.
