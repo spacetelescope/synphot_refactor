@@ -954,7 +954,7 @@ class BaseSourceSpectrum(BaseSpectrum):
             if band is None:
                 # TODO: Cannot get this to agree with results
                 # from using a very large box bandpass.
-                #stdflux = stdspec.integrate(wavelengths=w).value  # noqa
+                # stdflux = stdspec.integrate(wavelengths=w).value
                 raise NotImplementedError('Must provide a bandpass')
             else:
                 up = stdspec * band
