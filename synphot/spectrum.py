@@ -77,7 +77,7 @@ class BaseSpectrum(object):
             'alpha_2': u.dimensionless_unscaled},
         'Const1D': {'amplitude': 'noconv'},
         'ConstFlux1D': {'amplitude': 'noconv'},
-        'Empirical1D': {'x': 'wave', 'y': 'flux'},
+        'Empirical1D': {'points': 'wave', 'lookup_table': 'flux'},
         'ExponentialCutoffPowerLaw1D': {
             'amplitude': 'flux', 'x_0': 'wave', 'x_cutoff': 'wave',
             'alpha': u.dimensionless_unscaled},
@@ -106,7 +106,7 @@ class BaseSpectrum(object):
     _model_fconv_wav = {
         'Box1D': 'x_0',
         'BrokenPowerLaw1D': 'x_break',
-        'Empirical1D': 'x',
+        'Empirical1D': 'points',
         'ExponentialCutoffPowerLaw1D': 'x_0',
         'Gaussian1D': 'mean',
         'GaussianAbsorption1D': 'mean',
@@ -645,8 +645,8 @@ class BaseSpectrum(object):
         # Special handling for empirical data.
         # This is to be compatible with ASTROLIB PYSYNPHOT behavior.
         if isinstance(self._model, Empirical1D):
-            y1 = self._model.y.value[0]
-            y2 = self._model.y.value[-1]
+            y1 = self._model.lookup_table[0]
+            y2 = self._model.lookup_table[-1]
         # Other models can just evaluate at new end points
         else:
             y1 = self(w1)
@@ -665,7 +665,7 @@ class BaseSpectrum(object):
             x = np.insert(x, x.size, w2)
             y = np.insert(y, y.size, 0.0)
 
-        return self.__class__(Empirical1D, x=x, y=y)
+        return self.__class__(Empirical1D, points=x, lookup_table=y)
 
     def _get_arrays(self, wavelengths, **kwargs):
         """Get sampled spectrum or bandpass in user units."""
@@ -1187,8 +1187,8 @@ class SourceSpectrum(BaseSourceSpectrum):
 
         """
         header, wavelengths, fluxes = specio.read_spec(filename, **kwargs)
-        return cls(Empirical1D, x=wavelengths, y=fluxes, keep_neg=keep_neg,
-                   meta={'header': header})
+        return cls(Empirical1D, points=wavelengths, lookup_table=fluxes,
+                   keep_neg=keep_neg, meta={'header': header})
 
     @classmethod
     def from_vega(cls, **kwargs):
@@ -1211,7 +1211,8 @@ class SourceSpectrum(BaseSourceSpectrum):
         header['filename'] = filename
         meta = {'header': header,
                 'expr': 'Vega from {0}'.format(os.path.basename(filename))}
-        return cls(Empirical1D, x=wavelengths, y=fluxes, meta=meta)
+        return cls(Empirical1D, points=wavelengths, lookup_table=fluxes,
+                   meta=meta)
 
 
 class BaseUnitlessSpectrum(BaseSpectrum):
@@ -1668,7 +1669,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             kwargs['flux_col'] = 'THROUGHPUT'
 
         header, wavelengths, throughput = specio.read_spec(filename, **kwargs)
-        return cls(Empirical1D, x=wavelengths, y=throughput,
+        return cls(Empirical1D, points=wavelengths, lookup_table=throughput,
                    meta={'header': header})
 
     @classmethod
@@ -1741,4 +1742,5 @@ class SpectralElement(BaseUnitlessSpectrum):
         header['filename'] = filename
         header['descrip'] = cfgitem.description
         meta = {'header': header, 'expr': filtername}
-        return cls(Empirical1D, x=wavelengths, y=throughput, meta=meta)
+        return cls(Empirical1D, points=wavelengths, lookup_table=throughput,
+                   meta=meta)

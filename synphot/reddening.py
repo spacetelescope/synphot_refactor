@@ -67,8 +67,9 @@ class ReddeningLaw(BaseUnitlessSpectrum):
             'E(B-V)': ebv,
             'ReddeningLaw': self.meta.get('expr', 'unknown')}
 
-        return ExtinctionCurve(Empirical1D, x=x, y=y, meta={'header': header},
-                               fill_value='extrapolate')
+        return ExtinctionCurve(
+            Empirical1D, points=x, lookup_table=y, meta={'header': header},
+            fill_value=None)
 
     def to_fits(self, filename, wavelengths=None, **kwargs):
         """Write the reddening law to a FITS file.
@@ -145,8 +146,9 @@ class ReddeningLaw(BaseUnitlessSpectrum):
             kwargs['flux_col'] = 'Av/E(B-V)'
 
         header, wavelengths, rvs = specio.read_spec(filename, **kwargs)
-        return cls(Empirical1D, x=wavelengths, y=rvs, meta={'header': header},
-                   fill_value='extrapolate')
+
+        return cls(Empirical1D, points=wavelengths, lookup_table=rvs,
+                   meta={'header': header}, fill_value=None)
 
     @classmethod
     def from_extinction_model(cls, modelname, **kwargs):
@@ -208,8 +210,9 @@ class ReddeningLaw(BaseUnitlessSpectrum):
         header['filename'] = filename
         header['descrip'] = cfgitem.description
         meta = {'header': header, 'expr': modelname}
-        return cls(Empirical1D, x=wavelengths, y=rvs, meta=meta,
-                   fill_value='extrapolate')
+
+        return cls(Empirical1D, points=wavelengths, lookup_table=rvs,
+                   meta=meta, fill_value=None)
 
 
 class ExtinctionCurve(BaseUnitlessSpectrum):

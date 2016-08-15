@@ -19,6 +19,7 @@ from astropy.analytic_functions.blackbody import blackbody_nu
 from astropy.modeling import Fittable1DModel, Model, Parameter
 from astropy.modeling import models as _models
 from astropy.modeling.core import _CompoundModel
+from astropy.modeling.models import Tabular1D
 from astropy.stats.funcs import gaussian_fwhm_to_sigma, gaussian_sigma_to_fwhm
 from astropy.utils import metadata
 from astropy.utils.exceptions import AstropyUserWarning
@@ -130,7 +131,7 @@ class BlackBody1D(Fittable1DModel):
             units.PHOTLAM, u.spectral_density(wave)) / u.sr  # PHOTLAM/sr
 
         # Restore Numpy settings
-        dummy = np.seterr(**old_np_err_cfg)
+        np.seterr(**old_np_err_cfg)
 
         return bbflux.value
 
@@ -270,40 +271,26 @@ class ConstFlux1D(_models.Const1D):
         return y.value
 
 
-# TODO: Subclass from LookupTable (spacetelescope/gwcs#28)
-class Empirical1D(Fittable1DModel):
+class Empirical1D(Tabular1D):
     """Empirical (sampled) spectrum or bandpass model.
 
     .. note::
 
-        This model requires `SciPy <http://www.scipy.org>`_ 0.17
+        This model requires `SciPy <http://www.scipy.org>`_ 0.14
         or later to be installed.
 
     Parameters
     ----------
-    x : ndarray
-        Wavelengths.
-
-    y : ndarray
-        Flux or throughput.
-
     keep_neg : bool
-        Convert negative ``y`` values to zeroes?
+        Convert negative ``lookup_table`` values to zeroes?
         This is to be consistent with ASTROLIB PYSYNPHOT.
 
     kwargs : dict
-        Optional keywords for model creation or
-        :func:`~scipy.interpolate.interp1d`.
+        Keywords for `~astropy.modeling.models.Tabular1D` model
+        creation or :func:`~scipy.interpolate.interpn`.
 
     """
-    standard_broadcasting = False
-    x = Parameter(default=[0, 0])
-    y = Parameter(default=[0, 0])
-
-    def __init__(self, x, y, **kwargs):
-        n_models = kwargs.get('n_models', 1)
-        if n_models > 1:
-            raise NotImplementedError('Only n_models=1 is supported')
+    def __init__(self, **kwargs):
 
         # Manually insert user metadata here to accomodate any warning
         # from self._process_neg_flux()
@@ -312,90 +299,81 @@ class Empirical1D(Fittable1DModel):
         if 'warnings' not in self.meta:
             self.meta['warnings'] = {}
 
+        x = kwargs['points']
+        y = kwargs['lookup_table']
+
+        # Points can only be ascending for interpn()
+        if x[-1] < x[0]:
+            x = x[::-1]
+            y = y[::-1]
+            kwargs['points'] = x
+
+        # Handle negative flux
         keep_neg = kwargs.pop('keep_neg', False)
         self._keep_neg = keep_neg
-        y = self._process_neg_flux(y)
+        y = self._process_neg_flux(x, y)
 
-        # Set interpolation default values
-        self._kind = 'linear'
-        self._axis = -1
-        self._copy = True
-        self._bounds_error = False
-        self._fill_value = 0
-        self._assume_sorted = False
+        kwargs['lookup_table'] = y
+        super(Empirical1D, self).__init__(**kwargs)
 
-        # Filter out keywords that do not go into model init
-        kwargs = self._process_interp1d_options(x, y, **kwargs)
+        # Set non-default interpolation default values
+        self.bounds_error = kwargs.get('bounds_error', False)
+        self.fill_value = kwargs.get('fill_value', 0)
 
-        super(Empirical1D, self).__init__(x=x, y=y, **kwargs)
-
-    def _process_neg_flux(self, y):
+    def _process_neg_flux(self, x, y):
         """Remove negative flux."""
-        y = np.asarray(y)
 
-        if not self._keep_neg:
+        if self._keep_neg:  # Nothing to do
+            return y
+
+        old_y = None
+
+        if np.isscalar(y):
+            if y < 0:
+                n_neg = 1
+                old_x = x
+                old_y = y
+                y = 0
+        else:
+            x = np.asarray(x)  # In case input is just pure list
+            y = np.asarray(y)
             i = np.where(y < 0)
             n_neg = len(i[0])
             if n_neg > 0:
+                old_x = x[i]
+                old_y = y[i]
                 y[i] = 0
-                warn_str = ('{0} bin(s) contained negative flux or throughput'
-                            '; it/they will be set to zero.'.format(n_neg))
-                self.meta['warnings'].update({'NegativeFlux': warn_str})
-                warnings.warn(warn_str, AstropyUserWarning)
+
+        if old_y is not None:
+            warn_str = ('{0} bin(s) contained negative flux or throughput'
+                        '; it/they will be set to zero.'.format(n_neg))
+            warn_str += '\n  points: {0}\n  lookup_table: {1}'.format(
+                old_x, old_y)  # Extra info
+            self.meta['warnings'].update({'NegativeFlux': warn_str})
+            warnings.warn(warn_str, AstropyUserWarning)
 
         return y
 
-    def _process_interp1d_options(self, x, y, **kwargs):
-        """Override default interpolation options and return unused
-        keywords."""
-        from scipy.interpolate import interp1d
-
-        self._kind = kwargs.pop('kind', self._kind)
-        self._axis = kwargs.pop('axis', self._axis)
-        self._copy = kwargs.pop('copy', self._copy)
-        self._bounds_error = kwargs.pop('bounds_error', self._bounds_error)
-        self._fill_value = kwargs.pop('fill_value', self._fill_value)
-        self._assume_sorted = kwargs.pop('assume_sorted', self._assume_sorted)
-        self._f = interp1d(
-            x, y, kind=self._kind, axis=self._axis, copy=self._copy,
-            bounds_error=self._bounds_error, fill_value=self._fill_value,
-            assume_sorted=self._assume_sorted)
-
-        return kwargs
-
-    def set_interp1d(self, **kwargs):
-        """Use given keywords with :func:`~scipy.interpolate.interp1d` to
-        evaluate model. Otherwise, use previously set values."""
-        self._process_interp1d_options(self.x.value, self.y.value, **kwargs)
-
-    # NOTE: It is forced to be property by core Model. The decorator
-    #       here is just to make this obvious.
-    @property
-    def bounding_box(self):
-        """Tuple defining the default ``bounding_box`` limits,
-        ``(x_low, x_high)``."""
-        x = self.x.value
-        return (min(x), max(x))
-
     def sampleset(self):
-        """Return ``x`` array that samples the feature."""
-        return self.x.value
+        """Return ``points`` array that samples the feature."""
+        return self.points
 
-    def evaluate(self, x, *args):
+    def evaluate(self, inputs):
         """Evaluate the model.
 
         Parameters
         ----------
-        x : number or ndarray
-            Wavelengths in same unit as parameter ``x``.
+        inputs : number or ndarray
+            Wavelengths in same unit as ``points``.
 
         Returns
         -------
         y : number or ndarray
-            Flux or throughput in same unit as parameter ``y``.
+            Flux or throughput in same unit as ``lookup_table``.
 
         """
-        return self._process_neg_flux(self._f(x))
+        y = super(Empirical1D, self).evaluate(inputs)
+        return self._process_neg_flux(inputs, y)
 
 
 class GaussianSampleset1DMixin(object):

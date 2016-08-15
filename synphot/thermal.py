@@ -146,5 +146,6 @@ class ThermalSpectralElement(BaseUnitlessSpectrum):
             kwargs['flux_col'] = 'EMISSIVITY'
 
         header, wavelengths, em = specio.read_spec(filename, **kwargs)
-        return cls(Empirical1D, temperature, beam_fill_factor=beam_fill_factor,
-                   x=wavelengths, y=em, meta={'header': header})
+        return cls(
+            Empirical1D, temperature, beam_fill_factor=beam_fill_factor,
+            points=wavelengths, lookup_table=em, meta={'header': header})
