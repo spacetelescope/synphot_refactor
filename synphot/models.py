@@ -131,7 +131,7 @@ class BlackBody1D(Fittable1DModel):
             units.PHOTLAM, u.spectral_density(wave)) / u.sr  # PHOTLAM/sr
 
         # Restore Numpy settings
-        dummy = np.seterr(**old_np_err_cfg)
+        np.seterr(**old_np_err_cfg)
 
         return bbflux.value
 
@@ -271,84 +271,7 @@ class ConstFlux1D(_models.Const1D):
         return y.value
 
 
-# Ideally, this should be absorbed into Tabular base class in Astropy. There
-# is no 1D or 2D specific functionality here but inherits 1D for convenience.
-from astropy.utils import minversion
-
-try:
-    import scipy
-    from scipy.interpolate import interpn
-    has_scipy = True
-except ImportError:
-    has_scipy = False
-
-if has_scipy and not minversion(scipy, '0.14'):
-    has_scipy = False
-
-
-class CustomTabular1D(Tabular1D):
-    """Like `~astropy.modeling.models.Tabular1D` but with extra stuff."""
-
-    def __init__(self, **kwargs):
-        n_models = kwargs.get('n_models', 1)
-        if n_models > 1:
-            raise NotImplementedError('Only n_models=1 is supported')
-
-        super(CustomTabular1D, self).__init__(**kwargs)
-
-    @property
-    def points(self):
-        """The points defining the regular grid."""
-        return np.squeeze(self._points)
-
-    @property
-    def bounding_box(self):
-        """Tuple defining the default ``bounding_box`` limits,
-        ``(points_low, points_high)``.
-
-        Examples
-        --------
-        >>> from astropy.modeling.models import Tabular1D, Tabular2D
-        >>> t1 = Tabular1D([1,2,3], [10, 20, 30])
-        >>> t1.bounding_box
-        (1, 3)
-        >>> t2 = Tabular2D([[1,2,3],[2,3,4]], [[10,20,30],[20,30,40]])
-        >>> t2.bounding_box
-        ((2, 4), (1, 3))
-
-        """
-        bbox = [(min(p), max(p)) for p in self.points][::-1]
-        if len(bbox) == 1:
-            bbox = bbox[0]
-        return tuple(bbox)
-
-    def __repr__(self):
-        return self._format_repr(kwargs={
-            'points': self.points, 'lookup_table': self.lookup_table})
-
-    def __str__(self):
-        return self._format_str(keywords=[
-            ('points', self.points), ('lookup_table', self.lookup_table)])
-
-    # Same as Tabular except using self._points
-    def evaluate(self, *inputs):
-        """Return the interpolated values at the input coordinates.
-
-        Parameters
-        ----------
-        inputs : list of scalars or ndarrays
-            Input coordinates. The number of inputs must be equal
-            to the dimensions of the lookup table.
-        """
-        inputs = np.array(inputs[: self.n_inputs]).T
-        if not has_scipy:
-            raise ImportError('This model requires scipy >= v0.14')
-        return interpn(self._points, self.lookup_table, inputs,
-                       method=self.method, bounds_error=self.bounds_error,
-                       fill_value=self.fill_value)
-
-
-class Empirical1D(CustomTabular1D):
+class Empirical1D(Tabular1D):
     """Empirical (sampled) spectrum or bandpass model.
 
     .. note::
@@ -363,7 +286,7 @@ class Empirical1D(CustomTabular1D):
         This is to be consistent with ASTROLIB PYSYNPHOT.
 
     kwargs : dict
-        Keywords for `~astropy.modeling.models.Tabular` model
+        Keywords for `~astropy.modeling.models.Tabular1D` model
         creation or :func:`~scipy.interpolate.interpn`.
 
     """
@@ -388,7 +311,7 @@ class Empirical1D(CustomTabular1D):
         # Handle negative flux
         keep_neg = kwargs.pop('keep_neg', False)
         self._keep_neg = keep_neg
-        y = self._process_neg_flux(y)
+        y = self._process_neg_flux(x, y)
 
         kwargs['lookup_table'] = y
         super(Empirical1D, self).__init__(**kwargs)
@@ -397,19 +320,37 @@ class Empirical1D(CustomTabular1D):
         self.bounds_error = kwargs.get('bounds_error', False)
         self.fill_value = kwargs.get('fill_value', 0)
 
-    def _process_neg_flux(self, y):
+    def _process_neg_flux(self, x, y):
         """Remove negative flux."""
-        y = np.asarray(y)
 
-        if not self._keep_neg:
+        if self._keep_neg:  # Nothing to do
+            return y
+
+        old_y = None
+
+        if np.isscalar(y):
+            if y < 0:
+                n_neg = 1
+                old_x = x
+                old_y = y
+                y = 0
+        else:
+            x = np.asarray(x)  # In case input is just pure list
+            y = np.asarray(y)
             i = np.where(y < 0)
             n_neg = len(i[0])
             if n_neg > 0:
+                old_x = x[i]
+                old_y = y[i]
                 y[i] = 0
-                warn_str = ('{0} bin(s) contained negative flux or throughput'
-                            '; it/they will be set to zero.'.format(n_neg))
-                self.meta['warnings'].update({'NegativeFlux': warn_str})
-                warnings.warn(warn_str, AstropyUserWarning)
+
+        if old_y is not None:
+            warn_str = ('{0} bin(s) contained negative flux or throughput'
+                        '; it/they will be set to zero.'.format(n_neg))
+            warn_str += '\n  points: {0}\n  lookup_table: {1}'.format(
+                old_x, old_y)  # Extra info
+            self.meta['warnings'].update({'NegativeFlux': warn_str})
+            warnings.warn(warn_str, AstropyUserWarning)
 
         return y
 
@@ -432,7 +373,7 @@ class Empirical1D(CustomTabular1D):
 
         """
         y = super(Empirical1D, self).evaluate(inputs)
-        return self._process_neg_flux(y)
+        return self._process_neg_flux(inputs, y)
 
 
 class GaussianSampleset1DMixin(object):

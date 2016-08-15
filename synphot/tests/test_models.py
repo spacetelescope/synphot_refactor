@@ -16,13 +16,7 @@ import os
 
 # THIRD-PARTY
 import numpy as np
-
-try:
-    import scipy  # pylint: disable=W0611
-except ImportError:
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
+from astropy.utils import minversion
 
 # ASTROPY
 from astropy import units as u
@@ -32,6 +26,15 @@ from astropy.utils.data import get_pkg_data_filename
 # LOCAL
 from .. import specio, units
 from ..models import BlackBody1D, ConstFlux1D, Empirical1D, PowerLawFlux1D
+
+try:
+    import scipy
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
+
+HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
 
 
 class TestBlackBody1D(object):
@@ -102,7 +105,7 @@ class TestConstFlux1D(object):
         'flux_unit', [u.count, units.OBMAG, units.VEGAMAG, u.AA])
     def test_invalid_units(self, flux_unit):
         with pytest.raises(NotImplementedError):
-            m = ConstFlux1D(amplitude=1*flux_unit)
+            ConstFlux1D(amplitude=1*flux_unit)
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -153,10 +156,21 @@ class TestEmpirical1D(object):
         ('keep_neg', 'ans'),
         [(True, [-1.1, 0, 1.1]),
          (False, [0, 0, 1.1])])
-    def test_neg(self, keep_neg, ans):
+    def test_neg_array(self, keep_neg, ans):
         m2 = Empirical1D(points=[1, 2, 3], lookup_table=[-1.1, 0, 1.1],
                          keep_neg=keep_neg)
         np.testing.assert_array_equal(m2([1, 2, 3]), ans)
+        if not keep_neg:
+            assert 'NegativeFlux' in m2.meta['warnings']
+
+    @pytest.mark.parametrize(
+        ('keep_neg', 'ans'),
+        [(True, -1),
+         (False, 0)])
+    def test_neg_scalar(self, keep_neg, ans):
+        m2 = Empirical1D(points=[1, 2, 3], lookup_table=[-1, 0, 1],
+                         keep_neg=keep_neg)
+        np.testing.assert_array_equal(m2(1), ans)
         if not keep_neg:
             assert 'NegativeFlux' in m2.meta['warnings']
 
