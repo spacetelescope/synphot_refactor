@@ -17,7 +17,7 @@ from astropy import units as u
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
-from . import binning, exceptions, specio, units, utils
+from . import binning, exceptions, units, utils
 from .models import Empirical1D
 from .spectrum import BaseSourceSpectrum, SourceSpectrum, SpectralElement
 

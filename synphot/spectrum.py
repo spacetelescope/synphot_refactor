@@ -13,7 +13,6 @@ from copy import deepcopy
 import numpy as np
 
 # ASTROPY
-from astropy import constants as const
 from astropy import log
 from astropy import units as u
 from astropy.modeling import Model
@@ -25,8 +24,7 @@ from astropy.utils import metadata
 # LOCAL
 from . import exceptions, specio, units, utils
 from .config import Conf, conf
-from .models import (BlackBody1D, ConstFlux1D, Empirical1D, Gaussian1D,
-                     get_waveset, get_metadata)
+from .models import ConstFlux1D, Empirical1D, get_waveset, get_metadata
 
 __all__ = ['BaseSpectrum', 'BaseSourceSpectrum', 'SourceSpectrum',
            'BaseUnitlessSpectrum', 'SpectralElement']

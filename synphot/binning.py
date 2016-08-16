@@ -7,7 +7,6 @@ from .extern import six
 import numpy as np
 
 # ASTROPY
-from astropy import log
 from astropy import units as u
 
 # LOCAL
