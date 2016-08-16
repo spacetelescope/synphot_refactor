@@ -10,13 +10,6 @@ import tempfile
 # THIRD-PARTY
 import numpy as np
 
-try:
-    import scipy  # pylint: disable=W0611
-except ImportError:
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
-
 # ASTROPY
 from astropy import modeling
 from astropy import units as u
@@ -25,6 +18,7 @@ from astropy.modeling.models import (
     BrokenPowerLaw1D, Const1D, ExponentialCutoffPowerLaw1D, LogParabola1D,
     PowerLaw1D, RedshiftScaleFactor)
 from astropy.tests.helper import pytest, remote_data
+from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
@@ -36,6 +30,15 @@ from ..models import (
     PowerLawFlux1D, get_waveset)
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
+
+try:
+    import scipy
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
+
+HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
 
 # GLOBAL VARIABLES
 _vspec = None  # Loaded in test_load_vspec()
@@ -91,7 +94,7 @@ def test_filter(filtername):
 def test_filter_exception():
     """Test SpectralElement from_filter() exception."""
     with pytest.raises(exceptions.SynphotError):
-        bp = SpectralElement.from_filter('foo')
+        SpectralElement.from_filter('foo')
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -104,17 +107,17 @@ class TestEmpiricalSourceFromFile(object):
 
     def test_invalid_flux_unit(self):
         with pytest.raises(exceptions.SynphotError):
-            sp = SourceSpectrum(Empirical1D, points=_wave,
-                                lookup_table=_flux_vegamag)
+            SourceSpectrum(Empirical1D, points=_wave,
+                           lookup_table=_flux_vegamag)
 
     def test_invalid_models(self):
         # Test not a Model subclass
         with pytest.raises(exceptions.SynphotError):
-            sp = SourceSpectrum(fits.HDUList)
+            SourceSpectrum(fits.HDUList)
 
         # Test unsupported model
         with pytest.raises(exceptions.SynphotError):
-            sp = SourceSpectrum(RedshiftScaleFactor)
+            SourceSpectrum(RedshiftScaleFactor)
 
     def test_metadata(self):
         assert 'SourceSpectrum' in str(self.sp)
@@ -181,8 +184,8 @@ class TestEmpiricalBandpassFromFile(object):
 
     def test_invalid_flux_unit(self):
         with pytest.raises(u.UnitsError):
-            bp = SpectralElement(Empirical1D, points=_wave,
-                                 lookup_table=_flux_photlam)
+            SpectralElement(Empirical1D, points=_wave,
+                            lookup_table=_flux_photlam)
 
     def test_call(self):
         w = self.bp.model.points[5000:5004]
@@ -321,7 +324,7 @@ class TestBoxBandpass(object):
     def test_multi_n_models(self):
         """This is not allowed."""
         with pytest.raises(exceptions.SynphotError):
-            bp = SpectralElement(
+            SpectralElement(
                 Box1D, amplitude=[1, 1], x_0=[5000, 6000],
                 width=[100, 1], n_models=2)
 
@@ -463,57 +466,65 @@ class TestBuildModels(object):
 
 @pytest.mark.skipif('not HAS_SCIPY')
 class TestCheckOverlap(object):
-    """Test spectrum overlap check."""
+    """Test spectrum overlap check. This method is ever only used
+    in the form of ``bp.check_overlap(sp)``, so that is what is
+    tested here.
+    """
     def setup_class(self):
-        self.sp = SourceSpectrum(
+        self.bp = SpectralElement(
             Empirical1D, points=[2999.9, 3000, 6000, 6000.1],
             lookup_table=[0, 1, 1, 0])
 
     def test_full(self):
-        bp = SpectralElement(
+        """As long as we don't have to extrapolate or taper
+        source spectrum, it's okay.
+        """
+        sp = SourceSpectrum(
             Empirical1D, points=[999.9, 1000, 9000, 9000.1],
             lookup_table=[0, 1, 1, 0])
-        assert self.sp.check_overlap(bp) == 'full'
+        assert self.bp.check_overlap(sp) == 'full'
 
-    def test_partial_most(self):
-        bp = SpectralElement(
-            Empirical1D, points=[3000, 3001, 6000.1, 6000.2],
-            lookup_table=[0, 1, 1, 0])
-        assert self.sp.check_overlap(bp) == 'partial_most'
-
-    def test_partial_notmost(self):
-        bp = SpectralElement(
+        sp = SourceSpectrum(
             Empirical1D, points=[3999.9, 4000, 4500, 4500.1],
             lookup_table=[0, 1, 1, 0])
-        assert self.sp.check_overlap(bp) == 'partial_notmost'
+        assert self.bp.check_overlap(sp) == 'full'
 
-        # Ensure zeroes in passband are not taken into account
-        bp2 = SpectralElement(
+    def test_partial_most(self):
+        """99% overlap."""
+        sp = SourceSpectrum(
             Empirical1D, points=[3000, 3001, 6000.1, 6000.2],
             lookup_table=[0, 1, 1, 0])
-        bp3 = bp2 * bp
-        assert self.sp.check_overlap(bp2) == 'partial_most'
-        assert self.sp.check_overlap(bp3) == 'partial_notmost'
+        assert self.bp.check_overlap(sp) == 'partial_most'
+
+    def test_partial_notmost(self):
+        """Extrapolation or taper required."""
+        sp = SourceSpectrum(
+            Empirical1D, points=[3999.9, 4500.1], lookup_table=[1, 1],
+            fill_value=None)
+        assert self.bp.check_overlap(sp) == 'partial_notmost'
 
     def test_none(self):
-        bp = SpectralElement(
+        """No overlap at all."""
+        sp = SourceSpectrum(
             Empirical1D, points=[99.9, 100, 2999.9, 3000],
             lookup_table=[0, 1, 1, 0])
-        assert self.sp.check_overlap(bp) == 'none'
+        assert self.bp.check_overlap(sp) == 'none'
 
     def test_special_cases(self):
+        """One of them has no waveset defined."""
         # Other has no waveset
-        bp = SpectralElement(Const1D, amplitude=1)
-        assert self.sp.check_overlap(bp) == 'full'
+        sp = SourceSpectrum(Const1D, amplitude=1)
+        assert self.bp.check_overlap(sp) == 'full'
 
         # Self has no waveset
-        bp = SpectralElement(Box1D, amplitude=1, x_0=5000, width=10)
-        sp = SourceSpectrum(Const1D, amplitude=1)
-        assert sp.check_overlap(bp) == 'partial_notmost'
+        bp = SpectralElement(Const1D, amplitude=1)
+        sp = SourceSpectrum(Box1D, amplitude=1, x_0=5000, width=10)
+        assert bp.check_overlap(sp) == 'partial_notmost'
 
     def test_exceptions(self):
+        """Invalid input."""
         with pytest.raises(exceptions.SynphotError):
-            self.sp.check_overlap(1)
+            self.bp.check_overlap(1)
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -587,14 +598,9 @@ class TestNormalize(object):
          ('em', 2 * u.count, 2),
          ('em', -1 * units.OBMAG, 2.511888)])
     def test_renorm_nondensity(self, sp_type, rn_val, ans_countrate):
-        """This also tests force=True for 'partial_notmost' overlap."""
         sp = self._select_sp(sp_type)
-        rn_sp = sp.normalize(rn_val, band=self.acs, force=True, area=_area)
+        rn_sp = sp.normalize(rn_val, band=self.acs, area=_area)
         self._compare_countrate(rn_sp, ans_countrate)
-
-        if sp_type == 'em':
-            assert 'PartialRenorm' in rn_sp.warnings
-            assert 'PartialRenorm' not in sp.warnings
 
     @remote_data
     @pytest.mark.parametrize(
@@ -620,7 +626,19 @@ class TestNormalize(object):
     def test_renorm_noband_jy(self):
         """Replace this with real test when it is implemented."""
         with pytest.raises(NotImplementedError):
-            rn_sp = self.em.normalize(1e-23 * u.Jy)
+            self.em.normalize(1e-23 * u.Jy)
+
+    def test_renorm_partial_notmost(self):
+        """Test force=True for 'partial_notmost' overlap."""
+        sp = SourceSpectrum(Empirical1D, points=[5000, 6000],
+                            lookup_table=[1, 1], fill_value=None)
+        rn_sp = sp.normalize(1e-23 * u.Jy, band=self.acs, force=True)
+        assert 'PartialRenorm' in rn_sp.warnings
+        assert 'PartialRenorm' not in sp.warnings
+
+        # Partial overlap without force
+        with pytest.raises(exceptions.PartialOverlap):
+            sp.normalize(1, band=self.acs)
 
     def test_renorm_partial_most(self):
         """Test 'partial_most' overlap."""
@@ -633,25 +651,21 @@ class TestNormalize(object):
     def test_exceptions(self):
         # Invalid passband
         with pytest.raises(exceptions.SynphotError):
-            rn_sp = self.bb.normalize(10, band=np.ones(10))
+            self.bb.normalize(10, band=np.ones(10))
 
         # Disjoint passband
         bp = SpectralElement(Box1D, amplitude=1, x_0=30000, width=1)
         with pytest.raises(exceptions.DisjointError):
-            rn_sp = self.em.normalize(10, band=bp)
-
-        # Partial overlap without force
-        with pytest.raises(exceptions.PartialOverlap):
-            rn_sp = self.em.normalize(1, band=self.acs)
+            self.em.normalize(10, band=bp)
 
         # Missing Vega spectrum
         with pytest.raises(exceptions.SynphotError):
-            rn_sp = self.bb.normalize(10 * units.VEGAMAG, band=self.abox)
+            self.bb.normalize(10 * units.VEGAMAG, band=self.abox)
 
         # Zero flux
         sp = SourceSpectrum(Const1D, amplitude=0)
         with pytest.raises(exceptions.SynphotError):
-            rn_sp = sp.normalize(100 * u.ct, band=self.abox, area=_area)
+            sp.normalize(100 * u.ct, band=self.abox, area=_area)
 
 
 class TestWaveset(object):
@@ -796,7 +810,7 @@ class TestMathOperators(object):
 
     def test_source_addsub_exception(self):
         with pytest.raises(exceptions.IncompatibleSources):
-            ans = self.sp_1 + self.bp_1
+            self.sp_1 + self.bp_1
 
     @pytest.mark.parametrize('x', [2, 2 * u.dimensionless_unscaled])
     def test_source_mul_scalar(self, x):
@@ -824,31 +838,31 @@ class TestMathOperators(object):
 
     def test_source_mul_exceptions(self):
         with pytest.raises(exceptions.IncompatibleSources):
-            ans = self.sp_1 * self.sp_2
+            self.sp_1 * self.sp_2
         with pytest.raises(exceptions.IncompatibleSources):
-            ans = self.sp_1 * [1, 2]
+            self.sp_1 * [1, 2]
         with pytest.raises(exceptions.IncompatibleSources):
-            ans = self.sp_1 * (1 - 1j)
+            self.sp_1 * (1 - 1j)
         with pytest.raises(exceptions.IncompatibleSources):
-            ans = self.sp_1 * (1 * u.AA)
+            self.sp_1 * (1 * u.AA)
 
     def test_source_div(self):
         """Put real tests here when ``__truediv__`` is implemented."""
         with pytest.raises(NotImplementedError):
-            ans = self.sp_1 / 2.0
+            self.sp_1 / 2.0
         with pytest.raises(NotImplementedError):
-            ans = self.sp_1 / self.bp_1
+            self.sp_1 / self.bp_1
 
     def test_bandpass_addsub(self):
         """Not supported."""
         with pytest.raises(NotImplementedError):
-            ans = self.bp_1 + self.bp_1
+            self.bp_1 + self.bp_1
         with pytest.raises(NotImplementedError):
-            ans = self.bp_1 + 2.0
+            self.bp_1 + 2.0
         with pytest.raises(NotImplementedError):
-            ans = self.bp_1 - self.bp_1
+            self.bp_1 - self.bp_1
         with pytest.raises(NotImplementedError):
-            ans = self.bp_1 - 2.0
+            self.bp_1 - 2.0
 
     @pytest.mark.parametrize('x', [2.0, 2.0 * u.dimensionless_unscaled])
     def test_bandpass_mul_scalar(self, x):
@@ -868,18 +882,18 @@ class TestMathOperators(object):
 
     def test_bandpass_mul_exceptions(self):
         with pytest.raises(exceptions.IncompatibleSources):
-            ans = self.bp_1 * [1, 2]
+            self.bp_1 * [1, 2]
         with pytest.raises(exceptions.IncompatibleSources):
-            ans = self.bp_1 * (1 - 1j)
+            self.bp_1 * (1 - 1j)
         with pytest.raises(exceptions.IncompatibleSources):
-            ans = self.bp_1 * (1 * u.AA)
+            self.bp_1 * (1 * u.AA)
 
     def test_bandpass_div(self):
         """Put real tests here when ``__truediv__`` is implemented."""
         with pytest.raises(NotImplementedError):
-            ans = self.bp_1 / 2.0
+            self.bp_1 / 2.0
         with pytest.raises(NotImplementedError):
-            ans = self.bp_1 / self.bp_1
+            self.bp_1 / self.bp_1
 
 
 @pytest.mark.skipif('not HAS_SCIPY')

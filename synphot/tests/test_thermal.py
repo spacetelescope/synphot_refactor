@@ -8,21 +8,24 @@ import os
 # THIRD-PARTY
 import numpy as np
 
-try:
-    import scipy  # pylint: disable=W0611
-except ImportError:
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
-
 # ASTROPY
 from astropy import units as u
 from astropy.tests.helper import pytest
+from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
 from .. import exceptions
 from ..thermal import ThermalSpectralElement
+
+try:
+    import scipy
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
+
+HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -35,7 +38,7 @@ class TestThermalSpectralElement(object):
 
     def test_taper(self):
         with pytest.raises(NotImplementedError):
-            th2 = self.th.taper()
+            self.th.taper()
 
     def test_properties(self):
         assert self.th.temperature == 237.3 * u.K
@@ -53,11 +56,10 @@ class TestThermalSpectralElement(object):
     def test_from_file_exceptions(self):
         # Non-FITS file
         with pytest.raises(exceptions.SynphotError):
-            th = ThermalSpectralElement.from_file('dummy.txt')
+            ThermalSpectralElement.from_file('dummy.txt')
 
         # Missing DEFT keyword
         thfile = get_pkg_data_filename(
             os.path.join('data', 'hst_acs_hrc_f555w.fits'))
         with pytest.raises(exceptions.SynphotError):
-            th = ThermalSpectralElement.from_file(
-                thfile, flux_col='THROUGHPUT')
+            ThermalSpectralElement.from_file(thfile, flux_col='THROUGHPUT')

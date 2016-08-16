@@ -591,26 +591,35 @@ class BaseSpectrum(object):
         result = utils.overlap_status(a, b)
 
         if result == 'partial':
-            # Get all the flux
-            totalflux = self.integrate(wavelengths=wavelengths).value
-            utils.validate_totalflux(totalflux)
+            # If there is no need to extrapolate or taper other
+            # (i.e., other is zero at self's wave limits),
+            # then we consider it as a full coverage.
+            # This logic assumes __call__ never returns mag or count!
+            if np.allclose(other(x1[::x1.size-1]).value, 0):
+                result = 'full'
 
-            a_min, a_max = a.min(), a.max()
-            b_min, b_max = b.min(), b.max()
-
-            # Now get the other two pieces
-            excluded = 0.0
-            if a_min < b_min:
-                excluded += self.integrate(
-                    wavelengths=np.array([a_min, b_min])).value
-            if a_max > b_max:
-                excluded += self.integrate(
-                    wavelengths=np.array([b_max, a_max])).value
-
-            if excluded / totalflux < threshold:
-                result = 'partial_most'
+            # Check if the lack of overlap is significant.
             else:
-                result = 'partial_notmost'
+                # Get all the flux
+                totalflux = self.integrate(wavelengths=wavelengths).value
+                utils.validate_totalflux(totalflux)
+
+                a_min, a_max = a.min(), a.max()
+                b_min, b_max = b.min(), b.max()
+
+                # Now get the other two pieces
+                excluded = 0.0
+                if a_min < b_min:
+                    excluded += self.integrate(
+                        wavelengths=np.array([a_min, b_min])).value
+                if a_max > b_max:
+                    excluded += self.integrate(
+                        wavelengths=np.array([b_max, a_max])).value
+
+                if excluded / totalflux < threshold:
+                    result = 'partial_most'
+                else:
+                    result = 'partial_notmost'
 
         return result
 

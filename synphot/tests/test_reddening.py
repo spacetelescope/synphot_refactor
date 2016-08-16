@@ -10,24 +10,27 @@ import tempfile
 # THIRD-PARTY
 import numpy as np
 
-try:
-    import scipy  # pylint: disable=W0611
-except ImportError:
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
-
 # ASTROPY
 from astropy import units as u
 from astropy.io import fits
 from astropy.tests.helper import pytest, remote_data
+from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
 from .. import exceptions, units
 from ..models import ConstFlux1D, Empirical1D
-from ..reddening import ReddeningLaw, ExtinctionCurve
+from ..reddening import ReddeningLaw
 from ..spectrum import SourceSpectrum
+
+try:
+    import scipy
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
+
+HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -41,7 +44,7 @@ class TestExtinction(object):
 
     def test_invalid_ebv(self):
         with pytest.raises(exceptions.SynphotError):
-            extcurve = self.redlaw.extinction_curve(1 * units.FLAM)
+            self.redlaw.extinction_curve(1 * units.FLAM)
 
     def test_redlaw_call(self):
         w = self.redlaw.waveset[48:53]
@@ -91,7 +94,7 @@ def test_redlaw_from_model(modelname):
 @pytest.mark.skipif('not HAS_SCIPY')
 def test_redlaw_from_model_exception():
     with pytest.raises(exceptions.SynphotError):
-        redlaw = ReddeningLaw.from_extinction_model('foo')
+        ReddeningLaw.from_extinction_model('foo')
 
 
 @pytest.mark.skipif('not HAS_SCIPY')

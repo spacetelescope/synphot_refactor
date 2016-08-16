@@ -8,17 +8,11 @@ import os
 # THIRD-PARTY
 import numpy as np
 
-try:
-    import scipy  # pylint: disable=W0611
-except ImportError:
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
-
 # ASTROPY
 from astropy import units as u
 from astropy.modeling.models import Const1D
 from astropy.tests.helper import pytest, remote_data
+from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
@@ -28,6 +22,15 @@ from ..models import (BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D,
                       GaussianFlux1D)
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
+
+try:
+    import scipy
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
+
+HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
 
 # Global test data files
 _specfile = get_pkg_data_filename(
