@@ -397,8 +397,13 @@ class GaussianSampleset1DMixin(object):
 
         kwargs : dict
             Keyword(s) for ``bounding_box`` calculation.
+            Default ``factor`` is set to 5 to be compatible with
+            ASTROLIB PYSYNPHOT.
 
         """
+        if 'factor' not in kwargs:
+            kwargs['factor'] = 5.0
+
         w1, w2 = self.bounding_box(**kwargs)
         dw = factor_step * self.stddev
 

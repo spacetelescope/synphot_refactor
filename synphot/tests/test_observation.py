@@ -53,9 +53,9 @@ class TestObservation(object):
 
     def test_invalid_input_spec(self):
         with pytest.raises(exceptions.SynphotError):
-            obs2 = Observation(self.obs.bandpass, self.obs.bandpass)
+            Observation(self.obs.bandpass, self.obs.bandpass)
         with pytest.raises(exceptions.SynphotError):
-            obs2 = Observation(self.obs.spectrum, self.obs.spectrum)
+            Observation(self.obs.spectrum, self.obs.spectrum)
 
     def test_inherit_warnings(self):
         assert sorted(self.obs.warnings) == ['w1', 'w2']
@@ -67,11 +67,11 @@ class TestObservation(object):
             Empirical1D, points=[39999.9, 40000, 40001, 40001.1],
             lookup_table=[0, 1, 1, 0])
         with pytest.raises(exceptions.DisjointError):
-            obs2 = Observation(sp, self.obs.bandpass)
+            Observation(sp, self.obs.bandpass)
 
     def test_taper(self):
         with pytest.raises(NotImplementedError):
-            obs2 = self.obs.taper()
+            self.obs.taper()
 
     def test_binned_data(self):
         # Binned flux
@@ -118,9 +118,9 @@ class TestObservation(object):
 
     def test_sampled_binned_exceptions(self):
         with pytest.raises(exceptions.InterpolationNotAllowed):
-            y = self.obs.sample_binned([6000, 6004.5, 6009])
+            self.obs.sample_binned([6000, 6004.5, 6009])
         with pytest.raises(exceptions.UnsortedWavelength):
-            y = self.obs.sample_binned([6004, 6000, 6009])
+            self.obs.sample_binned([6004, 6000, 6009])
 
     @pytest.mark.parametrize(
         ('cenwave', 'ans'),
@@ -139,11 +139,8 @@ class TestObservation(object):
         np.testing.assert_array_equal(obs2.binset, self.obs.bandpass.waveset)
 
     def test_default_binset_from_spectrum(self):
-        x0 = 5000  # Angstrom
-        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM).value
-
-        sp = SourceSpectrum(GaussianFlux1D, mean=x0, total_flux=totflux,
-                            fwhm=10)
+        sp = SourceSpectrum(
+            GaussianFlux1D, mean=5000, total_flux=(1 * units.FLAM), fwhm=10)
         bp = SpectralElement(Const1D, amplitude=1)
         obs2 = Observation(sp, bp, force='extrap')
         np.testing.assert_array_equal(obs2.binset, sp.waveset)
@@ -151,7 +148,7 @@ class TestObservation(object):
     def test_undefined_binset(self):
         bp = SpectralElement(Const1D, amplitude=1)
         with pytest.raises(exceptions.UndefinedBinset):
-            obs2 = Observation(self.obs.spectrum, bp)
+            Observation(self.obs.spectrum, bp)
 
     def test_as_spectrum(self):
         w = np.arange(6000, 6005)
@@ -184,9 +181,9 @@ class TestInitWithForce(object):
 
     def test_exceptions(self):
         with pytest.raises(exceptions.PartialOverlap):
-            obs = Observation(self.sp, self.bp)
+            Observation(self.sp, self.bp)
         with pytest.raises(exceptions.SynphotError):
-            obs = Observation(self.sp, self.bp, force='foo')
+            Observation(self.sp, self.bp, force='foo')
 
 
 class TestMathOperators(object):
@@ -211,13 +208,13 @@ class TestMathOperators(object):
 
     def test_div(self):
         with pytest.raises(NotImplementedError):
-            obs2 = self.obs / 2
+            self.obs / 2
 
     def test_addsub(self):
         with pytest.raises(NotImplementedError):
-            obs2 = self.obs + self.obs
+            self.obs + self.obs
         with pytest.raises(NotImplementedError):
-            obs2 = self.obs - self.obs
+            self.obs - self.obs
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -265,7 +262,7 @@ class TestObsPar(object):
 
     def test_efflam_exception(self):
         with pytest.raises(exceptions.SynphotError):
-            w = self.obs.effective_wavelength(mode='foo')
+            self.obs.effective_wavelength(mode='foo')
 
     @pytest.mark.parametrize(
         ('flux_unit', 'ans'),
@@ -315,9 +312,9 @@ class TestObsPar(object):
 
     def test_effstim_exceptions(self):
         with pytest.raises(exceptions.SynphotError):
-            x = self.obs.effstim(flux_unit=u.mag)
+            self.obs.effstim(flux_unit=u.mag)
         with pytest.raises(exceptions.SynphotError):
-            x = self.obs.effstim(flux_unit=units.VEGAMAG)
+            self.obs.effstim(flux_unit=units.VEGAMAG)
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -371,11 +368,11 @@ class TestCountRate(object):
 
         # Must raise error without force
         with pytest.raises(exceptions.PartialOverlap):
-            x = self.obs.countrate(_area, waverange=w)
+            self.obs.countrate(_area, waverange=w)
 
     def test_disjoint_waverange(self):
         with pytest.raises(exceptions.DisjointError):
-            x = self.obs.countrate(_area, waverange=[1020, 1030])
+            self.obs.countrate(_area, waverange=[1020, 1030])
 
 
 @pytest.mark.skipif('not HAS_SCIPY')

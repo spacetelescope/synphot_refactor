@@ -536,11 +536,8 @@ class TestNormalize(object):
         self.bb = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
 
         # Gaussian emission line: em(5500, 250, 1e-13, flam)
-        x0 = 5500
-        totflux = units.convert_flux(
-            x0, 1e-13 * units.FLAM, units.PHOTLAM).value
-        self.em = SourceSpectrum(GaussianFlux1D, mean=x0, total_flux=totflux,
-                                 fwhm=250)
+        self.em = SourceSpectrum(GaussianFlux1D, mean=5500,
+                                 total_flux=(1e-13 * units.FLAM), fwhm=250)
 
         # ACS bandpass: band(acs,hrc,f555w)
         bandfile = get_pkg_data_filename(
@@ -642,7 +639,7 @@ class TestNormalize(object):
 
     def test_renorm_partial_most(self):
         """Test 'partial_most' overlap."""
-        bp = SpectralElement(Box1D, amplitude=1, x_0=5600, width=970)
+        bp = SpectralElement(Box1D, amplitude=1, x_0=5600, width=870)
         rn_sp = self.em.normalize(1e-23 * u.Jy, band=bp)
         assert 'PartialRenorm' in rn_sp.warnings
         assert 'PartialRenorm' not in self.em.warnings
@@ -675,10 +672,8 @@ class TestWaveset(object):
         assert sp.waveset is None
 
     def test_sampleset(self):
-        x0 = 5000
-        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM).value
         sp = SourceSpectrum(
-            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=10)
+            GaussianFlux1D, total_flux=(1 * units.FLAM), mean=5000, fwhm=10)
         np.testing.assert_array_equal(sp.waveset.value, sp.model.sampleset())
 
     def test_box1d(self):
@@ -692,36 +687,25 @@ class TestWaveset(object):
         np.testing.assert_array_equal(bp.waveset, bp1.waveset)
 
     def test_composite(self):
-        x0 = 5000
-        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM)
+        totflux = 1 * units.FLAM
         g1 = SourceSpectrum(
-            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=10)
-
-        x0 = 6500
-        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM)
+            GaussianFlux1D, total_flux=totflux, mean=5000, fwhm=10)
         g2 = SourceSpectrum(
-            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=100)
-
-        x0 = 7500
-        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM)
+            GaussianFlux1D, total_flux=totflux, mean=6500, fwhm=100)
         g3 = SourceSpectrum(
-            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=5)
-
+            GaussianFlux1D, total_flux=totflux, mean=7500, fwhm=5)
         sp = (SpectralElement(Box1D, amplitude=1, x_0=1000, width=1) *
               (g1 + g2 + g3))
         np.testing.assert_allclose(
             sp.waveset.value[::100],
-            [999.49, 1000.49, 5018.26041871, 6635.89148805, 7504.45893945])
+            [999.49, 1000.49, 5020.383723, 6703.837232, 7509.979531])
 
     def test_redshift(self):
-        x0 = 5000
-        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM)
         sp = SourceSpectrum(
-            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=10)
+            GaussianFlux1D, total_flux=(1 * units.FLAM), mean=5000, fwhm=10)
         sp.z = 1.3
         m = RedshiftScaleFactor(z=1.3)
-        w_step25_z0 = [4976.64365049, 4987.260173, 4997.8766955, 5008.493218,
-                       5019.10974051]
+        w_step25_z0 = [4978.76695499, 4989.3834775, 5000, 5010.6165225]
         np.testing.assert_allclose(sp.waveset.value[::25], m(w_step25_z0))
 
     def test_redshift_none(self):
@@ -741,7 +725,7 @@ class TestRedShift(object):
     """
     def setup_class(self):
         x0 = 5000
-        totflux = units.convert_flux(x0, 1 * u.Jy, units.PHOTLAM)
+        totflux = 1 * u.Jy
         fwhm = 100
         self.sp_z0 = SourceSpectrum(
             GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=fwhm)
