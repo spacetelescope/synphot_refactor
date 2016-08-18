@@ -45,11 +45,11 @@ class Observation(BaseSourceSpectrum):
         If not a Quantity, assumed to be in Angstrom.
         If `None`, input ``self.waveset`` values are used.
 
-    force : {'none', 'extrap', 'taper'}
+    force : {`None`, 'none', 'extrap', 'taper'}
         Force creation of an observation even when source spectrum
         and bandpass do not fully overlap:
 
-            * 'none' - Source must encompass bandpass (default)
+            * `None` or 'none' - Source must encompass bandpass (default)
             * 'extrap' - Extrapolate source spectrum
             * 'taper' - Taper source spectrum
 
@@ -80,7 +80,10 @@ class Observation(BaseSourceSpectrum):
         warn = {}
 
         # Validate overlap
-        force = force.lower()
+        if force is None:
+            force = 'none'
+        else:
+            force = force.lower()
         stat = band.check_overlap(spec)
 
         if stat == 'none':
