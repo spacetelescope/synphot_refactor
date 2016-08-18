@@ -354,6 +354,10 @@ class Empirical1D(Tabular1D):
 
         return y
 
+    def is_tapered(self):
+        return np.array_equal(
+            self.lookup_table[::self.lookup_table.size - 1], [0, 0])
+
     def sampleset(self):
         """Return ``points`` array that samples the feature."""
         return self.points

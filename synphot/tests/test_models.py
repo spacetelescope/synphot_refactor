@@ -174,6 +174,14 @@ class TestEmpirical1D(object):
         if not keep_neg:
             assert 'NegativeFlux' in m2.meta['warnings']
 
+    @pytest.mark.parametrize(
+        ('tab', 'ans'),
+        [([0, 1, 0], True),
+         ([0, 1, 1], False)])
+    def test_taper(self, tab, ans):
+        m2 = Empirical1D(points=[1, 2, 3], lookup_table=tab)
+        assert m2.is_tapered() is ans
+
 
 class TestPowerLawFlux1D(object):
     """Test PowerLawFlux1D model."""
