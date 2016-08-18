@@ -86,30 +86,39 @@ class Observation(BaseSourceSpectrum):
         if stat == 'none':
             raise exceptions.DisjointError(
                 'Source spectrum and bandpass are disjoint.')
+
         elif 'partial' in stat:
+
             if force == 'none':
                 raise exceptions.PartialOverlap(
                     'Source spectrum and bandpass do not fully overlap. '
                     'You may use force=[extrap|taper] to force this '
                     'Observation anyway.')
+
             elif force == 'taper':
                 spec = spec.taper()
                 msg = 'Source spectrum is tapered.'
                 warnings.warn(msg, AstropyUserWarning)
                 warn['PartialOverlap'] = msg
-            elif force.startswith('extrap'):
-                msg = ('Source spectrum will be extrapolated (at constant ' +
-                       'value for empirical model).')
-                warnings.warn(msg, AstropyUserWarning)
-                warn['PartialOverlap'] = msg
 
+            elif force.startswith('extrap'):
                 if isinstance(spec.model, Empirical1D):
                     spec.model.method = 'nearest'
                     spec.model.fill_value = None
+                    msg = ('Source spectrum will be extrapolated (at constant '
+                           'value for empirical model).')
+                else:
+                    msg = ('Source spectrum will be evaluated outside '
+                           'pre-defined waveset.')
+
+                warnings.warn(msg, AstropyUserWarning)
+                warn['PartialOverlap'] = msg
+
             else:
                 raise exceptions.SynphotError(
                     'force={0} is invalid, must be "none", "taper", '
                     'or "extrap"'.format(force))
+
         elif stat != 'full':  # pragma: no cover
             raise exceptions.SynphotError(
                 'Overlap result of {0} is unexpected'.format(stat))
