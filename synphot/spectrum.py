@@ -597,7 +597,8 @@ class BaseSpectrum(object):
             # This logic assumes __call__ never returns mag or count!
             if ((isinstance(other.model, Empirical1D) and
                  other.model.is_tapered() or
-                 not isinstance(other.model,  _CompoundModel)) and
+                 not isinstance(other.model,
+                                (Empirical1D, _CompoundModel))) and
                     np.allclose(other(x1[::x1.size-1]).value, 0)):
                 result = 'full'
 
