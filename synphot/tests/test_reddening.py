@@ -85,7 +85,7 @@ def test_redlaw_from_model(modelname):
     .. note:: No check on data quality as it is dependent on data file.
 
     """
-    redlaw = ReddeningLaw.from_extinction_model(modelname, encoding='binary')
+    redlaw = ReddeningLaw.from_extinction_model(modelname)
     assert modelname in redlaw.meta['expr']
     assert 'filename' in redlaw.meta['header']
     assert 'descrip' in redlaw.meta['header']

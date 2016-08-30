@@ -25,8 +25,8 @@ __all__ = ['read_remote_spec', 'read_spec', 'read_ascii_spec',
            'read_fits_spec', 'write_fits_spec']
 
 
-def read_remote_spec(filename, encoding=None, cache=True, show_progress=True,
-                     **kwargs):
+def read_remote_spec(filename, encoding='binary', cache=True,
+                     show_progress=True, **kwargs):
     """Read FITS or ASCII spectrum from a remote location.
 
     Parameters

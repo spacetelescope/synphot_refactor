@@ -305,7 +305,7 @@ class TestObsPar(object):
 
     @remote_data
     def test_effstim_vegamag(self):
-        vspec = SourceSpectrum.from_vega(encoding='binary')
+        vspec = SourceSpectrum.from_vega()
         np.testing.assert_allclose(
             self.obs.effstim(flux_unit=units.VEGAMAG, vegaspec=vspec).value,
             12.74661, atol=0.01, rtol=0)  # 1%
