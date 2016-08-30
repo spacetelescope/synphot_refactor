@@ -49,7 +49,7 @@ _vspec = None  # Loaded in test_load_vspec()
 def test_load_vspec():
     """Load VEGA spectrum once here to be used later."""
     global _vspec
-    _vspec = SourceSpectrum.from_vega(encoding='binary')
+    _vspec = SourceSpectrum.from_vega()
 
 
 @remote_data
@@ -86,7 +86,7 @@ def test_filter(filtername):
         Filter data quality is not checked as it depends on the file.
 
     """
-    bp = SpectralElement.from_filter(filtername, encoding='binary')
+    bp = SpectralElement.from_filter(filtername)
     assert isinstance(bp.model, Empirical1D)
     assert filtername in bp.meta['expr']
 
