@@ -288,6 +288,8 @@ class Empirical1D(Tabular1D):
     kwargs : dict
         Keywords for `~astropy.modeling.models.Tabular1D` model
         creation or :func:`~scipy.interpolate.interpn`.
+        When ``fill_value=np.nan`` is given, extrapolation is done
+        based on nearest end points on each end.
 
     """
     def __init__(self, **kwargs):
@@ -377,6 +379,19 @@ class Empirical1D(Tabular1D):
 
         """
         y = super(Empirical1D, self).evaluate(inputs)
+
+        # Assume NaN at both ends need to be extrapolated based on
+        # nearest end point.
+        if not self.is_tapered() and self.fill_value is np.nan:
+            if np.isscalar(y):
+                if inputs < self.points[0]:
+                    y = self.lookup_table[0]
+                elif inputs > self.points[-1]:
+                    y = self.lookup_table[-1]
+            else:
+                y[inputs < self.points[0]] = self.lookup_table[0]
+                y[inputs > self.points[-1]] = self.lookup_table[-1]
+
         return self._process_neg_flux(inputs, y)
 
 

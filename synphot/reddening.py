@@ -5,6 +5,9 @@ from __future__ import absolute_import, division, print_function
 # STDLIB
 import numbers
 
+# THIRD-PARTY
+import numpy as np
+
 # ASTROPY
 from astropy import units as u
 
@@ -69,7 +72,7 @@ class ReddeningLaw(BaseUnitlessSpectrum):
 
         return ExtinctionCurve(
             Empirical1D, points=x, lookup_table=y, meta={'header': header},
-            fill_value=None)
+            fill_value=np.nan)
 
     def to_fits(self, filename, wavelengths=None, **kwargs):
         """Write the reddening law to a FITS file.
@@ -148,7 +151,7 @@ class ReddeningLaw(BaseUnitlessSpectrum):
         header, wavelengths, rvs = specio.read_spec(filename, **kwargs)
 
         return cls(Empirical1D, points=wavelengths, lookup_table=rvs,
-                   meta={'header': header}, fill_value=None)
+                   meta={'header': header}, fill_value=np.nan)
 
     @classmethod
     def from_extinction_model(cls, modelname, **kwargs):
@@ -212,7 +215,7 @@ class ReddeningLaw(BaseUnitlessSpectrum):
         meta = {'header': header, 'expr': modelname}
 
         return cls(Empirical1D, points=wavelengths, lookup_table=rvs,
-                   meta=meta, fill_value=None)
+                   meta=meta, fill_value=np.nan)
 
 
 class ExtinctionCurve(BaseUnitlessSpectrum):
