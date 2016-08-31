@@ -50,7 +50,9 @@ class Observation(BaseSourceSpectrum):
         and bandpass do not fully overlap:
 
             * `None` or 'none' - Source must encompass bandpass (default)
-            * 'extrap' - Extrapolate source spectrum
+            * 'extrap' - Extrapolate source spectrum (this changes the
+              underlying model of ``spec`` to always extrapolate,
+              if applicable)
             * 'taper' - Taper source spectrum
 
     Raises
@@ -105,9 +107,7 @@ class Observation(BaseSourceSpectrum):
                 warn['PartialOverlap'] = msg
 
             elif force.startswith('extrap'):
-                if isinstance(spec.model, Empirical1D):
-                    spec.model.method = 'nearest'
-                    spec.model.fill_value = None
+                if spec.force_extrapolation():
                     msg = ('Source spectrum will be extrapolated (at constant '
                            'value for empirical model).')
                 else:
