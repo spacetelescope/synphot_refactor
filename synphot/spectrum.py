@@ -627,6 +627,37 @@ class BaseSpectrum(object):
 
         return result
 
+    def force_extrapolation(self):
+        """Force the underlying model to extrapolate.
+
+        An example where this is useful: You read in a source spectrum
+        from file (by default, the model returns zero flux if given
+        wavelength is out of range) and you wish to force the underlying
+        empirical model to extrapolate based on nearest point.
+
+        .. note::
+
+            This is only applicable to `~synphot.models.Empirical1D` model
+            and should still work even if the source spectrum has been
+            redshifted.
+
+        Returns
+        -------
+        is_forced : bool
+            `True` if the model is successfully forced to be extrapolated,
+            else `False`.
+
+        """
+        # We use _model here in case the spectrum is redshifted.
+        if isinstance(self._model, Empirical1D):
+            self._model.method = 'nearest'
+            self._model.fill_value = None
+            is_forced = True
+        else:
+            is_forced = False
+
+        return is_forced
+
     def taper(self, wavelengths=None):
         """Taper the spectrum or bandpass.
 
@@ -864,7 +895,9 @@ class BaseSourceSpectrum(BaseSpectrum):
             By default (`False`), renormalization is only done
             when band wavelength limits are within ``self``
             or at least 99% of the flux is within the overlap.
-            Set to `True` to force renormalization for partial overlap.
+            Set to `True` to force renormalization for partial overlap
+            (this changes the underlying model of ``self`` to always
+            extrapolate, if applicable).
             Disjoint bandpass raises an exception regardless.
 
         area, vegaspec
@@ -903,28 +936,31 @@ class BaseSourceSpectrum(BaseSpectrum):
                 raise exceptions.DisjointError(
                     'Spectrum and renormalization band are disjoint.')
 
-            elif stat == 'partial_most':
-                warn_str = (
-                    'Spectrum is not defined everywhere in renormalization' +
-                    'bandpass. At least 99% of the band throughput has' +
-                    'data. Spectrum will be extrapolated at constant value.')
-                warndict['PartialRenorm'] = warn_str
-                warnings.warn(warn_str, AstropyUserWarning)
-
-            elif stat == 'partial_notmost':
-                if force:
-                    warn_str = (
-                        'Spectrum is not defined everywhere in '
-                        'renormalization bandpass. Less than 99% of the ' +
-                        'band throughput has data. Spectrum will be ' +
-                        'extrapolated at constant value.')
-                    warndict['PartialRenorm'] = warn_str
-                    warnings.warn(warn_str, AstropyUserWarning)
+            elif 'partial' in stat:
+                if stat == 'partial_most':
+                    warn_str = 'At least'
+                elif stat == 'partial_notmost' and force:
+                    warn_str = 'Less than'
                 else:
                     raise exceptions.PartialOverlap(
                         'Spectrum and renormalization band do not fully '
                         'overlap. You may use force=True to force the '
                         'renormalization to proceed.')
+
+                warn_str = (
+                    'Spectrum is not defined everywhere in renormalization '
+                    'bandpass. {0} 99% of the band throughput has '
+                    'data. Spectrum will be').format(warn_str)
+
+                if self.force_extrapolation():
+                    warn_str = ('{0} extrapolated at constant '
+                                'value.').format(warn_str)
+                else:
+                    warn_str = ('{0} evaluated outside pre-defined '
+                                'waveset.').format(warn_str)
+
+                warnings.warn(warn_str, AstropyUserWarning)
+                warndict['PartialRenorm'] = warn_str
 
             elif stat != 'full':  # pragma: no cover
                 raise exceptions.SynphotError(
@@ -946,12 +982,14 @@ class BaseSourceSpectrum(BaseSpectrum):
             stdflux = 1.0
         else:
             totalflux = sp.integrate(wavelengths=wavelengths)
+
             # VEGAMAG
             if renorm_unit_name == units.VEGAMAG.to_string():
                 if not isinstance(vegaspec, SourceSpectrum):
                     raise exceptions.SynphotError(
                         'Vega spectrum is missing.')
                 stdspec = vegaspec
+
             # Magnitude flux-density units
             elif renorm_val.unit in (u.STmag, u.ABmag):
                 stdspec = SourceSpectrum(

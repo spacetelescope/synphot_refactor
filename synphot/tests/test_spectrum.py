@@ -527,6 +527,33 @@ class TestCheckOverlap(object):
             self.bp.check_overlap(1)
 
 
+class TestForceExtrap(object):
+    """Test forcing extrapolation on a source spectrum."""
+
+    @pytest.mark.skipif('not HAS_SCIPY')
+    @pytest.mark.parametrize('z', [0, 0.03])
+    def test_empirical(self, z):
+        sp = SourceSpectrum(Empirical1D, points=[1000, 2000, 3000, 4000],
+                            lookup_table=[0.5, 0.6, 10.6, 1.5])
+        sp.z = z
+        w = [900, 4300]
+        np.testing.assert_allclose(sp(w).value, 0)  # No extrapolation
+
+        is_forced = sp.force_extrapolation()  # Force extrapolation
+        assert is_forced
+        np.testing.assert_allclose(sp(w).value, [0.5, 1.5])
+
+    def test_analytical(self):
+        """Forcing is not possible."""
+        sp = SourceSpectrum(GaussianFlux1D, mean=5500, total_flux=1, fwhm=10)
+        w = [100, 10000]
+        np.testing.assert_allclose(sp(w).value, 0)
+
+        is_forced = sp.force_extrapolation()
+        assert not is_forced
+        np.testing.assert_allclose(sp(w).value, 0)
+
+
 @pytest.mark.skipif('not HAS_SCIPY')
 class TestNormalize(object):
     """Test source spectrum normalization."""
