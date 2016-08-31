@@ -499,8 +499,7 @@ class TestCheckOverlap(object):
     def test_partial_notmost(self):
         """Extrapolation or taper required."""
         sp = SourceSpectrum(
-            Empirical1D, points=[3999.9, 4500.1], lookup_table=[1, 1],
-            fill_value=None)
+            Empirical1D, points=[3999.9, 4500.1], lookup_table=[1, 1])
         assert self.bp.check_overlap(sp) == 'partial_notmost'
 
     def test_none(self):
@@ -534,7 +533,7 @@ class TestForceExtrap(object):
     @pytest.mark.parametrize('z', [0, 0.03])
     def test_empirical(self, z):
         sp = SourceSpectrum(Empirical1D, points=[1000, 2000, 3000, 4000],
-                            lookup_table=[0.5, 0.6, 10.6, 1.5])
+                            lookup_table=[0.5, 0.6, 10.6, 1.5], fill_value=0)
         sp.z = z
         w = [900, 4300]
         np.testing.assert_allclose(sp(w).value, 0)  # No extrapolation
@@ -655,7 +654,7 @@ class TestNormalize(object):
     def test_renorm_partial_notmost(self):
         """Test force=True for 'partial_notmost' overlap."""
         sp = SourceSpectrum(Empirical1D, points=[5000, 6000],
-                            lookup_table=[1, 1], fill_value=None)
+                            lookup_table=[1, 1])
         rn_sp = sp.normalize(1e-23 * u.Jy, band=self.acs, force=True)
         assert 'PartialRenorm' in rn_sp.warnings
         assert 'PartialRenorm' not in sp.warnings
@@ -791,7 +790,6 @@ class TestMathOperators(object):
             lookup_table=[0, 3.5e-14, 4e-14, 4.5e-14, 0] * units.FLAM)
         self.sp_2 = SourceSpectrum(
             Empirical1D, points=_wave, lookup_table=_flux_jy,
-            fill_value=np.nan,
             meta={'PHOTLAM': [9.7654e-3, 1.003896e-2, 9.78473e-3]})
         self.bp_1 = SpectralElement(
             Empirical1D, points=[399.99, 400.01, 500.0, 590.0, 600.1] * u.nm,
