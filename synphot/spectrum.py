@@ -650,8 +650,7 @@ class BaseSpectrum(object):
         """
         # We use _model here in case the spectrum is redshifted.
         if isinstance(self._model, Empirical1D):
-            self._model.method = 'nearest'
-            self._model.fill_value = None
+            self._model.fill_value = np.nan
             is_forced = True
         else:
             is_forced = False

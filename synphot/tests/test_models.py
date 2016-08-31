@@ -118,8 +118,7 @@ class TestEmpirical1D(object):
         y = units.convert_flux(x, f, units.PHOTLAM)
         self.flux_flam = f.value
         self.w = x.value
-        self.m = Empirical1D(
-            points=self.w, lookup_table=y.value, method='linear')
+        self.m = Empirical1D(points=self.w, lookup_table=y.value)
 
     def test_sampleset(self):
         np.testing.assert_array_equal(self.m.sampleset(), self.w)
@@ -181,6 +180,18 @@ class TestEmpirical1D(object):
     def test_taper(self, tab, ans):
         m2 = Empirical1D(points=[1, 2, 3], lookup_table=tab)
         assert m2.is_tapered() is ans
+
+    def test_extrap(self):
+        """Test extrapolation of constant at both ends, as done in
+        ASTROLIB PYSYNPHOT.
+        """
+        m2 = Empirical1D(
+            points=[1000, 2000, 3000, 4000],
+            lookup_table=[0.01, 5.0, 10.6, 1.5], fill_value=np.nan)
+        assert m2(900) == 0.01
+        assert m2(10000) == 1.5
+        np.testing.assert_allclose(
+            m2([900, 1000, 1500, 10000]), [0.01, 0.01, 2.505, 1.5])
 
 
 class TestPowerLawFlux1D(object):

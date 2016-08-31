@@ -791,7 +791,7 @@ class TestMathOperators(object):
             lookup_table=[0, 3.5e-14, 4e-14, 4.5e-14, 0] * units.FLAM)
         self.sp_2 = SourceSpectrum(
             Empirical1D, points=_wave, lookup_table=_flux_jy,
-            fill_value=None, method='nearest',
+            fill_value=np.nan,
             meta={'PHOTLAM': [9.7654e-3, 1.003896e-2, 9.78473e-3]})
         self.bp_1 = SpectralElement(
             Empirical1D, points=[399.99, 400.01, 500.0, 590.0, 600.1] * u.nm,
