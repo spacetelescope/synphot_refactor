@@ -630,10 +630,9 @@ class BaseSpectrum(object):
     def force_extrapolation(self):
         """Force the underlying model to extrapolate.
 
-        An example where this is useful: You read in a source spectrum
-        from file (by default, the model returns zero flux if given
-        wavelength is out of range) and you wish to force the underlying
-        empirical model to extrapolate based on nearest point.
+        An example where this is useful: You create a source spectrum
+        with non-default extrapolation behavior and you wish to force
+        the underlying empirical model to extrapolate based on nearest point.
 
         .. note::
 

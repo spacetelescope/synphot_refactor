@@ -289,7 +289,8 @@ class Empirical1D(Tabular1D):
         Keywords for `~astropy.modeling.models.Tabular1D` model
         creation or :func:`~scipy.interpolate.interpn`.
         When ``fill_value=np.nan`` is given, extrapolation is done
-        based on nearest end points on each end.
+        based on nearest end points on each end; This is the default
+        behavior.
 
     """
     def __init__(self, **kwargs):
@@ -318,9 +319,14 @@ class Empirical1D(Tabular1D):
         kwargs['lookup_table'] = y
         super(Empirical1D, self).__init__(**kwargs)
 
-        # Set non-default interpolation default values
+        # Set non-default interpolation default values.
+        # For tapered model, just fill with zero;
+        # Otherwise, extrapolate like ASTROLIB PYSYNPHOT.
         self.bounds_error = kwargs.get('bounds_error', False)
-        self.fill_value = kwargs.get('fill_value', 0)
+        if self.is_tapered():
+            self.fill_value = kwargs.get('fill_value', 0)
+        else:
+            self.fill_value = kwargs.get('fill_value', np.nan)
 
     def _process_neg_flux(self, x, y):
         """Remove negative flux."""
@@ -330,7 +336,7 @@ class Empirical1D(Tabular1D):
 
         old_y = None
 
-        if np.isscalar(y):
+        if np.isscalar(y):  # pragma: no cover
             if y < 0:
                 n_neg = 1
                 old_x = x
@@ -382,8 +388,8 @@ class Empirical1D(Tabular1D):
 
         # Assume NaN at both ends need to be extrapolated based on
         # nearest end point.
-        if not self.is_tapered() and self.fill_value is np.nan:
-            if np.isscalar(y):
+        if self.fill_value is np.nan:
+            if np.isscalar(y):  # pragma: no cover
                 if inputs < self.points[0]:
                     y = self.lookup_table[0]
                 elif inputs > self.points[-1]:

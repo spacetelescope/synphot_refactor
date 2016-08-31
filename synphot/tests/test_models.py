@@ -187,7 +187,7 @@ class TestEmpirical1D(object):
         """
         m2 = Empirical1D(
             points=[1000, 2000, 3000, 4000],
-            lookup_table=[0.01, 5.0, 10.6, 1.5], fill_value=np.nan)
+            lookup_table=[0.01, 5.0, 10.6, 1.5])
         assert m2(900) == 0.01
         assert m2(10000) == 1.5
         np.testing.assert_allclose(
