@@ -234,4 +234,4 @@ class TestPowerLawFlux1D(object):
         'flux_unit', [u.count, units.OBMAG, units.VEGAMAG, u.AA])
     def test_invalid_units(self, flux_unit):
         with pytest.raises(NotImplementedError):
-            m = PowerLawFlux1D(amplitude=1*flux_unit, x_0=5000, alpha=4)
+            PowerLawFlux1D(amplitude=1*flux_unit, x_0=5000, alpha=4)

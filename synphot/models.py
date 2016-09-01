@@ -189,7 +189,7 @@ class Box1D(_models.Box1D):
         if minimal:
             arr = [w1 - step, w1, w2, w2 + step]
         else:
-            arr = np.arange(w1 - step, w2 + step, step)
+            arr = np.arange(w1 - step, w2 + step + step, step)
 
         return arr
 

@@ -703,8 +703,12 @@ class TestWaveset(object):
         np.testing.assert_array_equal(sp.waveset.value, sp.model.sampleset())
 
     def test_box1d(self):
-        bp = SpectralElement(Box1D, amplitude=1, x_0=5000, width=10)
-        np.testing.assert_array_equal(bp.waveset.value, bp.model.sampleset())
+        bp = SpectralElement(Box1D, x_0=2000, width=1)
+        w = bp.waveset.value
+
+        np.testing.assert_array_equal(w, bp.model.sampleset())
+        np.testing.assert_allclose(
+            w[([0, 1, -2, -1], )], bp.model.sampleset(minimal=True))
 
     def test_composite_none(self):
         bp1 = SpectralElement(Box1D, amplitude=1, x_0=5000, width=10)
@@ -720,11 +724,10 @@ class TestWaveset(object):
             GaussianFlux1D, total_flux=totflux, mean=6500, fwhm=100)
         g3 = SourceSpectrum(
             GaussianFlux1D, total_flux=totflux, mean=7500, fwhm=5)
-        sp = (SpectralElement(Box1D, amplitude=1, x_0=1000, width=1) *
-              (g1 + g2 + g3))
+        sp = SpectralElement(Box1D, x_0=1000, width=1) * (g1 + g2 + g3)
         np.testing.assert_allclose(
             sp.waveset.value[::100],
-            [999.49, 1000.49, 5020.383723, 6703.837232, 7509.979531])
+            [999.49, 1000.49, 5019.95906231, 6699.59062307, 7509.7672007])
 
     def test_redshift(self):
         sp = SourceSpectrum(
