@@ -135,9 +135,6 @@ def read_ascii_spec(filename, wave_unit=u.AA, flux_unit=units.FLAM, **kwargs):
     """
     header = {}
 
-    if 'guess' not in kwargs:
-        kwargs['guess'] = False
-
     dat = ascii.read(filename, **kwargs)
 
     wave_unit = units.validate_unit(wave_unit)
