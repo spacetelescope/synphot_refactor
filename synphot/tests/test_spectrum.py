@@ -492,7 +492,7 @@ class TestCheckOverlap(object):
     def test_partial_most(self):
         """99% overlap."""
         sp = SourceSpectrum(
-            Empirical1D, points=[3000, 3001, 6000.1, 6000.2],
+            Empirical1D, points=[3005, 3005.1, 6000.1, 6000.2],
             lookup_table=[0, 1, 1, 0])
         assert self.bp.check_overlap(sp) == 'partial_most'
 
@@ -505,7 +505,7 @@ class TestCheckOverlap(object):
     def test_none(self):
         """No overlap at all."""
         sp = SourceSpectrum(
-            Empirical1D, points=[99.9, 100, 2999.9, 3000],
+            Empirical1D, points=[99.9, 100, 2999.8, 2999.9],
             lookup_table=[0, 1, 1, 0])
         assert self.bp.check_overlap(sp) == 'none'
 
