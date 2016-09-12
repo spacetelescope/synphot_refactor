@@ -1232,8 +1232,30 @@ class SpectralElement(BaseUnitlessSpectrum):
     def check_overlap(self, other, wavelengths=None, threshold=0.01):
         """Check for wavelength overlap between two spectra.
 
-        Only wavelengths where the flux or throughput is non-zero
+        Only wavelengths where ``self`` throughput is non-zero
         are considered.
+
+        Example of full overlap::
+
+            |---------- other ----------|
+               |------ self ------|
+
+        Examples of partial overlap::
+
+            |---------- self ----------|
+               |------ other ------|
+
+            |---- other ----|
+               |---- self ----|
+
+            |---- self ----|
+               |---- other ----|
+
+        Examples of no overlap::
+
+            |---- self ----|  |---- other ----|
+
+            |---- other ----|  |---- self ----|
 
         Parameters
         ----------
@@ -1283,9 +1305,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         y1 = self(x1)
         a = x1[y1 > 0].value
 
-        x2 = other._validate_wavelengths(wavelengths)
-        y2 = other(x2)
-        b = x2[y2 > 0].value
+        b = other._validate_wavelengths(wavelengths).value
 
         result = utils.overlap_status(a, b)
 
