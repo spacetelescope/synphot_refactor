@@ -1737,7 +1737,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         header, wavelengths, throughput = specio.read_spec(filename, **kwargs)
         return cls(Empirical1D, points=wavelengths, lookup_table=throughput,
-                   meta={'header': header})
+                   keep_neg=True, meta={'header': header})
 
     @classmethod
     def from_filter(cls, filtername, **kwargs):
