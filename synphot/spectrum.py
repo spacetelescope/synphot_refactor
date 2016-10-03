@@ -805,6 +805,14 @@ class BaseSourceSpectrum(BaseSpectrum):
                   area=None, vegaspec=None):
         """Renormalize the spectrum to the given Quantity and band.
 
+        .. warning::
+
+            Redshift attribute (``z``) is reset to 0 in the normalized
+            spectrum even if ``self.z`` is non-zero.
+            This is because the normalization simply adds a scale
+            factor to the existing composite model.
+            This is confusing but should not affect the flux sampling.
+
         Parameters
         ----------
         renorm_val : number or `~astropy.units.quantity.Quantity`

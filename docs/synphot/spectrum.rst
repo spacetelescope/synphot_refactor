@@ -1,57 +1,9 @@
 .. doctest-skip-all
 
-.. _synphot_spectrum:
+.. _source-spectrum-main:
 
-Spectra Manipulation
-====================
-
-Internal Units
---------------
-
-For simplicity and to be consistent with ASTROLIB PYSYNPHOT, a spectrum has
-pre-defined internal units. A spectrum object internally stores its wavelength
-in Angstrom. Source spectrum stores flux in PHOTLAM, and unitless spectrum
-stores throughput etc. in THROUGHPUT (unitless).
-
-Some methods provide options to calculate or display wavelength and
-flux/throughput/etc. in other units. Please refer to API documentations.
-
-
-.. _synphot-io:
-
-I/O
----
-
-These are the supported ``synphot`` file types via `synphot.specio`:
-
-=========  ====  =====
-File type  Read  Write
-=========  ====  =====
-ASCII      Yes   No
-FITS       Yes   Yes
-=========  ====  =====
-
-Once a spectrum is read in as an object, one may also use the ``astropy.io``
-package to write it out to formats not supported here.
-When writing a spectrum out to FITS, the default behaviors mimic ASTROLIB
-PYSYNPHOT (e.g., padding with zero flux/throughput at both ends, and removing
-rows with zero flux/throughput and duplicate wavelengths); See
-:func:`~synphot.specio.write_fits_spec` for all the options.
-
-Examples
-^^^^^^^^
-
->>> from synphot import SourceSpectrum, SpectralElement
->>> sp = SourceSpectrum.from_file('/my/path/my_spec.fits')
->>> sp.to_fits('/my/path/my_spec_copy.fits')
->>> bp = SpectralElement.from_file('/my/path/my_filter.txt')
->>> bp.to_fits('/my/path/my_filter_copy.fits')
-
-
-.. _synphot-source-create:
-
-Creating a Source Spectrum
---------------------------
+Source Spectrum
+===============
 
 Load a `~synphot.spectrum.SourceSpectrum` from file:
 
@@ -127,7 +79,7 @@ A source spectrum can also be created from these pre-defined sources below.
 .. _synphot-planck-law:
 
 Blackbody Radiation
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 Blackbody spectrum is generated with Planck law
 (:ref:`Rybicki & Lightman 1979 <synphot-ref-rybicki1979>`).
@@ -156,7 +108,7 @@ u'bb(5777)'
 .. _synphot-gaussian:
 
 Gaussian Emission
-^^^^^^^^^^^^^^^^^
+-----------------
 
 .. math::
 
@@ -184,7 +136,7 @@ u'em(6000, 100, 1, PHOTLAM)'
     :alt: Gaussian emission spectrum.
 
 Gaussian Absorption
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 Unlike the other source spectrum components, Gaussian absorption line should be
 unitless (`~synphot.spectrum.BaseUnitlessSpectrum`) because it is to be
@@ -203,8 +155,8 @@ formula is given in `~synphot.models.GaussianAbsorption1D`.
 
 .. _synphot-powerlaw:
 
-Power-Law
-^^^^^^^^^
+Powerlaw
+--------
 
 .. math::
 
@@ -237,7 +189,7 @@ still be used if you only work in PHOTLAM. It does not have pre-defined
 .. _synphot-flat-spec:
 
 Flat (Constant Flux)
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
 A flat spectrum has a constant flux value in the given flux unit, except the
 following, as per ASTROLIB PYSYNPHOT:
@@ -264,7 +216,7 @@ so wavelength values have to be explicitly given when sampling.
 .. _synphot-vega-spec:
 
 Vega
-^^^^
+----
 
 By default, Vega spectrum is downloaded from STScI via configurable item
 ``synphot.config.conf.vega_file``, which requires internet connection, unless
@@ -279,152 +231,3 @@ it is a valid file format, remote or local, by changing the ``vega_file`` value.
 .. image:: images/vega_spec.png
     :width: 600px
     :alt: Vega spectrum.
-
-.. _synphot-bandpass-create:
-
-Creating a Bandpass
--------------------
-
-A bandpass (`~synphot.spectrum.SpectralElement`) has similar basic properties
-and methods as a source spectrum (see :ref:`synphot-source-create`), except that
-a bandpass throughput is always unitless. Not all source spectrum
-functionalities are available for bandpass, and vice versa, so check the API
-documentations.
-
-Below are the pre-defined bandpass for common filters. By default, they are
-downloaded from STScI as defined in ``synphot.config``. They can be accessed via
-:func:`~synphot.spectrum.SpectralElement.from_filter` by providing the following
-filter names:
-
-===========  ======================================  ===========
-Filter name  Config Item                             Description
-===========  ======================================  ===========
-'bessel_j'   ``synphot.config.conf.bessel_j_file``   Bessel J
-'bessel_h'   ``synphot.config.conf.bessel_h_file``   Bessel H
-'bessel_k'   ``synphot.config.conf.bessel_k_file``   Bessel K
-'cousins_r'  ``synphot.config.conf.cousins_r_file``  Cousins R
-'cousins_i'  ``synphot.config.conf.cousins_i_file``  Cousins I
-'johnson_u'  ``synphot.config.conf.johnson_u_file``  Johnson U
-'johnson_b'  ``synphot.config.conf.johnson_b_file``  Johnson B
-'johnson_v'  ``synphot.config.conf.johnson_v_file``  Johnson V
-'johnson_r'  ``synphot.config.conf.johnson_r_file``  Johnson R
-'johnson_i'  ``synphot.config.conf.johnson_i_file``  Johnson I
-'johnson_j'  ``synphot.config.conf.johnson_j_file``  Johnson J
-'johnson_k'  ``synphot.config.conf.johnson_k_file``  Johnson K
-===========  ======================================  ===========
-
->>> from synphot import SpectralElement
->>> johnson_b = SpectralElement.from_filter('johnson_b', encoding='binary')
-Downloading ftp://ftp.stsci.edu/cdbs/comp/nonhst/johnson_b_004_syn.fits
-|===========================================| 8.6k/8.6k (100.00%)        00s
->>> johnson_b.plot(title=johnson_b.metadata['descrip'])
-
-.. image:: images/johnson_b.png
-    :width: 600px
-    :alt: Johnson B bandpass.
-
-Bandpass also has access to photometric parameter calculations akin to
-IRAF SYNPHOT BANDPAR task (see :ref:`synphot_formulae` and respective API
-documentations). Some of these need the information of telescope collecting
-area, which will be set to HST value in the examples below:
-
->>> from astropy import units as u
->>> area = 45238.93416 * (u.cm * u.cm)
->>> johnson_b.avgwave()
-<Quantity 4385.924405300897 Angstrom>
->>> johnson_b.barlam()
-<Quantity 4345.239426511072 Angstrom>
->>> johnson_b.pivot()
-<Quantity 4372.226931731961 Angstrom>
->>> johnson_b.unit_response(area)
-<Quantity 1.0968603705608007e-19 FLAM>
->>> johnson_b.rmswidth()
-<Quantity 352.319136703647 Angstrom>
->>> johnson_b.photbw()
-<Quantity 338.25063150252436 Angstrom>
->>> johnson_b.fwhm()
-<Quantity 796.5193673065214 Angstrom>
->>> johnson_b.tlambda()
-<Quantity 0.8972899017977345>
->>> johnson_b.tpeak()
-<Quantity 1.0>
->>> johnson_b.wpeak()
-<Quantity 4050.0 Angstrom>
->>> johnson_b.equivwidth()
-<Quantity 912.7500013855752 Angstrom>
->>> johnson_b.rectwidth()
-<Quantity 912.7500013855752 Angstrom>
->>> johnson_b.efficiency()
-<Quantity 0.20941490743836771>
->>> johnson_b.emflx(area)
-<Quantity 1.1157590236369704e-16 FLAM>
-
-.. _synphot-box-bandpass:
-
-Box
-^^^
-
-Like a source spectrum, a bandpass can also be constructed from a model.
-A box model is one of the most commonly used.
-
-.. math::
-
-    throughput = \left \{
-            \begin{array}{ll}
-                A   & : x_0 - w/2 \geq x \geq x_0 + w/2 \\
-                0   & : \textnormal{else}
-            \end{array}
-        \right.
-
-where
-
-    * :math:`A =` Amplitude, usually 1
-    * :math:`x =` Wavelength array in the unit of :math:`x_{0}`
-    * :math:`x_{0} =` Central wavelength
-    * :math:`w =` Width of the box in the unit of :math:`x_{0}`
-
->>> from modeling import models  # Has to support composite model and sampleset
->>> bp = SpectralElement(models.Box1D, amplitude=1, x_0=5000, width=100)
->>> bp.plot(top=1.1, title='Box-shaped bandpass')
-
-.. image:: images/box_bandpass.png
-    :width: 600px
-    :alt: Box bandpass.
-
-
-.. _synphot-spec-math-op:
-
-Math Operations
----------------
-
-The following operations are available for ``synphot`` spectra
-(`~synphot.spectrum.BaseUnitlessSpectrum` also includes `~synphot.spectrum.SpectralElement`):
-
-======================================== ============== ============================================= ===========
-Operand 1                                Operation      Operand 2                                     Commutative
-======================================== ============== ============================================= ===========
-`~synphot.spectrum.SourceSpectrum`       :math:`+`      `~synphot.spectrum.SourceSpectrum`            Yes
-`~synphot.spectrum.SourceSpectrum`       :math:`-`      `~synphot.spectrum.SourceSpectrum`            No
-`~synphot.spectrum.SourceSpectrum`       :math:`\times` `~synphot.spectrum.BaseUnitlessSpectrum`      Yes
-`~synphot.spectrum.SourceSpectrum`       :math:`\times` Scalar number                                 Yes
-`~synphot.spectrum.SourceSpectrum`       :math:`\times` `~astropy.units.quantity.Quantity` (unitless) No
-`~synphot.spectrum.BaseUnitlessSpectrum` :math:`\times` `~synphot.spectrum.BaseUnitlessSpectrum`      Yes
-`~synphot.spectrum.BaseUnitlessSpectrum` :math:`\times` Scalar number                                 Yes
-`~synphot.spectrum.BaseUnitlessSpectrum` :math:`\times` `~astropy.units.quantity.Quantity` (unitless) No
-======================================== ============== ============================================= ===========
-
-Examples
-^^^^^^^^
-
->>> from synphot import SourceSpectrum, SpectralElement
->>> from modeling import models  # Has to support composite model and sampleset
->>> bb = SourceSpectrum.from_blackbody(6000)
->>> g1 = SourceSpectrum.from_gaussian(5e-13, 3000, 100)
->>> g2 = SourceSpectrum.from_gaussian(1e-13, 4000, 50)
->>> bp = SpectralElement(models.Box1D, amplitude=1, x_0=4000, width=3500)
->>> sp = (bb + g1 - g2) * 2 * (bp * u.Quantity(0.8))
->>> sp.plot(left=2000, right=6000)
-
-.. image:: images/spec_math_ex1.png
-    :width: 600px
-    :alt: Spectrum math example.

@@ -146,6 +146,11 @@ man_pages = [('index', project.lower(), project + u' Documentation',
               [author], 1)]
 
 
+# -- Options for intersphinx ---------------------------------------------------
+
+intersphinx_mapping.update({
+        'stsynphot': ('http://stsynphot.readthedocs.org/en/latest/', None)})
+
 ## -- Options for the edit_on_github extension ---------------------------------
 
 if eval(setup_cfg.get('edit_on_github')):
