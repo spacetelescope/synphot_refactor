@@ -308,6 +308,8 @@ def validate_unit(input_unit):
         elif input_unit_lowcase in ('transmission', 'extinction',
                                     'emissivity'):
             output_unit = THROUGHPUT
+        elif input_unit_lowcase == 'jy':
+            output_unit = u.Jy
 
         # Work around mag unit limitations
         elif input_unit_lowcase in ('stmag', 'mag(st)'):
