@@ -14,7 +14,8 @@ import numpy as np
 # ASTROPY
 from astropy import log
 from astropy import units as u
-from astropy.utils.exceptions import AstropyUserWarning
+from astropy.utils.exceptions import (AstropyUserWarning,
+                                      AstropyDeprecationWarning)
 
 # LOCAL
 from . import binning, exceptions, units, utils
@@ -372,7 +373,7 @@ class Observation(BaseSourceSpectrum):
             Flux is first converted to the unit below before calculation:
 
                 * 'efflerg' - FLAM
-                * 'efflphot' - PHOTLAM (depreciated)
+                * 'efflphot' - PHOTLAM (deprecated)
 
         Returns
         -------
@@ -390,7 +391,7 @@ class Observation(BaseSourceSpectrum):
             flux_unit = units.FLAM
         elif mode == 'efflphot':
             warnings.warn(
-                'Usage of EFFLPHOT is depreciated.', AstropyUserWarning)
+                'Usage of EFFLPHOT is deprecated.', AstropyDeprecationWarning)
             flux_unit = units.PHOTLAM
         else:
             raise exceptions.SynphotError(
