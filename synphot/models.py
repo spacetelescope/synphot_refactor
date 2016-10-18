@@ -367,8 +367,8 @@ class Empirical1D(Tabular1D):
             self.lookup_table[::self.lookup_table.size - 1], [0, 0])
 
     def sampleset(self):
-        """Return ``points`` array that samples the feature."""
-        return self.points
+        """Return array that samples the feature."""
+        return np.squeeze(self.points)
 
     def evaluate(self, inputs):
         """Evaluate the model.
@@ -384,19 +384,20 @@ class Empirical1D(Tabular1D):
             Flux or throughput in same unit as ``lookup_table``.
 
         """
+        x = self.sampleset()
         y = super(Empirical1D, self).evaluate(inputs)
 
         # Assume NaN at both ends need to be extrapolated based on
         # nearest end point.
         if self.fill_value is np.nan:
             if np.isscalar(y):  # pragma: no cover
-                if inputs < self.points[0]:
+                if inputs < x[0]:
                     y = self.lookup_table[0]
-                elif inputs > self.points[-1]:
+                elif inputs > x[-1]:
                     y = self.lookup_table[-1]
             else:
-                y[inputs < self.points[0]] = self.lookup_table[0]
-                y[inputs > self.points[-1]] = self.lookup_table[-1]
+                y[inputs < x[0]] = self.lookup_table[0]
+                y[inputs > x[-1]] = self.lookup_table[-1]
 
         return self._process_neg_flux(inputs, y)
 
