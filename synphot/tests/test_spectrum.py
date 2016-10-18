@@ -128,7 +128,7 @@ class TestEmpiricalSourceFromFile(object):
             self.sp.waverange.value, [3479.99902344, 10500.00097656])
 
     def test_call(self):
-        w = self.sp.model.points[5000:5004]
+        w = self.sp.model.points[0][5000:5004]
         y = units.convert_flux(w, self.sp(w), units.FLAM)
         np.testing.assert_allclose(
             w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
@@ -188,7 +188,7 @@ class TestEmpiricalBandpassFromFile(object):
                             lookup_table=_flux_photlam)
 
     def test_call(self):
-        w = self.bp.model.points[5000:5004]
+        w = self.bp.model.points[0][5000:5004]
         y = self.bp(w)
         np.testing.assert_allclose(
             w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
