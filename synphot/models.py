@@ -77,11 +77,6 @@ class BlackBody1D(Fittable1DModel):
         w0 = self.lambda_max
         return (w0 * 0, np.log10(w0 + factor * w0))
 
-    @staticmethod
-    def _calc_sampleset(w1, w2, num):
-        """Calculate sampleset for each model."""
-        return np.logspace(w1, w2, num=num)
-
     def sampleset(self, factor_bbox=10.0, num=1000):
         """Return ``x`` array that samples the feature.
 
@@ -97,10 +92,9 @@ class BlackBody1D(Fittable1DModel):
         w1, w2 = self.bounding_box(factor=factor_bbox)
 
         if self._n_models == 1:
-            w = self._calc_sampleset(w1, w2, num)
+            w = np.logspace(w1, w2, num)
         else:
-            f = partial(self._calc_sampleset, num=num)
-            w = list(map(f, w1, w2))
+            w = list(map(partial(np.logspace, num=num), w1, w2))
 
         return np.asarray(w)
 
@@ -211,8 +205,8 @@ class Box1D(_models.Box1D):
         if self._n_models == 1:
             w = self._calc_sampleset(w1, w2, step, minimal)
         else:
-            f = partial(self._calc_sampleset, step=step, minimal=minimal)
-            w = list(map(f, w1, w2))
+            w = list(map(partial(
+                self._calc_sampleset, step=step, minimal=minimal), w1, w2))
 
         return np.asarray(w)
 
@@ -402,16 +396,11 @@ class Empirical1D(Tabular1D):
         return self._process_neg_flux(inputs, y)
 
 
-class GaussianSampleset1DMixin(object):
-    """Mixin class to define ``sampleset`` for Gaussian models.
-    Also used for Lorentz and MexicanHat due to similarities.
+class BaseGaussian1D(_models.BaseGaussian1D):
+    """Same as `astropy.modeling.models.BaseGaussian1D`, except with
+    ``sampleset`` defined.
 
     """
-    @staticmethod
-    def _calc_sampleset(w1, w2, dw):
-        """Calculate sampleset for each model."""
-        return np.arange(w1, w2, dw)
-
     def sampleset(self, factor_step=0.1, **kwargs):
         """Return ``x`` array that samples the feature.
 
@@ -434,14 +423,14 @@ class GaussianSampleset1DMixin(object):
         dw = factor_step * self.stddev
 
         if self._n_models == 1:
-            w = self._calc_sampleset(w1, w2, dw)
+            w = np.arange(w1, w2, dw)
         else:
-            w = list(map(self._calc_sampleset, w1, w2, dw))
+            w = list(map(np.arange, w1, w2, dw))
 
         return np.asarray(w)
 
 
-class Gaussian1D(_models.Gaussian1D, GaussianSampleset1DMixin):
+class Gaussian1D(_models.Gaussian1D, BaseGaussian1D):
     """Same as `astropy.modeling.models.Gaussian1D`, except with
     ``sampleset`` defined.
 
@@ -449,8 +438,7 @@ class Gaussian1D(_models.Gaussian1D, GaussianSampleset1DMixin):
     pass
 
 
-class GaussianAbsorption1D(_models.GaussianAbsorption1D,
-                           GaussianSampleset1DMixin):
+class GaussianAbsorption1D(_models.GaussianAbsorption1D, BaseGaussian1D):
     """Same as `astropy.modeling.models.GaussianAbsorption1D`, except with
     ``sampleset`` defined.
 
@@ -494,60 +482,62 @@ class GaussianFlux1D(Gaussian1D):
             self.mean.value, fwhm, total_flux)
 
 
-class Lorentz1D(_models.Lorentz1D, GaussianSampleset1DMixin):
+class Lorentz1D(_models.Lorentz1D):
     """Same as `astropy.modeling.models.Lorentz1D`, except with
     ``sampleset`` defined.
 
     """
-    # This is needed for sampleset()
-    @property
-    def stddev(self):
-        """Standard deviation based on FWHM."""
-        return self.fwhm * 0.5 / np.sqrt(2 * np.log(2))
-
-    def bounding_box(self, factor=25):
-        """Tuple defining the default ``bounding_box`` limits,
-        ``(x_low, x_high)``.
+    def sampleset(self, factor_step=0.05, **kwargs):
+        """Return ``x`` array that samples the feature.
 
         Parameters
         ----------
-        factor : float
-            The multiple of `stddev` used to define the limits.
-            Similar to `Gaussian1D`.
+        factor_step : float
+            Factor for sample step calculation. The step is calculated
+            using ``factor_step * self.fwhm``.
+
+        kwargs : dict
+            Keyword(s) for ``bounding_box`` calculation.
 
         """
-        x0 = self.x_0.value
-        dx = factor * self.stddev
+        w1, w2 = self.bounding_box(**kwargs)
+        dw = factor_step * self.fwhm
 
-        return (x0 - dx, x0 + dx)
+        if self._n_models == 1:
+            w = np.arange(w1, w2, dw)
+        else:
+            w = list(map(np.arange, w1, w2, dw))
+
+        return np.asarray(w)
 
 
-class MexicanHat1D(_models.MexicanHat1D, GaussianSampleset1DMixin):
+class MexicanHat1D(_models.MexicanHat1D):
     """Same as `astropy.modeling.models.MexicanHat1D`, except with
     ``sampleset`` defined.
 
     """
-    # This is needed for sampletset()
-    @property
-    def stddev(self):
-        """Alias for ``sigma``."""
-        return self.sigma
-
-    def bounding_box(self, factor=5.5):
-        """Tuple defining the default ``bounding_box`` limits,
-        ``(x_low, x_high)``.
+    def sampleset(self, factor_step=0.1, **kwargs):
+        """Return ``x`` array that samples the feature.
 
         Parameters
         ----------
-        factor : float
-            The multiple of ``sigma`` used to define the limits.
-            Similar to `Gaussian1D`.
+        factor_step : float
+            Factor for sample step calculation. The step is calculated
+            using ``factor_step * self.sigma``.
+
+        kwargs : dict
+            Keyword(s) for ``bounding_box`` calculation.
 
         """
-        x0 = self.x_0.value
-        dx = factor * self.sigma
+        w1, w2 = self.bounding_box(**kwargs)
+        dw = factor_step * self.sigma
 
-        return (x0 - dx, x0 + dx)
+        if self._n_models == 1:
+            w = np.arange(w1, w2, dw)
+        else:
+            w = list(map(np.arange, w1, w2, dw))
+
+        return np.asarray(w)
 
 
 class PowerLawFlux1D(_models.PowerLaw1D):
