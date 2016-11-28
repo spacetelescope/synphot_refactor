@@ -645,7 +645,7 @@ class BaseSpectrum(object):
             return
 
         fig, ax = plt.subplots()
-        ax.plot(x.value, y.value)
+        ax.plot(x, y)
 
         # Custom wavelength limits
         if left is not None:
@@ -659,8 +659,17 @@ class BaseSpectrum(object):
         if top is not None:
             ax.set_ylim(top=top)
 
-        ax.set_xlabel('{0}'.format(x.unit))
-        ax.set_ylabel('{0}'.format(y.unit))
+        xu = x.unit
+        if xu.physical_type == 'frequency':
+            ax.set_xlabel('Frequency ({0})'.format(xu))
+        else:
+            ax.set_xlabel('Wavelength ({0})'.format(xu))
+
+        yu = y.unit
+        if yu is u.dimensionless_unscaled:
+            ax.set_ylabel('Throughput')
+        else:
+            ax.set_ylabel('Flux ({0})'.format(yu))
 
         if title:
             ax.set_title(title)
