@@ -253,7 +253,7 @@ Calculate the count rate of the observation above for an 2-meter telescope:
 Using **synphot**
 =================
 
-# UNTIL HERE -- reorganize?
+# UNTIL HERE
 
 .. toctree::
    :maxdepth: 1
@@ -261,11 +261,9 @@ Using **synphot**
    synphot/overview
    synphot/from_pysyn_iraf
    synphot/bandpass
-##   synphot/units
+   synphot/spectrum
+   synphot/observation
 ##   synphot/formulae
-##   synphot/spectrum
-##   synphot/observation
-##   synphot/reddening
-##   synphot/thermal
+##   synphot/units
    synphot/ref_api
    synphot/biblio

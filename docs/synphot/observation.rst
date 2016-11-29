@@ -5,127 +5,133 @@
 Observation
 ===========
 
-An `~synphot.observation.Observation` combines a source spectrum and a bandpass.
-It is usually the end-point of a chain of spectral manipulation.
+:class:`~synphot.Observation` is a special type of :ref:`source-spectrum-main`,
+where the source is convolved with a :ref:`bandpass-main`; i.e., a photon has
+already passed through the telescope optics. It is usually the end-point of a
+chain of spectral manipulation. Unlike a regular source spectrum, there is only
+one way to create an observation; i.e., by passing in source and bandpass
+objects into its constructor. Operations that do not make sense in the context
+of an observation (e.g., redshifting, tapering, addition, and subtraction) are
+disabled.
 
-It has similar properties and methods as a source spectrum
-(see :ref:`synphot-source-create`), except that irrelevant methods
-(e.g., tapering) and properties (e.g., redshift) are disabled. It also has some
-extra functionalities that are specific to an observation
-(e.g., detector pixel binning, and effective wavelength and stimulus).
+An observation also understands detector binning. By default, the bins are
+assumed to be the same as the ``waveset`` of the input bandpass. However,
+this is not always true, particularly for :ref:`<stsynphot-obsmode>`. In those
+cases, the bandpass has an extra ``binset`` attribute (wavelength values for
+bin centers) that must be passed into an observation's constructor, as shown
+below::
 
+    >>> import stsynphot as STS
+    >>> from synphot import Observation
+    >>> sp = STS.Vega
+    >>> bp = STS.band('acs,wfc1,f555w')
+    >>> obs = Observation(sp, bp, binset=bp.binset)
 
-Examples
---------
+It has these main general components:
 
-Setting up an observation of a blackbody at 6000 K through a box-shaped
-bandpass, ignoring the rest of the telescope optics:
+* ``spectrum``, the input source spectrum
+* ``bandpass``, the input bandpass
+* ``model``, the underlying Astropy composite model
+* ``waveset``, the wavelength set for "native" sampling
+* ``waverange``, the range (inclusive) covered by ``waveset``
+* ``meta``, metadata associated with the observation
+* ``warnings``, special metadata to highlight any warning
 
->>> from synphot import SourceSpectrum, SpectralElement, Observation
->>> from modeling import models  # Has to support composite model and sampleset
->>> obs = Observation(
-...     SourceSpectrum.from_blackbody(6000),
-...     SpectralElement(models.Box1D, amplitude=1, x_0=6000, width=1000))
->>> obs.spectrum
-<synphot.spectrum.SourceSpectrum at 0x321db90>
->>> obs.bandpass
-<synphot.spectrum.SpectralElement at 0x321dd10>
->>> obs.plot(binned=True, title='Binned observation')
+It also has these components related to binning:
 
-.. image:: images/obs_binned.png
-    :width: 600px
-    :alt: Binned observation.
+* ``binset``, center of the wavelength bins
+* ``bin_edges``, edges of the wavelength bins
+* ``binflux``, binned flux computed by integrating the "native" flux over the
+  width of each bin
 
-By default, bin centers (``binset``) are extracted from bandpass ``waveset``,
-if available. Bin edges and binned flux are then calculated from the bin
-centers. They are not evaluated at ``__call__`` like the native dataset
-because they are not a continuous function. For that reason also, sampling
-binned data can only be done at bin centers:
+To **evaluate** its flux at a given wavelength (not binned), use its
+:py:meth:`~object.__call__` method as you would with any Astropy model
+(except that the method also takes additional keywords like ``flux_unit``
+for flux conversion). To get binned flux values, use
+:meth:`~synphot.Observation.sample_binned`, where you must provide the exact
+bin center(s)::
 
->>> obs.bandpass.waveset
-<Quantity [ 5499.99      , 5500.        , 5500.01      ,...,
-            6499.99000002, 6500.00000002, 6500.01000002] Angstrom>
->>> obs.binset
-<Quantity [ 5499.99      , 5500.        , 5500.01      ,...,
-            6499.99000002, 6500.00000002, 6500.01000002] Angstrom>
->>> obs.bin_edges
-<Quantity [ 5499.985     , 5499.995     , 5500.005     ,...,
-            6499.99500002, 6500.00500002, 6500.01500002] Angstrom>
->>> obs.binflux
-<Quantity [ 0.        , 0.00101533, 0.00135377,...,  0.00137422,
-            0.00034355, 0.        ] PHOTLAM>
->>> obs.sample_binned(wavelengths=[5500, 6500])
-<Quantity [ 0.00101533, 0.00034355] PHOTLAM>
->>> obs.sample_binned(wavelengths=4000)
-InterpolationNotAllowed: Some or all wavelength values are not in binset.
+    >>> obs(6000.5)  # Native (not binned) sampling; Angstrom
+    <Quantity 160.95438045640773 PHOTLAM>
+    >>> obs.sample_binned([6000, 6001])  # Binned flux in given centers
+    <Quantity [ 161.19216632, 160.65695961] PHOTLAM>
 
-To calculate the wavelength range for binned dataset for a given central
-wavelength and number of pixels:
+To calculate **bin properties** such as covered wavelength or pixel ranges,
+you can use its :meth:`~synphot.Observation.binned_waverange` and
+:meth:`~synphot.Observation.binned_pixelrange` as follows::
 
->>> obs.binned_waverange(6000, 100)
-<Quantity [ 5999.49500001, 6000.49500001] Angstrom>
+    >>> # Wavelength range covered by 10 pixels centered at 5500 Angstrom
+    >>> obs.binned_waverange(5500, 10)
+    <Quantity [ 5495.5, 5505.5] Angstrom>
+    >>> # Pixel range covered by above wavelength range
+    >>> obs.binned_pixelrange([5495.5, 5505.5])
+    10
 
-To calculate the number of pixels within the given wavelength range for binned
-data:
+In addition, it has unique properties such as :ref:`synphot-formula-effstim`
+and :ref:`synphot-formula-effwave`, which can be calculated for either "native"
+or binned sampling, which usually provides similar results regardless.
+The default sampling behaviors are to be consistent with ASTROLIB PYSYNPHOT::
 
->>> obs.binned_pixelrange([5500, 5501])
-99
+    >>> # Effective stimulus in FLAM for "native" sampling
+    >>> obs.effstim(flux_unit='flam')
+    <Quantity 3.78652304711832e-09 FLAM>
+    >>> # Repeat for binned sampling
+    >>> obs.effstim(flux_unit='flam', binned=True)
+    <Quantity 3.7865234761885156e-09 FLAM>
+    >>> # Effective wavelength for binned sampling in FLAM
+    >>> obs.effective_wavelength()
+    <Quantity 5332.703380347104 Angstrom>
+    >>> # Repeat for "native" sampling
+    >>> obs.effective_wavelength(binned=False)
+    <Quantity 5332.703444644624 Angstrom>
 
-The only math operation available for an observation is multiplication, which
-behaves like `~synphot.spectrum.SourceSpectrum`
-(see :ref:`synphot-spec-math-op`), except that a new observation is created
-with existing ``binset`` and ``force`` option:
+:meth:`~synphot.Observation.countrate` is probably the most often used method
+for an observation. It computes the **total counts** (a special case of
+effective stimulus) of a source spectrum, integrated over the bandpass with
+some binning. By default, it uses ``binset``, which should be defined such that
+one wavelength bin corresponds to one detector pixel::
 
->>> obs2 = obs * 2
->>> obs2.sample_binned(wavelengths=[5500, 6500])
-<Quantity [ 0.00203066, 0.00068711] PHOTLAM>
+    >>> area = 45238.93416  # HST, in cm^2
+    >>> obs.countrate(area)
+    <Quantity 19208895560.359768 ct / s>
 
-The following (see :ref:`synphot_formulae`) can be calculated but only available
-for native dataset:
+An observation can be converted to a **regular source spectrum** containing
+only the wavelength set and sampled flux (binned by default) by using its
+:meth:`~synphot.Observation.as_spectrum` method. This is useful when you wish
+to access functionalities that are not directly available to an observation
+(e.g., tapering or saving to a file).
 
->>> from astropy import units as u
->>> obs.integrate()
-<Quantity 1.376311746506425 PHOTLAM>
->>> obs.avgwave()
-<Quantity 6001.136682969507 Angstrom>
->>> obs.barlam()
-<Quantity 5980.340264024184 Angstrom>
->>> obs.pivot()
-<Quantity 5994.200092136247 Angstrom>
->>> obs_norm = obs.normalize(1 * u.mJy)
->>> obs_norm.integrate()
-<Quantity 16.420941494498578 PHOTLAM>
+To accurately represent binned flux visually, especially in a unit like count
+that is very sensitive to bin size, it is recommended to **plot** the data as a
+histogram using ``binset`` as mid-points, as shown below:
 
-The :ref:`effective wavelength <synphot-formula-effwave>` of an observation is
-calculated using binned dataset by default. As per ASTROLIB PYSYNPHOT, flux is
-first converted to FLAM prior to calculation:
+.. plot::
+    :include-source:
 
->>> obs.effective_wavelength()
-<Quantity 6001.139160552627 Angstrom>
-
-The :ref:`effective stimulus <synphot-formula-effstim>` of an observation is
-calculated in PHOTLAM using native dataset by default:
-
->>> obs.effstim()
-<Quantity 0.0013765736319723961 PHOTLAM>
->>> obs.effstim(flux_unit=u.Jy)
-<Quantity 0.00548642093772285 Jy>
-
-Count rate of an observation is a special form of effective stimulus. As per
-ASTROLIB PYSYNPHOT, it is calculated using binned dataset by default and
-requires telescope collecting area:
-
->>> area = 45238.93416 * (u.cm * u.cm)  # HST
->>> obs.countrate(area)
-<Quantity 62262.87879638469 ct / s>
-
-An observation can be reduced to a simple empirical source spectrum, which takes
-up less memory and has some functionalities that observation does not
-(e.g., writing to FITS, redshift, and tapering). By default, binned dataset is
-used:
-
->>> spec = obs.as_spectrum()
->>> spec
-<synphot.spectrum.SourceSpectrum at 0x4872210>
->>> spec.z
-0.0
+    import os
+    import matplotlib.pyplot as plt
+    from astropy.utils.data import get_pkg_data_filename
+    from synphot import Observation, SourceSpectrum, SpectralElement, units
+    from synphot.models import BlackBodyNorm1D
+    # Construct blackbody source
+    sp = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
+    # Simulate an instrument bandpass with custom binning
+    bp = SpectralElement.from_file(get_pkg_data_filename(
+        os.path.join('data', 'hst_acs_hrc_f555w.fits'),
+        package='synphot.tests'))
+    binset = range(1000, 11001)
+    # Build the observation and get binned flux in count
+    obs = Observation(sp, bp, binset=binset)
+    area = 45238.93416 * units.AREA  # HST
+    binflux = obs.sample_binned(flux_unit='count', area=area)
+    # Sample the "native" flux for comparison
+    flux = obs(obs.binset, flux_unit='count', area=area)
+    # Plot with zoom to see native vs binned
+    plt.plot(obs.binset, flux, 'bx-', label='native')
+    plt.plot(obs.binset, binflux, 'g-', drawstyle='steps-mid', label='binned')
+    plt.xlim(5342, 5372)
+    plt.ylim(5.598, 5.62)
+    plt.xlabel('Wavelength (Angstrom)')
+    plt.ylabel('Flux (count)')
+    plt.title('bb(5000) * acs,hrc,f555w')
+    plt.legend(loc='lower right', numpoints=1)

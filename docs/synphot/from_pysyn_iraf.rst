@@ -134,7 +134,7 @@ Observation
 |obs.as_spectrum().to_fits(filename)   |obs.writefits(filename)               |
 +--------------------------------------+--------------------------------------+
 |obs.plot()                            |matplotlib.pyplot.plot(obs.binwave,   |
-|                                      |obs.binflux')                         |
+|                                      |obs.binflux)                          |
 +--------------------------------------+--------------------------------------+
 |obs.plot(binned=False)                |matplotlib.pyplot.plot(obs.wave,      |
 |                                      |obs.flux)                             |

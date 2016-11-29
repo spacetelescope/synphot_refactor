@@ -5,105 +5,336 @@
 Source Spectrum
 ===============
 
-Load a `~synphot.spectrum.SourceSpectrum` from file:
+A source spectrum is used to represent astronomical sources, such as stars and
+galaxies. An :ref:`synphot_observation` is a special case of a
+source spectrum that is convolved with a :ref:`bandpass-main`.
 
->>> from synphot import SourceSpectrum
->>> sp = SourceSpectrum.from_file('/my/path/my_spec.fits')
+A source spectrum can be constructed by one of the following methods:
 
-Construct a spectrum from a model. Its ``model`` property exposes the
-underlying model. Actual evaluation of its flux value is not done until
-``__call__`` is invoked:
+* Load a supported :ref:`FITS file <synphot-fits-format-overview>` or
+  :ref:`ASCII file <synphot-ascii-format-overview>` with
+  :meth:`synphot.SourceSpectrum.from_file`.
+* Use the pre-defined Vega spectrum, which is also used to define VEGAMAG, with
+  :meth:`synphot.SourceSpectrum.from_vega`.
+* Pass a :ref:`supported model <synphot_models_overview>` along with the
+  keywords needed to define it into a
+  :class:`~synphot.spectrum.SourceSpectrum` object.
+* Create a thermal source spectrum with
+  :meth:`synphot.ThermalSpectralElement.thermal_source`.
+* Build a composite source using :ref:`synphot-spec-math-op`.
+  (Also see example in :ref:`synphot_getting_started`.)
 
->>> from synphot import units
->>> from astropy import units as u
->>> from modeling import models  # Has to support composite model and sampleset
->>> sp = SourceSpectrum(
-...     models.PowerLaw1D, amplitude=1*units.FLAM, x_0=0.3*u.micron, alpha=4)
->>> sp.model
-PowerLaw1D(amplitude=Parameter(...), ..., param_dim=1)>
->>> sp([3000, 3500])
-<Quantity [  1.51023510e+11,  8.15187294e+10] PHOTLAM>
+It has these main components:
 
-Construct an empirical spectrum, where wavelength and flux values are already
-known:
+* ``z``, the redshift applied, if any
+* ``model``, the underlying Astropy model
+* ``waveset``, the wavelength set for optimal sampling
+* ``waverange``, the range (inclusive) covered by ``waveset``
+* ``meta``, metadata associated with the spectrum
+* ``warnings``, special metadata to highlight any warning
 
->>> from synphot.models import Empirical1D
->>> sp = SourceSpectrum(Empirical1D, x=[1000, 2000, 3000], y=[0.1, 0.02, 1.3])
+To **evaluate** its flux at a given wavelength, use its
+:py:meth:`~object.__call__` method as you would with any Astropy model
+(except that the method also takes additional keywords like ``flux_unit``
+for flux conversion)::
 
-Redshift and metadata could be applied at the constructor or after creation.
-``warnings`` is a special type of metadata, usually used internally by
-``synphot``:
+    >>> from synphot import SourceSpectrum, units
+    >>> from synphot.models import ConstFlux1D
+    >>> sp = SourceSpectrum(ConstFlux1D, amplitude=1)  # PHOTLAM
+    >>> wave = [1000, 10000]  # Angstrom
+    >>> sp(wave)
+    <Quantity [ 1., 1.] PHOTLAM>
+    >>> sp(wave, flux_unit=units.FNU)
+    <Quantity [  6.62606957e-24,  6.62606957e-23] FNU>
+    >>> area = 45238.93416 * units.AREA  # HST
+    >>> sp(wave, flux_unit=units.OBMAG, area=area)
+    <Quantity [-21.52438718,-21.52438718] OBMAG>
 
->>> sp = SourceSpectrum(
-...     Empirical1D, x=[1000, 2000, 3000], y=[0.1, 0.02, 1.3],
-...     z=0.3, metadata={'Description': 'My source at z=0.3',
-...                      'warnings': {'DataWarning': 'Fake data!'}})
->>> sp.z = 1.3
->>> sp.metadata['Description'] = 'My source at z=1.3'
->>> sp.warnings
-{'DataWarning': 'Fake data!'}
+To apply (or remove) the effects of interstellar **reddening** on a source
+spectrum, use :meth:`synphot.ReddeningLaw.from_extinction_model` to provide a
+reddening model name (see table below; not to be confused with Astropy model)
+and then :meth:`~synphot.ReddeningLaw.extinction_curve` to create the
+extinction curve with a given :math:`E(B-V)` value (negative value effectively
+de-reddens the spectrum), and then multiply it to the source:
 
-If the model used has a ``sampleset``, it will be propagated into the spectrum
-object as ``waveset``. For empirical spectrum, its ``waveset`` is simply the
-sampled wavelength values (redshifted if applicable):
+.. plot::
+    :include-source:
 
->>> sp.waveset
-<Quantity [ 2300., 4600., 6900.] Angstrom>
->>> sp.waverange
-<Quantity [ 2300., 6900.] Angstrom>
+    import matplotlib.pyplot as plt
+    from synphot import SourceSpectrum, ReddeningLaw
+    from synphot.models import BlackBodyNorm1D
+    em = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
+    ext = ReddeningLaw.from_extinction_model('lmcavg').extinction_curve(0.1)
+    sp = em * ext
+    wave = em.waveset
+    plt.plot(wave, em(wave), 'b', wave, sp(wave), 'r')
+    plt.xlim(1000, 30000)
+    plt.xlabel('Wavelength (Angstrom)')
+    plt.ylabel('Flux (PHOTLAM)')
+    plt.legend(['E(B-V)=0', 'E(B-V)=0.1'], loc='upper right')
 
-A spectrum can also be tapered, plotted, and integrated, which is a trapezoid
-integration that uses ``waveset`` and flux in PHOTLAM by default:
++--------+---------------------------+------------+
+|Name    |Description                |Reference   |
++========+===========================+============+
+|mwavg   |Milky Way Diffuse, R(V)=3.1||mw_ext_ref||
++--------+---------------------------+            |
+|mwdense |Milky Way Dense, R(V)=5.0  |            |
++--------+---------------------------+            |
+|mwrv21  |Milky Way CCM, R(V)=2.1    |            |
++--------+---------------------------+            |
+|mwrv4   |Milky Way CCM, R(V)=4.0    |            |
++--------+---------------------------+------------+
+|lmc30dor|LMC Supershell, R(V)=2.76  ||mc_ext_ref||
++--------+---------------------------+            |
+|lmcavg  |LMC Average, R(V)=3.41     |            |
++--------+---------------------------+            |
+|smcbar  |SMC Bar, R(V)=2.74         |            |
++--------+---------------------------+------------+
+|xgalsb  |Starburst, R(V)=4.0        ||xg_ext_ref||
+|        |(attenuation law)          |            |
++--------+---------------------------+------------+
 
->>> sp2 = sp.taper()
->>> sp2(sp2.waverange)
-<Quantity [ 0., 0.] PHOTLAM>
->>> sp2.plot(wavelengths=sp2.waveset.to(u.micron), flux_unit=units.FLAM)
+.. |mw_ext_ref| replace:: :ref:`Cardelli et al. (1989) <synphot-ref-extinction-cardelli1989>`
+.. |mc_ext_ref| replace:: :ref:`Gordon et al. (2003) <synphot-ref-extinction-gordon2003>`
+.. |xg_ext_ref| replace:: :ref:`Calzetti et al. (2000) <synphot-ref-extinction-calzetti2000>`
 
-.. image:: images/src_spec_ex2.png
-    :width: 600px
-    :alt: Plotted spectrum.
+You can **redshift** a source spectrum in several ways (shown in example
+below), either by setting its ``z`` attribute or passing in a ``z`` keyword
+during initialization. To blueshift, you may use the same attribute/keyword but
+set its *value* to :math:`\frac{1}{(1 + z) - 1}` instead. Currently, only
+the wavelength values are shifted, not the flux:
 
->>> sp2.integrate()
-<Quantity 3955.999999999998 PHOTLAM>
+.. plot::
+    :include-source:
 
-A source spectrum can be normalized to a given flux value (and optionally,
-in a given bandpass):
+    import matplotlib.pyplot as plt
+    from synphot import SourceSpectrum
+    from synphot.models import BlackBodyNorm1D
+    fig, ax = plt.subplots(3, sharex=True)
+    # Create a source at rest wavelength and sample it because it will
+    # be modified in-place below
+    sp_rest = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
+    wave = range(2500, 25000, 10)
+    flux = sp_rest(wave)
+    # Redshift the original source as a new spectrum
+    sp_z1 = SourceSpectrum(sp_rest.model, z=0.1)
+    ax[0].plot(wave, flux, 'b--', wave, sp_z1(wave), 'r')
+    # Redshift the original source in-place
+    sp_rest.z = 0.1
+    ax[1].plot(wave, flux, 'b--', wave, sp_rest(wave), 'r')
+    # Create a redshifted source from scratch
+    sp_z2 = SourceSpectrum(BlackBodyNorm1D, temperature=5000, z=0.1)
+    ax[2].plot(wave, flux, 'b--', wave, sp_z2(wave), 'r')
+    # Extra plot commands
+    ax[2].set_xlim(2500, 25000)
+    ax[2].set_xlabel('Wavelength (Angstrom)')
+    ax[1].set_ylabel('Flux (PHOTLAM)')
 
->>> sp2_norm = sp2.normalize(1 * u.mJy)
->>> sp2_norm.integrate()
-<Quantity 3.5214440607410253 PHOTLAM>
+A source spectrum can also be **normalized** to a given flux value in a given
+bandpass using its :meth:`~synphot.SourceSpectrum.normalize` method.
+The resultant spectrum is basically the source multiplied with a factor
+necessary to achieve the desired normalization:
 
-A source spectrum can also be created from these pre-defined sources below.
+.. plot::
+    :include-source:
+
+    import matplotlib.pyplot as plt
+    from synphot import SourceSpectrum, SpectralElement, units
+    from synphot.models import BlackBodyNorm1D
+    sp = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
+    bp = SpectralElement.from_filter('johnson_v')
+    vega = SourceSpectrum.from_vega()  # For unit conversion
+    sp_norm = sp.normalize(17 * units.VEGAMAG, bp, vegaspec=vega)
+    wave = sp.waveset
+    plt.plot(wave, sp(wave), 'b', wave, sp_norm(wave), 'r')
+    plt.xlim(1000, 30000)
+    plt.xlabel('Wavelength (Angstrom)')
+    plt.ylabel('Flux (PHOTLAM)')
+    plt.title(sp.meta['expr'])
+    plt.legend(['Original', 'Normalized'], loc='upper right')
+
+**Integration** is done with the :meth:`~synphot.SourceSpectrum.integrate`
+method. It uses trapezoid integration (but could be expanded to perform
+analytical calculations instead in the future when that is supported by
+Astropy). By default, integration is done in internal units::
+
+    >>> from synphot import SourceSpectrum, units
+    >>> from synphot.models import GaussianFlux1D
+    >>> sp = SourceSpectrum(GaussianFlux1D, mean=6000, fwhm=10, total_flux=1)
+    >>> sp.integrate()
+    <Quantity 0.9999992180687505 PHOTLAM>
+    >>> sp.integrate(flux_unit=units.FLAM)
+    <Quantity 3.3107418773847306e-12 FLAM>
+
+
+.. _synphot-empirical-source:
+
+Arrays
+------
+
+Creating source spectrum from arrays is recommended when the input file is in
+a format that is not supported by **synphot**. You can read the file however
+you like using another package and store the wavelength and flux as arrays to
+be processed by **synphot** as an empirical model.
+
+The example below creates and plots a source from some given arrays. It also
+demonstrates that you can choose to keep negative flux values (however
+unrealistic), if desired:
+
+.. plot::
+    :include-source:
+
+    from synphot import SourceSpectrum, units
+    from synphot.models import Empirical1D
+    wave = [1000, 2000, 3000, 4000, 5000]  # Angstrom
+    flux = [1e-17, -2.3e-18, 1.8e-17, 4.5e-17, 9e-18] * units.FLAM
+    sp = SourceSpectrum(
+        Empirical1D, points=wave, lookup_table=flux, keep_neg=True)
+    sp.plot(flux_unit=units.FLAM)
+    plt.axhline(0, color='k', ls=':')
+
 
 .. _synphot-planck-law:
 
 Blackbody Radiation
 -------------------
 
-Blackbody spectrum is generated with Planck law
-(:ref:`Rybicki & Lightman 1979 <synphot-ref-rybicki1979>`).
+Blackbody radiation is defined by Planck's law
+(:ref:`Rybicki & Lightman 1979 <synphot-ref-rybicki1979>`):
 
 .. math::
 
     B_{\lambda}(T) = \frac{2 h c^{2} / \lambda^{5}}{exp(h c / \lambda k T) - 1}
 
 where the unit of :math:`B_{\lambda}(T)` is
-:math:`erg s^{-1} cm^{-2} \AA^{-1} sr^{-1}` (i.e., FLAM per steradian).
+:math:`erg \; s^{-1} cm^{-2} \mathring{A}^{-1} sr^{-1}`
+(i.e., FLAM per steradian).
 
-:func:`~synphot.spectrum.SourceSpectrum.from_blackbody` generates a blackbody
+:class:`~synphot.models.BlackBodyNorm1D` generates a blackbody
 spectrum in PHOTLAM for a given temperature, normalized to a star of 1 solar
-radius at a distance of 1 kpc. This is to be consistent with ASTROLIB PYSYNPHOT.
-Its ``expr`` metadata has IRAF SYNPHOT equivalent command.
+radius at a distance of 1 kpc.
+This is to be consistent with ASTROLIB PYSYNPHOT.
 
->>> bb_sun = SourceSpectrum.from_blackbody(5777)
->>> bb_sun.metadata['expr']
-u'bb(5777)'
->>> bb_sun.plot(title='Sun-like blackbody')
+The example below creates and plots a blackbody source at 5777 K:
 
-.. image:: images/sun_blackbody.png
-    :width: 600px
-    :alt: Blackbody spectrum.
+.. plot::
+    :include-source:
+
+    import matplotlib.pyplot as plt
+    from synphot import SourceSpectrum
+    from synphot.models import BlackBodyNorm1D
+    sp = SourceSpectrum(BlackBodyNorm1D, temperature=5777)
+    sp.plot(flux_unit='flam', title=sp.meta['expr'])
+    plt.axvline(sp.model.lambda_max, ls=':')
+
+
+.. _synphot-source-from-file:
+
+File
+----
+
+A source spectrum can also be defined using a FITS or ASCII table containing
+columns of wavelength and flux. See :ref:`synphot-fits-format-overview` and
+:ref:`synphot-ascii-format-overview` for details on how to create such tables.
+
+The example below loads and plots a source spectrum from FITS table in the
+software test data directory:
+
+.. plot::
+    :include-source:
+
+    import os
+    from astropy.utils.data import get_pkg_data_filename
+    from synphot import SourceSpectrum
+    filename = get_pkg_data_filename(
+        os.path.join('data', 'hst_acs_hrc_f555w_x_grw70d5824.fits'),
+        package='synphot.tests')
+    sp = SourceSpectrum.from_file(filename)
+    sp.plot(left=4000, right=7000)
+
+
+.. _synphot-flat-spec:
+
+Flat
+----
+
+.. math::
+
+    f(x) = A
+
+A flat (uniform) spectrum has a constant flux value in the given flux unit,
+except the following, as per ASTROLIB PYSYNPHOT:
+
+* STMAG - Constant value in the unit of FLAM.
+* ABMAG - Constant value in the unit of FNU.
+
+These are currently unsupported:
+
+* count
+* OBMAG
+
+Note that flux that is constant in a given unit might not be constant in
+another (see example below). Such a model has no ``waveset`` defined
+(i.e., no clear wavelength constraints on where the feature of interest lies).
+Therefore, wavelength values must be explicitly provided for sampling and
+plotting.
+
+The example below creates and plots a flat source with the amplitude of
+18 ABMAG and shows that it is not flat in STMAG:
+
+.. plot::
+    :include-source:
+
+    import matplotlib.pyplot as plt
+    from astropy import units as u
+    from synphot import SourceSpectrum
+    from synphot.models import ConstFlux1D
+    sp = SourceSpectrum(ConstFlux1D, amplitude=18*u.ABmag)
+    wave = range(10, 26000, 10)
+    plt.plot(wave, sp(wave, flux_unit=u.ABmag), 'b',
+             wave, sp(wave, flux_unit=u.STmag), 'r--')
+    plt.xlim(10, 26000)
+    plt.ylim(12, 22)
+    plt.ylabel('Flux (mag)')
+    plt.xlabel('Wavelength (Angstrom)')
+    plt.title('Flat spectrum in ABMAG')
+    plt.legend(['ABMAG', 'STMAG'], loc='lower right')
+
+
+.. _synphot-gaussian-abs:
+
+Gaussian Absorption
+-------------------
+
+There are two ways to create a Gaussian absorption feature;
+You can choose whichever method that better suits your needs.
+One is to first create :ref:`synphot-gaussian` and then subtract it from
+a continuum (e.g., :ref:`synphot-flat-spec`):
+
+.. plot::
+
+    from synphot import SourceSpectrum
+    from synphot.models import GaussianFlux1D, ConstFlux1D
+    em = SourceSpectrum(GaussianFlux1D, mean=6000, fwhm=10, total_flux=1)
+    bg = SourceSpectrum(ConstFlux1D, amplitude=2)
+    sp = bg - em
+    sp.plot()
+
+The other way is to create a unitless absorption profile and then multiply it
+to a continuum (e.g., :ref:`synphot-flat-spec`):
+
+.. plot::
+
+    from astropy.stats.funcs import gaussian_fwhm_to_sigma
+    from synphot import SourceSpectrum, BaseUnitlessSpectrum
+    from synphot.models import GaussianAbsorption1D, ConstFlux1D
+    sig = 10 * gaussian_fwhm_to_sigma
+    ab = BaseUnitlessSpectrum(GaussianAbsorption1D, mean=6000, stddev=sig,
+                              amplitude=0.047)
+    bg = SourceSpectrum(ConstFlux1D, amplitude=2)
+    sp = bg * ab
+    sp.plot()
+
 
 .. _synphot-gaussian:
 
@@ -112,46 +343,33 @@ Gaussian Emission
 
 .. math::
 
-    \sigma = \frac{FWHM}{2 \; \sqrt{2 \times ln \; 2}}
 
-    A = \frac{flux_{total}}{\sqrt{2 \; \pi} \; \sigma}
+    f(x) = A \; e^{- \frac{\left(x - x_{0}\right)^{2}}{2 \; \sigma^{2}}}
 
-    flux = A \; e^{- \frac{(x - x_{0})^{2}}{2 \; \sigma^{2}}}
+    \sigma = \frac{\text{FWHM}}{2 \; \sqrt{2 \; \ln 2}}
 
-where :math:`x` is in the unit of :math:`x_{0}` and flux is in the unit of
-the given total flux.
+    A = \frac{f_{\text{tot}}}{\sqrt{2 \; \pi} \; \sigma}
 
-:func:`~synphot.spectrum.SourceSpectrum.from_gaussian` generates a Gaussian
-emission spectrum as defined in ASTROLIB PYSYNPHOT, which assumes total flux
-to be in FLAM (not PHOTLAM) if no unit is given. Its ``expr`` metadata has
-IRAF SYNPHOT equivalent command.
+where :math:`f_{\text{tot}}` is the desired total flux.
 
->>> g_em = SourceSpectrum.from_gaussian(1 * units.PHOTLAM, 6000, 100)
->>> g_em.metadata['expr']
-u'em(6000, 100, 1, PHOTLAM)'
->>> g_em.plot(title='Gaussian with total flux of 1 PHOTLAM')
+:class:`~synphot.models.GaussianFlux1D` generates a Gaussian emission spectrum
+using input values (central wavelength, FWHM, and total flux) that are somewhat
+consistent with ASTROLIB PYSYNPHOT.
 
-.. image:: images/gaussian_em.png
-    :width: 600px
-    :alt: Gaussian emission spectrum.
+The example below creates and plots a Gaussian source centered at 1.8 micron
+with FWHM of 200 nm and total flux of 18.3 ABMAG. As stated in
+:ref:`synphot_overview`, conversion to internal units happen behind the scenes:
 
-Gaussian Absorption
--------------------
+.. plot::
+    :include-source:
 
-Unlike the other source spectrum components, Gaussian absorption line should be
-unitless (`~synphot.spectrum.BaseUnitlessSpectrum`) because it is to be
-*multiplied* (see :ref:`synphot-spec-math-op`) to the source spectrum. Its
-formula is given in `~synphot.models.GaussianAbsorption1D`.
+    from astropy import units as u
+    from synphot import SourceSpectrum
+    from synphot.models import GaussianFlux1D
+    sp = SourceSpectrum(GaussianFlux1D, mean=1.8*u.micron, fwhm=200*u.nm,
+                        total_flux=18.3*u.ABmag)
+    sp.plot(title=sp.meta['expr'])
 
->>> from synphot import BaseUnitlessSpectrum
->>> from synphot.models import GaussianAbsorption1D
->>> g_abs = BaseUnitlessSpectrum(
-...     GaussianAbsorption1D, amplitude=0.8, mean=6000, stddev=10)
->>> g_abs.plot(title='Gaussian absorption line')
-
-.. image:: images/gaussian_abs.png
-    :width: 600px
-    :alt: Gaussian absorption line.
 
 .. _synphot-powerlaw:
 
@@ -160,74 +378,61 @@ Powerlaw
 
 .. math::
 
-    flux = A \; (x \; / \; x_{0})^{-\alpha}
+    f(x) = A \; (x / x_{0})^{-\alpha}
 
-where
+where *A* should be set to 1 if you want to be consistent with
+ASTROLIB PYSYNPHOT.
 
-    * :math:`A =` Amplitude, usually 1
-    * :math:`x =` Wavelength array in the unit of :math:`x_{0}`
-    * :math:`x_{0} =` Reference wavelength
-    * :math:`\alpha =` Power-law index
+:class:`~synphot.models.PowerLawFlux1D` generates a powerlaw source spectrum.
+Such a model has no ``waveset`` defined (i.e., no clear wavelength constraints
+on where the feature of interest lies). Therefore, wavelength values must be
+explicitly provided for sampling and plotting.
 
-It is recommended to use `~synphot.models.PowerLawFlux1D` model that correctly
-handles flux conversion instead of ``PowerLaw1D``, although the latter could
-still be used if you only work in PHOTLAM. It does not have pre-defined
-``waveset``, so wavelength values have to be explicitly given when sampling.
+The example below creates and plots a powerlaw source with a reference
+wavelength of 1 micron and an index of -2:
 
->>> from synphot.models import PowerLawFlux1D
->>> import numpy as np
->>> plaw = SourceSpectrum(
-...     PowerLawFlux1D, amplitude=1*u.mJy, x_0=0.5*u.micron, alpha=1.5)
->>> plaw.plot(
-...     wavelengths=np.arange(0.2, 0.7, 0.005)*u.micron, flux_unit=u.mJy,
-...     title='Powerlaw spectrum with 1 mJy at 0.5 micron')
+.. plot::
+    :include-source:
 
-.. image:: images/powerlaw_spec.png
-    :width: 600px
-    :alt: Powerlaw spectrum.
+    import matplotlib.pyplot as plt
+    from astropy import units as u
+    from synphot import SourceSpectrum
+    from synphot.models import PowerLawFlux1D
+    sp = SourceSpectrum(PowerLawFlux1D, amplitude=1, x_0=1*u.micron, alpha=2)
+    wave = range(100, 100000, 50) * u.AA
+    sp.plot(wavelengths=wave, xlog=True, ylog=True, bottom=0.1, top=1000)
+    plt.axvline(sp.model.x_0, color='k', ls='--')  # Ref wave
+    plt.axhline(sp.model.amplitude, color='k', ls='--')  # Ref flux
 
-.. _synphot-flat-spec:
 
-Flat (Constant Flux)
---------------------
+.. _synphot_thermal:
 
-A flat spectrum has a constant flux value in the given flux unit, except the
-following, as per ASTROLIB PYSYNPHOT:
+Thermal
+-------
 
-    * STMAG - Constant value in the unit of FLAM.
-    * ABMAG - Constant value in the unit of FNU.
+`~synphot.ThermalSpectralElement` handles a spectral element with thermal
+properties, which is important in infrared observations.
+Its :meth:`~synphot.ThermalSpectralElement.thermal_source` method produces
+a thermal (blackbody) source spectrum. This is usually not used directly, but
+rather as part of the calculations for thermal background for some instrument.
+See :ref:`thermal source in stsynphot <stsynphot:stsynphot-thermal-spec>`
+for more details.
 
-Because flux that is constant in a given unit might not be constant in PHOTLAM,
-it is recommended to use `~synphot.models.ConstFlux1D` model that correctly
-handles flux conversion instead of ``Const1D``, although the latter could still
-be used if you only work in PHOTLAM. It does not have pre-defined ``waveset``,
-so wavelength values have to be explicitly given when sampling.
-
->>> from synphot.models import ConstFlux1D
->>> flat_abmag = SourceSpectrum(ConstFlux1D, amplitude=0*units.ABMAG)
->>> flat_abmag.plot(
-...     wavelengths=[1, 1e4], flux_unit=units.FNU,
-...     title='Flat spectrum in 0 ABMAG')
-
-.. image:: images/flat_abmag.png
-    :width: 600px
-    :alt: Flat spectrum.
 
 .. _synphot-vega-spec:
 
 Vega
 ----
 
-By default, Vega spectrum is downloaded from STScI via configurable item
-``synphot.config.conf.vega_file``, which requires internet connection, unless
-a local or cached copy is used. One can use any desired Vega spectrum as long as
-it is a valid file format, remote or local, by changing the ``vega_file`` value.
+**synphot** uses built-in Vega spectrum for VEGAMAG calculations.
+It is loaded from ``synphot.conf.vega_file`` using
+:meth:`~synphot.SourceSpectrum.from_vega`.
 
->>> from synphot.config import conf
->>> with conf.set_temp('vega_file', '/my/path/alpha_lyr_stis_007.fits'):
-...     vegaspec = SourceSpectrum.from_vega(encoding='binary')
->>> vegaspec.plot(right=20000, flux_unit=units.FLAM, title='Vega spectrum')
+The example below loads and plots the built-in Vega spectrum:
 
-.. image:: images/vega_spec.png
-    :width: 600px
-    :alt: Vega spectrum.
+.. plot::
+    :include-source:
+
+    from synphot import SourceSpectrum
+    sp = SourceSpectrum.from_vega()
+    sp.plot(right=12000, flux_unit='flam', title=sp.meta['expr'])

@@ -10,10 +10,11 @@ A bandpass can be constructed by one of the following methods:
 * Load a supported :ref:`FITS file <synphot-fits-format-overview>` or
   :ref:`ASCII file <synphot-ascii-format-overview>` with
   :meth:`synphot.SpectralElement.from_file`.
-* Using a pre-defined filter with :meth:`synphot.SpectralElement.from_filter`.
+* Use a pre-defined filter with :meth:`synphot.SpectralElement.from_filter`.
 * Pass a :ref:`supported model <synphot_models_overview>` along with the
   keywords needed to define it into a
   :class:`~synphot.spectrum.SpectralElement` object.
+* Build a composite bandpass using :ref:`synphot-spec-math-op`.
 
 It has various :ref:`photometric properties <synphot_formulae>` and these
 main components:
@@ -24,7 +25,7 @@ main components:
 * ``meta``, metadata associated with the spectrum
 * ``warnings``, special metadata to highlight any warning
 
-To evaluate its transmission at a given wavelength, use its
+To **evaluate** its transmission at a given wavelength, use its
 :py:meth:`~object.__call__` method as you would with any Astropy model::
 
     >>> from astropy import units as u
@@ -34,7 +35,7 @@ To evaluate its transmission at a given wavelength, use its
     >>> bp(500 * u.nm)
     <Quantity 1.0>
 
-Bandpass also has access to photometric parameter calculations akin to
+Bandpass also has access to **photometric parameter** calculations akin to
 IRAF SYNPHOT BANDPAR task. (Also see :ref:`synphot_formulae` and respective API
 documentations.) Some of these need the information of telescope collecting
 area, which will be set to HST value in the examples below::
@@ -69,8 +70,8 @@ area, which will be set to HST value in the examples below::
     >>> bp.emflx(area)
     <Quantity 8.782026838611703e-17 FLAM>
 
-To check whether the wavelength range of another spectrum is defined
-everywhere within the a bandpass, you can use
+To check the **overlap**, i.e., whether the wavelength range of another
+spectrum is defined everywhere within the a bandpass, you can use
 :meth:`~synphot.spectrum.SpectralElement.check_overlap`, as follows.
 This check is useful to test whether convolving the two spectra would result in
 any potential inaccurate representation of the result::
@@ -129,6 +130,7 @@ unrealistic), if desired:
     bp = SpectralElement(
         Empirical1D, points=wave, lookup_table=thru, keep_neg=True)
     bp.plot()
+    plt.axhline(0, color='k', ls=':')
 
 
 .. _synphot-box-bandpass:
@@ -190,9 +192,10 @@ test data directory:
     from astropy.utils.data import get_pkg_data_filename
     from synphot import SpectralElement
     filename = get_pkg_data_filename(
-        os.path.join('data', 'qso_fos_001.dat'), package='synphot.tests')
+        os.path.join('data', 'hst_acs_hrc_f555w.fits'),
+        package='synphot.tests')
     bp = SpectralElement.from_file(filename)
-    bp.plot()
+    bp.plot(left=4000, right=7000)
 
 
 .. _synphot-predefined-filter:
