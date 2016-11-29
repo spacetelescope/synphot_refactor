@@ -49,7 +49,7 @@ class BlackBody1D(Fittable1DModel):
 
     def __init__(self, *args, **kwargs):
         super(BlackBody1D, self).__init__(*args, **kwargs)
-        self.meta['expr'] = 'bb({0})'.format(self.temperature)
+        self.meta['expr'] = 'bb({0})'.format(self.temperature.value)
 
     @property
     def lambda_max(self):
