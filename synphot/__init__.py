@@ -20,4 +20,4 @@ if not _ASTROPY_SETUP_:
     from .observation import *
     from .reddening import *
     from .thermal import *
-    from .spectrum import SourceSpectrum, SpectralElement
+    from .spectrum import SourceSpectrum, SpectralElement, BaseUnitlessSpectrum
