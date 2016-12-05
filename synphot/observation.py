@@ -128,7 +128,7 @@ class Observation(BaseSourceSpectrum):
                 'Overlap result of {0} is unexpected'.format(stat))
 
         # Create composite spectrum
-        super(Observation, self).__init__(spec * band)
+        super(Observation, self).__init__(spec * band, clean_meta=True)
         self._spec = spec
         self._band = band
         self._force = force
