@@ -44,6 +44,11 @@ class BaseSpectrum(object):
     modelclass : cls
         Model class from `astropy.modeling.models`.
 
+    clean_meta : bool
+        Scrub "expr" and "header" entries from input metadata before merging.
+        Set this to `True` when those entries no longer make sense in ``self``.
+        This is automatically set to `True` regardless for spectrum arithmetic.
+
     kwargs : dict
         Model parameters accepted by ``modelclass``. Each parameter can
         be either a Quantity or number. If the latter, assume pre-defined
@@ -115,7 +120,7 @@ class BaseSpectrum(object):
         'PowerLaw1D': 'x_0',
         'Trapezoid1D': 'x_0'}
 
-    def __init__(self, modelclass, **kwargs):
+    def __init__(self, modelclass, clean_meta=False, **kwargs):
 
         # Does not handle multiple model sets for now; too complicated.
         n_models = kwargs.pop('n_models', 1)
@@ -123,7 +128,6 @@ class BaseSpectrum(object):
             raise exceptions.SynphotError('Model can only have n_models=1')
 
         other_meta = {}
-        clean_meta = False
 
         # This is needed for internal math operations to build composite model.
         # Handles the model instance, not class. Assume it is already in the
