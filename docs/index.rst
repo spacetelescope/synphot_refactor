@@ -263,7 +263,7 @@ Using **synphot**
    synphot/bandpass
    synphot/spectrum
    synphot/observation
-##   synphot/formulae
+   synphot/formulae
 ##   synphot/units
    synphot/ref_api
    synphot/biblio

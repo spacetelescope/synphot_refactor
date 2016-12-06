@@ -1414,10 +1414,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         return uresp.value * units.FLAM
 
     def rmswidth(self, wavelengths=None, threshold=None):
-        """Calculate the bandpass RMS width.
-
-        As defined in
-        :ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>`, page 836.
+        """Calculate the :ref:`bandpass RMS width <synphot-formula-rmswidth>`.
         Not to be confused with :func:`photbw`.
 
         Parameters

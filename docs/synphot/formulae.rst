@@ -2,209 +2,343 @@
 
 .. _synphot_formulae:
 
+Photometric Properties
+======================
 
-Spectrum Property Formulae
-==========================
+In here, we describe bandpass and spectral photometric properties that can be
+calculated using **synphot**, along with their respective formulae.
+More information can also be found in
+:ref:`Koornneef et al. (1986) <synphot-ref-koornneef1986>`,
+:ref:`bandpass-main`, and :ref:`synphot_observation`.
 
-This section contains the formulae for different spectrum properties.
+These are some common variables mentioned in the formulae in this section:
 
-* *INT* - integral with respect to wavelength
-* *EXP* - exponent
-* *LN* - natural logarithm
-* *LOG* - base-10 logarithm
-* *flux* - spectrum flux array
-* *thru* - bandpass throughput
-* *wave* - wavelength array corresponding to *flux* or *thru*
+=================== =================================
+Variable            Description
+=================== =================================
+:math:`F_{\lambda}` Source flux distribution
+:math:`P_{\lambda}` Dimensionless bandpass throughput
+*a*                 Telescope collecting area
+*h*                 The Planck constant
+*c*                 The speed of light
+=================== =================================
 
+The examples in this section uses bandpass from ACS/HRC F555W (from package
+test data) with some given bins and observation from that bandpass convolved
+with a blackbody::
 
-For All Spectrum Objects
-------------------------
-
-In this case, *flux* in the formulae can also be replaced by *thru*.
+    >>> import os
+    >>> from astropy.utils.data import get_pkg_data_filename
+    >>> from synphot import Observation, SourceSpectrum, SpectralElement, units
+    >>> from synphot.models import BlackBodyNorm1D
+    >>> area = 45238.93416 * units.AREA  # HST
+    >>> sp = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
+    >>> bp = SpectralElement.from_file(get_pkg_data_filename(
+    ...     os.path.join('data', 'hst_acs_hrc_f555w.fits'),
+    ...     package='synphot.tests'))
+    >>> binset = range(1000, 11001)
+    >>> obs = Observation(sp, bp, binset=binset)
 
 
 .. _synphot-formula-avgwv:
 
-Average Wavelength
-^^^^^^^^^^^^^^^^^^
+Bandpass Average Wavelength
+---------------------------
 
-This implements the equation for :math:`\lambda_{0}` as defined in
-:ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>`, page 836.
-
-Equivalent to IRAF SYNPHOT BANDPAR results for
-``AVGLAM``, ``AVGWV``, or ``REFWAVE``. For a bandpass, the throughput at this
-wavelength is ``TLAMBDA``.
-
-.. math::
-
-    \lambda_{0} = \frac{INT(flux * wave)}{INT(flux)}
-
-
-.. _synphot-formula-barlam:
-
-Mean Log Wavelength
-^^^^^^^^^^^^^^^^^^^
-
-Equivalent to IRAF SYNPHOT result for ``BARLAM``.
+For a bandpass, :meth:`~synphot.spectrum.BaseSpectrum.avgwave` implements
+the equation for :math:`\lambda_{0}` as defined in
+:ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>` (page 836). It is
+equivalent to IRAF SYNPHOT ``bandpar`` results for ``avglam``,
+``avgmw``, or ``refwave``; The throughput at this wavelength is
+:meth:`~synphot.SpectralElement.tlambda`.
 
 .. math::
 
-    \bar{\lambda} = EXP(INT(flux * LN(wave) / wave) / INT(flux / wave))
+    \lambda_{0} = \frac{\int \; P_{\lambda} \; \lambda \; d\lambda }{\int \; P_{\lambda} \; d\lambda}
+
+Example::
+
+    >>> bp.avgwave()
+    <Quantity 5367.903565874441 Angstrom>
+    >>> bp.tlambda()
+    <Quantity 0.22807748889452203>
 
 
-.. _synphot-formula-pivwv:
+.. _synphot-formula-tpeak:
 
-Pivot Wavelength
-^^^^^^^^^^^^^^^^
+Bandpass Peak Throughput
+------------------------
 
-Equivalent to IRAF SYNPHOT result for ``PIVWV`` and ``Pivot``.
+For a bandpass, :meth:`~synphot.SpectralElement.tpeak` implements the bandpass
+peak throughput. It is equivalent to IRAF SYNPHOT ``bandpar`` result for
+``tpeak``; The wavelength at this throughput is
+:meth:`~synphot.SpectralElement.wpeak` (only first match is returned if peak
+value is not unique).
+
+Example::
+
+    >>> bp.tpeak()
+    <Quantity 0.24144500494003296>
+    >>> bp.wpeak()
+    <Quantity 5059.8212890625 Angstrom>
+
+
+.. _synphot-formula-qtlam:
+
+Bandpass Dimensionless Efficiency
+---------------------------------
+
+For a bandpass, :meth:`~synphot.SpectralElement.efficiency` implements the
+dimensionless efficiency. It is equivalent to IRAF SYNPHOT ``bandpar`` result
+for ``qtlam``.
 
 .. math::
 
-    \lambda_{pivot} = \sqrt{\frac{INT(flux * wave)}{INT(flux / wave)}}
+    \text{qtlam} = \int \frac{P_{\lambda}}{\lambda} d\lambda
+
+Example::
+
+    >>> bp.efficiency()
+    <Quantity 0.05090165033079963>
 
 
-For Bandpass Only
------------------
+.. _synphot-formula-equvw:
 
-.. _synphot-formula-uresp:
+Bandpass Equivalent Width
+-------------------------
 
-Unit Response
-^^^^^^^^^^^^^
-
-This is the flux (in FLAM) of a star that produces a response of one photon
-per second in the bandpass.
-
-Equivalent to IRAF SYNPHOT BANDPAR result for ``URESP``, where H and C are
-astronomical constants, and *AREA* is the telescope collecting area.
+For a bandpass, :meth:`~synphot.SpectralElement.equivwidth` implements the
+equivalent width. It gives the same value (but not unit) as
+:meth:`~synphot.spectrum.BaseSpectrum.integrate` and is equivalent to
+IRAF SYNPHOT ``bandpar`` result for ``equvw``.
 
 .. math::
 
-    URESP = \frac{H * C}{AREA * INT(thru * wave)}
+    \text{equvw} = \int P_{\lambda} d\lambda
+
+Example::
+
+    >>> bp.equivwidth()
+    <Quantity 272.0108162945954 Angstrom>
+    >>> bp.integrate()
+    <Quantity 272.0108162945954>
+
+
+.. _synphot-formula-rectw:
+
+Bandpass Rectangular Width
+--------------------------
+
+For a bandpass, :meth:`~synphot.SpectralElement.rectwidth` implements the
+rectangular width. It is equivalent to IRAF SYNPHOT ``bandpar`` result for
+``rectw``. The ``equvw`` in the formula below is :ref:`synphot-formula-equvw`.
+
+.. math::
+
+    \text{rectw} = \frac{\text{equvw}}{\text{MAX}(P_{\lambda})}
+
+Example::
+
+    >>> bp.rectwidth()
+    <Quantity 1126.5953352903448 Angstrom>
+
+
+.. _synphot-formula-rmswidth:
+
+Bandpass RMS Band Width (Koornneef)
+-----------------------------------
+
+For a bandpass, :meth:`~synphot.SpectralElement.rmswidth` implements the
+bandpass RMS width as defined in
+:ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>` (page 836), where
+:math:`\lambda_{0}` is the :ref:`synphot-formula-avgwv`.
+
+.. math::
+
+    \lambda_{\text{rms}} = \sqrt{\frac{\int \; P_{\lambda} \; (\lambda - \lambda_{0})^{2} \; d\lambda}{\int \; P_{\lambda} \: d\lambda}}
+
+Example::
+
+    >>> bp.rmswidth()
+    <Quantity 359.56457676412236 Angstrom>
 
 
 .. _synphot-formula-bandw:
 
-Bandpass RMS Width (IRAF SYNPHOT)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Bandpass RMS Band Width (IRAF)
+------------------------------
 
-This is not the same as bandpass RMS width in
-:ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>`.
-
-Equivalent to IRAF SYNPHOT BANDPAR result for ``BANDW``, where
-:math:`\bar{\lambda}` is :ref:`synphot-formula-barlam`.
+For a bandpass, :meth:`~synphot.SpectralElement.photbw` implements the
+equivalent for ``bandw`` from IRAF SYNPHOT ``bandpar`` task, where
+:math:`\bar{\lambda}` is :ref:`synphot-formula-barlam`. This is not the same
+as :ref:`synphot-formula-rmswidth`.
 
 .. math::
 
-    BANDW = \bar{\lambda} * \sqrt{INT(thru * LN(wave / \bar{\lambda})^{2} / wave) / INT(thru / wave)}
+    \text{bandw} = \bar{\lambda} \; \sqrt{\frac{\int \; (P_{\lambda} / \lambda) \; \ln(\lambda \; / \; \bar{\lambda})^{2} \; d\lambda}{\int \; (P_{\lambda} / \lambda) \; d\lambda}}
+
+Example::
+
+    >>> bp.photbw()
+    <Quantity 357.17951791474843 Angstrom>
 
 
 .. _synphot-formula-fwhm:
 
 FWHM
-^^^^
+----
 
-Equivalent to IRAF SYNPHOT BANDPAR result for ``FWHM``, where ``BANDW`` is
-:ref:`synphot-formula-bandw`.
-
-.. math::
-
-    FWHM = \sqrt{8 * LOG(2)} * BANDW
-
-
-.. _synphot-formula-tpeak:
-
-Peak Throughput
-^^^^^^^^^^^^^^^
-
-Equivalent to IRAF SYNPHOT BANDPAR result for ``TPEAK``, which corresponds
-to the wavelength at ``WPEAK``.
+For a bandpass, :meth:`~synphot.SpectralElement.fwhm` implements the
+equivalent for ``fwhm`` from IRAF SYNPHOT ``bandpar`` task, where ``bandw``
+is :ref:`synphot-formula-bandw`.
 
 .. math::
 
-    TPEAK = MAX(thru)
+    \text{fwhm} = \text{bandw} \; \sqrt{8 \; \log 2}
+
+Example::
+
+    >>> bp.fwhm()
+    <Quantity 841.0934884601406 Angstrom>
 
 
-.. _synphot-formula-equvw:
+.. _synphot-formula-barlam:
 
-Equivalent Width
-^^^^^^^^^^^^^^^^
+Bandpass Mean Log Wavelength
+----------------------------
 
-Equivalent to IRAF SYNPHOT BANDPAR result for ``EQUVW``.
-
-.. math::
-
-    EQUVW = INT(thru)
-
-
-.. _synphot-formula-rectw:
-
-Rectangular Width
-^^^^^^^^^^^^^^^^^
-
-Equivalent to IRAF SYNPHOT BANDPAR result for ``RECTW``, where ``EQUVW``
-is :ref:`synphot-formula-equvw` and ``TPEAK`` is :ref:`synphot-formula-tpeak`.
+For a bandpass, :meth:`~synphot.spectrum.BaseSpectrum.barlam` implements the
+mean wavelength as defined in
+:ref:`Schneider, Gunn, and Hoessel (1983) <synphot-ref-schneider1983>`.
+This rather unusual definition is such that the corresponding mean frequency is
+:math:`c / \bar{\lambda}`.
+It is equivalent to IRAF SYNPHOT ``bandpar`` results for ``barlam``.
 
 .. math::
 
-    rectw = EQUVW / TPEAK
+    \bar{\lambda} = \exp\Bigg[\frac{\int \; (P_{\lambda} / \lambda) \; \ln(\lambda) \; d\lambda}{\int (P_{\lambda} / \lambda) \; d\lambda}\Bigg]
+
+Example::
+
+    >>> bp.barlam()
+    <Quantity 5331.8648495386 Angstrom>
 
 
-.. _synphot-formula-qtlam:
+.. _synphot-formula-uresp:
 
-Dimensionless Efficiency
-^^^^^^^^^^^^^^^^^^^^^^^^
+Bandpass Unit Response
+----------------------
 
-Equivalent to IRAF SYNPHOT BANDPAR result for ``QTLAM``.
+For a bandpass, :meth:`~synphot.SpectralElement.unit_response` implements the
+computation of the flux of a star that produces a response of
+one count per second in that bandpass for a given telescope collecting area.
+It is equivalent to IRAF SYNPHOT ``bandpar`` result for ``uresp``.
 
 .. math::
 
-    QTLAM = INT(thru / wave)
+    \text{uresp} = \frac{hc}{a} \int P_{\lambda}\; \lambda\; d\lambda
+
+Example::
+
+    >>> bp.unit_response(area)
+    <Quantity 3.007277127274156e-19 FLAM>
 
 
 .. _synphot-formula-emflx:
 
-Equivalent Monochromatic Flux
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Bandpass Equivalent Monochromatic Flux
+--------------------------------------
 
-Equivalent to IRAF SYNPHOT BANDPAR result for ``EMFLX``, where ``URESP`` is
-:ref:`synphot-formula-uresp`, ``RECTW`` is :ref:`synphot-formula-rectw`,
-``TPEAK`` is :ref:`synphot-formula-tpeak`, and ``TLAMBDA`` is throughput at
-:ref:`synphot-formula-avgwv`.
-
-.. math::
-
-    EMFLX = URESP * RECTW * (TPEAK / TLAMBDA)
-
-
-For Observation Only
---------------------
-
-.. _synphot-formula-effwave:
-
-Effective Wavelength
-^^^^^^^^^^^^^^^^^^^^
-
-Equivalent to IRAF SYNPHOT CALCPHOT result for:
-
-    * ``EFFLERG`` if :math:`flux_{obs}` is in FLAM (this is the correct
-      version, as defined in
-      :ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>`, page 836).
-    * ``EFFLPHOT`` or ``EFFLAM`` if :math:`flux_{obs}` is in PHOTLAM (this
-      is depreciated in IRAF SYNPHOT but kept for backward compatibility).
+For a bandpass, :meth:`~synphot.SpectralElement.emflx` implements the
+equivalent monochromatic flux for a given telescope collecting area.
+It is equivalent to IRAF SYNPHOT ``bandpar`` result for ``emflx``.
+In the formula below, ``uresp``, ``equvw``, and :math:`\lambda_{0}` are
+:ref:`synphot-formula-uresp`, :ref:`synphot-formula-equvw`, and
+:ref:`synphot-formula-avgwv`, respectively.
 
 .. math::
 
-    \lambda_{eff} = \frac{INT(flux_{obs} * wave^{2})}{INT(flux_{obs} * wave)}
+    \text{emflx} = \frac{\text{uresp} \; \text{equvw}}{P(\lambda_{0})}
 
+Example::
+
+    >>> bp.emflx(area)
+    <Quantity 3.586552579909415e-16 FLAM>
 
 .. _synphot-formula-effstim:
 
 Effective Stimulus
-^^^^^^^^^^^^^^^^^^
+------------------
 
-Equivalent to IRAF SYNPHOT CALCPHOT result for ``EFFSTIM``.
+For an observation, :meth:`~synphot.Observation.effstim` calculates the
+predicted effective stimulus in given flux unit.
+:meth:`~synphot.Observation.countrate` is a special form of effective stimulus
+in the unit of counts/s given a telescope collecting area.
+It is equivalent to IRAF SYNPHOT ``calcphot`` result for ``effstim``.
+The default binning behavior is to be consistent with ASTROLIB PYSYNPHOT.
 
 .. math::
 
-    EFFSTIM = \frac{INT(flux_{source} * thru_{bandpass} * wave)}{INT(thru_{bandpass} * wave)}
+    \text{effstim} = \frac{\int\; F_{\lambda}\; P_{\lambda}\; \lambda\; d\lambda}{\int\; P_{\lambda}\; \lambda\; d\lambda}
+
+Example::
+
+    >>> obs.effstim()  # Not binned
+    <Quantity 0.00054170149051543 PHOTLAM>
+    >>> obs.effstim('flam')
+    <Quantity 1.992237048596971e-15 FLAM>
+    >>> obs.effstim('count', area=area, binned=True)  # Binned
+    <Quantity 6624.720529866574 ct / s>
+    >>> obs.countrate(area=area)
+    <Quantity 6624.720529866574 ct / s>
+
+
+.. _synphot-formula-efflam:
+
+Effective Wavelength
+--------------------
+
+For an observation, :meth:`~synphot.Observation.effective_wavelength`
+implements the effective wavelength, as defined in
+:ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>` (page 836), where flux
+unit is converted to FLAM prior to calculations.
+It is equivalent to IRAF SYNPHOT ``calcphot`` result for ``efflerg``.
+For backward compatibility, there is also an option (``mode='efflphot'``) to
+calculate this using flux in PHOTLAM, which is equivalent to IRAF SYNPHOT
+``calcphot`` result for ``efflphot``.
+The default binning behavior is to be consistent with ASTROLIB PYSYNPHOT.
+
+.. math::
+
+    \lambda_{\text{eff}} = \frac{\int \; F_{\lambda} \; P_{\lambda} \; \lambda^2 \; d\lambda}{\int \; F_{\lambda} \; P_{\lambda} \; \lambda \; d\lambda}
+
+Example::
+
+    >>> obs.effective_wavelength()  # Binned
+    <Quantity 5401.267857308841 Angstrom>
+    >>> obs.effective_wavelength(mode='efflphot')  # Deprecated
+    WARNING: AstropyDeprecationWarning: Usage of EFFLPHOT is deprecated. [...]
+    <Quantity 5424.929868234263 Angstrom>
+
+
+.. _synphot-formula-pivwv:
+
+Pivot Wavelength
+----------------
+
+For a bandpass or a source spectrum,
+:meth:`~synphot.spectrum.BaseSpectrum.pivot` calculates the pivot wavelength.
+It is equivalent to IRAF SYNPHOT result for ``pivwv`` and ``pivot``.
+The formula shown applies to a bandpass. For a source, replace
+:math:`P_{\lambda}` with :math:`F_{\lambda}` below.
+
+.. math::
+
+    \lambda_{\text{pivot}} = \sqrt{\frac{\int \: P_{\lambda} \; \lambda \; d\lambda}{\int(P_{\lambda} \; / \; \lambda) \; d\lambda}}
+
+Example::
+
+    >>> bp.pivot()
+    <Quantity 5355.863596422958 Angstrom>
+    >>> obs.pivot()  # Not binned
+    <Quantity 5389.368734064575 Angstrom>

@@ -2,7 +2,6 @@
 
 .. _synphot_biblio:
 
-
 References
 ==========
 
@@ -37,3 +36,7 @@ Lim, P. L., Diaz, R. I., & Laidler, V. 2015, PySynphot User's Guide (Baltimore, 
 .. _synphot-ref-rybicki1979:
 
 Rybicki, G. B., & Lightman, A. P. 1979, Radiative Processes in Astrophysics (New York, NY: Wiley)
+
+.. _synphot-ref-schneider1983:
+
+Schneider, D. P., Gunn, J. E., & Hoessel J. G. 1983, ApJ, 264, 337

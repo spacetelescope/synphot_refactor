@@ -36,8 +36,8 @@ To **evaluate** its transmission at a given wavelength, use its
     <Quantity 1.0>
 
 Bandpass also has access to **photometric parameter** calculations akin to
-IRAF SYNPHOT BANDPAR task. (Also see :ref:`synphot_formulae` and respective API
-documentations.) Some of these need the information of telescope collecting
+IRAF SYNPHOT ``bandpar`` task. (Also see :ref:`synphot_formulae` and respective
+API documentations.) Some of these need the information of telescope collecting
 area, which will be set to HST value in the examples below::
 
     >>> area = 45238.93416 * (u.cm * u.cm)  # HST
