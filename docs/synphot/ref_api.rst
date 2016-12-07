@@ -2,7 +2,6 @@
 
 .. _synphot_api:
 
-
 API
 ===
 
