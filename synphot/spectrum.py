@@ -805,6 +805,14 @@ class BaseSourceSpectrum(BaseSpectrum):
                   area=None, vegaspec=None):
         """Renormalize the spectrum to the given Quantity and band.
 
+        .. warning::
+
+            Redshift attribute (``z``) is reset to 0 in the normalized
+            spectrum even if ``self.z`` is non-zero.
+            This is because the normalization simply adds a scale
+            factor to the existing composite model.
+            This is confusing but should not affect the flux sampling.
+
         Parameters
         ----------
         renorm_val : number or `~astropy.units.quantity.Quantity`
@@ -1406,10 +1414,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         return uresp.value * units.FLAM
 
     def rmswidth(self, wavelengths=None, threshold=None):
-        """Calculate the bandpass RMS width.
-
-        As defined in
-        :ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>`, page 836.
+        """Calculate the :ref:`bandpass RMS width <synphot-formula-rmswidth>`.
         Not to be confused with :func:`photbw`.
 
         Parameters
@@ -1767,7 +1772,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
     @classmethod
     def from_filter(cls, filtername, **kwargs):
-        """Load :ref:`pre-defined filter bandpass <synphot-bandpass-create>`.
+        """Load :ref:`pre-defined filter bandpass <synphot-predefined-filter>`.
 
         Parameters
         ----------

@@ -173,7 +173,7 @@ class BlackBodyNorm1D(BlackBody1D):
 
 
 class Box1D(_models.Box1D):
-    """Same as `astropy.modeling.models.Box1D`, except with
+    """Same as `astropy.modeling.functional_models.Box1D`, except with
     ``sampleset`` defined.
 
     """
@@ -280,7 +280,7 @@ class Empirical1D(Tabular1D):
         This is to be consistent with ASTROLIB PYSYNPHOT.
 
     kwargs : dict
-        Keywords for `~astropy.modeling.models.Tabular1D` model
+        Keywords for `~astropy.modeling.tabular.Tabular1D` model
         creation or :func:`~scipy.interpolate.interpn`.
         When ``fill_value=np.nan`` is given, extrapolation is done
         based on nearest end points on each end; This is the default
@@ -397,7 +397,7 @@ class Empirical1D(Tabular1D):
 
 
 class BaseGaussian1D(_models.BaseGaussian1D):
-    """Same as `astropy.modeling.models.BaseGaussian1D`, except with
+    """Same as `astropy.modeling.functional_models.BaseGaussian1D`, except with
     ``sampleset`` defined.
 
     """
@@ -431,7 +431,7 @@ class BaseGaussian1D(_models.BaseGaussian1D):
 
 
 class Gaussian1D(_models.Gaussian1D, BaseGaussian1D):
-    """Same as `astropy.modeling.models.Gaussian1D`, except with
+    """Same as `astropy.modeling.functional_models.Gaussian1D`, except with
     ``sampleset`` defined.
 
     """
@@ -439,8 +439,8 @@ class Gaussian1D(_models.Gaussian1D, BaseGaussian1D):
 
 
 class GaussianAbsorption1D(_models.GaussianAbsorption1D, BaseGaussian1D):
-    """Same as `astropy.modeling.models.GaussianAbsorption1D`, except with
-    ``sampleset`` defined.
+    """Same as `astropy.modeling.functional_models.GaussianAbsorption1D`,
+    except with ``sampleset`` defined.
 
     """
     pass
@@ -483,7 +483,7 @@ class GaussianFlux1D(Gaussian1D):
 
 
 class Lorentz1D(_models.Lorentz1D):
-    """Same as `astropy.modeling.models.Lorentz1D`, except with
+    """Same as `astropy.modeling.functional_models.Lorentz1D`, except with
     ``sampleset`` defined.
 
     """
@@ -547,7 +547,7 @@ class PowerLawFlux1D(_models.PowerLaw1D):
     same unit; e.g., ``amplitude=[1, 2]`` or
     ``amplitude=Quantity([1, 2], 'photlam')``.
 
-    Also see `~astropy.modeling.models.powerlaws.PowerLaw1D`.
+    Also see `~astropy.modeling.powerlaws.PowerLaw1D`.
 
     Parameters
     ----------
@@ -590,7 +590,7 @@ class PowerLawFlux1D(_models.PowerLaw1D):
 
 
 class Trapezoid1D(_models.Trapezoid1D):
-    """Same as `astropy.modeling.models.Trapezoid1D`, except with
+    """Same as `astropy.modeling.functional_models.Trapezoid1D`, except with
     ``sampleset`` defined.
 
     """
