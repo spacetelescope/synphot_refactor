@@ -825,8 +825,9 @@ class TestMathOperators(object):
             self.sp_1 + self.bp_1
 
     @pytest.mark.parametrize('x', [2, 2 * u.dimensionless_unscaled])
-    def test_source_mul_scalar(self, x):
+    def test_source_mul_div_scalar(self, x):
         w = self.sp_1.waveset.value
+
         ans1 = self.sp_1 * x
         np.testing.assert_allclose(
             ans1(w).value, [0, 0.01409552, 0.02013646, 0.02718424, 0],
@@ -837,33 +838,47 @@ class TestMathOperators(object):
             ans2 = x * self.sp_1
             np.testing.assert_array_equal(ans1(w), ans2(w))
 
-    def test_source_mul_spec(self):
-        """Compare with ASTROLIB PYSYNPHOT. Also test bp * sp."""
+        ans3 = self.sp_1 / x
+        np.testing.assert_allclose(
+            ans3(w).value, [0, 0.00352388, 0.00503411, 0.00679606, 0],
+            atol=1e-7)
+
+    def test_source_mul_div_spec(self):
+        """Compare mul with ASTROLIB PYSYNPHOT. Also test bp * sp."""
         ans1 = self.sp_1 * self.bp_1
         ans2 = self.bp_1 * self.sp_1
-        w = ans1.waveset
+        w = ans1.waveset[:-1]
         np.testing.assert_allclose(
             ans1(w).value,
             [0, 3.52381254e-04, 7.04792712e-04, 2.01360717e-03, 3.97184014e-03,
-             4.03718269e-05, 0, 0], rtol=1e-4)
+             4.03718269e-05, 0], rtol=1e-4)
         np.testing.assert_array_equal(ans1(w), ans2(w))
 
-    def test_source_mul_exceptions(self):
+        ans3 = self.sp_1 / self.bp_1
+        np.testing.assert_allclose(
+            ans3(w).value,
+            [0, 0.14095528, 0.07048066, 0.05034117, 0.04413243, 4.57601236, 0])
+
+        # Dividing throughput by flux does not make sense.
+        with pytest.raises(exceptions.IncompatibleSources):
+            self.bp_1 / self.sp_1
+
+    def test_source_mul_div_exceptions(self):
+        """Only mul is tested but truediv uses the same validation."""
         with pytest.raises(exceptions.IncompatibleSources):
             self.sp_1 * self.sp_2
+
         with pytest.raises(exceptions.IncompatibleSources):
             self.sp_1 * [1, 2]
         with pytest.raises(exceptions.IncompatibleSources):
             self.sp_1 * (1 - 1j)
+
+        with pytest.raises(exceptions.IncompatibleSources):
+            self.sp_1 * u.Quantity([1, 2])
+        with pytest.raises(exceptions.IncompatibleSources):
+            self.sp_1 * u.Quantity(1 - 1j)
         with pytest.raises(exceptions.IncompatibleSources):
             self.sp_1 * (1 * u.AA)
-
-    def test_source_div(self):
-        """Put real tests here when ``__truediv__`` is implemented."""
-        with pytest.raises(NotImplementedError):
-            self.sp_1 / 2.0
-        with pytest.raises(NotImplementedError):
-            self.sp_1 / self.bp_1
 
     def test_bandpass_addsub(self):
         """Not supported."""
@@ -877,8 +892,9 @@ class TestMathOperators(object):
             self.bp_1 - 2.0
 
     @pytest.mark.parametrize('x', [2.0, 2.0 * u.dimensionless_unscaled])
-    def test_bandpass_mul_scalar(self, x):
+    def test_bandpass_mul_div_scalar(self, x):
         w = self.bp_1.waveset.value
+
         ans1 = self.bp_1 * x
         np.testing.assert_allclose(ans1(w).value, [0, 0.2, 0.4, 0.6, 0])
 
@@ -887,25 +903,37 @@ class TestMathOperators(object):
             ans2 = x * self.bp_1
             np.testing.assert_array_equal(ans1(w), ans2(w))
 
-    def test_bandpass_mul_bandpass(self):
-        ans = self.bp_1 * self.bp_1
-        np.testing.assert_allclose(
-            ans(ans.waveset).value, [0, 0.01, 0.04, 0.09, 0])
+        ans3 = self.bp_1 / x
+        np.testing.assert_allclose(ans3(w).value, [0, 0.05, 0.1, 0.15, 0])
 
-    def test_bandpass_mul_exceptions(self):
+    def test_bandpass_mul_div_bandpass(self):
+        ans1 = self.bp_1 * self.bp_1
+        np.testing.assert_allclose(
+            ans1(ans1.waveset).value, [0, 0.01, 0.04, 0.09, 0])
+
+        w = [4000.1, 5000, 5900]  # Avoid div by zero
+        ans2 = self.bp_1 / self.bp_1
+        np.testing.assert_allclose(ans2(w), 1)
+
+    def test_bandpass_mul_div_exceptions(self):
+        """Only mul is tested but truediv uses the same validation."""
+        class DummyObject(object):
+            pass
+
+        with pytest.raises(exceptions.IncompatibleSources):
+            self.bp_1 * DummyObject()
+
+        with pytest.raises(exceptions.IncompatibleSources):
+            self.bp_1 * u.Quantity([1, 2])
+        with pytest.raises(exceptions.IncompatibleSources):
+            self.bp_1 * u.Quantity(1 - 1j)
+        with pytest.raises(exceptions.IncompatibleSources):
+            self.bp_1 * (1 * u.AA)
+
         with pytest.raises(exceptions.IncompatibleSources):
             self.bp_1 * [1, 2]
         with pytest.raises(exceptions.IncompatibleSources):
             self.bp_1 * (1 - 1j)
-        with pytest.raises(exceptions.IncompatibleSources):
-            self.bp_1 * (1 * u.AA)
-
-    def test_bandpass_div(self):
-        """Put real tests here when ``__truediv__`` is implemented."""
-        with pytest.raises(NotImplementedError):
-            self.bp_1 / 2.0
-        with pytest.raises(NotImplementedError):
-            self.bp_1 / self.bp_1
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
