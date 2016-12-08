@@ -9,8 +9,9 @@ A bandpass can be constructed by one of the following methods:
 
 * Load a supported :ref:`FITS file <synphot-fits-format-overview>` or
   :ref:`ASCII file <synphot-ascii-format-overview>` with
-  :meth:`synphot.SpectralElement.from_file`.
-* Use a pre-defined filter with :meth:`synphot.SpectralElement.from_filter`.
+  :meth:`~synphot.spectrum.SpectralElement.from_file`.
+* Use a pre-defined filter with
+  :meth:`~synphot.spectrum.SpectralElement.from_filter`.
 * Pass a :ref:`supported model <synphot_models_overview>` along with the
   keywords needed to define it into a
   :class:`~synphot.spectrum.SpectralElement` object.

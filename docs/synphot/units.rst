@@ -30,7 +30,7 @@ Constant        Description
 =============== ================================
 C               Speed of light in Angstrom/s
 H               Planck's constant in CGS
-HC              :math:`H \; C`
+HC              :math:`H \times C`
 SR_PER_ARCSEC2  Steradian per squared arcseconds
 =============== ================================
 
@@ -67,7 +67,7 @@ method and assigning it the unit name (as string) or direct variable name:
 .. |flam_math| replace:: :math:`\text{erg} \; \text{s}^{-1} \; \text{cm}^{-2} \; \mathring{A}^{-1}`
 .. |fnu_math| replace:: :math:`\text{erg} \; \text{s}^{-1} \text{cm}^{-2} \text{Hz}^{-1}`
 .. |obmag_math| replace:: :math:`-2.5 \; \log(\text{count})`
-.. |vegamag_math| replace:: :math:`-2.5 \; \log(\frac{F}{F_{\text{Vega}}})`
+.. |vegamag_math| replace:: :math:`-2.5 \; \log(\frac{f}{f_{\text{Vega}}})`
 
 The function :func:`~synphot.units.convert_flux` provides an easy way to
 convert between all the supported flux units, including count/OBMAG (needs an
@@ -160,8 +160,8 @@ system, such as *UBVRI*, without first deriving an appropriate transformation
 onto the desired standard system.
 
 OBMAG and counts are used to predict detected count rates. For instance,
-:meth:`~synphot.Observation.countrate` calculates the predicted number of
-detected counts per second integrated over the bandpass.
+:meth:`~synphot.observation.Observation.countrate` calculates the predicted
+number of detected counts per second integrated over the bandpass.
 There are two important things to remember concerning this unit:
 
 #. The number of counts per channel depends on the width (in wavelength space)

@@ -20,7 +20,8 @@ it was refactored again and separated into:
 
 * **synphot** (this package), which covers the general functionalities not
   related to any particular observatory; and
-* :ref:`stsynphot:stsynphot_index`.
+* **stsynphot** (https://github.com/spacetelescope/stsynphot_refactor), which
+  covers synthetic photometry for HST (and soon JWST)
 
 **synphot** simulates photometric data and spectra, observed or otherwise.
 You can incorporate your own filters, spectra, and data. You can also use a
@@ -90,7 +91,7 @@ Then, follow the instructions below to "install" the data files.
 
     **synphot** data files are a minimal subset of those required by
     **stsynphot**. If you plan to use the latter anyway, please also read the
-    instructions in :ref:`stsynphot:stsynphot-installation-setup`.
+    instructions in its documentation.
 
 To install local data files via anonymous FTP::
 
@@ -155,12 +156,12 @@ This section only contains minimal examples showing how to use this package.
 For detailed documentation, see :ref:`synphot_using`.
 
 In the examples below, you will notice that most models are from
-`synphot.models`, not `astropy.modeling.models`, because the models in
+`synphot.models`, not ``astropy.modeling.models``, because the models in
 ``synphot`` have extra things like ``sampleset`` that are not (yet) available
-in Astropy. Despite this, some models like `~astropy.modeling.models.Const1D`
-does not need the extra things to work, so they can be used directly.
-When in doubt, see if a model is in `synphot.models` first before using
-Astropy's.
+in Astropy. Despite this, some models like
+`~astropy.modeling.functional_models.Const1D` does not need the extra things to
+work, so they can be used directly. When in doubt, see if a model is in
+`synphot.models` first before using Astropy's.
 
 .. plot::
     :include-source:
@@ -264,5 +265,90 @@ Using **synphot**
    synphot/formulae
    synphot/units
    synphot/tutorials
-   synphot/ref_api
-   synphot/biblio
+
+
+.. _synphot_api:
+
+API
+===
+
+.. automodapi:: synphot.binning
+   :no-inheritance-diagram:
+
+Also imports this C-extension to local namespace:
+
+.. toctree::
+   :maxdepth: 1
+
+   synphot/c_ext
+
+.. automodapi:: synphot.config
+   :no-inheritance-diagram:
+
+.. automodapi:: synphot.exceptions
+
+.. automodapi:: synphot.models
+
+.. automodapi:: synphot.observation
+
+.. automodapi:: synphot.reddening
+
+.. automodapi:: synphot.specio
+   :no-inheritance-diagram:
+
+.. automodapi:: synphot.spectrum
+   :no-inheritance-diagram:
+
+.. automodapi:: synphot.thermal
+
+.. automodapi:: synphot.units
+   :no-inheritance-diagram:
+
+.. automodapi:: synphot.utils
+   :no-inheritance-diagram:
+
+
+.. _synphot_biblio:
+
+References
+==========
+
+.. _synphot-ref-extinction-calzetti2000:
+
+Calzetti, D., Armus, L., Bohlin, R. C., Kinney, A. L., Koornneef, J., & Storchi-Bergmann, T. 2000, ApJ, 533, 682
+
+.. _synphot-ref-extinction-cardelli1989:
+
+Cardelli, J. A., Clayton, G. C., & Mathis, J. S. 1989, ApJ, 345, 245
+
+.. _synphot-ref-extinction-gordon2003:
+
+Gordon, K. D., Clayton, G. C., Misselt, K. A., Landolt, A. U., & Wolff, M. J. 2003, ApJ, 594, 279
+
+.. _synphot-ref-horne1988:
+
+Horne, K. 1988, in New Directions in Spectophotometry: A Meeting Held in Las Vegas, NV, March 28-30, Application of Synthetic Photometry Techniques to Space Telescope Calibration, ed. A. G. Davis Philip, D. S. Hayes, & S. J. Adelman (Schenectady, NY: L. Davis Press), 145
+
+.. _synphot-ref-koornneef1986:
+
+Koornneef, J., Bohlin, R., Buser, R., Horne, K., & Turnshek, D. 1986, Highlights Astron., 7, 833
+
+.. _synphot-ref-laidler2008:
+
+Laidler, V., et al. 2008, Synphot Data User's Guide, Version 1.2 (Baltimore, MD: STScI)
+
+.. _synphot-ref-lim2015:
+
+Lim, P. L., Diaz, R. I., & Laidler, V. 2015, PySynphot User's Guide (Baltimore, MD: STScI), https://pysynphot.readthedocs.io/en/latest/
+
+.. _synphot-ref-oke1974:
+
+Oke, J. B., 1974, ApJS, 27, 21
+
+.. _synphot-ref-rybicki1979:
+
+Rybicki, G. B., & Lightman, A. P. 1979, Radiative Processes in Astrophysics (New York, NY: Wiley)
+
+.. _synphot-ref-schneider1983:
+
+Schneider, D. P., Gunn, J. E., & Hoessel J. G. 1983, ApJ, 264, 337

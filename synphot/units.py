@@ -140,7 +140,7 @@ def spectral_density_count(wav, area):
 
 
 def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
-    """Perform :ref:`flux conversion <synphot-flux-conversion>`.
+    """Perform conversion for :ref:`supported flux units <synphot-flux-units>`.
 
     Parameters
     ----------

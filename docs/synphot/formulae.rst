@@ -50,7 +50,7 @@ the equation for :math:`\lambda_{0}` as defined in
 :ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>` (page 836). It is
 equivalent to IRAF SYNPHOT ``bandpar`` results for ``avglam``,
 ``avgmw``, or ``refwave``; The throughput at this wavelength is
-:meth:`~synphot.SpectralElement.tlambda`.
+:meth:`~synphot.spectrum.SpectralElement.tlambda`.
 
 .. math::
 
@@ -69,11 +69,11 @@ Example::
 Bandpass Peak Throughput
 ------------------------
 
-For a bandpass, :meth:`~synphot.SpectralElement.tpeak` implements the bandpass
-peak throughput. It is equivalent to IRAF SYNPHOT ``bandpar`` result for
-``tpeak``; The wavelength at this throughput is
-:meth:`~synphot.SpectralElement.wpeak` (only first match is returned if peak
-value is not unique).
+For a bandpass, :meth:`~synphot.spectrum.SpectralElement.tpeak` implements the
+bandpass peak throughput. It is equivalent to IRAF SYNPHOT ``bandpar`` result
+for ``tpeak``; The wavelength at this throughput is
+:meth:`~synphot.spectrum.SpectralElement.wpeak` (only first match is returned
+if peak value is not unique).
 
 Example::
 
@@ -88,9 +88,9 @@ Example::
 Bandpass Dimensionless Efficiency
 ---------------------------------
 
-For a bandpass, :meth:`~synphot.SpectralElement.efficiency` implements the
-dimensionless efficiency. It is equivalent to IRAF SYNPHOT ``bandpar`` result
-for ``qtlam``.
+For a bandpass, :meth:`~synphot.spectrum.SpectralElement.efficiency` implements
+the dimensionless efficiency. It is equivalent to IRAF SYNPHOT ``bandpar``
+result for ``qtlam``.
 
 .. math::
 
@@ -107,8 +107,8 @@ Example::
 Bandpass Equivalent Width
 -------------------------
 
-For a bandpass, :meth:`~synphot.SpectralElement.equivwidth` implements the
-equivalent width. It gives the same value (but not unit) as
+For a bandpass, :meth:`~synphot.spectrum.SpectralElement.equivwidth` implements
+the equivalent width. It gives the same value (but not unit) as
 :meth:`~synphot.spectrum.BaseSpectrum.integrate` and is equivalent to
 IRAF SYNPHOT ``bandpar`` result for ``equvw``.
 
@@ -129,8 +129,8 @@ Example::
 Bandpass Rectangular Width
 --------------------------
 
-For a bandpass, :meth:`~synphot.SpectralElement.rectwidth` implements the
-rectangular width. It is equivalent to IRAF SYNPHOT ``bandpar`` result for
+For a bandpass, :meth:`~synphot.spectrum.SpectralElement.rectwidth` implements
+the rectangular width. It is equivalent to IRAF SYNPHOT ``bandpar`` result for
 ``rectw``. The ``equvw`` in the formula below is :ref:`synphot-formula-equvw`.
 
 .. math::
@@ -148,8 +148,8 @@ Example::
 Bandpass RMS Band Width (Koornneef)
 -----------------------------------
 
-For a bandpass, :meth:`~synphot.SpectralElement.rmswidth` implements the
-bandpass RMS width as defined in
+For a bandpass, :meth:`~synphot.spectrum.SpectralElement.rmswidth` implements
+the bandpass RMS width as defined in
 :ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>` (page 836), where
 :math:`\lambda_{0}` is the :ref:`synphot-formula-avgwv`.
 
@@ -168,7 +168,7 @@ Example::
 Bandpass RMS Band Width (IRAF)
 ------------------------------
 
-For a bandpass, :meth:`~synphot.SpectralElement.photbw` implements the
+For a bandpass, :meth:`~synphot.spectrum.SpectralElement.photbw` implements the
 equivalent for ``bandw`` from IRAF SYNPHOT ``bandpar`` task, where
 :math:`\bar{\lambda}` is :ref:`synphot-formula-barlam`. This is not the same
 as :ref:`synphot-formula-rmswidth`.
@@ -188,7 +188,7 @@ Example::
 FWHM
 ----
 
-For a bandpass, :meth:`~synphot.SpectralElement.fwhm` implements the
+For a bandpass, :meth:`~synphot.spectrum.SpectralElement.fwhm` implements the
 equivalent for ``fwhm`` from IRAF SYNPHOT ``bandpar`` task, where ``bandw``
 is :ref:`synphot-formula-bandw`.
 
@@ -229,8 +229,8 @@ Example::
 Bandpass Unit Response
 ----------------------
 
-For a bandpass, :meth:`~synphot.SpectralElement.unit_response` implements the
-computation of the flux of a star that produces a response of
+For a bandpass, :meth:`~synphot.spectrum.SpectralElement.unit_response`
+implements the computation of the flux of a star that produces a response of
 one count per second in that bandpass for a given telescope collecting area.
 It is equivalent to IRAF SYNPHOT ``bandpar`` result for ``uresp``.
 
@@ -249,7 +249,7 @@ Example::
 Bandpass Equivalent Monochromatic Flux
 --------------------------------------
 
-For a bandpass, :meth:`~synphot.SpectralElement.emflx` implements the
+For a bandpass, :meth:`~synphot.spectrum.SpectralElement.emflx` implements the
 equivalent monochromatic flux for a given telescope collecting area.
 It is equivalent to IRAF SYNPHOT ``bandpar`` result for ``emflx``.
 In the formula below, ``uresp``, ``equvw``, and :math:`\lambda_{0}` are
@@ -258,7 +258,7 @@ In the formula below, ``uresp``, ``equvw``, and :math:`\lambda_{0}` are
 
 .. math::
 
-    \text{emflx} = \frac{\text{uresp} \; \text{equvw}}{P(\lambda_{0})}
+    \text{emflx} = \frac{\text{uresp} \times \text{equvw}}{P(\lambda_{0})}
 
 Example::
 
@@ -270,10 +270,10 @@ Example::
 Effective Stimulus
 ------------------
 
-For an observation, :meth:`~synphot.Observation.effstim` calculates the
-predicted effective stimulus in given flux unit.
-:meth:`~synphot.Observation.countrate` is a special form of effective stimulus
-in the unit of counts/s given a telescope collecting area.
+For an observation, :meth:`~synphot.observation.Observation.effstim` calculates
+the predicted effective stimulus in given flux unit.
+:meth:`~synphot.observation.Observation.countrate` is a special form of
+effective stimulus in the unit of count/s given a telescope collecting area.
 It is equivalent to IRAF SYNPHOT ``calcphot`` result for ``effstim``.
 The default binning behavior is to be consistent with ASTROLIB PYSYNPHOT.
 
@@ -293,12 +293,13 @@ Example::
     <Quantity 6624.720529866574 ct / s>
 
 
-.. _synphot-formula-efflam:
+.. _synphot-formula-effwave:
 
 Effective Wavelength
 --------------------
 
-For an observation, :meth:`~synphot.Observation.effective_wavelength`
+For an observation,
+:meth:`~synphot.observation.Observation.effective_wavelength`
 implements the effective wavelength, as defined in
 :ref:`Koornneef et al. 1986 <synphot-ref-koornneef1986>` (page 836), where flux
 unit is converted to FLAM prior to calculations.

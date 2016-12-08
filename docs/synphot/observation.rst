@@ -5,7 +5,8 @@
 Observation
 ===========
 
-:class:`~synphot.Observation` is a special type of :ref:`source-spectrum-main`,
+:class:`~synphot.observation.Observation` is a special type of
+:ref:`source-spectrum-main`,
 where the source is convolved with a :ref:`bandpass-main`; i.e., a photon has
 already passed through the telescope optics. It is usually the end-point of a
 chain of spectral manipulation. Unlike a regular source spectrum, there is only
@@ -16,7 +17,7 @@ disabled.
 
 An observation also understands detector binning. By default, the bins are
 assumed to be the same as the ``waveset`` of the input bandpass. However,
-this is not always true, particularly for :ref:`<stsynphot-obsmode>`. In those
+this is not always true, particularly for "obsmode" in **stsynphot**. In those
 cases, the bandpass has an extra ``binset`` attribute (wavelength values for
 bin centers) that must be passed into an observation's constructor, as shown
 below::
@@ -48,8 +49,8 @@ To **evaluate** its flux at a given wavelength (not binned), use its
 :py:meth:`~object.__call__` method as you would with any Astropy model
 (except that the method also takes additional keywords like ``flux_unit``
 for flux conversion). To get binned flux values, use
-:meth:`~synphot.Observation.sample_binned`, where you must provide the exact
-bin center(s)::
+:meth:`~synphot.observation.Observation.sample_binned`, where you must provide
+the exact bin center(s)::
 
     >>> obs(6000.5)  # Native (not binned) sampling; Angstrom
     <Quantity 160.95438045640773 PHOTLAM>
@@ -57,8 +58,8 @@ bin center(s)::
     <Quantity [ 161.19216632, 160.65695961] PHOTLAM>
 
 To calculate **bin properties** such as covered wavelength or pixel ranges,
-you can use its :meth:`~synphot.Observation.binned_waverange` and
-:meth:`~synphot.Observation.binned_pixelrange` as follows::
+you can use its :meth:`~synphot.observation.Observation.binned_waverange` and
+:meth:`~synphot.observation.Observation.binned_pixelrange` as follows::
 
     >>> # Wavelength range covered by 10 pixels centered at 5500 Angstrom
     >>> obs.binned_waverange(5500, 10)
@@ -85,9 +86,10 @@ The default sampling behaviors are to be consistent with ASTROLIB PYSYNPHOT::
     >>> obs.effective_wavelength(binned=False)
     <Quantity 5332.703444644624 Angstrom>
 
-:meth:`~synphot.Observation.countrate` is probably the most often used method
-for an observation. It computes the **total counts** (a special case of
-effective stimulus) of a source spectrum, integrated over the bandpass with
+:meth:`~synphot.observation.Observation.countrate` is probably the most often
+used method for an observation.
+It computes the **total counts** (a special case of effective stimulus)
+of a source spectrum, integrated over the bandpass with
 some binning. By default, it uses ``binset``, which should be defined such that
 one wavelength bin corresponds to one detector pixel::
 
@@ -97,9 +99,9 @@ one wavelength bin corresponds to one detector pixel::
 
 An observation can be converted to a **regular source spectrum** containing
 only the wavelength set and sampled flux (binned by default) by using its
-:meth:`~synphot.Observation.as_spectrum` method. This is useful when you wish
-to access functionalities that are not directly available to an observation
-(e.g., tapering or saving to a file).
+:meth:`~synphot.observation.Observation.as_spectrum` method.
+This is useful when you wish to access functionalities that are not directly
+available to an observation (e.g., tapering or saving to a file).
 
 To accurately represent binned flux visually, especially in a unit like count
 that is very sensitive to bin size, it is recommended to **plot** the data as a

@@ -105,7 +105,7 @@ release = package.__version__
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes. To override the custom theme, set this to the
 # name of a builtin theme or the name of a custom theme in html_theme_path.
-#html_theme = None
+#html_theme = 'sphinx_rtd_theme'
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
@@ -149,7 +149,9 @@ man_pages = [('index', project.lower(), project + u' Documentation',
 # -- Options for intersphinx ---------------------------------------------------
 
 intersphinx_mapping.update({
-        'stsynphot': ('http://stsynphot.readthedocs.org/en/latest/', None)})
+        'astropy': ('http://docs.astropy.org/en/latest/', None)})
+#intersphinx_mapping.update({
+#        'stsynphot': ('http://stsynphot.readthedocs.org/en/latest/', None)})
 
 ## -- Options for the edit_on_github extension ---------------------------------
 

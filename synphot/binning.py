@@ -12,7 +12,7 @@ from astropy import units as u
 # LOCAL
 from . import exceptions
 
-__all__ = ['calcbinflux', 'calculate_bin_edges', 'calculate_bin_widths',
+__all__ = ['calculate_bin_edges', 'calculate_bin_widths',
            'calculate_bin_centers', 'wave_range', 'pixel_range']
 
 

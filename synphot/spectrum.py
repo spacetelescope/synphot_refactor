@@ -1772,7 +1772,7 @@ class SpectralElement(BaseUnitlessSpectrum):
 
     @classmethod
     def from_filter(cls, filtername, **kwargs):
-        """Load :ref:`pre-defined filter bandpass <synphot-bandpass-create>`.
+        """Load :ref:`pre-defined filter bandpass <synphot-predefined-filter>`.
 
         Parameters
         ----------

@@ -13,14 +13,14 @@ A source spectrum can be constructed by one of the following methods:
 
 * Load a supported :ref:`FITS file <synphot-fits-format-overview>` or
   :ref:`ASCII file <synphot-ascii-format-overview>` with
-  :meth:`synphot.SourceSpectrum.from_file`.
+  :meth:`~synphot.spectrum.SourceSpectrum.from_file`.
 * Use the pre-defined Vega spectrum, which is also used to define VEGAMAG, with
-  :meth:`synphot.SourceSpectrum.from_vega`.
+  :meth:`~synphot.spectrum.SourceSpectrum.from_vega`.
 * Pass a :ref:`supported model <synphot_models_overview>` along with the
   keywords needed to define it into a
   :class:`~synphot.spectrum.SourceSpectrum` object.
 * Create a thermal source spectrum with
-  :meth:`synphot.ThermalSpectralElement.thermal_source`.
+  :meth:`~synphot.thermal.ThermalSpectralElement.thermal_source`.
 * Build a composite source using :ref:`synphot-spec-math-op`.
   (Also see example in :ref:`synphot_getting_started`.)
 
@@ -50,10 +50,13 @@ for flux conversion)::
     >>> sp(wave, flux_unit=units.OBMAG, area=area)
     <Quantity [-21.52438718,-21.52438718] OBMAG>
 
+.. _synphot_reddening:
+
 To apply (or remove) the effects of interstellar **reddening** on a source
-spectrum, use :meth:`synphot.ReddeningLaw.from_extinction_model` to provide a
-reddening model name (see table below; not to be confused with Astropy model)
-and then :meth:`~synphot.ReddeningLaw.extinction_curve` to create the
+spectrum, use :meth:`~synphot.reddening.ReddeningLaw.from_extinction_model`
+to provide a reddening model name (see table below; not to be confused with
+Astropy model) and then
+:meth:`~synphot.reddening.ReddeningLaw.extinction_curve` to create the
 extinction curve with a given :math:`E(B-V)` value (negative value effectively
 de-reddens the spectrum), and then multiply it to the source:
 
@@ -101,7 +104,7 @@ de-reddens the spectrum), and then multiply it to the source:
 You can **redshift** a source spectrum in several ways (shown in example
 below), either by setting its ``z`` attribute or passing in a ``z`` keyword
 during initialization. To blueshift, you may use the same attribute/keyword but
-set its *value* to :math:`\frac{1}{(1 + z) - 1}` instead. Currently, only
+set its *value* to :math:`\frac{1}{1 + z} - 1` instead. Currently, only
 the wavelength values are shifted, not the flux:
 
 .. plot::
@@ -131,8 +134,8 @@ the wavelength values are shifted, not the flux:
     ax[1].set_ylabel('Flux (PHOTLAM)')
 
 A source spectrum can also be **normalized** to a given flux value in a given
-bandpass using its :meth:`~synphot.SourceSpectrum.normalize` method.
-The resultant spectrum is basically the source multiplied with a factor
+bandpass using its :meth:`~synphot.spectrum.BaseSourceSpectrum.normalize`
+method. The resultant spectrum is basically the source multiplied with a factor
 necessary to achieve the desired normalization:
 
 .. plot::
@@ -153,7 +156,8 @@ necessary to achieve the desired normalization:
     plt.title(sp.meta['expr'])
     plt.legend(['Original', 'Normalized'], loc='upper right')
 
-**Integration** is done with the :meth:`~synphot.SourceSpectrum.integrate`
+**Integration** is done with the
+:meth:`~synphot.spectrum.BaseSpectrum.integrate`
 method. It uses trapezoid integration (but could be expanded to perform
 analytical calculations instead in the future when that is supported by
 Astropy). By default, integration is done in internal units::
@@ -204,7 +208,7 @@ Blackbody radiation is defined by Planck's law
 
 .. math::
 
-    B_{\lambda}(T) = \frac{2 h c^{2} / \lambda^{5}}{exp(h c / \lambda k T) - 1}
+    B_{\lambda}(T) = \frac{2 h c^{2} / \lambda^{5}}{\exp(h c / \lambda k T) - 1}
 
 where the unit of :math:`B_{\lambda}(T)` is
 :math:`erg \; s^{-1} cm^{-2} \mathring{A}^{-1} sr^{-1}`
@@ -312,6 +316,7 @@ One is to first create :ref:`synphot-gaussian` and then subtract it from
 a continuum (e.g., :ref:`synphot-flat-spec`):
 
 .. plot::
+    :include-source:
 
     from synphot import SourceSpectrum
     from synphot.models import GaussianFlux1D, ConstFlux1D
@@ -324,6 +329,7 @@ The other way is to create a unitless absorption profile and then multiply it
 to a continuum (e.g., :ref:`synphot-flat-spec`):
 
 .. plot::
+    :include-source:
 
     from astropy.stats.funcs import gaussian_fwhm_to_sigma
     from synphot import SourceSpectrum, BaseUnitlessSpectrum
@@ -342,7 +348,6 @@ Gaussian Emission
 -----------------
 
 .. math::
-
 
     f(x) = A \; e^{- \frac{\left(x - x_{0}\right)^{2}}{2 \; \sigma^{2}}}
 
@@ -410,13 +415,13 @@ wavelength of 1 micron and an index of -2:
 Thermal
 -------
 
-`~synphot.ThermalSpectralElement` handles a spectral element with thermal
-properties, which is important in infrared observations.
-Its :meth:`~synphot.ThermalSpectralElement.thermal_source` method produces
-a thermal (blackbody) source spectrum. This is usually not used directly, but
-rather as part of the calculations for thermal background for some instrument.
-See :ref:`thermal source in stsynphot <stsynphot:stsynphot-thermal-spec>`
-for more details.
+`~synphot.thermal.ThermalSpectralElement` handles a spectral element with
+thermal properties, which is important in infrared observations.
+Its :meth:`~synphot.thermal.ThermalSpectralElement.thermal_source` method
+produces a thermal (blackbody) source spectrum. This is usually not used
+directly, but rather as part of the calculations for thermal background for
+some instrument.
+See **stsynphot** documentation regarding "thermal source" for more details.
 
 
 .. _synphot-vega-spec:
@@ -426,7 +431,7 @@ Vega
 
 **synphot** uses built-in Vega spectrum for VEGAMAG calculations.
 It is loaded from ``synphot.conf.vega_file`` using
-:meth:`~synphot.SourceSpectrum.from_vega`.
+:meth:`~synphot.spectrum.SourceSpectrum.from_vega`.
 
 The example below loads and plots the built-in Vega spectrum:
 
