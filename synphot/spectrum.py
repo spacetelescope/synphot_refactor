@@ -685,7 +685,7 @@ class BaseSpectrum(object):
 
         yu = y.unit
         if yu is u.dimensionless_unscaled:
-            ax.set_ylabel('Throughput')
+            ax.set_ylabel('Unitless')
         else:
             ax.set_ylabel('Flux ({0})'.format(yu))
 
