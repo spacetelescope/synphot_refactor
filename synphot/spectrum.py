@@ -364,15 +364,15 @@ class BaseSpectrum(object):
 
     # Operators are to be implemented by subclasses, where applicable.
 
-    def __add__(self, other):
+    def __add__(self, other):  # pragma: no cover
         """Add self and other."""
         raise NotImplementedError('This operation is not supported.')
 
-    def __sub__(self, other):
+    def __sub__(self, other):  # pragma: no cover
         """Subtract other from self."""
         raise NotImplementedError('This operation is not supported.')
 
-    def __mul__(self, other):
+    def __mul__(self, other):  # pragma: no cover
         """Multiply self and other."""
         raise NotImplementedError('This operation is not supported.')
 
@@ -380,13 +380,9 @@ class BaseSpectrum(object):
         """This is only called if ``other.__mul__`` cannot operate."""
         return self.__mul__(other)
 
-    def __truediv__(self, other):
+    def __truediv__(self, other):  # pragma: no cover
         """Divide self by other."""
         raise NotImplementedError('This operation is not supported.')
-
-    def __div__(self, other):  # pragma: no cover
-        """Same as :func:`__truediv__`."""
-        return self.__truediv__(other)
 
     def integrate(self, wavelengths=None, **kwargs):
         """Perform integration.
@@ -1020,30 +1016,45 @@ class SourceSpectrum(BaseSourceSpectrum):
         self._merge_meta(self, other, result)
         return result
 
-    def __mul__(self, other):
-        """Multiply self and other."""
-        if isinstance(other, (u.Quantity, numbers.Number)):
-            if isinstance(other, u.Quantity):
-                if other.unit.decompose() != u.dimensionless_unscaled:
-                    raise exceptions.IncompatibleSources(
-                        'Can only operate on dimensionless Quantity.')
-                val = other.value
-            else:
-                val = other
-
-            if not np.isscalar(val) or not isinstance(val, numbers.Real):
-                raise exceptions.IncompatibleSources(
-                    'Can only operate on real scalar number.')
-
-            newcls = self.__class__(self.model | Scale(val))
-
-        elif isinstance(other, BaseUnitlessSpectrum):
-            newcls = self.__class__(self.model * other.model)
-
-        else:
+    @staticmethod
+    def _validate_other_mul_div(other):
+        """Conditions for other to satisfy before mul/div."""
+        if not isinstance(other, (u.Quantity, numbers.Number,
+                                  BaseUnitlessSpectrum)):
             raise exceptions.IncompatibleSources(
                 'Can only operate on scalar number/Quantity or '
-                'unitless spectrum.')
+                'unitless spectrum')
+        elif (isinstance(other, u.Quantity) and
+              (other.unit.decompose() != u.dimensionless_unscaled or
+               not np.isscalar(other.value) or
+               not isinstance(other.value, numbers.Real))):
+            raise exceptions.IncompatibleSources(
+                'Can only operate on real scalar dimensionless Quantity')
+        elif (isinstance(other, numbers.Number) and
+              not (np.isscalar(other) and isinstance(other, numbers.Real))):
+            raise exceptions.IncompatibleSources(
+                'Can only operate on real scalar number')
+
+    def __mul__(self, other):
+        """Multiply self and other."""
+        self._validate_other_mul_div(other)
+
+        if isinstance(other, (u.Quantity, numbers.Number)):
+            newcls = self.__class__(self.model | Scale(other))
+        else:  # Unitless spectrum
+            newcls = self.__class__(self.model * other.model)
+
+        self._merge_meta(self, other, newcls)
+        return newcls
+
+    def __truediv__(self, other):
+        """Divide self by other."""
+        self._validate_other_mul_div(other)
+
+        if isinstance(other, (u.Quantity, numbers.Number)):
+            newcls = self.__class__(self.model | Scale(1 / other))
+        else:  # Unitless spectrum
+            newcls = self.__class__(self.model / other.model)
 
         self._merge_meta(self, other, newcls)
         return newcls
@@ -1197,39 +1208,55 @@ class BaseUnitlessSpectrum(BaseSpectrum):
 
         return new_unit
 
+    @staticmethod
+    def _validate_other_mul_div(other):
+        """Conditions for other to satisfy before mul/div."""
+        if not isinstance(other, (u.Quantity, numbers.Number,
+                                  BaseUnitlessSpectrum, SourceSpectrum)):
+            raise exceptions.IncompatibleSources(
+                'Can only operate on scalar number/Quantity or spectrum')
+        elif (isinstance(other, u.Quantity) and
+              (other.unit.decompose() != u.dimensionless_unscaled or
+               not np.isscalar(other.value) or
+               not isinstance(other.value, numbers.Real))):
+            raise exceptions.IncompatibleSources(
+                'Can only operate on real scalar dimensionless Quantity')
+        elif (isinstance(other, numbers.Number) and
+              not (np.isscalar(other) and isinstance(other, numbers.Real))):
+            raise exceptions.IncompatibleSources(
+                'Can only operate on real scalar number')
+
     def __mul__(self, other):
         """Multiply self and other."""
         do_meta_merge = True
+        self._validate_other_mul_div(other)
 
         if isinstance(other, (u.Quantity, numbers.Number)):
-            if isinstance(other, u.Quantity):
-                if other.unit.decompose() != u.dimensionless_unscaled:
-                    raise exceptions.IncompatibleSources(
-                        'Can only operate on dimensionless Quantity.')
-                val = other.value
-            else:
-                val = other
-
-            if not np.isscalar(val) or not isinstance(val, numbers.Real):
-                raise exceptions.IncompatibleSources(
-                    'Can only operate on real scalar number.')
-
-            newcls = self.__class__(self.model | Scale(val))
-
+            newcls = self.__class__(self.model | Scale(other))
         elif isinstance(other, BaseUnitlessSpectrum):
             newcls = self.__class__(self.model * other.model)
-
-        elif isinstance(other, SourceSpectrum):
+        else:  # SourceSpectrum
             do_meta_merge = False
             newcls = other.__mul__(self)
-
-        else:
-            raise exceptions.IncompatibleSources(
-                'Can only operate on scalar number/Quantity or spectrum.')
 
         if do_meta_merge:
             self._merge_meta(self, other, newcls)
 
+        return newcls
+
+    def __truediv__(self, other):
+        """Divide self by other."""
+        self._validate_other_mul_div(other)
+
+        if isinstance(other, (u.Quantity, numbers.Number)):
+            newcls = self.__class__(self.model | Scale(1 / other))
+        elif isinstance(other, BaseUnitlessSpectrum):
+            newcls = self.__class__(self.model / other.model)
+        else:  # SourceSpectrum
+            raise exceptions.IncompatibleSources(
+                'Cannot divide by source spectrum')
+
+        self._merge_meta(self, other, newcls)
         return newcls
 
 
