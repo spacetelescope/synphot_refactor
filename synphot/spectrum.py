@@ -372,6 +372,24 @@ class BaseSpectrum(object):
         """Subtract other from self."""
         raise NotImplementedError('This operation is not supported.')
 
+    @staticmethod
+    def _validate_other_mul_div(other):
+        """Conditions for other to satisfy before mul/div."""
+        if not isinstance(other, (u.Quantity, numbers.Number,
+                                  BaseUnitlessSpectrum, SourceSpectrum)):
+            raise exceptions.IncompatibleSources(
+                'Can only operate on scalar number/Quantity or spectrum')
+        elif (isinstance(other, u.Quantity) and
+              (other.unit.decompose() != u.dimensionless_unscaled or
+               not np.isscalar(other.value) or
+               not isinstance(other.value, numbers.Real))):
+            raise exceptions.IncompatibleSources(
+                'Can only operate on real scalar dimensionless Quantity')
+        elif (isinstance(other, numbers.Number) and
+              not (np.isscalar(other) and isinstance(other, numbers.Real))):
+            raise exceptions.IncompatibleSources(
+                'Can only operate on real scalar number')
+
     def __mul__(self, other):  # pragma: no cover
         """Multiply self and other."""
         raise NotImplementedError('This operation is not supported.')
@@ -1016,33 +1034,17 @@ class SourceSpectrum(BaseSourceSpectrum):
         self._merge_meta(self, other, result)
         return result
 
-    @staticmethod
-    def _validate_other_mul_div(other):
-        """Conditions for other to satisfy before mul/div."""
-        if not isinstance(other, (u.Quantity, numbers.Number,
-                                  BaseUnitlessSpectrum)):
-            raise exceptions.IncompatibleSources(
-                'Can only operate on scalar number/Quantity or '
-                'unitless spectrum')
-        elif (isinstance(other, u.Quantity) and
-              (other.unit.decompose() != u.dimensionless_unscaled or
-               not np.isscalar(other.value) or
-               not isinstance(other.value, numbers.Real))):
-            raise exceptions.IncompatibleSources(
-                'Can only operate on real scalar dimensionless Quantity')
-        elif (isinstance(other, numbers.Number) and
-              not (np.isscalar(other) and isinstance(other, numbers.Real))):
-            raise exceptions.IncompatibleSources(
-                'Can only operate on real scalar number')
-
     def __mul__(self, other):
         """Multiply self and other."""
         self._validate_other_mul_div(other)
 
         if isinstance(other, (u.Quantity, numbers.Number)):
             newcls = self.__class__(self.model | Scale(other))
-        else:  # Unitless spectrum
+        elif isinstance(other, BaseUnitlessSpectrum):
             newcls = self.__class__(self.model * other.model)
+        else:  # Source spectrum
+            raise exceptions.IncompatibleSources(
+                'Cannot multiply two source spectra together')
 
         self._merge_meta(self, other, newcls)
         return newcls
@@ -1053,8 +1055,10 @@ class SourceSpectrum(BaseSourceSpectrum):
 
         if isinstance(other, (u.Quantity, numbers.Number)):
             newcls = self.__class__(self.model | Scale(1 / other))
-        else:  # Unitless spectrum
+        elif isinstance(other, BaseUnitlessSpectrum):
             newcls = self.__class__(self.model / other.model)
+        else:  # Source spectrum
+            newcls = BaseUnitlessSpectrum(self.model / other.model)
 
         self._merge_meta(self, other, newcls)
         return newcls
@@ -1207,24 +1211,6 @@ class BaseUnitlessSpectrum(BaseSpectrum):
                 'Unit {0} is not dimensionless'.format(new_unit))
 
         return new_unit
-
-    @staticmethod
-    def _validate_other_mul_div(other):
-        """Conditions for other to satisfy before mul/div."""
-        if not isinstance(other, (u.Quantity, numbers.Number,
-                                  BaseUnitlessSpectrum, SourceSpectrum)):
-            raise exceptions.IncompatibleSources(
-                'Can only operate on scalar number/Quantity or spectrum')
-        elif (isinstance(other, u.Quantity) and
-              (other.unit.decompose() != u.dimensionless_unscaled or
-               not np.isscalar(other.value) or
-               not isinstance(other.value, numbers.Real))):
-            raise exceptions.IncompatibleSources(
-                'Can only operate on real scalar dimensionless Quantity')
-        elif (isinstance(other, numbers.Number) and
-              not (np.isscalar(other) and isinstance(other, numbers.Real))):
-            raise exceptions.IncompatibleSources(
-                'Can only operate on real scalar number')
 
     def __mul__(self, other):
         """Multiply self and other."""

@@ -859,6 +859,10 @@ class TestMathOperators(object):
             ans3(w).value,
             [0, 0.14095528, 0.07048066, 0.05034117, 0.04413243, 4.57601236, 0])
 
+        ans4 = self.sp_1 / self.sp_1
+        np.testing.assert_allclose(
+            ans4([4000, 5000, 6000]), 1 * u.dimensionless_unscaled)
+
         # Dividing throughput by flux does not make sense.
         with pytest.raises(exceptions.IncompatibleSources):
             self.bp_1 / self.sp_1
