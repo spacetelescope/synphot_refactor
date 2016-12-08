@@ -133,10 +133,10 @@ and special notes:
 Spectrum Arithmetic
 -------------------
 
-When spectrum objects are added to, subtracted from, or multiplied with each
-other, the resultant spectrum contains a compound model derived from the
-operands. If the operands themselves also contain compound models, then the
-final compound model is a compound of the input compound models.
+When spectrum objects are added to, subtracted from, multiplied with, or
+divided by each other, the resultant spectrum contains a compound model derived
+from the operands. If the operands themselves also contain compound models,
+then the final compound model is a compound of the input compound models.
 
 Operations that do not make sense (e.g., multiplying two source spectra or
 adding a bandpass to a source spectrum) are prohibited. The type of output
@@ -151,9 +151,16 @@ Source Spectrum   :math:`-`      Source Spectrum   Source Spectrum   No
 Source Spectrum   :math:`\times` Unitless Spectrum Source Spectrum   Yes
 Source Spectrum   :math:`\times` Scalar number     Source Spectrum   Yes
 Source Spectrum   :math:`\times` Unitless Quantity Source Spectrum   No
+Source Spectrum   :math:`/`      Source Spectrum   Unitless Spectrum No
+Source Spectrum   :math:`/`      Unitless Spectrum Source Spectrum   No
+Source Spectrum   :math:`/`      Scalar number     Source Spectrum   No
+Source Spectrum   :math:`/`      Unitless Quantity Source Spectrum   No
 Unitless Spectrum :math:`\times` Unitless Spectrum Unitless Spectrum Yes
 Unitless Spectrum :math:`\times` Scalar number     Unitless Spectrum Yes
 Unitless Spectrum :math:`\times` Unitless Quantity Unitless Spectrum No
+Unitless Spectrum :math:`/`      Unitless Spectrum Unitless Spectrum No
+Unitless Spectrum :math:`/`      Scalar number     Unitless Spectrum No
+Unitless Spectrum :math:`/`      Unitless Quantity Unitless Spectrum No
 ================= ============== ================= ================= ===========
 
 

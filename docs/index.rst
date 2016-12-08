@@ -263,6 +263,6 @@ Using **synphot**
    synphot/observation
    synphot/formulae
    synphot/units
-## UNTIL HERE   synphot/tutorials
+   synphot/tutorials
    synphot/ref_api
    synphot/biblio
