@@ -438,8 +438,6 @@ The example below loads and plots the built-in Vega spectrum:
 .. plot::
     :include-source:
 
-    from astropy.utils.data import conf as data_conf
     from synphot import SourceSpectrum
-    with data_conf.set_temp('remote_timeout', 10):
-        sp = SourceSpectrum.from_vega()
+    sp = SourceSpectrum.from_vega()
     sp.plot(right=12000, flux_unit='flam', title=sp.meta['expr'])
