@@ -105,7 +105,7 @@ setup(name=PACKAGENAME,
       version=VERSION,
       description=DESCRIPTION,
       scripts=scripts,
-      install_requires=['numpy>=1.9', 'astropy>=1.3', 'scipy>=0.14'],
+      install_requires=['numpy>=1.9', 'astropy'],  # 'astropy>=1.3', 'scipy>=0.14'
       author=AUTHOR,
       author_email=AUTHOR_EMAIL,
       license=LICENSE,
