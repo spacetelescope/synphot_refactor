@@ -421,7 +421,7 @@ Its :meth:`~synphot.thermal.ThermalSpectralElement.thermal_source` method
 produces a thermal (blackbody) source spectrum. This is usually not used
 directly, but rather as part of the calculations for thermal background for
 some instrument.
-See **stsynphot** documentation regarding "thermal source" for more details.
+See **stsynphot** documentation regarding "thermal background" for more details.
 
 
 .. _synphot-vega-spec:
