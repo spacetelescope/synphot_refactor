@@ -402,6 +402,12 @@ class BaseSpectrum(object):
         """Divide self by other."""
         raise NotImplementedError('This operation is not supported.')
 
+    def __div__(self, other):  # pragma: py2
+        """Same as :meth:`__truediv__` for Python 2 compatibility without
+        future import.
+        """
+        return self.__truediv__(other)
+
     def integrate(self, wavelengths=None, **kwargs):
         """Perform integration.
 
