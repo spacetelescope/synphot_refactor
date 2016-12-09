@@ -1,7 +1,7 @@
 setuptools>=18.0.0
 Cython>=0.23.4
-numpy
+numpy>=1.11
 scipy>=0.14
-matplotlib
+matplotlib>=1.5
 astropy-helpers
 -e git+https://github.com/astropy/astropy.git#egg=astropy
