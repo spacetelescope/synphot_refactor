@@ -1,7 +1,9 @@
 synphot
 =======
 
-**DO NOT USE! Work in progress...**
+.. image:: https://readthedocs.org/projects/synphot/badge/?version=latest
+    :target: http://synphot.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 .. image:: https://travis-ci.org/spacetelescope/synphot_refactor.svg?branch=master
     :target: https://travis-ci.org/spacetelescope/synphot_refactor
@@ -12,8 +14,6 @@ synphot
 .. image:: https://coveralls.io/repos/github/spacetelescope/synphot_refactor/badge.svg?branch=master
     :target: https://coveralls.io/github/spacetelescope/synphot_refactor?branch=master
 
-
-This is a module for manipulating spectra.
-
-It is intended to be used for synthetic photometry, i.e., constructing source
-spectra and spectral element throughputs.
+This is a replacement for IRAF STSDAS SYNPHOT and ASTROLIB PYSYNPHOT,
+utilizing Astropy and covering the non-instrument specific portions
+of the old packages.
