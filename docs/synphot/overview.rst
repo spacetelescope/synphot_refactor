@@ -70,61 +70,61 @@ The following table lists the models allowed to be used for spectrum
 construction (with flux unit or unitless), where they reside,
 and special notes:
 
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|Model                                                 |Package    |Notes                                                         |
-+======================================================+===========+==============================================================+
-|`~synphot.models.BlackBody1D`                         |**synphot**|Calculate flux in PHOTLAM per                                 |
-|                                                      |           |steradian.                                                    |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.BlackBodyNorm1D`                     |**synphot**|Calculate flux in PHOTLAM.                                    |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.Box1D`                               |**synphot**|Like `astropy.modeling.functional_models.Box1D`               |
-|                                                      |           |but with ``sampleset``.                                       |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~astropy.modeling.models.BrokenPowerLaw1D`           |Astropy    ||note_flux_conv_incorrect|                                    |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~astropy.modeling.models.Const1D`                    |Astropy    ||note_flux_conv_incorrect|                                    |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.ConstFlux1D`                         |**synphot**|Constant flux in a given unit might                           |
-|                                                      |           |not be constant in other flux units.                          |
-|                                                      |           |This handles flux unit conversion                             |
-|                                                      |           |properly.                                                     |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.Empirical1D`                         |**synphot**|Like `~astropy.modeling.tabular.Tabular1D`                    |
-|                                                      |           |but with extra features specific to                           |
-|                                                      |           |spectrum (e.g., option to keep negative flux) and             |
-|                                                      |           |different default values.                                     |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~astropy.modeling.models.ExponentialCutoffPowerLaw1D`|Astropy    ||note_flux_conv_incorrect|                                    |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.Gaussian1D`                          |**synphot**|Like `astropy.modeling.functional_models.Gaussian1D`          |
-|                                                      |           |but with ``sampleset``.                                       |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.GaussianAbsorption1D`                |**synphot**|Like `astropy.modeling.functional_models.GaussianAbsorption1D`|
-|                                                      |           |but with ``sampleset``.                                       |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.GaussianFlux1D`                      |**synphot**|Like `~synphot.models.Gaussian1D` but allows                  |
-|                                                      |           |backward-compatible parameters like total flux and            |
-|                                                      |           |FWHM.                                                         |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~astropy.modeling.models.LogParabola1D`              |Astropy    ||note_flux_conv_incorrect|                                    |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.Lorentz1D`                           |**synphot**|Like `astropy.modeling.functional_models.Lorentz1D`           |
-|                                                      |           |but with ``sampleset`` and ``bounding_box``.                  |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.MexicanHat1D`                        |**synphot**|Like `astropy.modeling.functional_models.MexicanHat1D`        |
-|                                                      |           |but with ``sampleset`` and ``bounding_box``.                  |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~astropy.modeling.models.PowerLaw1D`                 |Astropy    ||note_flux_conv_incorrect|                                    |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.PowerLawFlux1D`                      |**synphot**|Like `~astropy.modeling.powerlaws.PowerLaw1D`                 |
-|                                                      |           |but handles flux unit conversion properly by                  |
-|                                                      |           |evaluating in user flux unit instead of internal              |
-|                                                      |           |unit of PHOTLAM.                                              |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.Trapezoid1D`                         |**synphot**|Like `astropy.modeling.functional_models.Trapezoid1D`         |
-|                                                      |           |but with ``sampleset``.                                       |
-+------------------------------------------------------+-----------+--------------------------------------------------------------+
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|Model                                                    |Package    |Notes                                                         |
++=========================================================+===========+==============================================================+
+|`~synphot.models.BlackBody1D`                            |**synphot**|Calculate flux in PHOTLAM per                                 |
+|                                                         |           |steradian.                                                    |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~synphot.models.BlackBodyNorm1D`                        |**synphot**|Calculate flux in PHOTLAM.                                    |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~synphot.models.Box1D`                                  |**synphot**|Like `astropy.modeling.functional_models.Box1D`               |
+|                                                         |           |but with ``sampleset``.                                       |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~astropy.modeling.powerlaws.BrokenPowerLaw1D`           |Astropy    ||note_flux_conv_incorrect|                                    |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~astropy.modeling.functional_models.Const1D`            |Astropy    ||note_flux_conv_incorrect|                                    |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~synphot.models.ConstFlux1D`                            |**synphot**|Constant flux in a given unit might                           |
+|                                                         |           |not be constant in other flux units.                          |
+|                                                         |           |This handles flux unit conversion                             |
+|                                                         |           |properly.                                                     |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~synphot.models.Empirical1D`                            |**synphot**|Like `~astropy.modeling.tabular.Tabular1D`                    |
+|                                                         |           |but with extra features specific to                           |
+|                                                         |           |spectrum (e.g., option to keep negative flux) and             |
+|                                                         |           |different default values.                                     |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~astropy.modeling.powerlaws.ExponentialCutoffPowerLaw1D`|Astropy    ||note_flux_conv_incorrect|                                    |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~synphot.models.Gaussian1D`                             |**synphot**|Like `astropy.modeling.functional_models.Gaussian1D`          |
+|                                                         |           |but with ``sampleset``.                                       |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~synphot.models.GaussianAbsorption1D`                   |**synphot**|Like `astropy.modeling.functional_models.GaussianAbsorption1D`|
+|                                                         |           |but with ``sampleset``.                                       |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~synphot.models.GaussianFlux1D`                         |**synphot**|Like `~synphot.models.Gaussian1D` but allows                  |
+|                                                         |           |backward-compatible parameters like total flux and            |
+|                                                         |           |FWHM.                                                         |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~astropy.modeling.powerlaws.LogParabola1D`              |Astropy    ||note_flux_conv_incorrect|                                    |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~synphot.models.Lorentz1D`                              |**synphot**|Like `astropy.modeling.functional_models.Lorentz1D`           |
+|                                                         |           |but with ``sampleset`` and ``bounding_box``.                  |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~synphot.models.MexicanHat1D`                           |**synphot**|Like `astropy.modeling.functional_models.MexicanHat1D`        |
+|                                                         |           |but with ``sampleset`` and ``bounding_box``.                  |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~astropy.modeling.powerlaws.PowerLaw1D`                 |Astropy    ||note_flux_conv_incorrect|                                    |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~synphot.models.PowerLawFlux1D`                         |**synphot**|Like `~astropy.modeling.powerlaws.PowerLaw1D`                 |
+|                                                         |           |but handles flux unit conversion properly by                  |
+|                                                         |           |evaluating in user flux unit instead of internal              |
+|                                                         |           |unit of PHOTLAM.                                              |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
+|`~synphot.models.Trapezoid1D`                            |**synphot**|Like `astropy.modeling.functional_models.Trapezoid1D`         |
+|                                                         |           |but with ``sampleset``.                                       |
++---------------------------------------------------------+-----------+--------------------------------------------------------------+
 
 .. |note_flux_conv_incorrect| replace:: Flux handling might be incorrect unless amplitude is in PHOTLAM when creating a source spectrum using this model.
 
