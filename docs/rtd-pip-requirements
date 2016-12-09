@@ -2,4 +2,5 @@ numpy
 matplotlib
 Cython
 scipy
+astropy-helpers
 -e git+https://github.com/astropy/astropy.git#egg=astropy
