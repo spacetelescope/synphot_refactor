@@ -40,7 +40,7 @@ allows you to:
   type of sources through multiple bandpasses.
 
 If you use **synphot** in your work, please cite it as,
-"*Lim, P. L. 2016, synphot User's Guide
+"*Lim, P. L., et al. 2016, synphot User's Guide
 (Baltimore, MD: STScI), http://synphot.readthedocs.io/en/latest/*"
 
 If you have questions or concerns regarding the software, please open an issue
