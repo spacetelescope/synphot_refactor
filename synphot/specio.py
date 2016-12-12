@@ -218,7 +218,7 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
 
 
 def write_fits_spec(filename, wavelengths, fluxes, pri_header={},
-                    ext_header={}, clobber=False, trim_zero=True,
+                    ext_header={}, overwrite=False, trim_zero=True,
                     pad_zero_ends=True, precision=None, epsilon=0.00032,
                     wave_col='WAVELENGTH', flux_col='FLUX',
                     wave_unit=u.AA, flux_unit=units.FLAM):
@@ -241,7 +241,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={},
         Metadata to be added to primary and given extension FITS header,
         respectively. Do *not* use this to define column names and units.
 
-    clobber : bool
+    overwrite : bool
         Overwrite existing file. Defaults to `False`.
 
     trim_zero : bool
@@ -383,4 +383,4 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={},
     # Write to file
     hdulist = fits.HDUList([hdr_hdu])
     hdulist.append(tab_hdu)
-    hdulist.writeto(filename, clobber=clobber)
+    hdulist.writeto(filename, overwrite=overwrite)

@@ -112,9 +112,9 @@ class TestWriteReddeningLaw(object):
         outfile = os.path.join(self.outdir, 'outredlaw.fits')
 
         if ext_hdr is None:
-            self.redlaw.to_fits(outfile, clobber=True)
+            self.redlaw.to_fits(outfile, overwrite=True)
         else:
-            self.redlaw.to_fits(outfile, clobber=True, ext_header=ext_hdr)
+            self.redlaw.to_fits(outfile, overwrite=True, ext_header=ext_hdr)
 
         # Read it back in and check
         redlaw2 = ReddeningLaw.from_file(outfile)
