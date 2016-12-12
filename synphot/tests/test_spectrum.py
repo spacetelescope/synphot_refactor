@@ -967,10 +967,10 @@ class TestWriteSpec(object):
             sp1 = self.bp
 
         if ext_hdr is None:
-            sp1.to_fits(outfile, clobber=True, trim_zero=False,
+            sp1.to_fits(outfile, overwrite=True, trim_zero=False,
                         pad_zero_ends=False)
         else:
-            sp1.to_fits(outfile, clobber=True, trim_zero=False,
+            sp1.to_fits(outfile, overwrite=True, trim_zero=False,
                         pad_zero_ends=False, ext_header=ext_hdr)
 
         # Read it back in and check

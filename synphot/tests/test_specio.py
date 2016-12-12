@@ -141,17 +141,17 @@ class TestReadWriteFITS(object):
         # Invalid precision keyword
         with pytest.raises(exceptions.SynphotError):
             specio.write_fits_spec(
-                outfile, self.wave, self.flux, precision='foo', clobber=True)
+                outfile, self.wave, self.flux, precision='foo', overwrite=True)
 
         # Invalid wavelength precision
         with pytest.raises(exceptions.SynphotError):
             specio.write_fits_spec(
-                outfile, np.arange(6), self.flux, clobber=True)
+                outfile, np.arange(6), self.flux, overwrite=True)
 
         # Invalid flux precision
         with pytest.raises(exceptions.SynphotError):
             specio.write_fits_spec(
-                outfile, self.wave, np.arange(6), clobber=True)
+                outfile, self.wave, np.arange(6), overwrite=True)
 
     def teardown_class(self):
         shutil.rmtree(self.outdir)
