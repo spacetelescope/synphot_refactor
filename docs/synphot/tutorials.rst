@@ -94,3 +94,82 @@ continuum-normalized spectrum.
         ratio.plot(left=2500, right=17000,
                    title='Continuum-normalized spectrum')
     plt.axhline(1, ls='--', color='k')
+
+
+.. _tutorial_fit_ew:
+
+Fitting, Equivalent Width
+-------------------------
+
+In this tutorial, you will learn how to fit a Gaussian model to some real
+data and calculate its equivalent width. This is not handled by **synphot** but
+it is included here for those who are interested to see how fitting in IRAF
+SYNPHOT is done in Python. See :ref:`astropy:astropy-modeling` for more
+information about fitting a model.
+
+Read in the real data. If your own data has a different format, you need to
+adjust the example accordingly::
+
+    >>> from astropy.io import fits
+    >>> with fits.open('/path/to/combined_13330_G130M_v40_bin4.fits') as pf:
+    ...     dat = pf[1].data
+    ...     wave = dat.field('WAVELENGTH').flatten()  # Angstrom
+    ...     flux = dat.field('FLUX').flatten()  # FLAM
+
+For a good fit, only use data around the feature of interest. In this example,
+the feature is between 1202 and 1211 Angstrom::
+
+    >>> mask = (wave >= 1202) & (wave <= 1211)
+    >>> x = wave[mask]
+    >>> y = flux[mask]
+
+Create a composite model with some initial parameters close to the desired
+result (usually sufficient to guess from looking at a plot of the data) and
+fit it using some fitter that is best for the data (sometimes, several
+iterations are required for a good fit)::
+
+    >>> from astropy.modeling import models, fitting
+    >>> bg = models.Const1D(amplitude=3.5E-14)
+    >>> ab = models.GaussianAbsorption1D(amplitude=0.9, mean=1206, stddev=1)
+    >>> init_model = bg * ab
+    >>> fitter = fitting.LevMarLSQFitter()
+    >>> fit_model = fitter(init_model, x, y)
+    >>> y_fit = fit_model(x)
+    >>> print(fit_model)
+    Model: CompoundModel4
+    Inputs: ('x',)
+    Outputs: ('y',)
+    Model set size: 1
+    Expression: [0] * [1]
+    Components:
+        [0]: <Const1D(amplitude=3.5e-14)>
+
+        [1]: <GaussianAbsorption1D(amplitude=0.9, mean=1206.0, stddev=1.0)>
+    Parameters:
+           amplitude_0     amplitude_1       mean_1       stddev_1
+        ----------------- -------------- ------------- --------------
+        3.63010059253e-14 0.994943613521 1206.27379171 0.237526079884
+
+Plot the fitted model on top of input data::
+
+    >>> import matplotlib.pyplot as plt
+    >>> from matplotlib import ticker
+    >>> fig, ax = plt.subplots()
+    >>> ax.plot(x, y, 'b', x, y_fit, 'r')
+    >>> ax.get_xaxis().set_major_formatter(
+    ...     ticker.FuncFormatter(ticker.FormatStrFormatter('%.0f')))
+    >>> ax.set_xlabel('Wavelength (Angstrom)')
+    >>> ax.set_ylabel('Flux (FLAM)')
+    >>> ax.legend(['Data', 'Fit'], loc='lower right')
+
+.. image:: images/tutorial_fit_ab.png
+   :width: 600px
+   :alt: Fitting absorption line in data.
+
+Calculate equivalent width using the fitted model::
+
+    >>> import numpy as np
+    >>> area = np.trapz(y_fit, x=x)  # Area under curve
+    >>> height = fit_model.amplitude_0  # Continuum level
+    >>> area / height  # Equivalent width in Angstrom
+    8.3318809315339433
