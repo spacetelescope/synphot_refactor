@@ -58,23 +58,25 @@ to provide a reddening model name (see table below; not to be confused with
 Astropy model) and then
 :meth:`~synphot.reddening.ReddeningLaw.extinction_curve` to create the
 extinction curve with a given :math:`E(B-V)` value (negative value effectively
-de-reddens the spectrum), and then multiply it to the source:
+de-reddens the spectrum), and then multiply it to the source::
 
-.. plot::
-    :include-source:
+    >>> import matplotlib.pyplot as plt
+    >>> from synphot import SourceSpectrum, ReddeningLaw
+    >>> from synphot.models import BlackBodyNorm1D
+    >>> em = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
+    >>> ext = ReddeningLaw.from_extinction_model(
+    ...     'lmcavg').extinction_curve(0.1)
+    >>> sp = em * ext
+    >>> wave = em.waveset
+    >>> plt.plot(wave, em(wave), 'b', wave, sp(wave), 'r')
+    >>> plt.xlim(1000, 30000)
+    >>> plt.xlabel('Wavelength (Angstrom)')
+    >>> plt.ylabel('Flux (PHOTLAM)')
+    >>> plt.legend(['E(B-V)=0', 'E(B-V)=0.1'], loc='upper right')
 
-    import matplotlib.pyplot as plt
-    from synphot import SourceSpectrum, ReddeningLaw
-    from synphot.models import BlackBodyNorm1D
-    em = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
-    ext = ReddeningLaw.from_extinction_model('lmcavg').extinction_curve(0.1)
-    sp = em * ext
-    wave = em.waveset
-    plt.plot(wave, em(wave), 'b', wave, sp(wave), 'r')
-    plt.xlim(1000, 30000)
-    plt.xlabel('Wavelength (Angstrom)')
-    plt.ylabel('Flux (PHOTLAM)')
-    plt.legend(['E(B-V)=0', 'E(B-V)=0.1'], loc='upper right')
+.. image:: images/bb5000_lmcavg.png
+   :width: 600px
+   :alt: Apply extinction to blackbody.
 
 +--------+---------------------------+------------+
 |Name    |Description                |Reference   |
@@ -136,25 +138,26 @@ the wavelength values are shifted, not the flux:
 A source spectrum can also be **normalized** to a given flux value in a given
 bandpass using its :meth:`~synphot.spectrum.BaseSourceSpectrum.normalize`
 method. The resultant spectrum is basically the source multiplied with a factor
-necessary to achieve the desired normalization:
+necessary to achieve the desired normalization::
 
-.. plot::
-    :include-source:
+    >>> import matplotlib.pyplot as plt
+    >>> from synphot import SourceSpectrum, SpectralElement, units
+    >>> from synphot.models import BlackBodyNorm1D
+    >>> sp = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
+    >>> bp = SpectralElement.from_filter('johnson_v')
+    >>> vega = SourceSpectrum.from_vega()  # For unit conversion
+    >>> sp_norm = sp.normalize(17 * units.VEGAMAG, bp, vegaspec=vega)
+    >>> wave = sp.waveset
+    >>> plt.plot(wave, sp(wave), 'b', wave, sp_norm(wave), 'r')
+    >>> plt.xlim(1000, 30000)
+    >>> plt.xlabel('Wavelength (Angstrom)')
+    >>> plt.ylabel('Flux (PHOTLAM)')
+    >>> plt.title(sp.meta['expr'])
+    >>> plt.legend(['Original', 'Normalized'], loc='upper right')
 
-    import matplotlib.pyplot as plt
-    from synphot import SourceSpectrum, SpectralElement, units
-    from synphot.models import BlackBodyNorm1D
-    sp = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
-    bp = SpectralElement.from_filter('johnson_v')
-    vega = SourceSpectrum.from_vega()  # For unit conversion
-    sp_norm = sp.normalize(17 * units.VEGAMAG, bp, vegaspec=vega)
-    wave = sp.waveset
-    plt.plot(wave, sp(wave), 'b', wave, sp_norm(wave), 'r')
-    plt.xlim(1000, 30000)
-    plt.xlabel('Wavelength (Angstrom)')
-    plt.ylabel('Flux (PHOTLAM)')
-    plt.title(sp.meta['expr'])
-    plt.legend(['Original', 'Normalized'], loc='upper right')
+.. image:: images/bb5000_renorm.png
+   :width: 600px
+   :alt: Renormalize blackbody.
 
 **Integration** is done with the
 :meth:`~synphot.spectrum.BaseSpectrum.integrate`
@@ -433,11 +436,12 @@ Vega
 It is loaded from ``synphot.conf.vega_file`` using
 :meth:`~synphot.spectrum.SourceSpectrum.from_vega`.
 
-The example below loads and plots the built-in Vega spectrum:
+The example below loads and plots the built-in Vega spectrum::
 
-.. plot::
-    :include-source:
+    >>> from synphot import SourceSpectrum
+    >>> sp = SourceSpectrum.from_vega()
+    >>> sp.plot(right=12000, flux_unit='flam', title=sp.meta['expr'])
 
-    from synphot import SourceSpectrum
-    sp = SourceSpectrum.from_vega()
-    sp.plot(right=12000, flux_unit='flam', title=sp.meta['expr'])
+.. image:: images/vega_spec.png
+   :width: 600px
+   :alt: Vega spectrum

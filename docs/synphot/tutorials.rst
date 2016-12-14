@@ -19,25 +19,39 @@ This tutorial is adapted from
 In this tutorial, you will learn how to manipulate and superimpose
 an emission line to a continuum spectrum.
 
-.. plot::
-    :include-source:
+Create a continuum spectrum of a 5500 K blackbody with z=0.6::
 
-    from synphot import SourceSpectrum, ReddeningLaw, units
-    from synphot.models import BlackBodyNorm1D, GaussianFlux1D
-    # Create a continuum spectrum of a 5500 K blackbody with z=0.6
-    bb = SourceSpectrum(BlackBodyNorm1D, temperature=5500, z=0.6)
-    # Create a Gaussian emission line with 8E-14 FLAM total flux,
-    # FWHM of 100 Angstrom, and centered at 7000 Angstrom
-    em = SourceSpectrum(
-        GaussianFlux1D, total_flux=8e-14*units.FLAM, fwhm=100, mean=7000)
-    # Add emission line to continuum spectrum
-    sp = bb + em
-    # Apply extinction curve for LMC (average) with E(B-V)=1.3
-    # to the composite spectrum
-    ext = ReddeningLaw.from_extinction_model('lmcavg').extinction_curve(1.3)
-    my_spec = sp * ext
-    # Plot the result
-    my_spec.plot(right=45000)
+    >>> from synphot import SourceSpectrum
+    >>> from synphot.models import BlackBodyNorm1D
+    >>> bb = SourceSpectrum(BlackBodyNorm1D, temperature=5500, z=0.6)
+
+Create a Gaussian emission line with 8E-14 FLAM total flux,
+FWHM of 100 Angstrom, and centered at 7000 Angstrom::
+
+    >>> from synphot import units
+    >>> from synphot.models import GaussianFlux1D
+    >>> em = SourceSpectrum(
+    ...     GaussianFlux1D, total_flux=8e-14*units.FLAM, fwhm=100, mean=7000)
+
+Add emission line to continuum spectrum::
+
+    >>> sp = bb + em
+
+Apply extinction curve for LMC (average) with E(B-V)=1.3
+to the composite spectrum::
+
+    >>> from synphot import ReddeningLaw
+    >>> ext = ReddeningLaw.from_extinction_model(
+    ...     'lmcavg').extinction_curve(1.3)
+    >>> my_spec = sp * ext
+
+Plot the result::
+
+    >>> my_spec.plot(right=45000)
+
+.. image:: images/tutorial_em_line.png
+   :width: 600px
+   :alt: Emission line tutorial
 
 
 .. _tutorial_continuum_norm:

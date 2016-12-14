@@ -223,19 +223,20 @@ appropriate filter names:
 * ``'johnson_j'`` (Johnson *J*)
 * ``'johnson_k'`` (Johnson *K*)
 
-The example below loads and plots bandpasses from Johnson *BI*:
+The example below loads and plots bandpasses from Johnson *BI*::
 
-.. plot::
-    :include-source:
+    >>> import matplotlib.pyplot as plt
+    >>> from synphot import SpectralElement
+    >>> b = SpectralElement.from_filter('johnson_b')
+    >>> i = SpectralElement.from_filter('johnson_i')
+    >>> plt.plot(b.waveset, b(b.waveset), 'b', i.waveset, i(i.waveset), 'r')
+    >>> plt.ylim(0, 1.1)
+    >>> # Label comes from DESCRIP keyword from FITS header
+    >>> plt.legend([b.meta['header']['descrip'], i.meta['header']['descrip']])
 
-    import matplotlib.pyplot as plt
-    from synphot import SpectralElement
-    b = SpectralElement.from_filter('johnson_b')
-    i = SpectralElement.from_filter('johnson_i')
-    plt.plot(b.waveset, b(b.waveset), 'b', i.waveset, i(i.waveset), 'r')
-    plt.ylim(0, 1.1)
-    # Label comes from DESCRIP keyword from FITS header
-    plt.legend([b.meta['header']['descrip'], i.meta['header']['descrip']])
+.. image:: images/johnson_bi.png
+    :width: 600px
+    :alt: Johnson BI bandpass.
 
 
 .. _synphot-bandpass-uniform:
