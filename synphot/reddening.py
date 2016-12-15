@@ -236,8 +236,8 @@ def etau_madau(wave, z, **kwargs):
     The Lyman-alpha forest approximately has an effective
     "throughput" which is a function of redshift and
     rest-frame wavelength.
-    One would multiply the SEDs by this factor before redshifting
-    it and passing it through an instrument filter.
+    One would multiply the SEDs by this factor before
+    passing it through an instrument filter.
 
     This approximation is from Footnote 3 of
     :ref:`Madau et al. (1995) <synphot-ref-madau1995>`.
@@ -277,14 +277,14 @@ def etau_madau(wave, z, **kwargs):
 
     ll = 912.0
     c = np.array([3.6e-3, 1.7e-3, 1.2e-3, 9.3e-4])
-    l = np.array([1216, 1026, 973, 950], dtype=np.float)
+    el = np.array([1216, 1026, 973, 950], dtype=np.float)  # noqa
     tau = np.zeros_like(wave, dtype=np.float)
     xe = 1.0 + z
 
     # Lyman series
-    for i in range(len(l)):
-        tau = np.where(wave <= l[i] * xe,
-                       tau + c[i] * (wave / l[i]) ** 3.46,
+    for i in range(len(el)):
+        tau = np.where(wave <= el[i] * xe,
+                       tau + c[i] * (wave / el[i]) ** 3.46,
                        tau)
 
     # Photoelectric absorption
