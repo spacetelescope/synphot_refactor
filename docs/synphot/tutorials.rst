@@ -130,25 +130,25 @@ iterations are required for a good fit)::
 
     >>> from astropy.modeling import models, fitting
     >>> bg = models.Const1D(amplitude=3.5E-14)
-    >>> ab = models.GaussianAbsorption1D(amplitude=0.9, mean=1206, stddev=1)
-    >>> init_model = bg * ab
+    >>> gs = models.Gaussian1D(amplitude=3.5E-14, mean=1206, stddev=1)
+    >>> init_model = bg - gs
     >>> fitter = fitting.LevMarLSQFitter()
     >>> fit_model = fitter(init_model, x, y)
     >>> y_fit = fit_model(x)
     >>> print(fit_model)
-    Model: CompoundModel4
+    Model: CompoundModel1
     Inputs: ('x',)
     Outputs: ('y',)
     Model set size: 1
-    Expression: [0] * [1]
+    Expression: [0] - [1]
     Components:
         [0]: <Const1D(amplitude=3.5e-14)>
 
-        [1]: <GaussianAbsorption1D(amplitude=0.9, mean=1206.0, stddev=1.0)>
+        [1]: <Gaussian1D(amplitude=3.5e-14, mean=1206.0, stddev=1.0)>
     Parameters:
-           amplitude_0     amplitude_1       mean_1       stddev_1
-        ----------------- -------------- ------------- --------------
-        3.63010059253e-14 0.994943613521 1206.27379171 0.237526079884
+           amplitude_0       amplitude_1        mean_1       stddev_1
+        ----------------- ----------------- ------------- -------------
+        3.63064137361e-14 3.62623007738e-14 1206.27454371 0.23713207018
 
 Plot the fitted model on top of input data::
 
@@ -168,8 +168,9 @@ Plot the fitted model on top of input data::
 
 Calculate equivalent width using the fitted model::
 
-    >>> import numpy as np
-    >>> area = np.trapz(y_fit, x=x)  # Area under curve
+    >>> import math
+    >>> area = (math.sqrt(2 * math.pi) * fit_model.amplitude_1 *
+    ...     fit_model.stddev_1)  # Area under curve
     >>> height = fit_model.amplitude_0  # Continuum level
-    >>> area / height  # Equivalent width in Angstrom
-    8.3318809315339433
+    >>> print('EW = {:.4f} Angstrom'.format(area / height))
+    EW = 0.5937 Angstrom
