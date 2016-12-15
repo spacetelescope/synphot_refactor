@@ -174,3 +174,55 @@ Calculate equivalent width using the fitted model::
     >>> height = fit_model.amplitude_0  # Continuum level
     >>> print('EW = {:.4f} Angstrom'.format(area / height))
     EW = 0.5937 Angstrom
+
+
+.. _tutorial_lyman_alpha:
+
+Lyman-Alpha Extinction
+----------------------
+
+In this tutorial, you will learn how to apply extinction curve due to
+Lyman-alpha forest (:ref:`Madau et al. 1995 <synphot-ref-madau1995>`) to
+a source spectrum. For clarity, we will only use a flat source.
+
+.. plot::
+    :include-source:
+
+    import matplotlib.pyplot as plt
+    from synphot import SourceSpectrum, etau_madau
+    from synphot.models import ConstFlux1D
+    # Create a flat source
+    sp = SourceSpectrum(ConstFlux1D, amplitude=1E-4)
+    # Apply extinction for a given redshift
+    z = 2
+    wave = range(2400, 4200)  # Angstrom
+    extcurve = etau_madau(wave, z)
+    sp_ext = sp * extcurve
+    # Compare the source with and without extinction
+    plt.plot(wave, sp(wave), 'b--', wave, sp_ext(wave), 'r')
+    plt.xlabel('Wavelength (Angstrom)')
+    plt.ylabel('Flux (PHOTLAM)')
+    plt.legend(['Original', 'Extincted'], loc='lower right')
+
+The chart below illustrates the Madau 1995 extinction curves for different
+redshift values. For clarity, they are plotted against rest wavelength, not the
+redshifted wavelength:
+
+.. plot::
+    :include-source:
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from synphot import etau_madau
+    w_rest = np.arange(800, 1400)
+    lc = ['k', 'navy', 'b', 'deepskyblue', 'mediumseagreen',
+          'lightgreen', 'y', 'orange', 'r']
+    for z in range(0, 9):
+        wave = w_rest * (1 + z)
+        extcurve = etau_madau(wave, z)
+        plt.plot(w_rest, extcurve(wave), color=lc[z], label='z={}'.format(z))
+    plt.ylim(0, 1.1)
+    plt.xlabel('Rest-Frame Wavelength (Angstrom)')
+    plt.ylabel('Lyman-alpha Forest "Throughput"')
+    plt.legend(loc='center right')
+    plt.grid()

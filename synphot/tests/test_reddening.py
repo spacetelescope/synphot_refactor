@@ -20,7 +20,7 @@ from astropy.utils.data import get_pkg_data_filename
 # LOCAL
 from .. import exceptions, units
 from ..models import ConstFlux1D, Empirical1D
-from ..reddening import ReddeningLaw
+from ..reddening import ReddeningLaw, etau_madau
 from ..spectrum import SourceSpectrum
 
 try:
@@ -71,6 +71,34 @@ class TestExtinction(object):
         w = 5.03399992 * (u.micron ** -1)
         ans = self.extcurve(w).value
         np.testing.assert_allclose(sp2(w).value, ans, rtol=1e-6)
+
+
+# See https://github.com/spacetelescope/synphot_refactor/issues/77
+@pytest.mark.skipif('not HAS_SCIPY')
+@pytest.mark.parametrize(
+    ('z', 'ans'),
+    ([0, [0.99514224, 0.99572959, 0.99630696, 0.99640647, 1]],
+     [2, [0.80417561, 0.82569455, 0.84739614, 0.85119226, 1]],
+     [4, [0.27908754, 0.32576126, 0.37920904, 0.38926572, 1]],
+     [8, [5.80763088e-05, 1.89352199e-04, 6.04679639e-04, 7.38588957e-04, 1]]))
+def test_etau_madau(z, ans):
+    """Test Madau 1995 extinction curve."""
+    w_rest = np.array([950, 973, 1026, 1216, 1300])
+    w_z = w_rest * (1 + z)
+    extcurve = etau_madau(w_z, z)
+    np.testing.assert_allclose(extcurve(w_z), ans)
+
+
+def test_etau_madau_exceptions():
+    # Invalid z
+    with pytest.raises(exceptions.SynphotError):
+        etau_madau([500, 1000], [1, 2])
+
+    # Too few wave
+    with pytest.raises(exceptions.SynphotError):
+        etau_madau(500, 0)
+    with pytest.raises(exceptions.SynphotError):
+        etau_madau([500], 0)
 
 
 @remote_data

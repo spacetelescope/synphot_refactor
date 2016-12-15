@@ -341,6 +341,10 @@ Laidler, V., et al. 2008, Synphot Data User's Guide, Version 1.2 (Baltimore, MD:
 
 Lim, P. L., Diaz, R. I., & Laidler, V. 2015, PySynphot User's Guide (Baltimore, MD: STScI), https://pysynphot.readthedocs.io/en/latest/
 
+.. _synphot-ref-madau1995:
+
+Madau, P., et al. 1995, ApJ, 441, 18
+
 .. _synphot-ref-oke1974:
 
 Oke, J. B., 1974, ApJS, 27, 21
