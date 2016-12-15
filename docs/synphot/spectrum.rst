@@ -104,6 +104,9 @@ de-reddens the spectrum), and then multiply it to the source::
 .. |mc_ext_ref| replace:: :ref:`Gordon et al. (2003) <synphot-ref-extinction-gordon2003>`
 .. |xg_ext_ref| replace:: :ref:`Calzetti et al. (2000) <synphot-ref-extinction-calzetti2000>`
 
+For extinction due to Lyman-alpha forest, see :ref:`tutorial_lyman_alpha`
+tutorial.
+
 You can **redshift** a source spectrum in several ways (shown in example
 below), either by setting its ``z`` attribute or passing in a ``z`` keyword
 during initialization. To blueshift, you may use the same attribute/keyword but

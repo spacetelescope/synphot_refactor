@@ -258,6 +258,8 @@ Create Other Unitless Spectrum
 |reddening law at given     |                                                |
 |:math:`E(B-V)`             |                                                |
 +---------------------------+------------------------------------------------+
+|Extinction for Lyman-alpha |extcurve = etau_madau(wave, z)                  |
++---------------------------+------------------------------------------------+
 |Bandpass with thermal      |thbp = ThermalSpectralElement(modelclass,       |
 |properties (from model).   |temperature, \*\*kwargs)                        |
 +---------------------------+------------------------------------------------+
