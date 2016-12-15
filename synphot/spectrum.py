@@ -979,8 +979,18 @@ class SourceSpectrum(BaseSourceSpectrum):
     z : number
         Redshift to apply to model.
 
+    z_type : {'wavelength_only', 'conserve_flux'}
+        Redshift can be done in one of the following ways:
+
+        * ``'wavelength_only'`` only shifts the wavelength
+          without adjusting the flux. This is the default behavior
+          to be backward compatible with ASTROLIB PYSYNPHOT.
+        * ``'conserve_flux'`` also scales the flux to conserve it.
+
     """
-    def __init__(self, modelclass, z=0, **kwargs):
+    def __init__(self, modelclass, z=0, z_type='wavelength_only', **kwargs):
+        self._valid_z_types = ('wavelength_only', 'conserve_flux')
+        self.z_type = z_type
         self.z = z
         super(SourceSpectrum, self).__init__(modelclass, **kwargs)
 
@@ -1004,9 +1014,16 @@ class SourceSpectrum(BaseSourceSpectrum):
             if self._internal_wave_unit.physical_type == 'length':
                 rs = self._redshift_model.inverse
             # frequency or wavenumber
+            # NOTE: This will never execute as long as internal wavelength
+            #       unit remains Angstrom.
             else:  # pragma: no cover
                 rs = self._redshift_model
-            m = rs | self._model
+
+            if self.z_type == 'wavelength_only':
+                m = rs | self._model
+            else:  # conserve_flux
+                m = rs | self._model | self._redshift_flux_model
+
         return m
 
     @property
@@ -1022,6 +1039,23 @@ class SourceSpectrum(BaseSourceSpectrum):
                 'Redshift must be a real scalar number.')
         self._z = float(what)
         self._redshift_model = RedshiftScaleFactor(self._z)
+        if self.z_type == 'wavelength_only':
+            self._redshift_flux_model = None
+        else:  # conserve_flux
+            self._redshift_flux_model = Scale(1 / (1 + self._z))
+
+    @property
+    def z_type(self):
+        """Redshift behavior."""
+        return self._z_type
+
+    @z_type.setter
+    def z_type(self, what):
+        if what not in self._valid_z_types:
+            raise exceptions.SynphotError(
+                '{0} is not a valid redshift behavior, choose '
+                'from {1}'.format(what, self._valid_z_types))
+        self._z_type = what
 
     def __str__(self):
         """Descriptive information of the spectrum."""

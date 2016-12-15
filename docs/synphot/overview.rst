@@ -326,10 +326,12 @@ New source spectrum is created as a result unless stated otherwise.
 +---------------------------+------------------------------------------------+
 |Apply redshift (models     |sp.z = z                                        |
 |modified in-place).        |                                                |
+|                           |sp.z_type = ...
 +---------------------------+------------------------------------------------+
-|Apply redshift (new source |sp2 = SourceSpectrum(sp.model, z=z)             |
+|Apply redshift (new source |sp2 = SourceSpectrum(sp.model, z=z, z_type=...) |
 |spectrum).                 |                                                |
-|                           |sp = SourceSpectrum(modelclass, z=z, \*\*kwargs)|
+|                           |sp = SourceSpectrum(modelclass, z=z, z_type=...,|
+|                           |\*\*kwargs)                                     |
 +---------------------------+------------------------------------------------+
 
 .. _synphot-quick-obs:

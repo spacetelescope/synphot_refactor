@@ -765,9 +765,12 @@ class TestRedShift(object):
     def test_property(self):
         with pytest.raises(exceptions.SynphotError):
             self.sp.z = 1 * u.AA
+        with pytest.raises(exceptions.SynphotError):
+            self.sp.z_type = 'unknown_behavior'
 
         assert self.sp_z0.z == 0
         assert self.sp.z == 1.3
+        assert self.sp_z0.z_type == self.sp.z_type == 'wavelength_only'
 
         assert isinstance(self.sp_z0.model, Gaussian1D)
         assert isinstance(self.sp.model, modeling.core._CompoundModel)
@@ -782,6 +785,14 @@ class TestRedShift(object):
         sp_z0 = SourceSpectrum(ConstFlux1D, amplitude=1 * u.Jy)
         sp = SourceSpectrum(ConstFlux1D, amplitude=1 * u.Jy, z=1.3)
         np.testing.assert_allclose(sp_z0(3000), sp(6900))
+
+    def test_conserve_flux_redshift(self):
+        """Test redshift behavior that conserves flux."""
+        sp = SourceSpectrum(self.sp_z0.model, z=1.3, z_type='conserve_flux')
+        fac = 1 / (1 + sp.z)
+        wave = [5000, 11500]
+        np.testing.assert_allclose(sp(wave), self.sp(wave) * fac)
+        np.testing.assert_allclose(sp.integrate(), self.sp_z0.integrate())
 
 
 @pytest.mark.skipif('not HAS_SCIPY')

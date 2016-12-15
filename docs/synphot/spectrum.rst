@@ -27,6 +27,7 @@ A source spectrum can be constructed by one of the following methods:
 It has these main components:
 
 * ``z``, the redshift applied, if any
+* ``z_type`` that indicates whether redshift also conserves flux or not
 * ``model``, the underlying Astropy model
 * ``waveset``, the wavelength set for optimal sampling
 * ``waverange``, the range (inclusive) covered by ``waveset``
@@ -106,8 +107,9 @@ de-reddens the spectrum), and then multiply it to the source::
 You can **redshift** a source spectrum in several ways (shown in example
 below), either by setting its ``z`` attribute or passing in a ``z`` keyword
 during initialization. To blueshift, you may use the same attribute/keyword but
-set its *value* to :math:`\frac{1}{1 + z} - 1` instead. Currently, only
-the wavelength values are shifted, not the flux:
+set its *value* to :math:`\frac{1}{1 + z} - 1` instead. By default, only
+the wavelength values are shifted, not the flux (i.e., total flux is not
+preserved):
 
 .. plot::
     :include-source:
@@ -134,6 +136,28 @@ the wavelength values are shifted, not the flux:
     ax[2].set_xlim(2500, 25000)
     ax[2].set_xlabel('Wavelength (Angstrom)')
     ax[1].set_ylabel('Flux (PHOTLAM)')
+    ax[0].legend(['z=0', 'z=0.1'], loc='upper right')
+
+You can also **redshift while preserving flux** by setting ``z_type`` to
+``'conserve_flux'``:
+
+.. plot::
+    :include-source:
+
+    import matplotlib.pyplot as plt
+    from synphot import SourceSpectrum
+    from synphot.models import BlackBodyNorm1D
+    # Create a source at rest wavelength
+    sp_rest = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
+    # Redshift the original source and conserve flux
+    sp_z1 = SourceSpectrum(sp_rest.model, z=0.1, z_type='conserve_flux')
+    # Plot them
+    wave = range(2500, 25000, 10)
+    plt.plot(wave, sp_rest(wave), 'b--', wave, sp_z1(wave), 'r')
+    plt.xlim(2500, 25000)
+    plt.xlabel('Wavelength (Angstrom)')
+    plt.ylabel('Flux (PHOTLAM)')
+    plt.legend(['z=0', 'z=0.1'], loc='upper right')
 
 A source spectrum can also be **normalized** to a given flux value in a given
 bandpass using its :meth:`~synphot.spectrum.BaseSourceSpectrum.normalize`
