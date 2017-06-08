@@ -67,7 +67,7 @@ for a future release):
 
 * From standalone release::
 
-    pip install git+https://github.com/spacetelescope/synphot_refactor.git@0.1b2
+    pip install git+https://github.com/spacetelescope/synphot_refactor.git@0.1b4
 
 * From source (example shown is for the ``dev`` version)::
 
