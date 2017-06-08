@@ -18,13 +18,13 @@ environment:
 
   matrix:
 
-      # We test Python 2.7 and 3.5
+      # We test Python 2.7 and 3.6
 
       - PYTHON_VERSION: "2.7"
-        ASTROPY_VERSION: "development"
+        ASTROPY_VERSION: "stable"
         NUMPY_VERSION: "stable"
 
-      - PYTHON_VERSION: "3.5"
+      - PYTHON_VERSION: "3.6"
         ASTROPY_VERSION: "development"
         NUMPY_VERSION: "stable"
 

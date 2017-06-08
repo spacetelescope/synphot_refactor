@@ -5,10 +5,10 @@ from ..extern import six
 
 # THIRD PARTY
 import numpy as np
+import pytest
 
 # ASTROPY
 from astropy import units as u
-from astropy.tests.helper import pytest
 
 # LOCAL
 from .. import exceptions, utils

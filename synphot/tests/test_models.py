@@ -16,10 +16,10 @@ import os
 
 # THIRD-PARTY
 import numpy as np
+import pytest
 
 # ASTROPY
 from astropy import units as u
-from astropy.tests.helper import pytest
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 
