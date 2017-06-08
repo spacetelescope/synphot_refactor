@@ -8,10 +8,10 @@ from __future__ import absolute_import, division, print_function
 
 # THIRD-PARTY
 import numpy as np
+import pytest
 
 # ASTROPY
 from astropy import units as u
-from astropy.tests.helper import pytest
 
 # LOCAL
 from .. import exceptions, units

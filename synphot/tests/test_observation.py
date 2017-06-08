@@ -7,13 +7,15 @@ import os
 
 # THIRD-PARTY
 import numpy as np
+import pytest
 
 # ASTROPY
 from astropy import units as u
 from astropy.modeling.models import Const1D
-from astropy.tests.helper import pytest, remote_data
+from astropy.tests.helper import remote_data, catch_warnings
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
+from astropy.utils.exceptions import AstropyDeprecationWarning
 
 # LOCAL
 from .test_units import _area
@@ -248,17 +250,20 @@ class TestObsPar(object):
         np.testing.assert_allclose(
             obs2.countrate(_area).value, 59517756.384, rtol=1e-5)
 
-    @pytest.mark.parametrize(
-        ('mode', 'ans'),
-        [('efflerg', 5321.091),
-         ('efflphot', 5344.312)])
-    def test_efflam(self, mode, ans):
+    @pytest.mark.parametrize('binned', [True, False])
+    def test_efflam(self, binned):
+        with catch_warnings(AstropyDeprecationWarning) as w:
+            x = self.obs.effective_wavelength(mode='efflphot', binned=binned)
+            assert len(w) == 1
+            assert str(w[0].message) == 'Usage of EFFLPHOT is deprecated.'
+
+        np.testing.assert_allclose(x.value, 5344.312, rtol=1e-4)
+
+    @pytest.mark.parametrize('binned', [True, False])
+    def test_efflam_erg(self, binned):
         np.testing.assert_allclose(
-            self.obs.effective_wavelength(mode=mode, binned=False).value,
-            ans, rtol=1e-4)
-        np.testing.assert_allclose(
-            self.obs.effective_wavelength(mode=mode, binned=True).value,
-            ans, rtol=1e-4)
+            self.obs.effective_wavelength(mode='efflerg', binned=binned).value,
+            5321.091, rtol=1e-4)
 
     def test_efflam_exception(self):
         with pytest.raises(exceptions.SynphotError):

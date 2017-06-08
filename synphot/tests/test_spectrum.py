@@ -9,6 +9,7 @@ import tempfile
 
 # THIRD-PARTY
 import numpy as np
+import pytest
 
 # ASTROPY
 from astropy import modeling
@@ -17,7 +18,7 @@ from astropy.io import fits
 from astropy.modeling.models import (
     BrokenPowerLaw1D, Const1D, ExponentialCutoffPowerLaw1D, LogParabola1D,
     PowerLaw1D, RedshiftScaleFactor)
-from astropy.tests.helper import pytest, remote_data
+from astropy.tests.helper import remote_data
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 

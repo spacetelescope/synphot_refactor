@@ -106,6 +106,7 @@ setup(name=PACKAGENAME,
       description=DESCRIPTION,
       scripts=scripts,
       install_requires=['numpy', 'astropy'],  # 'numpy>=1.9', 'astropy>=1.3', 'scipy>=0.14'
+      tests_require=['pytest'],
       author=AUTHOR,
       author_email=AUTHOR_EMAIL,
       license=LICENSE,
