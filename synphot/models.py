@@ -15,7 +15,6 @@ import numpy as np
 # ASTROPY
 from astropy import constants as const
 from astropy import units as u
-from astropy.analytic_functions.blackbody import blackbody_nu
 from astropy.modeling import Fittable1DModel, Model, Parameter
 from astropy.modeling import models as _models
 from astropy.modeling.core import _CompoundModel
@@ -26,6 +25,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from . import units
+from .compat import ASTROPY_LT_2_0
 from .exceptions import SynphotError
 from .utils import merge_wavelengths
 
@@ -116,6 +116,11 @@ class BlackBody1D(Fittable1DModel):
             Blackbody radiation in PHOTLAM per steradian.
 
         """
+        if ASTROPY_LT_2_0:
+            from astropy.analytic_functions.blackbody import blackbody_nu
+        else:
+            from astropy.modeling.blackbody import blackbody_nu
+
         # Silence Numpy
         old_np_err_cfg = np.seterr(all='ignore')
 
