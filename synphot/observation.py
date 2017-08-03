@@ -6,6 +6,7 @@ that has gone through a bandpass.
 from __future__ import absolute_import, division, print_function
 
 # STDLIB
+import math
 import warnings
 
 # THIRD-PARTY
@@ -558,7 +559,7 @@ class Observation(BaseSourceSpectrum):
 
         # Special handling for non-density units
         if flux_unit == u.count or flux_unit_name == units.OBMAG.to_string():
-            val = influx.sum()
+            val = math.fsum(influx)
             utils.validate_totalflux(val)
 
             if flux_unit.decompose() == u.mag:

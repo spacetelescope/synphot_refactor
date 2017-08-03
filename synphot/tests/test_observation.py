@@ -400,3 +400,23 @@ class TestCountRateNegFlux(object):
 
         if not keep_neg:
             assert 'NegativeFlux' in obs.warnings
+
+
+@pytest.mark.skipif('not HAS_SCIPY')
+def test_countrate_neg_leak():
+    """Test countrate of sub-sampling not exceeding total countrate.
+    https://github.com/spacetelescope/synphot_refactor/issues/126
+    """
+    # This bug only manifests itself in very specific cases.
+    bp = SpectralElement.from_file(get_pkg_data_filename(
+        os.path.join('data', 'stis_fuv_f25ndq2_mjd58300_0822774.fits')))
+    sp = SourceSpectrum.from_file(get_pkg_data_filename(
+        os.path.join('data', 'k93_4500_0_5_rn_box.fits')))
+    binset = np.fromfile(get_pkg_data_filename(
+        os.path.join('data', 'stis_fuv_f25ndq2_binset.bin')))
+    obs = Observation(sp, bp, binset=binset)
+    area = 45238.93416  # HST cm^2
+    wrange = [1109.22, 12000.0]  # Angstrom
+    c_all = obs.countrate(area)
+    c_sub = obs.countrate(area, waverange=wrange)
+    assert c_sub <= c_all
