@@ -57,6 +57,7 @@ matrix:
         # Try Astropy development version
         - python: 3.6
           env: ASTROPY_VERSION=development
+               SETUP_CMD='test --open-files --remote-data'
 
         # Do a PEP8 test with pycodestyle
         - python: 3.5
