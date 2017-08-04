@@ -49,7 +49,7 @@ _vspec = None  # Loaded in test_load_vspec()
 
 def setup_module(module):
     # https://github.com/astropy/astropy/issues/6383
-    if ASTROPY_LT_20:
+    if not ASTROPY_LT_20:
         import astropy.constants as const
         from astropy.constants import si, astropyconst13
 
@@ -60,7 +60,7 @@ def setup_module(module):
 
 def teardown_module(module):
     # https://github.com/astropy/astropy/issues/6383
-    if ASTROPY_LT_20:
+    if not ASTROPY_LT_20:
         import astropy.constants as const
         from astropy.constants import si, astropyconst20
         const.sigma_sb = si.sigma_sb = astropyconst20.sigma_sb
