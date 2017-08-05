@@ -64,7 +64,7 @@ def teardown_module(module):
         import astropy.constants as const
         from astropy.constants import si, astropyconst20
         const.sigma_sb = si.sigma_sb = astropyconst20.sigma_sb
-        const.h = si.sigma.h = astropyconst20.h
+        const.h = si.h = astropyconst20.h
         const.k_B = si.k_B = astropyconst20.k_B
 
 
