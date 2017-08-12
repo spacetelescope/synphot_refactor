@@ -21,8 +21,9 @@ from astropy.utils.data import get_pkg_data_filename
 # LOCAL
 from .. import exceptions, units
 from ..models import ConstFlux1D, Empirical1D
+from ..observation import Observation
 from ..reddening import ReddeningLaw, etau_madau
-from ..spectrum import SourceSpectrum
+from ..spectrum import SourceSpectrum, SpectralElement
 
 try:
     import scipy
@@ -57,7 +58,10 @@ class TestExtinction(object):
             [7.90572977, 8.01734924, 8.17892265, 8.40150452, 8.69231796])
 
     def test_extcurve_call(self):
-        w = self.extcurve.waveset
+        # Cannot use waveset.
+        # See https://github.com/spacetelescope/synphot_refactor/issues/129
+        w = np.squeeze(self.extcurve.model.points) * u.AA
+
         y = self.extcurve(w)
         np.testing.assert_array_equal(w, self.redlaw.waveset)
         np.testing.assert_allclose(y, 10 ** (-0.4 * self.redlaw(w) * 0.3))
@@ -72,6 +76,23 @@ class TestExtinction(object):
         w = 5.03399992 * (u.micron ** -1)
         ans = self.extcurve(w).value
         np.testing.assert_allclose(sp2(w).value, ans, rtol=1e-6)
+
+    def test_qso_countrate(self):
+        """Ensure extinction curve waveset is not propagated to spectrum.
+        https://github.com/spacetelescope/synphot_refactor/issues/129
+        """
+        bp = SpectralElement.from_file(get_pkg_data_filename(
+            os.path.join('data', 'hst_acs_hrc_f850lp.fits')))
+        qso = SourceSpectrum.from_file(get_pkg_data_filename(
+            os.path.join('data', 'qso_template_001.dat')))
+        extcurve = self.redlaw.extinction_curve(1.0 * u.mag)
+        spext = qso * extcurve
+        sp = spext.normalize(25 * u.STmag, bp)
+        obs = Observation(sp, bp, force='taper')
+        area = 45238.93416  # HST cm^2
+        c = obs.countrate(area)
+        ans = 1.104404103799421e-07  # From similar setup in Astrolib PySynphot
+        np.testing.assert_allclose(c.value, ans, rtol=1e-3)  # 0.1% agreement
 
 
 # See https://github.com/spacetelescope/synphot_refactor/issues/77

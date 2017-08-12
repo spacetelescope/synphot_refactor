@@ -81,6 +81,7 @@ class BaseSpectrum(object):
         'Const1D': {'amplitude': 'noconv'},
         'ConstFlux1D': {'amplitude': 'noconv'},
         'Empirical1D': {'points': 'wave', 'lookup_table': 'flux'},
+        'ExtinctionModel1D': {'points': 'wave', 'lookup_table': 'flux'},
         'ExponentialCutoffPowerLaw1D': {
             'amplitude': 'flux', 'x_0': 'wave', 'x_cutoff': 'wave',
             'alpha': u.dimensionless_unscaled},

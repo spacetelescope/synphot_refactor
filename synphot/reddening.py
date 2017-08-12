@@ -15,7 +15,20 @@ from .config import Conf
 from .models import Empirical1D
 from .spectrum import BaseUnitlessSpectrum
 
-__all__ = ['ReddeningLaw', 'ExtinctionCurve', 'etau_madau']
+__all__ = ['ExtinctionModel1D', 'ReddeningLaw', 'ExtinctionCurve',
+           'etau_madau']
+
+
+class ExtinctionModel1D(Empirical1D):
+    """Model to handle extinction curve.
+    This is like :class:`~synphot.models.Empirical1D` except that
+    its ``sampleset`` will not be propagated to composite spectrum.
+    """
+    def sampleset(self):
+        """This simply returns `None`. Use ``numpy.squeeze(self.points)``
+        instead for array (in Angstrom) that samples the model.
+        """
+        return None
 
 
 class ReddeningLaw(BaseUnitlessSpectrum):
@@ -68,8 +81,8 @@ class ReddeningLaw(BaseUnitlessSpectrum):
             'E(B-V)': ebv,
             'ReddeningLaw': self.meta.get('expr', 'unknown')}
 
-        return ExtinctionCurve(
-            Empirical1D, points=x, lookup_table=y, meta={'header': header})
+        return ExtinctionCurve(ExtinctionModel1D, points=x, lookup_table=y,
+                               meta={'header': header})
 
     def to_fits(self, filename, wavelengths=None, **kwargs):
         """Write the reddening law to a FITS file.
@@ -299,5 +312,5 @@ def etau_madau(wave, z, **kwargs):
 
     thru = np.where(tau > 700., 0., np.exp(-tau))
     meta = {'descrip': 'Madau 1995 extinction for z={0}'.format(z)}
-    return ExtinctionCurve(Empirical1D, points=wave, lookup_table=thru,
+    return ExtinctionCurve(ExtinctionModel1D, points=wave, lookup_table=thru,
                            meta=meta)

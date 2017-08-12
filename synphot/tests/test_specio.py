@@ -14,7 +14,7 @@ import pytest
 # ASTROPY
 from astropy import units as u
 from astropy.io import fits
-from astropy.tests.helper import remote_data
+from astropy.tests.helper import remote_data, assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
@@ -41,19 +41,13 @@ def test_read_remote_spec():
 def test_read_ascii_spec():
     """Test read local ASCII spectrum."""
     specfile = get_pkg_data_filename(
-        os.path.join('data', 'qso_fos_001.dat'))
+        os.path.join('data', 'qso_template_001.dat'))
     hdr, wave, flux = specio.read_spec(specfile)
 
-    np.testing.assert_array_equal(
-        wave.value[::1000],
-        [100.0, 610.8, 910.8, 1210.8, 1510.8, 1810.8, 2110.8, 2410.8, 2710.8,
-         3010.8, 3310.8])
-    np.testing.assert_array_equal(
-        flux.value[::1000],
-        [1.5e-13, 2.40258e-13, 2.24e-13, 7.49e-13, 1.97e-13, 1.41e-13,
-         1.17e-13, 1.1e-13, 9.07e-14, 8.47173e-14, 8.10268e-14])
-    assert wave.unit == u.AA
-    assert flux.unit == units.FLAM
+    assert_quantity_allclose(wave[::500], [800, 2050, 3300, 4550, 5800] * u.AA)
+    assert_quantity_allclose(
+        flux[::500], [5.28776750e-14, 1.40065693e-13, 6.48401282e-14,
+                      3.57973708e-14, 1.99793337e-14] * units.FLAM)
     assert hdr == {}
 
 
