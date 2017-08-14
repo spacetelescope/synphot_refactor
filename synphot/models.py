@@ -383,12 +383,14 @@ class Empirical1D(Tabular1D):
             Flux or throughput in same unit as ``lookup_table``.
 
         """
-        x = self.sampleset()
         y = super(Empirical1D, self).evaluate(inputs)
 
         # Assume NaN at both ends need to be extrapolated based on
         # nearest end point.
         if self.fill_value is np.nan:
+            # Cannot use sampleset() due to ExtinctionModel1D
+            x = np.squeeze(self.points)
+
             if np.isscalar(y):  # pragma: no cover
                 if inputs < x[0]:
                     y = self.lookup_table[0]
