@@ -403,7 +403,7 @@ class Empirical1D(Tabular1D):
         return self._process_neg_flux(inputs, y)
 
 
-class BaseGaussian1D(_models.BaseGaussian1D):
+class BaseGaussian1D(_models.Gaussian1D):
     """Same as `astropy.modeling.functional_models.BaseGaussian1D`, except with
     ``sampleset`` defined.
 
@@ -437,7 +437,7 @@ class BaseGaussian1D(_models.BaseGaussian1D):
         return np.asarray(w)
 
 
-class Gaussian1D(_models.Gaussian1D, BaseGaussian1D):
+class Gaussian1D(BaseGaussian1D):
     """Same as `astropy.modeling.functional_models.Gaussian1D`, except with
     ``sampleset`` defined.
 
