@@ -445,12 +445,26 @@ class Gaussian1D(BaseGaussian1D):
     pass
 
 
-class GaussianAbsorption1D(_models.GaussianAbsorption1D, BaseGaussian1D):
+class GaussianAbsorption1D(BaseGaussian1D):
     """Same as `astropy.modeling.functional_models.GaussianAbsorption1D`,
     except with ``sampleset`` defined.
 
     """
-    pass
+    @staticmethod
+    def evaluate(x, amplitude, mean, stddev):
+        """
+        GaussianAbsorption1D model function.
+        """
+        return 1.0 - Gaussian1D.evaluate(x, amplitude, mean, stddev)
+
+    @staticmethod
+    def fit_deriv(x, amplitude, mean, stddev):
+        """
+        GaussianAbsorption1D model function derivatives.
+        """
+        import operator
+        return list(map(
+            operator.neg, Gaussian1D.fit_deriv(x, amplitude, mean, stddev)))
 
 
 class GaussianFlux1D(Gaussian1D):
