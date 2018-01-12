@@ -8,7 +8,7 @@ from astropy.version import version as astropy_version
 if astropy_version < '3.0':
     # With older versions of Astropy, we actually need to import the pytest
     # plugins themselves in order to make them discoverable by pytest.
-    from astropy.tests.pytest_plugins import *  # noqa
+    from astropy.tests.pytest_plugins import *
 else:
     # As of Astropy 3.0, the pytest plugins provided by Astropy are
     # automatically made available when Astropy is installed. This means it's
@@ -19,8 +19,8 @@ else:
 
 # Uncomment the following line to treat all DeprecationWarnings as
 # exceptions
-# from astropy.tests.helper import enable_deprecations_as_exceptions
-# enable_deprecations_as_exceptions()
+from astropy.tests.helper import enable_deprecations_as_exceptions
+enable_deprecations_as_exceptions()
 
 # Uncomment and customize the following lines to add/remove entries
 # from the list of packages for which version numbers are displayed
