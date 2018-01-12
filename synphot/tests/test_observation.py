@@ -12,7 +12,7 @@ import pytest
 # ASTROPY
 from astropy import units as u
 from astropy.modeling.models import Const1D
-from astropy.tests.helper import remote_data, catch_warnings
+from astropy.tests.helper import catch_warnings
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyDeprecationWarning
@@ -46,7 +46,7 @@ class TestObservation(object):
     """Test Observation (most of them)."""
     def setup_class(self):
         sp = SourceSpectrum(
-            ConstFlux1D, amplitude=1*units.FLAM,
+            ConstFlux1D, amplitude=1 * units.FLAM,
             meta={'warnings': {'w1': 'spec warn', 'w2': 'foo'}})
         bp = SpectralElement.from_file(_bandfile)
         bp.warnings = {'w1': 'band warn'}
@@ -308,7 +308,7 @@ class TestObsPar(object):
         np.testing.assert_allclose(
             obs.effstim(flux_unit=units.FLAM).value, 2.03E-15, rtol=0.01)  # 1%
 
-    @remote_data
+    @pytest.mark.remote_data
     def test_effstim_vegamag(self):
         vspec = SourceSpectrum.from_vega()
         np.testing.assert_allclose(

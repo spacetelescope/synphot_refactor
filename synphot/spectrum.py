@@ -936,12 +936,12 @@ class BaseSourceSpectrum(BaseSpectrum):
             # Magnitude flux-density units
             elif renorm_val.unit in (u.STmag, u.ABmag):
                 stdspec = SourceSpectrum(
-                    ConstFlux1D, amplitude=0*renorm_val.unit)
+                    ConstFlux1D, amplitude=(0 * renorm_val.unit))
 
             # Linear flux-density units
             else:
                 stdspec = SourceSpectrum(
-                    ConstFlux1D, amplitude=1*renorm_val.unit)
+                    ConstFlux1D, amplitude=(1 * renorm_val.unit))
 
             if band is None:
                 # TODO: Cannot get this to agree with results
@@ -1393,7 +1393,7 @@ class SpectralElement(BaseUnitlessSpectrum):
                  other.model.is_tapered() or
                  not isinstance(other.model,
                                 (Empirical1D, _CompoundModel))) and
-                    np.allclose(other(x1[::x1.size-1]).value, 0)):
+                    np.allclose(other(x1[::x1.size - 1]).value, 0)):
                 result = 'full'
 
             # Check if the lack of overlap is significant.

@@ -14,14 +14,14 @@ import pytest
 # ASTROPY
 from astropy import units as u
 from astropy.io import fits
-from astropy.tests.helper import remote_data, assert_quantity_allclose
+from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
 from .. import exceptions, specio, units
 
 
-@remote_data
+@pytest.mark.remote_data
 def test_read_remote_spec():
     """Test read remote spectrum.
 

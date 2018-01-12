@@ -67,11 +67,11 @@ def test_center_edge_center_roundtrip():
 def test_calculate_bin_exceptions(arr):
     """Test binning.py raising appropriate exceptions."""
     with pytest.raises(exceptions.SynphotError):
-        x = binning.calculate_bin_edges(arr)
+        binning.calculate_bin_edges(arr)
     with pytest.raises(exceptions.SynphotError):
-        x = binning.calculate_bin_widths(arr)
+        binning.calculate_bin_widths(arr)
     with pytest.raises(exceptions.SynphotError):
-        x = binning.calculate_bin_centers(arr)
+        binning.calculate_bin_centers(arr)
 
 
 class TestBinRange(object):
@@ -83,15 +83,15 @@ class TestBinRange(object):
     def test_wave_range_exceptions(self):
         """Test for appropriate wavelength range exceptions."""
         with pytest.raises(exceptions.SynphotError):
-            x = binning.wave_range(self.bins, 5000, 100, mode='up')
+            binning.wave_range(self.bins, 5000, 100, mode='up')
         with pytest.raises(exceptions.SynphotError):
-            x = binning.wave_range(self.bins, 5000, 1.3)
+            binning.wave_range(self.bins, 5000, 1.3)
         with pytest.raises(exceptions.OverlapError):
-            x = binning.wave_range(self.bins, 1010, 100)
+            binning.wave_range(self.bins, 1010, 100)
         with pytest.raises(exceptions.OverlapError):
-            x = binning.wave_range(self.bins, 11000, 1000)
+            binning.wave_range(self.bins, 11000, 1000)
         with pytest.raises(exceptions.OverlapError):
-            x = binning.wave_range(self.bins, 600, 1000)
+            binning.wave_range(self.bins, 600, 1000)
 
     def test_wave_range_mode_none(self):
         """Test wavelength range calculations for mode='none'."""
@@ -142,11 +142,11 @@ class TestBinRange(object):
     def test_pixel_range_exceptions(self):
         """Test for appropriate pixel range exceptions."""
         with pytest.raises(exceptions.SynphotError):
-            x = binning.pixel_range(self.bins, (5000, 5001), mode='up')
+            binning.pixel_range(self.bins, (5000, 5001), mode='up')
         with pytest.raises(exceptions.OverlapError):
-            x = binning.pixel_range(self.bins, (500, 5001))
+            binning.pixel_range(self.bins, (500, 5001))
         with pytest.raises(exceptions.OverlapError):
-            x = binning.pixel_range(self.bins, (5000, 50010))
+            binning.pixel_range(self.bins, (5000, 50010))
 
     @pytest.mark.parametrize(
         ('waverange', 'ans', 'mode'),

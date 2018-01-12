@@ -81,11 +81,11 @@ def test_validate_wave_unit(in_u, out_u):
 def test_validate_unit_exceptions():
     """Test that unit validation raises appropriate exceptions."""
     with pytest.raises(exceptions.SynphotError):
-        x = units.validate_unit(10)
+        units.validate_unit(10)
     with pytest.raises(ValueError):
-        x = units.validate_unit('foo')
+        units.validate_unit('foo')
     with pytest.raises(exceptions.SynphotError):
-        x = units.validate_wave_unit('Kelvin')
+        units.validate_wave_unit('Kelvin')
 
 
 @pytest.mark.parametrize(
@@ -155,16 +155,16 @@ def test_flux_conversion_exceptions():
     """Test for appropriate exceptions."""
     # Invalid flux unit
     with pytest.raises(u.UnitsError):
-        x = units.convert_flux(_wave, _wave, units.PHOTLAM)
+        units.convert_flux(_wave, _wave, units.PHOTLAM)
     with pytest.raises(u.UnitsError):
-        x = units.convert_flux(_wave, _flux_photlam, u.AA)
+        units.convert_flux(_wave, _flux_photlam, u.AA)
 
     # Missing Vega spectrum
     with pytest.raises(exceptions.SynphotError):
-        x = units.convert_flux(_wave, _flux_fnu, units.VEGAMAG, vegaspec=None)
+        units.convert_flux(_wave, _flux_fnu, units.VEGAMAG, vegaspec=None)
 
     # Missing area
     with pytest.raises(exceptions.SynphotError):
-        x = units.convert_flux(_wave, _flux_photlam, u.count, area=None)
+        units.convert_flux(_wave, _flux_photlam, u.count, area=None)
     with pytest.raises(exceptions.SynphotError):
-        x = units.convert_flux(_wave, _flux_obmag, units.PHOTLAM, area=None)
+        units.convert_flux(_wave, _flux_obmag, units.PHOTLAM, area=None)
