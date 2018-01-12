@@ -58,9 +58,10 @@ matrix:
         - python: 3.5
           env: SETUP_CMD='test --open-files'
 
-        # Do a test in Python 2 with LTS.
+        # TODO: Switch to Astropy lts when 3.0 is out.
+        # Do a test in Python 2.
         - python: 2.7
-          env: ASTROPY_VERSION=lts SETUP_CMD='test --open-files'
+          env: ASTROPY_VERSION=stable SETUP_CMD='test --open-files'
 
         # Try Astropy development version
         - python: 3.6
@@ -113,4 +114,4 @@ after_success:
     # If coveralls.io is set up for this package, uncomment the line
     # below and replace "packagename" with the name of your package.
     # The coveragerc file may be customized as needed for your package.
-    - if [[ $SETUP_CMD == 'test --coverage' ]]; then coveralls --rcfile='synphot/tests/coveragerc'; fi
+    - if [[ $SETUP_CMD == *--coverage* ]]; then coveralls --rcfile='synphot/tests/coveragerc'; fi

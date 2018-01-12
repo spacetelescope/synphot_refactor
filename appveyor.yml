@@ -15,14 +15,14 @@ environment:
       # Cython code, you can set CONDA_DEPENDENCIES=''
       #CONDA_DEPENDENCIES: "Cython"
       CONDA_DEPENDENCIES: "Cython jinja2 scipy"
-      PIP_DEPENDENCIES: "pytest-remotedata"
 
   matrix:
 
       # We test Python 2.7 and 3.6
 
+      # TODO: Switch to Astropy lts release when 3.0 is out.
       - PYTHON_VERSION: "2.7"
-        ASTROPY_VERSION: "lts"
+        ASTROPY_VERSION: "stable"
         NUMPY_VERSION: "stable"
 
       - PYTHON_VERSION: "3.6"
