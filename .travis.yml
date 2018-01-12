@@ -54,6 +54,10 @@ matrix:
         - python: 3.6
           env: SETUP_CMD='test --coverage --open-files --remote-data'
 
+        # Do a test in older Python 3.
+        - python: 3.5
+          env: SETUP_CMD='test --open-files'
+
         # Do a test in Python 2 with LTS.
         - python: 2.7
           env: ASTROPY_VERSION=lts SETUP_CMD='test --open-files'
