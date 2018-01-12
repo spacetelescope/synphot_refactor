@@ -15,7 +15,6 @@ environment:
       # Cython code, you can set CONDA_DEPENDENCIES=''
       #CONDA_DEPENDENCIES: "Cython"
       CONDA_DEPENDENCIES: "Cython jinja2 scipy"
-      PIP_DEPENDENCIES: "pytest-remotedata"
 
   matrix:
 
