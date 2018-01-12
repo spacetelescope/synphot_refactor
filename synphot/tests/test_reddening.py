@@ -14,7 +14,6 @@ import pytest
 # ASTROPY
 from astropy import units as u
 from astropy.io import fits
-from astropy.tests.helper import remote_data
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 
@@ -123,7 +122,7 @@ def test_etau_madau_exceptions():
         etau_madau([500], 0)
 
 
-@remote_data
+@pytest.mark.remote_data
 @pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.parametrize(
     'modelname',

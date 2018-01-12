@@ -19,7 +19,6 @@ from astropy.io import fits
 from astropy.modeling.models import (
     BrokenPowerLaw1D, Const1D, ExponentialCutoffPowerLaw1D, LogParabola1D,
     PowerLaw1D, RedshiftScaleFactor)
-from astropy.tests.helper import remote_data
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 
@@ -68,7 +67,7 @@ def teardown_module(module):
         const.k_B = si.k_B = astropyconst20.k_B
 
 
-@remote_data
+@pytest.mark.remote_data
 @pytest.mark.skipif('not HAS_SCIPY')
 def test_load_vspec():
     """Load VEGA spectrum once here to be used later."""
@@ -76,7 +75,7 @@ def test_load_vspec():
     _vspec = SourceSpectrum.from_vega()
 
 
-@remote_data
+@pytest.mark.remote_data
 @pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.parametrize(
     ('in_q', 'out_u', 'ans'),
@@ -95,7 +94,7 @@ def test_flux_conversion_vega(in_q, out_u, ans):
     assert result.unit == ans.unit
 
 
-@remote_data
+@pytest.mark.remote_data
 @pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.parametrize(
     'filtername',
@@ -649,7 +648,7 @@ class TestNormalize(object):
         rn_sp = sp.normalize(rn_val, band=self.acs, area=_area)
         self._compare_countrate(rn_sp, ans_countrate)
 
-    @remote_data
+    @pytest.mark.remote_data
     @pytest.mark.parametrize(
         ('sp_type', 'ans_countrate'),
         [('bb', 115.9126),

@@ -3,10 +3,14 @@
 # no matter how it is invoked within the source tree.
 
 import os
-from astropy.tests.pytest_plugins import *
+
+# pytest plugins provided by Astropy are now standalone packages.
+from astropy.tests.plugins.display import (PYTEST_HEADER_MODULES,
+                                           TESTED_VERSIONS)
 
 # Uncomment the following line to treat all DeprecationWarnings as
 # exceptions
+# from astropy.tests.helper import enable_deprecations_as_exceptions
 # enable_deprecations_as_exceptions()
 
 # Uncomment and customize the following lines to add/remove entries

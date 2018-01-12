@@ -15,13 +15,14 @@ environment:
       # Cython code, you can set CONDA_DEPENDENCIES=''
       #CONDA_DEPENDENCIES: "Cython"
       CONDA_DEPENDENCIES: "Cython jinja2 scipy"
+      PIP_DEPENDENCIES: "pytest-remotedata"
 
   matrix:
 
       # We test Python 2.7 and 3.6
 
       - PYTHON_VERSION: "2.7"
-        ASTROPY_VERSION: "stable"
+        ASTROPY_VERSION: "lts"
         NUMPY_VERSION: "stable"
 
       - PYTHON_VERSION: "3.6"
