@@ -252,12 +252,12 @@ class TestEmpiricalBandpassFromFile(object):
         w = self.bp.rmswidth()
         np.testing.assert_allclose(w.value, 359.55954282883687, rtol=1e-4)
 
-        w = self.bp.rmswidth(threshold=0.01*u.dimensionless_unscaled)
+        w = self.bp.rmswidth(threshold=0.01 * u.dimensionless_unscaled)
         np.testing.assert_allclose(w.value, 357.43298216917754, rtol=1e-4)
 
         # Invalid threshold must raise exception
         with pytest.raises(exceptions.SynphotError):
-            w = self.bp.rmswidth(threshold=0.01*u.AA)
+            w = self.bp.rmswidth(threshold=0.01 * u.AA)
         with pytest.raises(exceptions.SynphotError):
             w = self.bp.rmswidth(threshold=[0.01, 0.02])
         with pytest.raises(exceptions.SynphotError):
@@ -268,7 +268,7 @@ class TestEmpiricalBandpassFromFile(object):
         w = self.bp.fwhm()
         np.testing.assert_allclose(w.value, 841.09, rtol=2.5e-5)
 
-        w = self.bp.fwhm(threshold=0.01*u.dimensionless_unscaled)
+        w = self.bp.fwhm(threshold=0.01 * u.dimensionless_unscaled)
         np.testing.assert_allclose(w.value, 836.2879507505378, rtol=2.5e-5)
 
         # Zero value
@@ -277,7 +277,7 @@ class TestEmpiricalBandpassFromFile(object):
 
         # Invalid threshold must raise exception
         with pytest.raises(exceptions.SynphotError):
-            w = self.bp.fwhm(threshold=0.01*u.AA)
+            w = self.bp.fwhm(threshold=0.01 * u.AA)
         with pytest.raises(exceptions.SynphotError):
             w = self.bp.fwhm(threshold=[0.01, 0.02])
         with pytest.raises(exceptions.SynphotError):
@@ -329,7 +329,8 @@ class TestBoxBandpass(object):
         np.testing.assert_array_equal(y.value, [0, 0, 1])
 
     def test_conversion(self):
-        bp2 = SpectralElement(Box1D, amplitude=1, x_0=500*u.nm, width=10*u.nm)
+        bp2 = SpectralElement(
+            Box1D, amplitude=1, x_0=500 * u.nm, width=10 * u.nm)
         y = bp2([4000, 4949.95, 5000])
         np.testing.assert_array_equal(y.value, [0, 0, 1])
 
@@ -443,7 +444,7 @@ class TestBuildModels(object):
         np.testing.assert_array_equal(y.value, 1)
 
     def test_ConstFlux1D(self):
-        sp = SourceSpectrum(ConstFlux1D, amplitude=1*u.Jy)
+        sp = SourceSpectrum(ConstFlux1D, amplitude=1 * u.Jy)
         w = [1, 1000, 1e6]
         y = units.convert_flux(w, sp(w), u.Jy)
         np.testing.assert_allclose(y.value, 1)

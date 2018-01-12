@@ -116,7 +116,7 @@ class TestConstFlux1D(object):
         [(u.STmag, units.FLAM, 3.63e-9),
          (u.ABmag, units.FNU, 3.63e-20)])
     def test_mag(self, in_unit, out_unit, val):
-        m = ConstFlux1D(amplitude=0*in_unit)
+        m = ConstFlux1D(amplitude=0 * in_unit)
         f = units.convert_flux(self.w, m(self.w) * units.PHOTLAM, out_unit)
         np.testing.assert_allclose(f.value, val, rtol=2.5e-4)
 
@@ -128,7 +128,7 @@ class TestConstFlux1D(object):
         'flux_unit', [u.count, units.OBMAG, units.VEGAMAG, u.AA])
     def test_invalid_units(self, flux_unit):
         with pytest.raises(NotImplementedError):
-            ConstFlux1D(amplitude=1*flux_unit)
+            ConstFlux1D(amplitude=1 * flux_unit)
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -236,7 +236,7 @@ class TestPowerLawFlux1D(object):
 
     def test_multi_n_models(self):
         m2 = PowerLawFlux1D(
-            amplitude=[1, 1]*units.FLAM, x_0=[0.3, 0.305]*u.micron,
+            amplitude=[1, 1] * units.FLAM, x_0=[0.3, 0.305] * u.micron,
             alpha=[4, 1], n_models=2)
         y = units.convert_flux(
             self.w, m2(self.w, model_set_axis=False) * units.PHOTLAM,
@@ -257,4 +257,4 @@ class TestPowerLawFlux1D(object):
         'flux_unit', [u.count, units.OBMAG, units.VEGAMAG, u.AA])
     def test_invalid_units(self, flux_unit):
         with pytest.raises(NotImplementedError):
-            PowerLawFlux1D(amplitude=1*flux_unit, x_0=5000, alpha=4)
+            PowerLawFlux1D(amplitude=1 * flux_unit, x_0=5000, alpha=4)

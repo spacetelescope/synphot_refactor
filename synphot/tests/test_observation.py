@@ -46,7 +46,7 @@ class TestObservation(object):
     """Test Observation (most of them)."""
     def setup_class(self):
         sp = SourceSpectrum(
-            ConstFlux1D, amplitude=1*units.FLAM,
+            ConstFlux1D, amplitude=1 * units.FLAM,
             meta={'warnings': {'w1': 'spec warn', 'w2': 'foo'}})
         bp = SpectralElement.from_file(_bandfile)
         bp.warnings = {'w1': 'band warn'}
