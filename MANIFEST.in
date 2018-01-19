@@ -5,6 +5,7 @@ include LICENSE.rst
 include ez_setup.py
 include ah_bootstrap.py
 include setup.cfg
+include synphot/include/.gitignore
 
 recursive-include *.pyx *.c *.pxd
 recursive-include docs *
