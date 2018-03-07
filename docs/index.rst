@@ -61,13 +61,15 @@ packages:
 * scipy (>= 0.14)
 * matplotlib (optional for plotting)
 
-You can install **synphot** using one of the following ways
-(`AstroConda <http://astroconda.readthedocs.io/en/latest/>`_ support is planned
-for a future release):
+You can install **synphot** using one of the following ways:
+
+* From `AstroConda <http://astroconda.readthedocs.io/en/latest/>`_::
+
+    conda install synphot
 
 * From standalone release::
 
-    pip install git+https://github.com/spacetelescope/synphot_refactor.git@0.1
+    pip install synphot
 
 * From source (example shown is for the ``dev`` version)::
 
