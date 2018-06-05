@@ -108,7 +108,7 @@ Bandpass Equivalent Width
 -------------------------
 
 For a bandpass, :meth:`~synphot.spectrum.SpectralElement.equivwidth` implements
-the equivalent width. It gives the same value (but not unit) as
+the equivalent width. It gives the same value as
 :meth:`~synphot.spectrum.BaseSpectrum.integrate` and is equivalent to
 IRAF SYNPHOT ``bandpar`` result for ``equvw``.
 
@@ -121,7 +121,7 @@ Example::
     >>> bp.equivwidth()
     <Quantity 272.0108162945954 Angstrom>
     >>> bp.integrate()
-    <Quantity 272.0108162945954>
+    <Quantity 272.0108162945954 Angstrom>
 
 
 .. _synphot-formula-rectw:
@@ -236,7 +236,7 @@ It is equivalent to IRAF SYNPHOT ``bandpar`` result for ``uresp``.
 
 .. math::
 
-    \text{uresp} = \frac{hc}{a} \int P_{\lambda}\; \lambda\; d\lambda
+    \text{uresp} = \frac{hc}{a \int P_{\lambda}\; \lambda\; d\lambda}
 
 Example::
 

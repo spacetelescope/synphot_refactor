@@ -445,9 +445,16 @@ class BaseSpectrum(object):
             Invalid default integrator.
 
         synphot.exceptions.SynphotError
-            `waveset` is needed but undefined.
+            `waveset` is needed but undefined or cannot integrate
+            natively in the given ``flux_unit``.
 
         """
+        # Cannot integrate per Hz units natively across wavelength
+        # without converting them to per Angstrom unit first, so
+        # less misleading to just disallow that option for now.
+        if 'flux_unit' in kwargs:
+            self._validate_flux_unit(kwargs['flux_unit'], wav_only=True)
+
         x = self._validate_wavelengths(wavelengths)
 
         # TODO: When astropy.modeling.models supports this, need to
@@ -459,7 +466,8 @@ class BaseSpectrum(object):
         except (AttributeError, NotImplementedError):
             if conf.default_integrator == 'trapezoid':
                 y = self(x, **kwargs)
-                result = abs(np.trapz(y.value, x=x.value)) * y.unit
+                result = abs(np.trapz(y.value, x=x.value))
+                result_unit = y.unit
             else:  # pragma: no cover
                 raise NotImplementedError(
                     'Analytic integral not available and default integrator '
@@ -467,9 +475,24 @@ class BaseSpectrum(object):
         else:  # pragma: no cover
             start = x[0].value
             stop = x[-1].value
-            result = (m(stop) - m(start)) * self._internal_flux_unit
+            result = (m(stop) - m(start))
+            result_unit = self._internal_flux_unit
 
-        return result
+        # Ensure final unit takes account of integration across wavelength
+        if result_unit != units.THROUGHPUT:
+            if result_unit == units.PHOTLAM:
+                result_unit = u.photon / (u.cm**2 * u.s)
+            elif result_unit == units.FLAM:
+                result_unit = u.erg / (u.cm**2 * u.s)
+            else:  # pragma: no cover
+                raise NotImplementedError(
+                    'Integration of {0} is not supported'.format(result_unit))
+        else:
+            # Ideally flux can use this too but unfortunately this
+            # operation results in confusing output unit for flux.
+            result_unit *= self._internal_wave_unit
+
+        return result * result_unit
 
     def avgwave(self, wavelengths=None):
         """Calculate the :ref:`average wavelength <synphot-formula-avgwv>`.
@@ -761,17 +784,22 @@ class BaseSourceSpectrum(BaseSpectrum):
     _internal_flux_unit = units.PHOTLAM
 
     @staticmethod
-    def _validate_flux_unit(new_unit):
+    def _validate_flux_unit(new_unit, wav_only=False):
         """Make sure flux unit is valid."""
         new_unit = units.validate_unit(new_unit)
-        acceptable_types = [
-            'spectral flux density', 'spectral flux density wav',
-            'photon flux density', 'photon flux density wav']
+        acceptable_types = ['spectral flux density wav',
+                            'photon flux density wav']
+        acceptable_names = ['PHOTLAM', 'FLAM']
+
+        if not wav_only:  # Include per Hz units
+            acceptable_types += ['spectral flux density',
+                                 'photon flux density']
+            acceptable_names += ['PHOTNU', 'FNU', 'Jy']
 
         if new_unit.physical_type not in acceptable_types:
             raise exceptions.SynphotError(
-                'Source spectrum cannot operate in {0}. Acceptable units are '
-                'PHOTLAM, PHOTNU, FLAM, FNU, or Jy.'.format(new_unit))
+                'Source spectrum cannot operate in {0}. Acceptable units: '
+                '{1}'.format(new_unit, ','.join(acceptable_names)))
 
         return new_unit
 
@@ -921,10 +949,10 @@ class BaseSourceSpectrum(BaseSpectrum):
                 renorm_unit_name == units.OBMAG.to_string()):
             # Special handling for non-density units
             flux_tmp = sp(w, flux_unit=u.count, area=area)
-            totalflux = flux_tmp.sum()
+            totalflux = flux_tmp.sum().value
             stdflux = 1.0
         else:
-            totalflux = sp.integrate(wavelengths=wavelengths)
+            totalflux = sp.integrate(wavelengths=wavelengths).value
 
             # VEGAMAG
             if renorm_unit_name == units.VEGAMAG.to_string():
@@ -952,17 +980,17 @@ class BaseSourceSpectrum(BaseSpectrum):
                 up = stdspec * band
                 stdflux = up.integrate(wavelengths=wavelengths).value
 
-        utils.validate_totalflux(totalflux.value)
+        utils.validate_totalflux(totalflux)
 
         # Renormalize in magnitudes
         if (renorm_val.unit.decompose() == u.mag or
                 isinstance(renorm_val.unit, u.LogUnit)):
             const = renorm_val.value + (2.5 *
-                                        np.log10(totalflux.value / stdflux))
+                                        np.log10(totalflux / stdflux))
             newsp = self.__mul__(10**(-0.4 * const))
         # Renormalize in linear flux units
         else:
-            const = renorm_val.value * (stdflux / totalflux.value)
+            const = renorm_val.value * (stdflux / totalflux)
             newsp = self.__mul__(const)
 
         newsp.warnings = warndict
@@ -1662,8 +1690,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             Bandpass equivalent width.
 
         """
-        return (self.integrate(wavelengths=wavelengths).value *
-                self._internal_wave_unit)
+        return self.integrate(wavelengths=wavelengths)
 
     def rectwidth(self, wavelengths=None):
         """Calculate :ref:`bandpass rectangular width <synphot-formula-rectw>`.
@@ -1724,7 +1751,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         Returns
         -------
         em_flux : `~astropy.units.quantity.Quantity`
-            Equivalent monochromatic flux in FLAM.
+            Equivalent monochromatic flux.
 
         """
         t_lambda = self.tlambda(wavelengths=wavelengths)
@@ -1733,9 +1760,8 @@ class SpectralElement(BaseUnitlessSpectrum):
             em_flux = 0.0 * units.FLAM
         else:
             uresp = self.unit_response(area, wavelengths=wavelengths)
-            rectw = self.rectwidth(wavelengths=wavelengths).value
-            fac = self.tpeak(wavelengths=wavelengths) / t_lambda
-            em_flux = uresp * rectw * fac
+            equvw = self.equivwidth(wavelengths=wavelengths).value
+            em_flux = uresp * equvw / t_lambda
 
         return em_flux
 

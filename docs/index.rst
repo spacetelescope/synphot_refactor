@@ -193,13 +193,13 @@ Sample the spectrum at 0.3 micron::
 
     >>> from astropy import units as u
     >>> sp(0.3 * u.micron)
-    <Quantity 0.001268063356632316 PHOTLAM>
+    <Quantity 0.0012685 PHOTLAM>
 
 Models that built the spectrum::
 
     >>> print(sp)
     SourceSpectrum at z=0.0
-    Model: CompoundModel5
+    Model: CompoundModel2
     Inputs: ('x',)
     Outputs: ('y',)
     Model set size: 1
@@ -233,7 +233,7 @@ integrate it::
 
     >>> sp_rn = sp.normalize(1 * u.Jy, band=bp)
     >>> sp_rn.integrate()
-    <Quantity 12900.947986966807 PHOTLAM>
+    <Quantity 12901.13466265 ph / (cm2 s)>
 
 Create an observation by passing the redshifted and normalized source spectrum
 through the box bandpass::
@@ -246,9 +246,9 @@ Calculate the count rate of the observation above for an 2-meter telescope:
     >>> import numpy as np
     >>> area = np.pi * (1 * u.m) ** 2
     >>> area
-    <Quantity 3.141592653589793 m2>
+    <Quantity 3.14159265 m2>
     >>> obs.countrate(area=area)
-    <Quantity 24219652.902789623 ct / s>
+    <Quantity 24219651.1854991 ct / s>
 
 
 .. _synphot_using:

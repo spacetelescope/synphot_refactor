@@ -196,9 +196,9 @@ Astropy). By default, integration is done in internal units::
     >>> from synphot.models import GaussianFlux1D
     >>> sp = SourceSpectrum(GaussianFlux1D, mean=6000, fwhm=10, total_flux=1)
     >>> sp.integrate()
-    <Quantity 0.9999992180687505 PHOTLAM>
+    <Quantity 0.99999922 ph / (cm2 s)>
     >>> sp.integrate(flux_unit=units.FLAM)
-    <Quantity 3.3107418773847306e-12 FLAM>
+    <Quantity 3.31074211e-12 erg / (cm2 s)>
 
 
 .. _synphot-empirical-source:

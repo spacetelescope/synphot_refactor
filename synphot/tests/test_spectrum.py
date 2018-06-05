@@ -173,13 +173,20 @@ class TestEmpiricalSourceFromFile(object):
         np.testing.assert_allclose(y.value, 2.282950185743497e-26, rtol=1e-6)
 
     def test_integrate(self):
+        expected_unit = u.erg / (u.cm**2 * u.s)
         # Whole range
         f = self.sp.integrate(flux_unit=units.FLAM)
         np.testing.assert_allclose(f.value, 8.460125829057308e-12, rtol=1e-5)
+        assert f.unit == expected_unit
 
         # Given range
         f = self.sp.integrate(wavelengths=_wave, flux_unit=units.FLAM)
         np.testing.assert_allclose(f.value, 4.810058069909525e-14, rtol=1e-5)
+        assert f.unit == expected_unit
+
+        # Unsupported unit
+        with pytest.raises(exceptions.SynphotError):
+            self.sp.integrate(flux_unit=u.Jy)
 
     def test_taper(self):
         # Original spectrum already tapered -- nothing done
@@ -222,10 +229,12 @@ class TestEmpiricalBandpassFromFile(object):
         # Whole range (same as EQUVW)
         f = self.bp.integrate()
         np.testing.assert_allclose(f.value, 272.01081629459344)
+        assert f.unit == u.AA
 
         # Given range
         f = self.bp.integrate(wavelengths=_wave)
         np.testing.assert_allclose(f.value, 1.2062975715374322, rtol=2.5e-6)
+        assert f.unit == u.AA
 
     def test_avgwave(self):
         """Compare AVGWAVE with old SYNPHOT result."""
@@ -300,6 +309,7 @@ class TestEmpiricalBandpassFromFile(object):
         """Compare EQUVW with ASTROLIB PYSYNPHOT result."""
         w = self.bp.equivwidth()
         np.testing.assert_allclose(w.value, 272.01081629459344, rtol=1e-6)
+        assert w.unit == u.AA
 
     def test_rectw(self):
         """Compare RECTW with old SYNPHOT result."""
@@ -381,8 +391,9 @@ class TestGaussianSource(object):
 
     def test_totalflux(self):
         # PHOTLAM
-        val = self.sp.integrate().value
-        np.testing.assert_allclose(val, 1, rtol=1e-5)
+        f = self.sp.integrate()
+        np.testing.assert_allclose(f.value, 1, rtol=1e-5)
+        assert f.unit == u.photon / (u.cm**2 * u.s)
 
         # FLAM
         x0 = (400 * u.nm).to(u.AA).value
@@ -659,16 +670,6 @@ class TestNormalize(object):
         rn_sp = sp.normalize(20 * units.VEGAMAG, band=self.abox,
                              vegaspec=_vspec)
         self._compare_countrate(rn_sp, ans_countrate)
-
-    def test_renorm_noband_count(self):
-        """No bandpass. This option is not offered by ASTROLIB PYSYNPHOT
-        but can be indirectly calculated using a very large box as bandpass.
-
-        """
-        rn_sp = self.em.normalize(1 * u.ct, area=_area)
-        x = rn_sp.integrate(flux_unit=u.ct, area=_area)
-        ans = 10.615454634451927
-        np.testing.assert_allclose(x.value, ans, rtol=1e-3)
 
     def test_renorm_noband_jy(self):
         """Replace this with real test when it is implemented."""
