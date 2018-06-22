@@ -381,8 +381,7 @@ class TestBlackBodySource(object):
 class TestGaussianSource(object):
     """Test source spectrum with GaussianFlux1D model."""
     def setup_class(self):
-        self._tf_unit = u.erg / (u.cm * u.cm * u.s)
-        tf = 4.96611456e-12 * self._tf_unit
+        tf = 4.96611456e-12 * u.erg / (u.cm * u.cm * u.s)
         self.sp = SourceSpectrum(
             GaussianFlux1D, total_flux=tf, mean=4000, fwhm=100)
 
@@ -399,10 +398,9 @@ class TestGaussianSource(object):
 
         # FLAM
         x0 = (400 * u.nm).to(u.AA).value
-        totflux = 1 * self._tf_unit
         fwhm = (10 * u.nm).to(u.AA)
         sp2 = SourceSpectrum(
-            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=fwhm)
+            GaussianFlux1D, total_flux=1, mean=x0, fwhm=fwhm)
         val = sp2.integrate(flux_unit=units.FLAM).value
         np.testing.assert_allclose(val, 1, rtol=1e-3)
 
@@ -415,6 +413,14 @@ class TestGaussianSource(object):
         bp = SpectralElement(
             Gaussian1D, mean=m.mean, amplitude=m.amplitude, stddev=m.stddev)
         np.testing.assert_allclose(bp.fwhm().value, 100, rtol=1e-3)  # 0.1%
+
+    def test_alt_source(self):
+        """Same source, different way to init."""
+        sp2 = SourceSpectrum(
+            GaussianFlux1D, amplitude=self.sp.model.amplitude.value,
+            mean=self.sp.model.mean.value, stddev=self.sp.model.stddev.value)
+        w = [3900, 4000, 4060] * u.AA
+        np.testing.assert_allclose(sp2(w), self.sp(w))
 
 
 def test_gaussian_source_watts():

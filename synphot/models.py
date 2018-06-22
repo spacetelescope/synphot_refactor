@@ -516,11 +516,12 @@ class GaussianFlux1D(Gaussian1D):
             if isinstance(total_flux, u.Quantity):
                 total_flux = total_flux.to(tf_unit)
             else:
-                total_flux *= tf_unit
+                total_flux = total_flux * tf_unit
             self.amplitude = (total_flux / (gaussian_amp_to_totflux * u.AA)).to(units.PHOTLAM, u.spectral_density(self.mean.value * u.AA)).value  # noqa
+            total_flux = total_flux.value
 
         self.meta['expr'] = 'em({0:g}, {1:g}, {2:g}, {3})'.format(
-            self.mean.value, fwhm, total_flux.value, u_str)
+            self.mean.value, fwhm, total_flux, u_str)
 
 
 class Lorentz1D(_models.Lorentz1D):
