@@ -141,8 +141,9 @@ class TestObservation(object):
         np.testing.assert_array_equal(obs2.binset, self.obs.bandpass.waveset)
 
     def test_default_binset_from_spectrum(self):
+        tf_unit = u.erg / (u.cm * u.cm * u.s)
         sp = SourceSpectrum(
-            GaussianFlux1D, mean=5000, total_flux=(1 * units.FLAM), fwhm=10)
+            GaussianFlux1D, mean=5000, total_flux=(1 * tf_unit), fwhm=10)
         bp = SpectralElement(Const1D, amplitude=1)
         obs2 = Observation(sp, bp, force='extrap')
         np.testing.assert_array_equal(obs2.binset, sp.waveset)
