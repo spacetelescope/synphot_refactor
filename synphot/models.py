@@ -446,7 +446,7 @@ class Gaussian1D(BaseGaussian1D):
 
 
 class GaussianAbsorption1D(BaseGaussian1D):
-    """Same as `astropy.modeling.functional_models.GaussianAbsorption1D`,
+    """Same as ``astropy.modeling.functional_models.GaussianAbsorption1D``,
     except with ``sampleset`` defined.
 
     """
@@ -472,12 +472,23 @@ class GaussianFlux1D(Gaussian1D):
 
     Parameters
     ----------
+    amplitude : float
+        Amplitude of the Gaussian in PHOTLAM.
+        Also see ``total_flux``.
+
+    mean : float
+        Mean of the Gaussian in Angstrom.
+
+    stddev : float
+        Standard deviation of the Gaussian in Angstrom.
+        Also see ``fwhm``.
+
     fwhm : float
         Full width at half maximum of the Gaussian in Angstrom.
         If given, this overrides ``stddev``.
 
     total_flux : float
-        Total flux under the Gaussian in PHOTLAM.
+        Total flux under the Gaussian in ``erg/s/cm^2``.
         If given, this overrides ``amplitude``.
 
     """
@@ -495,12 +506,22 @@ class GaussianFlux1D(Gaussian1D):
         gaussian_amp_to_totflux = np.sqrt(2.0 * np.pi) * self.stddev
 
         if total_flux is None:
+            u_str = 'PHOTLAM'
             total_flux = self.amplitude * gaussian_amp_to_totflux
         else:
-            self.amplitude = total_flux / gaussian_amp_to_totflux
+            u_str = 'FLAM'
+            # total_flux is passed in unaltered, any conversion error would
+            # happen here.
+            tf_unit = u.erg / (u.cm * u.cm * u.s)
+            if isinstance(total_flux, u.Quantity):
+                total_flux = total_flux.to(tf_unit)
+            else:
+                total_flux = total_flux * tf_unit
+            self.amplitude = (total_flux / (gaussian_amp_to_totflux * u.AA)).to(units.PHOTLAM, u.spectral_density(self.mean.value * u.AA)).value  # noqa
+            total_flux = total_flux.value
 
-        self.meta['expr'] = 'em({0:g}, {1:g}, {2:g}, PHOTLAM)'.format(
-            self.mean.value, fwhm, total_flux)
+        self.meta['expr'] = 'em({0:g}, {1:g}, {2:g}, {3})'.format(
+            self.mean.value, fwhm, total_flux, u_str)
 
 
 class Lorentz1D(_models.Lorentz1D):

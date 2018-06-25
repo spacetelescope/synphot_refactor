@@ -95,7 +95,7 @@ Source Spectrum
 |alpha=expon)                          |                                      |
 +--------------------------------------+--------------------------------------+
 |SourceSpectrum(GaussianFlux1D, mean=mu|GaussianSource(flux, mu, fwhm,        |
-|, fwhm=fwhm, total_flux=flux*form)    |fluxunits=form)                       |
+|, fwhm=fwhm, total_flux=flux)         |fluxunits=form)                       |
 +--------------------------------------+--------------------------------------+
 |sp.taper()                            |sp.taper()                            |
 +--------------------------------------+--------------------------------------+
@@ -219,7 +219,7 @@ Source Spectrum
 |alpha=expon)                          |                                      |
 +--------------------------------------+--------------------------------------+
 |SourceSpectrum(GaussianFlux1D, mean=mu|em(mu, fwhm, flux, form)              |
-|, fwhm=fwhm, total_flux=flux*form)    |                                      |
+|, fwhm=fwhm, total_flux=flux)         |                                      |
 +--------------------------------------+--------------------------------------+
 |sp.normalize(val*form, band=bp)       |rn(sp, bp, val, form)                 |
 +--------------------------------------+--------------------------------------+

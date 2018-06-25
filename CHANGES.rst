@@ -1,6 +1,11 @@
 0.2.0 (unreleased)
 ==================
 
+0.1.2 (unreleased)
+==================
+
+Bug fix for GaussianFlux1D ``total_flux`` unit handling. [#154]
+
 0.1.1 (2018-06-05)
 ==================
 

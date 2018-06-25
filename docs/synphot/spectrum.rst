@@ -194,11 +194,12 @@ Astropy). By default, integration is done in internal units::
 
     >>> from synphot import SourceSpectrum, units
     >>> from synphot.models import GaussianFlux1D
-    >>> sp = SourceSpectrum(GaussianFlux1D, mean=6000, fwhm=10, total_flux=1)
+    >>> sp = SourceSpectrum(GaussianFlux1D, mean=6000, fwhm=10,
+    ...                     total_flux=1*u.erg/(u.cm**2 * u.s))
     >>> sp.integrate()
-    <Quantity 0.99999922 ph / (cm2 s)>
+    <Quantity 3.02046763e+11 ph / (cm2 s)
     >>> sp.integrate(flux_unit=units.FLAM)
-    <Quantity 3.31074211e-12 erg / (cm2 s)>
+    <Quantity 0.99999972 erg / (cm2 s)>
 
 
 .. _synphot-empirical-source:
@@ -350,7 +351,8 @@ a continuum (e.g., :ref:`synphot-flat-spec`):
 
     from synphot import SourceSpectrum
     from synphot.models import GaussianFlux1D, ConstFlux1D
-    em = SourceSpectrum(GaussianFlux1D, mean=6000, fwhm=10, total_flux=1)
+    em = SourceSpectrum(GaussianFlux1D, mean=6000, fwhm=10,
+                        total_flux=3.3e-12*u.erg/(u.cm**2 * u.s))
     bg = SourceSpectrum(ConstFlux1D, amplitude=2)
     sp = bg - em
     sp.plot()
@@ -392,7 +394,7 @@ using input values (central wavelength, FWHM, and total flux) that are somewhat
 consistent with ASTROLIB PYSYNPHOT.
 
 The example below creates and plots a Gaussian source centered at 1.8 micron
-with FWHM of 200 nm and total flux of 18.3 ABMAG. As stated in
+with FWHM of 200 nm and the given total flux. As stated in
 :ref:`synphot_overview`, conversion to internal units happen behind the scenes:
 
 .. plot::
@@ -402,7 +404,7 @@ with FWHM of 200 nm and total flux of 18.3 ABMAG. As stated in
     from synphot import SourceSpectrum
     from synphot.models import GaussianFlux1D
     sp = SourceSpectrum(GaussianFlux1D, mean=1.8*u.micron, fwhm=200*u.nm,
-                        total_flux=18.3*u.ABmag)
+                        total_flux=1e-26*u.W/(u.m**2))
     sp.plot(title=sp.meta['expr'])
 
 

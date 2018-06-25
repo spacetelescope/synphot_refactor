@@ -31,7 +31,8 @@ FWHM of 100 Angstrom, and centered at 7000 Angstrom::
     >>> from synphot import units
     >>> from synphot.models import GaussianFlux1D
     >>> em = SourceSpectrum(
-    ...     GaussianFlux1D, total_flux=8e-14*units.FLAM, fwhm=100, mean=7000)
+    ...     GaussianFlux1D, total_flux=8e-14*u.erg/(u.cm**2 * u.s),
+    ...     fwhm=100, mean=7000)
 
 Add emission line to continuum spectrum::
 
@@ -82,10 +83,11 @@ continuum-normalized spectrum.
     sp_nse = BaseUnitlessSpectrum(Empirical1D, points=wave, lookup_table=nse)
     bb_noisy = bb * sp_nse
     # Apply emission and absorption lines to the noisy continuum.
+    tf_unit = u.erg / (u.cm**2 * u.s)
     g_em = SourceSpectrum(
-        GaussianFlux1D, total_flux=0.02, mean=15000, fwhm=500)
+        GaussianFlux1D, total_flux=2.65e-14*tf_unit, mean=15000, fwhm=500)
     g_ab = SourceSpectrum(
-        GaussianFlux1D, total_flux=0.015, mean=4500, fwhm=100)
+        GaussianFlux1D, total_flux=6.62e-14*tf_unit, mean=4500, fwhm=100)
     sp = bb_noisy + g_em - g_ab
     # Divide the noisy spectrum with lines with the original smooth continuum
     # to obtain the continuum-normalized spectrum.

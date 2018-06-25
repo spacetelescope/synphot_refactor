@@ -88,7 +88,7 @@ class BaseSpectrum(object):
         'Gaussian1D': {'amplitude': 'flux', 'mean': 'wave', 'stddev': 'wave'},
         'GaussianAbsorption1D': {
             'amplitude': 'flux', 'mean': 'wave', 'stddev': 'wave'},
-        'GaussianFlux1D': {'total_flux': 'flux', 'amplitude': 'flux',
+        'GaussianFlux1D': {'total_flux': 'noconv', 'amplitude': 'flux',
                            'mean': 'wave', 'stddev': 'wave', 'fwhm': 'wave'},
         'LogParabola1D': {
             'amplitude': 'flux', 'x_0': 'wave',
