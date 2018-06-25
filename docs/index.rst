@@ -174,9 +174,10 @@ work, so they can be used directly. When in doubt, see if a model is in
     # 4000 Angstrom with a sigma of 20 Angstrom
     g_abs = BaseUnitlessSpectrum(GaussianAbsorption1D, amplitude=0.8,
                                  mean=4000, stddev=20)
-    # Create a Gaussian emission line with a total flux of 0.05 PHOTLAM
+    # Create a Gaussian emission line with the given total flux
     # centered at 3000 Angstrom with FWHM of 100 Angstrom
-    g_em = SourceSpectrum(GaussianFlux1D, total_flux=0.05*units.PHOTLAM,
+    g_em = SourceSpectrum(GaussianFlux1D,
+                          total_flux=3.5e-13*u.erg/(u.cm**2 * u.s),
                           mean=3000, fwhm=100)
     # Create a blackbody source spectrum with a temperature of 6000 K
     bb = SourceSpectrum(BlackBodyNorm1D, temperature=6000)
@@ -203,7 +204,7 @@ Models that built the spectrum::
     Model set size: 1
     Expression: ([0] + ([1] | [2])) * [3]
     Components:
-        [0]: <GaussianFlux1D(amplitude=0.0004697186393498257, mean=3000.0, ...>
+        [0]: <GaussianFlux1D(amplitude=...>
 
         [1]: <BlackBodyNorm1D(temperature=6000.0)>
 
@@ -211,9 +212,7 @@ Models that built the spectrum::
 
         [3]: <GaussianAbsorption1D(amplitude=0.8, mean=4000.0, stddev=20.0)>
     Parameters:
-          amplitude_0    mean_0    stddev_0   ... amplitude_3 mean_3 stddev_3
-        ---------------- ------ ------------- ... ----------- ------ --------
-        0.00046971863935 3000.0 42.4660900144 ...         0.8 4000.0     20.0
+        ...
 
 Redshift the source spectrum by :math:`z = 0.2`::
 

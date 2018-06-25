@@ -381,8 +381,9 @@ class TestBlackBodySource(object):
 class TestGaussianSource(object):
     """Test source spectrum with GaussianFlux1D model."""
     def setup_class(self):
+        tf = 4.96611456e-12 * u.erg / (u.cm * u.cm * u.s)
         self.sp = SourceSpectrum(
-            GaussianFlux1D, total_flux=1, mean=4000, fwhm=100)
+            GaussianFlux1D, total_flux=tf, mean=4000, fwhm=100)
 
     def test_eval(self):
         y = self.sp([3900, 4000, 4060])
@@ -397,10 +398,9 @@ class TestGaussianSource(object):
 
         # FLAM
         x0 = (400 * u.nm).to(u.AA).value
-        totflux = units.convert_flux(x0, 1 * units.FLAM, units.PHOTLAM).value
         fwhm = (10 * u.nm).to(u.AA)
         sp2 = SourceSpectrum(
-            GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=fwhm)
+            GaussianFlux1D, total_flux=1, mean=x0, fwhm=fwhm)
         val = sp2.integrate(flux_unit=units.FLAM).value
         np.testing.assert_allclose(val, 1, rtol=1e-3)
 
@@ -413,6 +413,25 @@ class TestGaussianSource(object):
         bp = SpectralElement(
             Gaussian1D, mean=m.mean, amplitude=m.amplitude, stddev=m.stddev)
         np.testing.assert_allclose(bp.fwhm().value, 100, rtol=1e-3)  # 0.1%
+
+    def test_alt_source(self):
+        """Same source, different way to init."""
+        sp2 = SourceSpectrum(
+            GaussianFlux1D, amplitude=self.sp.model.amplitude.value,
+            mean=self.sp.model.mean.value, stddev=self.sp.model.stddev.value)
+        w = [3900, 4000, 4060] * u.AA
+        np.testing.assert_allclose(sp2(w), self.sp(w))
+
+
+def test_gaussian_source_watts():
+    """https://github.com/spacetelescope/synphot_refactor/issues/153"""
+    mu = 1 * u.um
+    fwhm = (0.01 / 0.42466) * u.um
+    flux = 1 * u.W / u.m**2
+
+    sp = SourceSpectrum(GaussianFlux1D, mean=mu, fwhm=fwhm, total_flux=flux)
+    tf = sp.integrate(flux_unit=units.FLAM)
+    np.testing.assert_allclose(tf.to(flux.unit), flux, rtol=1e-4)
 
 
 class TestPowerLawSource(object):
@@ -597,8 +616,9 @@ class TestNormalize(object):
         self.bb = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
 
         # Gaussian emission line: em(5500, 250, 1e-13, flam)
+        tf_unit = u.erg / (u.cm * u.cm * u.s)
         self.em = SourceSpectrum(GaussianFlux1D, mean=5500,
-                                 total_flux=(1e-13 * units.FLAM), fwhm=250)
+                                 total_flux=(1e-13 * tf_unit), fwhm=250)
 
         # ACS bandpass: band(acs,hrc,f555w)
         bandfile = get_pkg_data_filename(
@@ -723,8 +743,9 @@ class TestWaveset(object):
         assert sp.waveset is None
 
     def test_sampleset(self):
+        tf_unit = u.erg / (u.cm * u.cm * u.s)
         sp = SourceSpectrum(
-            GaussianFlux1D, total_flux=(1 * units.FLAM), mean=5000, fwhm=10)
+            GaussianFlux1D, total_flux=(1 * tf_unit), mean=5000, fwhm=10)
         np.testing.assert_array_equal(sp.waveset.value, sp.model.sampleset())
 
     def test_box1d(self):
@@ -742,7 +763,7 @@ class TestWaveset(object):
         np.testing.assert_array_equal(bp.waveset, bp1.waveset)
 
     def test_composite(self):
-        totflux = 1 * units.FLAM
+        totflux = 1 * (u.erg / (u.cm * u.cm * u.s))
         g1 = SourceSpectrum(
             GaussianFlux1D, total_flux=totflux, mean=5000, fwhm=10)
         g2 = SourceSpectrum(
@@ -755,8 +776,9 @@ class TestWaveset(object):
             [999.49, 1000.49, 5019.95906231, 6699.59062307, 7509.7672007])
 
     def test_redshift(self):
+        tf_unit = u.erg / (u.cm * u.cm * u.s)
         sp = SourceSpectrum(
-            GaussianFlux1D, total_flux=(1 * units.FLAM), mean=5000, fwhm=10)
+            GaussianFlux1D, total_flux=(1 * tf_unit), mean=5000, fwhm=10)
         sp.z = 1.3
         m = RedshiftScaleFactor(z=1.3)
         w_step25_z0 = [4978.76695499, 4989.3834775, 5000, 5010.6165225]
@@ -779,7 +801,7 @@ class TestRedShift(object):
     """
     def setup_class(self):
         x0 = 5000
-        totflux = 1 * u.Jy
+        totflux = 1e-23 * (u.erg / (u.cm * u.cm * u.s))  # 1 Jy * Hz
         fwhm = 100
         self.sp_z0 = SourceSpectrum(
             GaussianFlux1D, total_flux=totflux, mean=x0, fwhm=fwhm)
