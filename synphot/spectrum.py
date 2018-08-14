@@ -741,7 +741,7 @@ class BaseSpectrum(object):
         Parameters
         ----------
         wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
-            Wavelength values for integration.
+            Wavelength values for sampling.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
 
