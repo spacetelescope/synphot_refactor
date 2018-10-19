@@ -415,32 +415,131 @@ class Observation(BaseSourceSpectrum):
 
         return eff_lam * self._internal_wave_unit
 
-    def effstim(self, flux_unit=None, wavelengths=None, binned=False,
-                area=None, vegaspec=None, waverange=None, force=False):
-        """Calculate :ref:`effective stimulus <synphot-formula-effstim>`.
-
-        Calculations are done in given flux unit, and wavelengths
-        in Angstrom.
+    # https://github.com/spacetelescope/synphot_refactor/issues/159
+    def effstim(self, flux_unit=None, wavelengths=None, area=None,
+                vegaspec=None):
+        """Calculate :ref:`effective stimulus <synphot-formula-effstim>`
+        for given flux unit.
 
         Parameters
         ----------
         flux_unit : str or `~astropy.units.core.Unit` or `None`
             The unit of effective stimulus.
-            COUNT gives result in count/s.
+            COUNT gives result in count/s (see :meth:`countrate` for more
+            options).
             If not given, internal unit is used.
 
         wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
-            Wavelength values for sampling.
+            Wavelength values for sampling. This must be given if
+            ``self.waveset`` is undefined for the underlying spectrum model(s).
             If not a Quantity, assumed to be in Angstrom.
-            If `None`, ``self.waveset`` or `binset` is used, depending
-            on ``binned``.
-
-        binned : bool
-            Sample data in native wavelengths if `False` (default).
-            Else, sample binned data.
+            If `None`, ``self.waveset`` is used.
 
         area, vegaspec
             See :func:`~synphot.units.convert_flux`.
+
+        Returns
+        -------
+        eff_stim : `~astropy.units.quantity.Quantity`
+            Observation effective stimulus based on given flux unit.
+
+        """
+        if flux_unit is None:
+            flux_unit = self._internal_flux_unit
+
+        flux_unit = units.validate_unit(flux_unit)
+        flux_unit_name = flux_unit.to_string()
+
+        # Special handling of COUNT/OBMAG.
+        # This is special case of countrate calculations.
+        if flux_unit == u.count or flux_unit_name == units.OBMAG.to_string():
+            val = self.countrate(area, binned=False, wavelengths=wavelengths)
+
+            if flux_unit.decompose() == u.mag:
+                eff_stim = (-2.5 * np.log10(val.value)) * flux_unit
+            else:
+                eff_stim = val
+
+            return eff_stim
+
+        # Special handling of VEGAMAG.
+        # This is basically effstim(self)/effstim(Vega)
+        if flux_unit_name == units.VEGAMAG.to_string():
+            num = self.integrate(wavelengths=wavelengths)
+            den = (vegaspec * self.bandpass).integrate()
+            utils.validate_totalflux(num)
+            utils.validate_totalflux(den)
+            return (2.5 * (math.log10(den.value) -
+                           math.log10(num.value))) * units.VEGAMAG
+
+        # Special handling for PHOTLAM
+        if flux_unit.physical_type == 'photon flux density wav':
+            num = self.integrate(wavelengths=wavelengths)
+            den = self.bandpass.integrate(wavelengths=wavelengths)
+            utils.validate_totalflux(num)
+            utils.validate_totalflux(den)
+            return (num / den).value * units.PHOTLAM
+
+        # Sample the bandpass
+        x_band = self.bandpass._validate_wavelengths(wavelengths).value
+        y_band = self.bandpass(x_band).value
+
+        # Special handling for PHOTNU
+        if flux_unit.physical_type == 'photon flux density':
+            num = self.integrate(wavelengths=wavelengths) * units.C
+            den = abs(np.trapz(y_band / (x_band * x_band), x=x_band))
+            utils.validate_totalflux(num)
+            utils.validate_totalflux(den)
+            return (num / den).value * units.PHOTNU
+
+        # Sample the observation in FLAM
+        inwave = self._validate_wavelengths(wavelengths).value
+        influx = units.convert_flux(inwave, self(inwave), units.FLAM).value
+
+        # Integrate
+        num = abs(np.trapz(inwave * influx, x=inwave))
+        den = abs(np.trapz(x_band * y_band, x=x_band))
+        utils.validate_totalflux(num)
+        utils.validate_totalflux(den)
+        val = (num / den) * units.FLAM
+
+        # Integration should always be done in FLAM and then
+        # converted to desired units as follows.
+        if flux_unit.physical_type == 'spectral flux density wav':
+            if flux_unit == u.STmag:
+                eff_stim = val.to(flux_unit)
+            else:  # FLAM
+                eff_stim = val
+        elif flux_unit.physical_type == 'spectral flux density':
+            w_pivot = self.bandpass.pivot()
+            eff_stim = units.convert_flux(w_pivot, val, flux_unit)
+        else:
+            raise exceptions.SynphotError(
+                'Flux unit {0} is invalid'.format(flux_unit))
+
+        return eff_stim
+
+    def countrate(self, area, binned=True, wavelengths=None, waverange=None,
+                  force=False):
+        """Calculate :ref:`effective stimulus <synphot-formula-effstim>`
+        in count/s.
+
+        Parameters
+        ----------
+        area : float or `~astropy.units.quantity.Quantity`
+            Area that flux covers. If not a Quantity, assumed to be in
+            :math:`cm^{2}`.
+
+        binned : bool
+            Sample data in native wavelengths if `False`.
+            Else, sample binned data (default).
+
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
+            Wavelength values for sampling. This must be given if
+            ``self.waveset`` is undefined for the underlying spectrum model(s).
+            If not a Quantity, assumed to be in Angstrom.
+            If `None`, ``self.waveset`` or `binset` is used, depending
+            on ``binned``.
 
         waverange : tuple of float, Quantity, or `None`
             Lower and upper limits of the desired wavelength range.
@@ -455,8 +554,8 @@ class Observation(BaseSourceSpectrum):
 
         Returns
         -------
-        eff_stim : `~astropy.units.quantity.Quantity`
-            Observation effective stimulus based on given flux unit.
+        count_rate : `~astropy.units.quantity.Quantity`
+            Observation effective stimulus in count/s.
 
         Raises
         ------
@@ -470,49 +569,18 @@ class Observation(BaseSourceSpectrum):
             Calculation failed.
 
         """
-        if flux_unit is None:
-            flux_unit = self._internal_flux_unit
-
-        flux_unit = units.validate_unit(flux_unit)
-        flux_unit_name = flux_unit.to_string()
-
-        # Calculation is actually done in this unit
-        if flux_unit_name == units.OBMAG.to_string():
-            eff_flux_unit = u.count
-        elif (flux_unit == u.STmag or
-              flux_unit_name == units.VEGAMAG.to_string()):
-            eff_flux_unit = units.FLAM
-        elif flux_unit == u.ABmag:
-            eff_flux_unit = units.FNU
-        elif flux_unit.decompose() != u.mag:
-            eff_flux_unit = flux_unit
-        else:
-            raise exceptions.SynphotError(
-                'Flux unit {0} is invalid'.format(flux_unit))
-
         # Sample the observation
         if binned:
             x = self._validate_binned_wavelengths(wavelengths).value
-            y = self.sample_binned(wavelengths=x, flux_unit=eff_flux_unit,
-                                   area=area, vegaspec=vegaspec).value
+            y = self.sample_binned(wavelengths=x, flux_unit=u.count,
+                                   area=area).value
         else:
             x = self._validate_wavelengths(wavelengths).value
-            y = units.convert_flux(x, self(x), eff_flux_unit,
-                                   area=area, vegaspec=vegaspec).value
-
-        # Special flux handling for VEGAMAG
-        if flux_unit_name == units.VEGAMAG.to_string():
-            if not isinstance(vegaspec, SourceSpectrum):
-                raise exceptions.SynphotError('Vega spectrum is missing.')
-            y_vega = units.convert_flux(
-                x, vegaspec(x), eff_flux_unit, area=area).value
-            mask = y_vega > 0  # Avoid NaN
-            x = x[mask]
-            y = y[mask] / y_vega[mask]
+            y = units.convert_flux(x, self(x), u.count,
+                                   area=area).value
 
         # Use entire wavelength range
         if waverange is None:
-            inwave = x
             influx = y
 
         # Use given wavelength range
@@ -529,7 +597,7 @@ class Observation(BaseSourceSpectrum):
             elif 'partial' in stat:
                 if force:
                     warnings.warn(
-                        'EFFSTIM calculated only for wavelengths in the '
+                        'Count rate calculated only for wavelengths in the '
                         'overlap between observation and given range.',
                         AstropyUserWarning)
                     w1 = max(w1, x.min())
@@ -550,74 +618,15 @@ class Observation(BaseSourceSpectrum):
                     bin_edges = binning.calculate_bin_edges(x).value
                 i1 = np.searchsorted(bin_edges, w1) - 1
                 i2 = np.searchsorted(bin_edges, w2)
-                inwave = x[i1:i2]
                 influx = y[i1:i2]
             else:
                 mask = ((x >= w1) & (x <= w2))
-                inwave = x[mask]
                 influx = y[mask]
 
-        # Special handling for non-density units
-        if flux_unit == u.count or flux_unit_name == units.OBMAG.to_string():
-            val = math.fsum(influx)
-            utils.validate_totalflux(val)
+        val = math.fsum(influx)
+        utils.validate_totalflux(val)
 
-            if flux_unit.decompose() == u.mag:
-                eff_stim = (-2.5 * np.log10(val)) * flux_unit
-            else:
-                eff_stim = val * (u.count / u.s)
-
-        # Density flux units and VEGAMAG
-        else:
-            # Sample the bandpass
-            x_band = self.bandpass._validate_wavelengths(wavelengths).value
-            y_band = self.bandpass(x_band).value
-
-            # Integrate
-            num = abs(np.trapz(inwave * influx, x=inwave))
-            den = abs(np.trapz(x_band * y_band, x=x_band))
-            utils.validate_totalflux(num)
-            utils.validate_totalflux(den)
-            val = num / den
-
-            # Convert back to mag, if needed
-            if flux_unit in (u.STmag, u.ABmag):
-                eff_stim = units.convert_flux(1, val * eff_flux_unit,
-                                              flux_unit)
-            elif flux_unit_name == units.VEGAMAG.to_string():
-                eff_stim = (-2.5 * np.log10(val)) * flux_unit
-            else:
-                eff_stim = val * flux_unit
-
-        return eff_stim
-
-    def countrate(self, area, binned=True, wavelengths=None, waverange=None,
-                  force=False):
-        """Calculate :ref:`effective stimulus <synphot-formula-effstim>`
-        in count/s.
-
-        Parameters
-        ----------
-        area : float or `~astropy.units.quantity.Quantity`
-            Area that flux covers. If not a Quantity, assumed to be in
-            :math:`cm^{2}`.
-
-        binned : bool
-            Sample data in native wavelengths if `False`.
-            Else, sample binned data (default).
-
-        wavelengths, waverange, force
-            See :func:`effstim`.
-
-        Returns
-        -------
-        eff_stim : `~astropy.units.quantity.Quantity`
-            Observation effective stimulus in count/s.
-
-        """
-        return self.effstim(
-            flux_unit=u.count, wavelengths=wavelengths, binned=binned,
-            area=area, waverange=waverange, force=force)
+        return val * (u.count / u.s)
 
     def plot(self, binned=True, wavelengths=None, flux_unit=None, area=None,
              vegaspec=None, **kwargs):  # pragma: no cover
