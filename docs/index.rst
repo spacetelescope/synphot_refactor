@@ -39,9 +39,9 @@ allows you to:
 * Perform repetitive operations such as simulating the observations of multiple
   type of sources through multiple bandpasses.
 
-If you use **synphot** in your work, please cite it as,
-"*Lim, P. L., et al. 2016, synphot User's Guide
-(Baltimore, MD: STScI), http://synphot.readthedocs.io/en/latest/*"
+If you use **synphot** in your work, please see
+`CITATION <https://github.com/spacetelescope/synphot_refactor/blob/master/CITATION>`_
+for details on how to cite it in your publications.
 
 If you have questions or concerns regarding the software, please open an issue
 at https://github.com/spacetelescope/synphot_refactor/issues (if not already
