@@ -45,7 +45,7 @@ for details on how to cite it in your publications.
 
 If you have questions or concerns regarding the software, please open an issue
 at https://github.com/spacetelescope/synphot_refactor/issues (if not already
-reported) or contact STScI Help Desk via ``help[at]stsci.edu``.
+reported) or contact `STScI Help Desk <https://hsthelp.stsci.edu>`_.
 
 
 .. _synphot-installation-setup:
