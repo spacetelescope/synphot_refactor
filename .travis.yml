@@ -1,8 +1,9 @@
-language: python
+# We set the language to c because python isn't supported on the MacOS X nodes
+# on Travis. However, the language ends up being irrelevant anyway, since we
+# install Python ourselves using conda.
+language: c
 
-python:
-    - 2.7
-    - 3.6
+compiler: gcc
 
 os:
     - linux
@@ -19,24 +20,22 @@ addons:
     apt:
         packages:
             - graphviz
-            - texlive-latex-extra
-            - dvipng
 
 env:
     global:
         # The following versions are the 'default' for tests, unless
         # overridden underneath. They are defined here in order to save having
         # to repeat them for all configurations.
+        - PYTHON_VERSION=3.7
         - NUMPY_VERSION=stable
-        - MAIN_CMD='python setup.py'
         - ASTROPY_VERSION=stable
+        - MAIN_CMD='python setup.py'
         - SETUP_CMD='test'
-        - PIP_DEPENDENCIES='pytest-remotedata pytest-doctestplus pytest-openfiles'
+        - PIP_DEPENDENCIES='pytest-remotedata pytest-openfiles'
         # For this package-template, we include examples of Cython modules,
         # so Cython is required for testing. If your package does not include
         # Cython code, you can set CONDA_DEPENDENCIES=''
-        #- CONDA_DEPENDENCIES='Cython'
-        - CONDA_DEPENDENCIES='Cython jinja2 scipy pytest'
+        - CONDA_DEPENDENCIES='Cython jinja2 scipy'
     matrix:
         # Make sure that egg_info works without dependencies
         - SETUP_CMD='egg_info'
@@ -47,29 +46,19 @@ matrix:
         # DISABLED FOR NOW
         # Check for sphinx doc build warnings - we do this first because it
         # may run for a long time
-        #- python: 3.6
-        #  env: SETUP_CMD='build_sphinx -w'
+        #- env: PYTHON_VERSION=3.6 env: SETUP_CMD='build_sphinx -w'
 
         # Do a coverage test in Python 3.
-        - python: 3.6
-          env: SETUP_CMD='test --coverage --open-files --remote-data'
+        - env: SETUP_CMD='test --coverage --open-files --remote-data'
 
         # Do a test in older Python 3.
-        - python: 3.5
-          env: SETUP_CMD='test --open-files'
-
-        # TODO: Switch to Astropy lts when 3.0 is out.
-        # Do a test in Python 2.
-        - python: 2.7
-          env: ASTROPY_VERSION=stable SETUP_CMD='test --open-files'
+        - env: PYTHON_VERSION=3.6 SETUP_CMD='test --open-files'
 
         # Try Astropy development version
-        - python: 3.6
-          env: ASTROPY_VERSION=development
+        - env: ASTROPY_VERSION=development
 
         # Do a PEP8 test with flake8
-        - python: 3.6
-          env: MAIN_CMD='flake8 synphot --count' SETUP_CMD=''
+        - env: MAIN_CMD='flake8 synphot --count' SETUP_CMD=''
 
 before_install:
 
