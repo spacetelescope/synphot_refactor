@@ -16,10 +16,10 @@ sudo: false
 #
 # https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
 
-addons:
-    apt:
-        packages:
-            - graphviz
+#addons:
+#    apt:
+#        packages:
+#            - graphviz
 
 env:
     global:
@@ -46,7 +46,7 @@ matrix:
         # DISABLED FOR NOW
         # Check for sphinx doc build warnings - we do this first because it
         # may run for a long time
-        #- env: PYTHON_VERSION=3.6 env: SETUP_CMD='build_sphinx -w'
+        #- env: PYTHON_VERSION=3.6 SETUP_CMD='build_sphinx -w'
 
         # Do a coverage test in Python 3.
         - env: SETUP_CMD='test --coverage --open-files --remote-data'
