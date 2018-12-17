@@ -44,8 +44,5 @@ try:
 except ImportError:
     version = 'dev'
 
-try:
-    packagename = os.path.basename(os.path.dirname(__file__))
-    TESTED_VERSIONS[packagename] = version
-except NameError:   # Needed to support Astropy <= 1.0.0
-    pass
+packagename = os.path.basename(os.path.dirname(__file__))
+TESTED_VERSIONS[packagename] = version
