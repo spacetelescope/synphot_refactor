@@ -472,25 +472,9 @@ class Observation(BaseSourceSpectrum):
             return (2.5 * (math.log10(den.value) -
                            math.log10(num.value))) * units.VEGAMAG
 
-        # Special handling for PHOTLAM
-        if flux_unit.physical_type == 'photon flux density wav':
-            num = self.integrate(wavelengths=wavelengths)
-            den = self.bandpass.integrate(wavelengths=wavelengths)
-            utils.validate_totalflux(num)
-            utils.validate_totalflux(den)
-            return (num / den).value * units.PHOTLAM
-
         # Sample the bandpass
         x_band = self.bandpass._validate_wavelengths(wavelengths).value
         y_band = self.bandpass(x_band).value
-
-        # Special handling for PHOTNU
-        if flux_unit.physical_type == 'photon flux density':
-            num = self.integrate(wavelengths=wavelengths) * units.C
-            den = abs(np.trapz(y_band / (x_band * x_band), x=x_band))
-            utils.validate_totalflux(num)
-            utils.validate_totalflux(den)
-            return (num / den).value * units.PHOTNU
 
         # Sample the observation in FLAM
         inwave = self._validate_wavelengths(wavelengths).value
@@ -510,7 +494,9 @@ class Observation(BaseSourceSpectrum):
                 eff_stim = val.to(flux_unit)
             else:  # FLAM
                 eff_stim = val
-        elif flux_unit.physical_type == 'spectral flux density':
+        elif flux_unit.physical_type in (
+                'spectral flux density', 'photon flux density',
+                'photon flux density wav'):
             w_pivot = self.bandpass.pivot()
             eff_stim = units.convert_flux(w_pivot, val, flux_unit)
         else:
