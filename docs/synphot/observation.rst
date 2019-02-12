@@ -69,22 +69,18 @@ you can use its :meth:`~synphot.observation.Observation.binned_waverange` and
     10
 
 In addition, it has unique properties such as :ref:`synphot-formula-effstim`
-and :ref:`synphot-formula-effwave`, which can be calculated for either "native"
-or binned sampling, which usually provides similar results regardless.
-The default sampling behaviors are to be consistent with ASTROLIB PYSYNPHOT::
+and :ref:`synphot-formula-effwave`, which can be calculated in a way
+that is consistent with ASTROLIB PYSYNPHOT::
 
-    >>> # Effective stimulus in FLAM for "native" sampling
+    >>> # Effective stimulus in FLAM
     >>> obs.effstim(flux_unit='flam')
-    <Quantity 3.78652304711832e-09 FLAM>
-    >>> # Repeat for binned sampling
-    >>> obs.effstim(flux_unit='flam', binned=True)
-    <Quantity 3.7865234761885156e-09 FLAM>
+    <Quantity 3.78664384e-09 FLAM>
     >>> # Effective wavelength for binned sampling in FLAM
     >>> obs.effective_wavelength()
-    <Quantity 5332.703380347104 Angstrom>
+    <Quantity 5332.62717945 Angstrom>
     >>> # Repeat for "native" sampling
     >>> obs.effective_wavelength(binned=False)
-    <Quantity 5332.703444644624 Angstrom>
+    <Quantity 5332.62724394 Angstrom>
 
 :meth:`~synphot.observation.Observation.countrate` is probably the most often
 used method for an observation.
@@ -95,7 +91,7 @@ one wavelength bin corresponds to one detector pixel::
 
     >>> area = 45238.93416  # HST, in cm^2
     >>> obs.countrate(area)
-    <Quantity 19208895560.359768 ct / s>
+    <Quantity 1.9249653e+10 ct / s>
 
 An observation can be converted to a **regular source spectrum** containing
 only the wavelength set and sampled flux (binned by default) by using its
