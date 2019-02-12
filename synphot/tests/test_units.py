@@ -116,39 +116,46 @@ def test_wave_conversion(in_q, out_u, ans):
 
 
 @pytest.mark.parametrize(
-    ('in_q', 'out_u', 'ans'),
-    [(_flux_photlam.value, units.PHOTLAM, _flux_photlam),
-     (_flux_photlam, u.count, _flux_count),
-     (_flux_count, units.PHOTLAM, _flux_photlam),
-     (_flux_photlam, units.OBMAG, _flux_obmag),
-     (_flux_obmag, units.PHOTLAM, _flux_photlam),
-     (_flux_count, units.OBMAG, _flux_obmag),
-     (_flux_obmag, u.count, _flux_count),
-     (_flux_photlam, units.FLAM, _flux_flam),
-     (_flux_flam, units.PHOTLAM, _flux_photlam),
-     (_flux_photlam, u.STmag, _flux_stmag),
-     (_flux_stmag, units.PHOTLAM, _flux_photlam),
-     (_flux_flam, u.STmag, _flux_stmag),
-     (_flux_stmag, units.FLAM, _flux_flam),
-     (_flux_photlam, units.PHOTNU, _flux_photnu),
-     (_flux_photnu, units.PHOTLAM, _flux_photlam),
-     (_flux_photlam, units.FNU, _flux_fnu),
-     (_flux_fnu, units.PHOTLAM, _flux_photlam),
-     (_flux_photlam, u.ABmag, _flux_abmag),
-     (_flux_abmag, units.PHOTLAM, _flux_photlam),
-     (_flux_fnu, u.ABmag, _flux_abmag),
-     (_flux_abmag, units.FNU, _flux_fnu),
-     (_flux_fnu, u.STmag, _flux_stmag),
-     (_flux_fnu, u.mJy, _flux_jy.to(u.mJy)),
-     (_flux_photlam, u.Jy, _flux_jy),
-     (_flux_jy, units.PHOTLAM, _flux_photlam),
-     (_flux_flam, u.Jy, _flux_jy),
-     (np.zeros(3) * units.FNU, units.FLAM, np.zeros(3) * units.FLAM)])
-def test_flux_conversion(in_q, out_u, ans):
+    ('in_q', 'out_u', 'ans', 'support_scalar'),
+    [(_flux_photlam.value, units.PHOTLAM, _flux_photlam, True),
+     (_flux_photlam, u.count, _flux_count, False),
+     (_flux_count, units.PHOTLAM, _flux_photlam, False),
+     (_flux_photlam, units.OBMAG, _flux_obmag, False),
+     (_flux_obmag, units.PHOTLAM, _flux_photlam, False),
+     (_flux_count, units.OBMAG, _flux_obmag, False),
+     (_flux_obmag, u.count, _flux_count, False),
+     (_flux_photlam, units.FLAM, _flux_flam, True),
+     (_flux_flam, units.PHOTLAM, _flux_photlam, True),
+     (_flux_photlam, u.STmag, _flux_stmag, True),
+     (_flux_stmag, units.PHOTLAM, _flux_photlam, True),
+     (_flux_flam, u.STmag, _flux_stmag, True),
+     (_flux_stmag, units.FLAM, _flux_flam, True),
+     (_flux_photlam, units.PHOTNU, _flux_photnu, True),
+     (_flux_photnu, units.PHOTLAM, _flux_photlam, True),
+     (_flux_photlam, units.FNU, _flux_fnu, True),
+     (_flux_fnu, units.PHOTLAM, _flux_photlam, True),
+     (_flux_photlam, u.ABmag, _flux_abmag, True),
+     (_flux_abmag, units.PHOTLAM, _flux_photlam, True),
+     (_flux_fnu, u.ABmag, _flux_abmag, True),
+     (_flux_abmag, units.FNU, _flux_fnu, True),
+     (_flux_fnu, u.STmag, _flux_stmag, True),
+     (_flux_fnu, u.mJy, _flux_jy.to(u.mJy), True),
+     (_flux_photlam, u.Jy, _flux_jy, True),
+     (_flux_jy, units.PHOTLAM, _flux_photlam, True),
+     (_flux_flam, u.Jy, _flux_jy, True),
+     (np.zeros(3) * units.FNU, units.FLAM, np.zeros(3) * units.FLAM, True)])
+def test_flux_conversion(in_q, out_u, ans, support_scalar):
     """Test flux conversion, except VEGAMAG."""
     result = units.convert_flux(_wave, in_q, out_u, area=_area)
     np.testing.assert_allclose(result.value, ans.value, rtol=1e-6)
     assert result.unit == ans.unit
+
+    # Scalar should work, except for count and OBMAG, which need bin centers.
+    if support_scalar:
+        i = 0
+        result = units.convert_flux(_wave[i], in_q[i], out_u, area=_area)
+        np.testing.assert_allclose(result.value, ans[i].value, rtol=1e-6)
+        assert result.unit == ans[i].unit
 
 
 def test_flux_conversion_exceptions():
