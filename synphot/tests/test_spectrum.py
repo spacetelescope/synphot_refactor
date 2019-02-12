@@ -93,6 +93,12 @@ def test_flux_conversion_vega(in_q, out_u, ans):
     np.testing.assert_allclose(result.value, ans.value, rtol=1e-2)
     assert result.unit == ans.unit
 
+    # Scalar
+    i = 0
+    result = units.convert_flux(_wave[i], in_q[i], out_u, vegaspec=_vspec)
+    np.testing.assert_allclose(result.value, ans[i].value, rtol=1e-2)
+    assert result.unit == ans[i].unit
+
 
 @pytest.mark.remote_data
 @pytest.mark.skipif('not HAS_SCIPY')

@@ -89,7 +89,10 @@ def spectral_density_vega(wav, vegaflux):
         val = -2.5 * np.log10(x / vega_photlam)
         result = np.zeros(val.shape, dtype=np.float64) - 99
         mask = np.isfinite(val)
-        result[mask] = val[mask]
+        if result.ndim > 0:
+            result[mask] = val[mask]
+        elif mask:
+            result = np.asarray(val)
         return result
 
     def iconverter(x):
