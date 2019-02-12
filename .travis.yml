@@ -50,6 +50,7 @@ matrix:
 
         # Do a coverage test in Python 3.
         - env: SETUP_CMD='test --coverage --open-files --remote-data'
+               PIP_DEPENDENCIES='codecov pytest-remotedata pytest-openfiles'
 
         # Do a test in older Python 3.
         - env: PYTHON_VERSION=3.6 SETUP_CMD='test --open-files'
@@ -100,7 +101,5 @@ script:
     - $MAIN_CMD $SETUP_CMD
 
 after_success:
-    # If coveralls.io is set up for this package, uncomment the line
-    # below and replace "packagename" with the name of your package.
-    # The coveragerc file may be customized as needed for your package.
-    - if [[ $SETUP_CMD == *--coverage* ]]; then coveralls --rcfile='synphot/tests/coveragerc'; fi
+    # Coverage report.
+    - if [[ $SETUP_CMD == *--coverage* ]]; then codecov; fi
