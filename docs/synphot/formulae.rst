@@ -283,14 +283,16 @@ The default binning behavior is to be consistent with ASTROLIB PYSYNPHOT.
 
 Example::
 
-    >>> obs.effstim()  # Not binned
-    <Quantity 0.00054170149051543 PHOTLAM>
+    >>> obs.effstim()
+    <Quantity 0.00053744 PHOTLAM>
     >>> obs.effstim('flam')
-    <Quantity 1.992237048596971e-15 FLAM>
-    >>> obs.effstim('count', area=area, binned=True)  # Binned
-    <Quantity 6624.720529866574 ct / s>
-    >>> obs.countrate(area=area)
-    <Quantity 6624.720529866574 ct / s>
+    <Quantity 1.99333435e-15 FLAM>
+    >>> obs.effstim('count', area=area)  # Not binned
+    <Quantity 6628.36886854 ct / s>
+    >>> obs.countrate(area=area, binned=False)
+    <Quantity 6628.36886854 ct / s>
+    >>> obs.countrate(area=area)  # Binned
+    <Quantity 6628.36888121 ct / s>
 
 
 .. _synphot-formula-effwave:
