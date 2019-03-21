@@ -270,37 +270,56 @@ class TestObsPar(object):
         with pytest.raises(exceptions.SynphotError):
             self.obs.effective_wavelength(mode='foo')
 
+    # ans taken from calculating effstim in FLAM and then using unit
+    # conversion around bandpass pivot wavelength.
     @pytest.mark.parametrize(
         ('flux_unit', 'ans'),
-        [(units.FLAM, 3.05E-14),
-         (units.FNU, 2.92E-25),
-         (None, 0.008245),
-         (units.PHOTNU, 7.82E-14),
-         (u.count, 101462.5),
-         (u.Jy, 0.029196),
-         (u.mJy, 29.19613)])
+        [(units.FLAM, 3.05131543e-14),
+         (units.FNU, 2.91961387e-25),
+         (None, 0.00822697),
+         (units.PHOTLAM, 0.00822697),
+         (units.PHOTNU, 7.8718752e-14),
+         (u.Jy, 0.02919614),
+         (u.mJy, 29.19613866)])
     def test_effstim(self, flux_unit, ans):
-        """Test EFFSTIM for all supported non-mag flux units.
+        """Test EFFSTIM for all supported non-mag and non-count flux units."""
+        np.testing.assert_allclose(
+            self.obs.effstim(flux_unit=flux_unit).value, ans)
+
+    def test_effstim_count(self):
+        """Test EFFSTIM in count and OBMAG separately due to different API
+        and tolerance.
 
         .. note::
 
             ``binned``, ``waverange``, and ``force`` tested in `TestCountRate`.
 
         """
-        np.testing.assert_allclose(
-            self.obs.effstim(flux_unit=flux_unit, area=_area).value,
-            ans, rtol=0.01)  # 1%
+        # pysynphot 0.9.12.dev5
+        ans_ct = 101462.39601864747
+        ans_ob = -12.515762784747238
+        tol = 1e-4
 
+        val_ct = self.obs.effstim(flux_unit=u.count, area=_area).value
+        np.testing.assert_allclose(val_ct, ans_ct, rtol=tol)
+
+        val_ob = self.obs.effstim(flux_unit=units.OBMAG, area=_area).value
+        np.testing.assert_allclose(val_ob, ans_ob, atol=tol, rtol=0)
+
+        # Sanity check
+        np.testing.assert_allclose(val_ob, -2.5 * np.log10(val_ct))
+
+    # ans taken from calculating effstim in FLAM and then using unit
+    # conversion around bandpass pivot wavelength.
     @pytest.mark.parametrize(
         ('flux_unit', 'ans'),
-        [(u.STmag, 12.68878),
-         (u.ABmag, 12.73669),
-         (units.OBMAG, -12.5158)])
+        [(u.STmag, 12.68878224),
+         (u.ABmag, 12.73668646)])
     def test_effstim_mag(self, flux_unit, ans):
-        """Test mag separately because 1% tolerance test is different."""
+        """Test mag separately because tolerance calculation, if needed,
+        is different."""
         np.testing.assert_allclose(
-            self.obs.effstim(flux_unit=flux_unit, area=_area).value,
-            ans, atol=0.01, rtol=0)  # 1%
+            self.obs.effstim(flux_unit=flux_unit, area=_area).value, ans)
 
     def test_effstim_analytic(self):
         sp = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
@@ -311,16 +330,16 @@ class TestObsPar(object):
 
     @pytest.mark.remote_data
     def test_effstim_vegamag(self):
+        ans = 12.737293324241517  # pysynphot 0.9.12.dev5
         vspec = SourceSpectrum.from_vega()
         np.testing.assert_allclose(
             self.obs.effstim(flux_unit=units.VEGAMAG, vegaspec=vspec).value,
-            12.74661, atol=0.01, rtol=0)  # 1%
+            ans)
 
-    def test_effstim_exceptions(self):
+    @pytest.mark.parametrize('flux_unit', [u.mag, units.VEGAMAG])
+    def test_effstim_exceptions(self, flux_unit):
         with pytest.raises(exceptions.SynphotError):
-            self.obs.effstim(flux_unit=u.mag)
-        with pytest.raises(exceptions.SynphotError):
-            self.obs.effstim(flux_unit=units.VEGAMAG)
+            self.obs.effstim(flux_unit=flux_unit)
 
 
 @pytest.mark.skipif('not HAS_SCIPY')

@@ -1,6 +1,9 @@
 0.1.3 (unreleased)
 ==================
 
+- Config to use HTTP instead of FTP. [#171]
+- Fixed scalar unit conversion for VEGAMAG. [#174]
+- Bug fix for ``effstim`` calculations in some flux units. [#159, #166]
 
 0.1.2 (2018-07-19)
 ==================
