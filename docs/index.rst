@@ -9,20 +9,6 @@ Synthetic Photometry (synphot)
 Introduction
 ============
 
-A brief history: First, there was
-`STSDAS SYNPHOT <http://stsdas.stsci.edu/cgi-bin/gethelp.cgi?synphot.sys>`_.
-Then, there was
-ASTROLIB PYSYNPHOT (:ref:`Lim et al. 2015 <synphot-ref-lim2015>`), which
-aimed at replacing STSDAS SYNPHOT using Python. In order to take advantage of
-:ref:`astropy:astropy-modeling` and :ref:`astropy:astropy-units` and to
-repurpose the functionality for a wider audience (other than HST users),
-it was refactored again and separated into:
-
-* **synphot** (this package), which covers the general functionalities not
-  related to any particular observatory; and
-* **stsynphot** (https://github.com/spacetelescope/stsynphot_refactor), which
-  covers synthetic photometry for HST (and soon JWST)
-
 **synphot** simulates photometric data and spectra, observed or otherwise.
 You can incorporate your own filters, spectra, and data. You can also use a
 pre-defined standard star (Vega), bandpass, or extinction law. Furthermore, it
@@ -38,6 +24,11 @@ allows you to:
 * Plot a quick-view of a spectrum.
 * Perform repetitive operations such as simulating the observations of multiple
   type of sources through multiple bandpasses.
+
+This package covers the general functionalities not related to any particular
+observatory. If you use HST (and soon JWST), you might also be interested in
+**stsynphot** (https://github.com/spacetelescope/stsynphot_refactor), which
+covers synthetic photometry for the telescope(s).
 
 If you use **synphot** in your work, please see
 `CITATION <https://github.com/spacetelescope/synphot_refactor/blob/master/CITATION>`_
@@ -65,7 +56,7 @@ You can install **synphot** using one of the following ways:
 
 * From `AstroConda <http://astroconda.readthedocs.io/en/latest/>`_::
 
-    conda install synphot
+    conda install synphot -c http://ssb.stsci.edu/astroconda
 
 * From standalone release::
 
@@ -267,6 +258,20 @@ Using **synphot**
    synphot/units
    synphot/tutorials
 
+.. _synphot_history:
+
+A Brief History
+===============
+
+A brief history: First, there was
+`STSDAS SYNPHOT <http://stsdas.stsci.edu/cgi-bin/gethelp.cgi?synphot.sys>`_.
+Then, there was
+ASTROLIB PYSYNPHOT (:ref:`Lim et al. 2015 <synphot-ref-lim2015>`), which
+aimed at replacing STSDAS SYNPHOT using Python. In order to take advantage of
+:ref:`astropy:astropy-modeling` and :ref:`astropy:astropy-units` and to
+repurpose the functionality for a wider audience (other than HST users),
+it was refactored again and separated into **synphot** and
+**stsynphot** (see :ref:`astropy_synphot`).
 
 .. _synphot_api:
 
