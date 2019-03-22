@@ -22,7 +22,7 @@ _wavenum_micron = [1e+5, 2.0, 1.0] * (u.micron ** -1)
 _freq = [2.99792458e+19, 5.99584916e+14, 2.99792458e+14] * u.Hz
 
 # Flux conversions
-# ftp://ftp.stsci.edu/cdbs/supplemental_calspec/grw_70d5824_stisnic_002.ascii
+# http://ssb.stsci.edu/cdbs/supplemental_calspec/grw_70d5824_stisnic_002.ascii
 _area = 45238.93416 * units.AREA  # HST
 _wave = [4956.8, 4959.55, 4962.3] * u.AA
 _flux_photlam = [9.7654e-3, 1.003896e-2, 9.78473e-3] * units.PHOTLAM
