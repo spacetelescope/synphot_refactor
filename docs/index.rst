@@ -65,7 +65,7 @@ You can install **synphot** using one of the following ways:
 
 * From `AstroConda <http://astroconda.readthedocs.io/en/latest/>`_::
 
-    conda install synphot
+    conda install synphot -c http://ssb.stsci.edu/astroconda
 
 * From standalone release::
 
