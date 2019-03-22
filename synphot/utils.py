@@ -2,17 +2,23 @@
 """Synthetic photometry utility functions."""
 from __future__ import absolute_import, division, print_function
 
+# STDLIB
+import os
+from shutil import copyfile
+
 # THIRD-PARTY
 import numpy as np
 
 # ASTROPY
 from astropy import units as u
+from astropy.config import ConfigItem
+from astropy.utils.data import download_file
 
 # LOCAL
 from . import exceptions, units
 
 __all__ = ['overlap_status', 'validate_totalflux', 'validate_wavelengths',
-           'generate_wavelengths', 'merge_wavelengths']
+           'generate_wavelengths', 'merge_wavelengths', 'download_data']
 
 
 def overlap_status(a, b):
@@ -245,3 +251,63 @@ def merge_wavelengths(waveset1, waveset2, threshold=1e-12):
                 out_wavelengths[i_good], out_wavelengths[-1])
 
     return out_wavelengths
+
+
+def download_data(cdbs_root, verbose=True):
+    """Download CDBS data files to given root directory.
+    Download is skipped if a data file already exists.
+
+    Parameters
+    ----------
+    cdbs_root : str
+        Root directory for CDBS data files.
+
+    verbose : bool
+        Print extra information to screen.
+
+    Raises
+    ------
+    OSError
+        Problem with directory.
+
+    """
+    from ..config import conf  # Avoid potential circular import
+
+    if not os.exists(cdbs_root):
+        os.mkdir(cdbs_root)
+        if verbose:
+            print('Created {}'.format(cdbs_root))
+    elif not os.isdir(cdbs_root):
+        raise OSError('{} must be a directory'.format(cdbs_root))
+
+    host = 'http://ssb.stsci.edu/cdbs/'
+
+    if not cdbs_root.endswith(os.sep):
+        cdbs_root += os.sep
+
+    # See https://github.com/astropy/astropy/issues/8524
+    for cfgitem in conf.__class__.__dict__.values():
+        if isinstance(cfgitem, ConfigItem) and cfgitem.name.endswith('file'):
+            url = cfgitem.value
+
+            if not url.startswith(host):
+                if verbose:
+                    print('{} is not from {}, skipping download'.format(
+                        url, host))
+                continue
+
+            dst = url.replace(host, cdbs_root).replace('/', os.sep)
+
+            if os.path.exists(dst):
+                if verbose:
+                    print('{} already exists, skipping download'.format(dst))
+                continue
+
+            # Create sub-directories, if needed.
+            subdirs = url.replace(host, '').split('/')[:-1]
+            os.makedirs(subdirs, exist_ok=True)
+
+            src = download_file(url)
+            copyfile(src, dst)
+            if verbose:
+                print('{} downloaded to {}'.format(url, dst))
