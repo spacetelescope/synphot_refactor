@@ -72,7 +72,7 @@ To use the pre-defined standard star, extinction laws, and bandpasses, it is
 recommended that you copy
 `synphot.cfg <https://github.com/spacetelescope/synphot_refactor/blob/master/synphot/synphot.cfg>`_
 to your ``$HOME/.astropy/config/`` directory.
-In doing so, you can avoid connecting directly to STScI anonymous FTP service,
+In doing so, you can avoid connecting directly to STScI HTTP service,
 which is slower and might not be available all the time.
 
 If necessary (i.e., if you are not an internal STScI user), replace
@@ -86,39 +86,14 @@ Then, follow the instructions below to "install" the data files.
     **stsynphot**. If you plan to use the latter anyway, please also read the
     instructions in its documentation.
 
-To install local data files via anonymous FTP::
+To install local data files via HTTP into, say, ``/my/local/dir/cdbs``::
 
-    $ cd /my/local/dir/cdbs
-    $ mkdir calspec extinction comp comp/nonhst
-    $ ftp ftp.stsci.edu
-    Name: anonymous
-    Password: (Enter your email address)
-    ftp> lcd calspec
-    ftp> cd cdbs/calspec
-    ftp> get alpha_lyr_stis_008.fits
-    ftp> lcd ../extinction
-    ftp> cd ../extinction
-    ftp> mget *.fits
-    (Press "y" to accept transfer)
-    ftp> lcd ../comp/nonhst
-    ftp> cd ../comp/nonhst
-    ftp> get bessell_h_004_syn.fits
-    ftp> get bessell_j_003_syn.fits
-    ftp> get bessell_k_003_syn.fits
-    ftp> get cousins_i_004_syn.fits
-    ftp> get cousins_r_004_syn.fits
-    ftp> get johnson_b_004_syn.fits
-    ftp> get johnson_i_003_syn.fits
-    ftp> get johnson_j_003_syn.fits
-    ftp> get johnson_k_003_syn.fits
-    ftp> get johnson_r_003_syn.fits
-    ftp> get johnson_u_004_syn.fits
-    ftp> get johnson_v_004_syn.fits
-    ftp> quit
+    >>> from synphot.util import download_data
+    >>> file_list = download_data('/my/local/dir/cdbs')
 
 If you have your own version of the data files that you wish to use, you can
 modify ``synphot.cfg`` to point to your own copies without having to download
-from the FTP server above. However, before you do so, make sure that your own
+using the function above. However, before you do so, make sure that your own
 file(s) can be read in successfully with
 :func:`~synphot.specio.read_fits_spec`.
 For example, if you want to use your own Johnson *V* throughput file, you
