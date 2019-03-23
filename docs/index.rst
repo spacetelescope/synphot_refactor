@@ -134,6 +134,7 @@ work, so they can be used directly. When in doubt, see if a model is in
 .. plot::
     :include-source:
 
+    from astropy import units as u
     from synphot import units, SourceSpectrum
     from synphot.models import (BlackBodyNorm1D, GaussianAbsorption1D,
                                 GaussianFlux1D)
@@ -158,9 +159,19 @@ work, so they can be used directly. When in doubt, see if a model is in
 
 Sample the spectrum at 0.3 micron::
 
-    >>> from astropy import units as u
     >>> sp(0.3 * u.micron)
     <Quantity 0.0012685 PHOTLAM>
+
+Or sample the same thing but in a different flux unit::
+
+    >>> sp(0.3 * u.micron, flux_unit=units.FLAM)
+    <Quantity 8.57716634e-15 FLAM>
+
+Sample the spectrum at its native wavelength set::
+
+    >>> sp(sp.waveset)
+    <Quantity [0.00000000e+00, 0.00000000e+00, 0.00000000e+00, ...,
+               4.47483287e-05, 4.34264666e-05, 4.21423394e-05] PHOTLAM>
 
 Models that built the spectrum::
 
