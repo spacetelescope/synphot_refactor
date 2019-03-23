@@ -2,6 +2,8 @@
 ==================
 
 - Config to use HTTP instead of FTP. [#171]
+- New ``synphot.utils.download_data()`` function to help download data from
+  STScI HTTP service. [#179]
 - Fixed scalar unit conversion for VEGAMAG. [#174]
 - Bug fix for ``effstim`` calculations in some flux units. [#159, #166]
 

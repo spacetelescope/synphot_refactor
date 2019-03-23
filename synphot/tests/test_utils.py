@@ -3,6 +3,9 @@
 from __future__ import absolute_import, division, print_function
 from ..extern import six
 
+# STDLIB
+import os
+
 # THIRD PARTY
 import numpy as np
 import pytest
@@ -111,3 +114,45 @@ class TestMergeWave(object):
     def test_merge_same(self):
         wave = utils.merge_wavelengths(self.wave, self.wave)
         np.testing.assert_array_equal(wave, self.wave)
+
+
+def test_download_bad_root(tmpdir):
+    """Test data download helper when input dir is invalid."""
+    ptr = tmpdir.join('bad_cdbs')
+    ptr.write('content')
+    cdbs_root = str(ptr)
+
+    with pytest.raises(OSError):
+        utils.download_data(cdbs_root, verbose=False)
+
+
+def test_download_data(tmpdir):
+    """Test data download helper in dry run mode."""
+    from ..config import conf
+
+    # Use case where user downloads all data into new dir.
+    cdbs_root = os.path.join(tmpdir.strpath, 'cdbs')
+    file_list_1 = utils.download_data(cdbs_root, verbose=False, dry_run=True)
+    filename = file_list_1[0]
+    assert len(file_list_1) == 21
+    assert filename.startswith(cdbs_root)
+    assert os.path.isdir(os.path.join(cdbs_root, 'calspec'))
+
+    # Make dummy files for the next step.
+    for fname in file_list_1:
+        with open(fname, 'w') as f:
+            f.write('\n')
+
+    # Use case where user downloads only some data into existing dir.
+    os.remove(filename)
+    file_list_2 = utils.download_data(cdbs_root, verbose=False, dry_run=True)
+    assert len(file_list_2) == 1 and file_list_2[0] == filename
+
+    # Use case where user redefined data file to be non-STScI.
+    fname = [f for f in file_list_1
+             if f.endswith('alpha_lyr_stis_008.fits')][0]
+    file_list_1.remove(fname)
+    with conf.set_temp('vega_file', '/custom/host/my_vega.fits'):
+        file_list_2 = utils.download_data(
+            cdbs_root, verbose=False, dry_run=True)
+    assert len(file_list_2) == 0
