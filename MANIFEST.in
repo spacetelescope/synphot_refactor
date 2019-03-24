@@ -1,9 +1,8 @@
 include README.rst
 include CHANGES.rst
 include LICENSE.rst
-include CITATION
+include CITATION.md
 
-include ez_setup.py
 include ah_bootstrap.py
 include setup.cfg
 include synphot/include/.gitignore
@@ -11,8 +10,6 @@ include synphot/include/.gitignore
 recursive-include *.pyx *.c *.pxd
 recursive-include docs *
 recursive-include licenses *
-recursive-include cextern *
-recursive-include scripts *
 
 prune build
 prune docs/_build
