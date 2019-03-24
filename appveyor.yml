@@ -18,15 +18,15 @@ environment:
 
   matrix:
 
-      # We test Python 2.7 and 3.6
+      # We test Python 2.7 and 3.7
 
-      # TODO: Switch to Astropy lts release when 3.0 is out.
-      - PYTHON_VERSION: "2.7"
-        ASTROPY_VERSION: "lts"
-        NUMPY_VERSION: "1.15"
+      # COMMENTED OUT FOR v0.1.x
+      #- PYTHON_VERSION: "2.7"
+      #  ASTROPY_VERSION: "lts"
+      #  NUMPY_VERSION: "1.15"
 
-      - PYTHON_VERSION: "3.6"
-        ASTROPY_VERSION: "development"
+      - PYTHON_VERSION: "3.7"
+        ASTROPY_VERSION: "stable"
         NUMPY_VERSION: "stable"
 
 platform:
