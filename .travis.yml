@@ -70,6 +70,10 @@ matrix:
         - python: 3.6
           env: MAIN_CMD='flake8 synphot --count' SETUP_CMD=''
 
+    allow_failures:
+        - python: 3.6
+          env: ASTROPY_VERSION=development
+
 before_install:
 
     # If there are matplotlib tests, comment these out to
