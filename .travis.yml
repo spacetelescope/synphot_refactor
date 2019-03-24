@@ -58,10 +58,9 @@ matrix:
         - python: 3.5
           env: SETUP_CMD='test --open-files'
 
-        # TODO: Switch to Astropy lts when 3.0 is out.
         # Do a test in Python 2.
         - python: 2.7
-          env: ASTROPY_VERSION=stable SETUP_CMD='test --open-files'
+          env: ASTROPY_VERSION=lts NUMPY_VERSION="1.15" SETUP_CMD='test --open-files'
 
         # Try Astropy development version
         - python: 3.6

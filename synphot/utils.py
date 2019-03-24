@@ -285,7 +285,7 @@ def download_data(cdbs_root, verbose=True, dry_run=False):
     from .config import conf  # Avoid potential circular import
 
     if not os.path.exists(cdbs_root):
-        os.makedirs(cdbs_root, exist_ok=True)
+        os.makedirs(cdbs_root)
         if verbose:  # pragma: no cover
             print('Created {}'.format(cdbs_root))
     elif not os.path.isdir(cdbs_root):
@@ -320,7 +320,8 @@ def download_data(cdbs_root, verbose=True, dry_run=False):
 
         # Create sub-directories, if needed.
         subdirs = os.path.dirname(dst)
-        os.makedirs(subdirs, exist_ok=True)
+        if not os.path.exists(subdirs):
+            os.makedirs(subdirs)
 
         if not dry_run:  # pragma: no cover
             try:
