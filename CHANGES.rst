@@ -1,3 +1,9 @@
+0.1.4 (unreleased)
+==================
+
+This is for critical bug fix that absolutely has to be Python 2 compatible
+only. Realistically speaking, this release may never happen.
+
 0.1.3 (2019-03-24)
 ==================
 
