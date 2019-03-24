@@ -148,10 +148,14 @@ def test_download_data(tmpdir):
     file_list_2 = utils.download_data(cdbs_root, verbose=False, dry_run=True)
     assert len(file_list_2) == 1 and file_list_2[0] == filename
 
+    # Re-create the deleted dummy file for next step.
+    with open(filename, 'w') as f:
+        f.write('\n')
+
     # Use case where user redefined data file to be non-STScI.
-    fname = [f for f in file_list_1
-             if f.endswith('alpha_lyr_stis_008.fits')][0]
-    file_list_1.remove(fname)
+    filename = [fname for fname in file_list_1
+                if fname.endswith('alpha_lyr_stis_008.fits')][0]
+    os.remove(filename)
     with conf.set_temp('vega_file', '/custom/host/my_vega.fits'):
         file_list_2 = utils.download_data(
             cdbs_root, verbose=False, dry_run=True)
