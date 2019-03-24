@@ -1,7 +1,7 @@
 0.2.0 (unreleased)
 ==================
 
-0.1.3 (unreleased)
+0.1.3 (2019-03-24)
 ==================
 
 - Config to use HTTP instead of FTP. [#171]
