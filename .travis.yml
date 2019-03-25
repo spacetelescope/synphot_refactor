@@ -44,6 +44,11 @@ env:
 matrix:
     include:
 
+        # DELETE ME: astrofrog asked me to check this for debugging
+        - python 3.6
+          env: ASTROPY_VERSION=development
+               MAIN_CMD='python -c "from astropy.tests.command import AstropyTest"' SETUP_CMD=''
+
         # DISABLED FOR NOW
         # Check for sphinx doc build warnings - we do this first because it
         # may run for a long time
@@ -69,10 +74,6 @@ matrix:
         # Do a PEP8 test with flake8
         - python: 3.6
           env: MAIN_CMD='flake8 synphot --count' SETUP_CMD=''
-
-    allow_failures:
-        - python: 3.6
-          env: ASTROPY_VERSION=development
 
 before_install:
 
