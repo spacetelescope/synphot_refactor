@@ -45,7 +45,7 @@ matrix:
     include:
 
         # DELETE ME: astrofrog asked me to check this for debugging.
-        - python 3.6
+        - python: 3.6
           env: ASTROPY_VERSION=development
                MAIN_CMD='python -c "from astropy.tests.command import AstropyTest"' SETUP_CMD=''
 
