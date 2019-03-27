@@ -67,6 +67,7 @@ matrix:
           env: ASTROPY_VERSION=development
           script:
               - python -c 'from astropy.tests.command import AstropyTest'
+              - cat ./synphot/version.py
               - $MAIN_CMD $SETUP_CMD
 
         # Do a PEP8 test with flake8
