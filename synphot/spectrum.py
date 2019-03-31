@@ -1,7 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module defines the different types of spectra."""
-from __future__ import absolute_import, division, print_function
-from .extern import six
 
 # STDLIB
 import numbers
@@ -166,7 +164,7 @@ class BaseSpectrum(object):
                 pval_wav = None
 
             # Process the rest of the parameters.
-            for pname, kval in six.iteritems(kwargs):
+            for pname, kval in kwargs.items():
                 if pname in self._model_param_dict[modelname]:
                     ptype = self._model_param_dict[modelname][pname]
                     if ptype == 'wave':

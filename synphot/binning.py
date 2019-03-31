@@ -1,7 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Utilities related to wavelength bin calculations."""
-from __future__ import absolute_import, division, print_function
-from .extern import six
 
 # THIRD-PARTY
 import numpy as np
@@ -30,7 +28,7 @@ def _slow_calcbinflux(len_binwave, i_beg, i_end, avflux, deltaw):
 
     # Note that, like all Python striding, the range over which
     # we integrate is [first:last).
-    for i in six.moves.range(len(i_beg)):
+    for i in range(len(i_beg)):
         first = i_beg[i]
         last = i_end[i]
         cur_dw = deltaw[first:last]
@@ -162,7 +160,7 @@ def calculate_bin_centers(edges):
     centers = np.empty(edges.size - 1, dtype=np.float64)
     centers[0] = edges.value[:2].mean()
 
-    for i in six.moves.range(1, centers.size):
+    for i in range(1, centers.size):
         centers[i] = 2.0 * edges.value[i] - centers[i - 1]
 
     return centers * edges.unit
@@ -228,7 +226,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
             'mode={0} is invalid, must be "round", "min", "max", '
             'or "none".'.format(mode))
 
-    if not isinstance(npix, six.integer_types):
+    if not isinstance(npix, int):
         raise exceptions.SynphotError('npix={0} is invalid.'.format(npix))
 
     # Bin values must be in ascending order.

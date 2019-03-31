@@ -1,7 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This modules handles synthetic photometry data formats."""
-from __future__ import absolute_import, division, print_function
-from .extern import six
 
 # STDLIB
 import os
@@ -86,7 +84,7 @@ def read_spec(filename, fname='', **kwargs):
         Read failed.
 
     """
-    if isinstance(filename, six.string_types):
+    if isinstance(filename, str):
         fname = filename
     elif not fname:  # pragma: no cover
         raise exceptions.SynphotError('Cannot determine filename.')
@@ -211,7 +209,7 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
     wavelengths = wave_dat * wave_unit
     fluxes = flux_dat * flux_unit
 
-    if isinstance(filename, six.string_types):
+    if isinstance(filename, str):
         fs.close()
 
     return header, wavelengths, fluxes

@@ -3,7 +3,6 @@
 that has gone through a bandpass.
 
 """
-from __future__ import absolute_import, division, print_function
 
 # STDLIB
 import math

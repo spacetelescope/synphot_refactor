@@ -1,6 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Test different integration methods."""
-from __future__ import absolute_import, division, print_function
 
 # THIRD-PARTY
 import numpy as np

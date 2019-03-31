@@ -1,7 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Spectrum models not in `astropy.modeling`."""
-from __future__ import absolute_import, division, print_function
-from .extern.six.moves import map, zip
 
 # STDLIB
 import warnings

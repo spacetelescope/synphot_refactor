@@ -3,7 +3,6 @@
 """
 This is an Astropy affiliated package.
 """
-from __future__ import absolute_import
 
 # Affiliated packages may add whatever they like to this file, but
 # should keep this content at the top.

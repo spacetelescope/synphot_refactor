@@ -44,12 +44,12 @@ reported) or contact `STScI Help Desk <https://hsthelp.stsci.edu>`_.
 Installation and Setup
 ======================
 
-**synphot** works under both Python 2 and 3. It requires the following
+**synphot** works for Python 3.5 or later only. It requires the following
 packages:
 
-* numpy (>= 1.9)
-* astropy (>= 1.3)
-* scipy (>= 0.14)
+* numpy
+* astropy
+* scipy
 * matplotlib (optional for plotting)
 
 You can install **synphot** using one of the following ways:

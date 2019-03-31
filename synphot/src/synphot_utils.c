@@ -92,7 +92,6 @@ static PyMethodDef synphot_utils_methods[] =
 };
 
 
-#if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef moduledef = {
   PyModuleDef_HEAD_INIT,
   "synphot_utils",     /* m_name */
@@ -104,25 +103,12 @@ static struct PyModuleDef moduledef = {
   NULL,                /* m_clear */
   NULL,                /* m_free */
 };
-#endif
 
 
 PyMODINIT_FUNC
-#if PY_MAJOR_VERSION >= 3
 PyInit_synphot_utils(void)
-#else
-initsynphot_utils(void)
-#endif
 {
-#if PY_MAJOR_VERSION >= 3
   PyObject *module = PyModule_Create(&moduledef);
-#else
-  (void) Py_InitModule("synphot_utils", synphot_utils_methods);
-#endif
-
   import_array(); /* Must be present for NumPy */
-
-#if PY_MAJOR_VERSION >= 3
   return module;
-#endif
 }
