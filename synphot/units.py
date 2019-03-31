@@ -1,7 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module handles photometry units that are not in `astropy.units`."""
-from __future__ import absolute_import, division, print_function
-from .extern import six
 
 # THIRD-PARTY
 import numpy as np
@@ -300,7 +298,7 @@ def validate_unit(input_unit):
         Invalid unit.
 
     """
-    if isinstance(input_unit, six.string_types):
+    if isinstance(input_unit, str):
         input_unit_lowcase = input_unit.lower()
 
         # Backward-compatibility

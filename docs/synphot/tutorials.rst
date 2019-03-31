@@ -70,6 +70,7 @@ continuum-normalized spectrum.
 
     import matplotlib.pyplot as plt
     import numpy as np
+    from astropy import units as u
     from synphot import SourceSpectrum, BaseUnitlessSpectrum
     from synphot.models import BlackBodyNorm1D, Empirical1D, GaussianFlux1D
     np.random.seed(1234)  # For reproducibility

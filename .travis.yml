@@ -16,10 +16,10 @@ sudo: false
 #
 # https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
 
-#addons:
-#    apt:
-#        packages:
-#            - graphviz
+addons:
+    apt:
+        packages:
+            - graphviz
 
 env:
     global:
@@ -43,17 +43,17 @@ matrix:
         # Make sure that egg_info works without dependencies
         - env: SETUP_CMD='egg_info'
 
-        # DISABLED FOR NOW
         # Check for sphinx doc build warnings - we do this first because it
         # may run for a long time
-        #- env: PYTHON_VERSION=3.6 SETUP_CMD='build_sphinx -w'
+        - env: PYTHON_VERSION=3.6 SETUP_CMD='build_docs -w'
 
         # Do a coverage test in Python 3.
         - env: SETUP_CMD='test --coverage --open-files --remote-data'
                PIP_DEPENDENCIES='codecov pytest-remotedata pytest-openfiles'
 
         # Do a test in older Python 3.
-        - env: PYTHON_VERSION=3.6 SETUP_CMD='test --open-files'
+        - env: PYTHON_VERSION=3.6 ASTROPY_VERSION=lts
+               SETUP_CMD='test --open-files'
 
         # Try Astropy development version
         - env: ASTROPY_VERSION=development

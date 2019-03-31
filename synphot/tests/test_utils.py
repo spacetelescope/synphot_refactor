@@ -1,7 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Test utils.py module."""
-from __future__ import absolute_import, division, print_function
-from ..extern import six
 
 # STDLIB
 import os
@@ -86,7 +84,7 @@ def test_genwave(num, delta, log, ans):
         wave_unit=u.micron)
     np.testing.assert_allclose(wave.value, ans)
     assert wave.unit == u.micron
-    assert isinstance(wave_str, six.string_types)
+    assert isinstance(wave_str, str)
 
 
 class TestMergeWave(object):

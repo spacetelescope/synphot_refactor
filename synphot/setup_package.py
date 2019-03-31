@@ -1,7 +1,4 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-from .extern import six
 
 # STDLIB
 import io
@@ -14,19 +11,11 @@ from astropy_helpers import setup_helpers
 LOCALROOT = os.path.relpath(os.path.dirname(__file__))
 
 
-if six.PY2:
-    def string_escape(s):
-        # string_escape has subtle differences with the escaping done in
-        # Python 3 so correct for those too
-        s = s.encode('string_escape')
-        s = s.replace(r'\x00', r'\0')
-        return s.replace(r"\'", "'")
-else:
-    def string_escape(s):
-        s = s.decode('ascii').encode('ascii', 'backslashreplace')
-        s = s.replace(b'\n', b'\\n')
-        s = s.replace(b'\0', b'\\0')
-        return s.decode('ascii')
+def string_escape(s):
+    s = s.decode('ascii').encode('ascii', 'backslashreplace')
+    s = s.replace(b'\n', b'\\n')
+    s = s.replace(b'\0', b'\\0')
+    return s.decode('ascii')
 
 
 def generate_c_docstrings():
@@ -34,7 +23,7 @@ def generate_c_docstrings():
     docstrings = docstrings.__dict__
     keys = [
         key for key, val in docstrings.items()
-        if not key.startswith('__') and isinstance(val, six.string_types)]
+        if not key.startswith('__') and isinstance(val, str)]
     keys.sort()
     docs = {}
     for key in keys:
@@ -90,7 +79,7 @@ MSVC, do not support string literals greater than 256 characters.
         val = docs[key]
         # For portability across various compilers, we need to fill the
         # docstrings in 256-character chunks
-        for i in six.moves.range(0, len(val), 256):
+        for i in range(0, len(val), 256):
             chunk = string_escape(val[i:i + 256]).replace('"', '\\"')
             c_file.write('   strncpy(doc_{0} + {1}, "{2}", {3});\n'.format(
                 key, i, chunk, min(len(val) - i, 256)))
@@ -119,6 +108,6 @@ def get_extensions():
     cfg['sources'] = [
         str(os.path.join(LOCALROOT, 'src', 'synphot_utils.c')),
         str(os.path.join(LOCALROOT, 'src', 'docstrings.c'))]
-    cfg = dict((str(key), val) for key, val in six.iteritems(cfg))
+    cfg = dict((str(key), val) for key, val in cfg.items())
 
     return [Extension(str('synphot.synphot_utils'), **cfg)]
