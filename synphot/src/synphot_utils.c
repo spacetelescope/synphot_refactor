@@ -1,5 +1,7 @@
 /* Licensed under a 3-clause BSD style license - see LICENSE.rst */
 
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+
 #include "Python.h"
 #include <numpy/arrayobject.h>
 
@@ -28,14 +30,14 @@ static PyObject * py_calcbinflux(PyObject *self, PyObject *args) {
   }
 
   /* turn inputs into numpy array types */
-  indices = (PyArrayObject *) PyArray_FROMANY(oindices, PyArray_INT64, 1, 1,
-                                              NPY_IN_ARRAY);
-  indices_last = (PyArrayObject *) PyArray_FROMANY(oindices_last, PyArray_INT64,
-                                                   1, 1, NPY_IN_ARRAY);
-  avflux = (PyArrayObject *) PyArray_FROMANY(oavflux, PyArray_FLOAT64, 1, 1,
-                                             NPY_IN_ARRAY);
-  deltaw = (PyArrayObject *) PyArray_FROMANY(odeltaw, PyArray_FLOAT64, 1, 1,
-                                             NPY_IN_ARRAY);
+  indices = (PyArrayObject *) PyArray_FROMANY(oindices, NPY_INT64, 1, 1,
+                                              NPY_ARRAY_IN_ARRAY);
+  indices_last = (PyArrayObject *) PyArray_FROMANY(oindices_last, NPY_INT64,
+                                                   1, 1, NPY_ARRAY_IN_ARRAY);
+  avflux = (PyArrayObject *) PyArray_FROMANY(oavflux, NPY_FLOAT64, 1, 1,
+                                             NPY_ARRAY_IN_ARRAY);
+  deltaw = (PyArrayObject *) PyArray_FROMANY(odeltaw, NPY_FLOAT64, 1, 1,
+                                             NPY_ARRAY_IN_ARRAY);
   if (!indices || !indices_last || !avflux || !deltaw) {
     return NULL;
   }
@@ -43,13 +45,13 @@ static PyObject * py_calcbinflux(PyObject *self, PyObject *args) {
   /* finish creating return variables */
   out_dim = (npy_intp *) malloc(1 * sizeof(npy_intp));
   out_dim[0] = (npy_intp) out_arr_len;
-  binflux = (PyArrayObject *) PyArray_SimpleNew(1, out_dim, PyArray_FLOAT64);
-  intwave = (PyArrayObject *) PyArray_SimpleNew(1, out_dim, PyArray_FLOAT64);
+  binflux = (PyArrayObject *) PyArray_SimpleNew(1, out_dim, NPY_FLOAT64);
+  intwave = (PyArrayObject *) PyArray_SimpleNew(1, out_dim, NPY_FLOAT64);
   if (!binflux || !intwave) {
     return NULL;
   }
 
-  num_indices = indices->dimensions[0];
+  num_indices = PyArray_DIM(indices,0);
 
   for (i = 0; i < num_indices; i++) {
     first = (npy_intp) *(npy_int64 *) PyArray_GETPTR1(indices,i);
