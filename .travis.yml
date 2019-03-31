@@ -16,10 +16,10 @@ sudo: false
 #
 # https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
 
-#addons:
-#    apt:
-#        packages:
-#            - graphviz
+addons:
+    apt:
+        packages:
+            - graphviz
 
 env:
     global:

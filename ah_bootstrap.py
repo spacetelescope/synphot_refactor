@@ -48,10 +48,7 @@ import sys
 from distutils import log
 from distutils.debug import DEBUG
 
-try:
-    from ConfigParser import ConfigParser, RawConfigParser
-except ImportError:
-    from configparser import ConfigParser, RawConfigParser
+from configparser import ConfigParser, RawConfigParser
 
 import pkg_resources
 
