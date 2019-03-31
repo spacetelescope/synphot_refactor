@@ -349,6 +349,7 @@ a continuum (e.g., :ref:`synphot-flat-spec`):
 .. plot::
     :include-source:
 
+    from astropy import units as u
     from synphot import SourceSpectrum
     from synphot.models import GaussianFlux1D, ConstFlux1D
     em = SourceSpectrum(GaussianFlux1D, mean=6000, fwhm=10,
