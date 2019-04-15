@@ -88,7 +88,7 @@ Then, follow the instructions below to "install" the data files.
 
 To install local data files via HTTP into, say, ``/my/local/dir/cdbs``::
 
-    >>> from synphot.util import download_data
+    >>> from synphot.utils import download_data
     >>> file_list = download_data('/my/local/dir/cdbs')
 
 If you have your own version of the data files that you wish to use, you can
