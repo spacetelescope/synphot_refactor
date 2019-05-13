@@ -41,7 +41,7 @@ jobs:
   - script: |
       sudo apt-get install libxml2-utils
       python -m pip install --upgrade pip setuptools
-      pip install numpy scipy astropy pytest-remotedata pytest-openfiles
+      pip install numpy scipy astropy pytest-astropy
       python setup.py test
     displayName: 'Run tests'
 
@@ -56,6 +56,7 @@ jobs:
       architecture: 'x64'
 
   - script: |
+      sudo apt-get install graphviz
       python -m pip install --upgrade pip setuptools
       pip install numpy scipy matplotlib astropy sphinx-astropy
       python setup.py build_docs -w
