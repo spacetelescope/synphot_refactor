@@ -1,0 +1,87 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+trigger:
+- master
+
+jobs:
+- job: 'EggInfo'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.x'
+      architecture: 'x64'
+
+  # Make sure that egg_info works without dependencies
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      python setup.py egg_info
+    displayName: 'egg_info'
+
+- job: 'Test'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - script: |
+      sudo apt-get install libxml2-utils
+      python -m pip install --upgrade pip setuptools
+      pip install numpy scipy astropy pytest-remotedata pytest-openfiles
+      python setup.py test
+    displayName: 'Run tests'
+
+- job: 'Doc'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.6'
+      architecture: 'x64'
+
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install numpy scipy matplotlib astropy sphinx-astropy
+      python setup.py build_docs -w
+    displayName: 'Doc build'
+# DEV NOTE:
+# Not very useful like this because I have to sign in with Microsoft account,
+# download a ZIP file, unzip on local disk, and then only I can preview the
+# HTML pages. Was hoping for direct preview by clicking URL like CircleCI.
+#
+#  - task: PublishPipelineArtifact@0
+#    inputs:
+#      artifactName: 'htmlDocs'
+#      targetPath: 'docs/_build/html'
+
+- job: 'PEP8'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.x'
+      architecture: 'x64'
+
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install flake8
+      flake8 synphot --count
+    displayName: 'PEP 8 check'
