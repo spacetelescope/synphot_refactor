@@ -75,9 +75,9 @@ to your ``$HOME/.astropy/config/`` directory.
 In doing so, you can avoid connecting directly to STScI HTTP service,
 which is slower and might not be available all the time.
 
-If necessary (i.e., if you are not an internal STScI user), replace
-``/grp/hst/cdbs`` with your local directory name
-(e.g., ``/my/local/dir/cdbs``), where you plan to store the data files.
+If you are not an internal STScI user, create a local directory where you plan
+to store the data files (e.g., ``/my/local/dir/cdbs``), then replace every instance of
+``/grp/hst/cdbs`` in your copy of synphot.cfg with ``http://ssb.stsci.edu/cdbs``.
 Then, follow the instructions below to "install" the data files.
 
 .. note::
@@ -86,7 +86,7 @@ Then, follow the instructions below to "install" the data files.
     **stsynphot**. If you plan to use the latter anyway, please also read the
     instructions in its documentation.
 
-To install local data files via HTTP into, say, ``/my/local/dir/cdbs``::
+To install local data files via HTTP into ``/my/local/dir/cdbs``::
 
     >>> from synphot.utils import download_data
     >>> file_list = download_data('/my/local/dir/cdbs')
