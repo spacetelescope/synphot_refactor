@@ -68,17 +68,20 @@ You can install **synphot** using one of the following ways:
     cd synphot_refactor
     python setup.py install
 
-To use the pre-defined standard star, extinction laws, and bandpasses, it is
-recommended that you copy
-`synphot.cfg <https://github.com/spacetelescope/synphot_refactor/blob/master/synphot/synphot.cfg>`_
-to your ``$HOME/.astropy/config/`` directory.
-In doing so, you can avoid connecting directly to STScI HTTP service,
-which is slower and might not be available all the time.
+To use the pre-defined standard star, extinction laws, and bandpasses, it is 
+recommended for non-internal STScI users to download the necessary data files to
+a local directory so you can avoid connecting directly to STScI HTTP service,
+which is slower and might not be available all the time. To download the files
+via HTTP, create a local directory where you plan to store the data files
+(e.g., ``/my/local/dir/cdbs``) and run the following:
 
-If you are not an internal STScI user, create a local directory where you plan
-to store the data files (e.g., ``/my/local/dir/cdbs``), then replace every instance of
-``/grp/hst/cdbs`` in your copy of synphot.cfg with ``http://ssb.stsci.edu/cdbs``.
-Then, follow the instructions below to "install" the data files.
+    >>> from synphot.utils import download_data
+    >>> file_list = download_data('/my/local/dir/cdbs')
+
+Then copy `synphot.cfg <https://github.com/spacetelescope/synphot_refactor/blob/master/synphot/synphot.cfg>`_
+to your ``$HOME/.astropy/config/`` directory, and replace every instance of
+``/grp/hst/cdbs`` with ``/my/local/dir/cdbs`` so that ``synphot`` knows where to 
+look for these files.
 
 .. note::
 
