@@ -23,7 +23,32 @@ jobs:
       python setup.py egg_info
     displayName: 'egg_info'
 
-- job: 'Test'
+- job: 'Coverage'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - script: |
+      sudo apt-get install libxml2-utils
+      python -m pip install --upgrade pip setuptools
+      pip install numpy scipy astropy pytest-astropy codecov
+      python setup.py test --coverage --open-files --remote-data
+    displayName: 'Run tests'
+
+  - script: codecov
+    displayName: 'Calculate coverage'
+
+- job: 'Default'
   pool:
     vmImage: 'Ubuntu-16.04'
   strategy:
@@ -42,7 +67,94 @@ jobs:
       sudo apt-get install libxml2-utils
       python -m pip install --upgrade pip setuptools
       pip install numpy scipy astropy pytest-astropy
-      python setup.py test
+      python setup.py test --open-files
+    displayName: 'Run tests'
+
+- job: 'LTS_Astropy'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+    maxParallel: 4
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - script: |
+      sudo apt-get install libxml2-utils
+      python -m pip install --upgrade pip setuptools
+      pip install numpy scipy astropy==2.0.12 pytest-astropy
+      python setup.py test --open-files
+    displayName: 'Run tests'
+
+- job: 'Dev_Astropy'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - script: |
+      sudo apt-get install libxml2-utils
+      python -m pip install --upgrade pip setuptools
+      pip install numpy scipy pytest-astropy
+      pip install git+https://github.com/astropy/astropy.git@master#egg=astropy
+      python setup.py test --open-files
+    displayName: 'Run tests'
+
+- job: 'Windows'
+  pool:
+    vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install numpy scipy astropy pytest-astropy
+      python setup.py test --open-files
+    displayName: 'Run tests'
+
+- job: 'OSX'
+  pool:
+    vmImage: 'macOS-10.13'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install numpy scipy astropy pytest-astropy
+      python setup.py test --open-files
     displayName: 'Run tests'
 
 - job: 'Doc'
