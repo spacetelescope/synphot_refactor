@@ -1,0 +1,26 @@
+parameters:
+  name: 'Default'  # Defaults for any parameters that aren't specified
+  vmImage: 'Ubuntu-16.04'
+  astropyCmd: 'pip install astropy'
+  pythonVersion: '3.7'
+
+jobs:
+- job: ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  strategy:
+    maxParallel: 4
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: ${{ parameters.pythonVersion }}
+      architecture: 'x64'
+
+  - script: |
+      sudo apt-get install libxml2-utils
+      python -m pip install --upgrade pip setuptools
+      pip install numpy scipy pytest-astropy
+      ${{ parameters.astropyCmd }}
+      python setup.py test --open-files
+    displayName: 'Run tests'

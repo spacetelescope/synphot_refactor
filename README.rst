@@ -9,14 +9,6 @@ synphot
     :target: https://dev.azure.com/spacetelescope/synphot_refactor/_build/latest?definitionId=2&branchName=master
     :alt: Azure CI Status
 
-.. image:: https://travis-ci.org/spacetelescope/synphot_refactor.svg?branch=master
-    :target: https://travis-ci.org/spacetelescope/synphot_refactor
-    :alt: Travis CI Status
-
-.. image:: https://ci.appveyor.com/api/projects/status/jc4f77cpng8iyvnd/branch/master?svg=true
-    :target: https://ci.appveyor.com/project/pllim/synphot-refactor/branch/master
-    :alt: Appveyor CI Status
-
 .. image:: https://codecov.io/gh/spacetelescope/synphot_refactor/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/spacetelescope/synphot_refactor
     :alt: Coverage results
