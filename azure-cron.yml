@@ -1,0 +1,7 @@
+trigger:
+- master
+
+jobs:
+  - template: azure-templates.yml
+    parameters:
+      name: 'Nightly'
