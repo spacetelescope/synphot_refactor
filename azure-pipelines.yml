@@ -1,3 +1,5 @@
+# This is the CI matrix that runs per push event.
+
 trigger:
 - master
 
