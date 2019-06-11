@@ -1,8 +1,7 @@
 # This is used for scheduled job that is configured on the
 # Azure side.
 
-trigger:
-- master
+trigger: none
 
 jobs:
   - template: azure-templates.yml
