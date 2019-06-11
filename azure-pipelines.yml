@@ -62,7 +62,7 @@ stages:
   - template: azure-templates.yml
     parameters:
       name: 'LTS_Astropy'
-      numpyCmd: 'pip install numpy==1.15'
+      numpyCmd: 'pip install numpy==1.15.4'
       astropyCmd: 'pip install astropy==2.0.12'
       pythonVersion: '3.6'
 
