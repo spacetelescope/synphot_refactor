@@ -1,3 +1,5 @@
+# Azure job template for the most common job in CI.
+
 parameters:
   name: 'Default'  # Defaults for any parameters that aren't specified
   vmImage: 'Ubuntu-16.04'
