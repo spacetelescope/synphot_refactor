@@ -61,10 +61,10 @@ class BlackBody1D(Fittable1DModel):
 
         .. math::
 
-            x_{\\textnormal{low}} = 0
+            x_{\\mathrm{low}} = 0
 
-            x_{\\textnormal{high}} = \\log(\\lambda_{\\textnormal{max}} \\;\
-            (1 + \\textnormal{factor}))
+            x_{\\mathrm{high}} = \\log(\\lambda_{\\mathrm{max}} \\;\
+            (1 + \\mathrm{factor}))
 
         Parameters
         ----------
@@ -142,7 +142,7 @@ class BlackBodyNorm1D(BlackBody1D):
 
     .. math::
 
-        \\Omega = \\frac{\\pi R_{\\textnormal{Sun}}^{2}}{d^{2}}
+        \\Omega = \\frac{\\pi R_{\\mathrm{Sun}}^{2}}{d^{2}}
 
     Parameters
     ----------
