@@ -34,6 +34,7 @@ jobs:
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     displayName: Set var on Windows
 
+  # Cannot use this for doc build because [docs only] will skip this
   - script: |
       sudo apt-get install libxml2-utils
       python -m pip install --upgrade pip setuptools
@@ -42,3 +43,4 @@ jobs:
       ${{ parameters.astropyCmd }}
       python setup.py test --open-files $(PYTEST_EXTRA_ARGS)
     displayName: 'Run tests'
+    condition: not(contains(variables['Build.SourceVersionMessage'], '[docs only]'))

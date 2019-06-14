@@ -55,11 +55,13 @@ stages:
         pip install numpy scipy astropy pytest-astropy codecov
         python setup.py test --coverage --open-files --remote-data
       displayName: 'Run tests'
+      condition: not(contains(variables['Build.SourceVersionMessage'], '[docs only]'))
 
     - script: codecov -t $codecov_token
       env:
         codecov_token: $(CODECOV_TOKEN)
       displayName: 'Calculate coverage'
+      condition: not(contains(variables['Build.SourceVersionMessage'], '[docs only]'))
 
   - template: azure-templates.yml
     parameters:
