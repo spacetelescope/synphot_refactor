@@ -6,4 +6,10 @@ trigger: none
 jobs:
   - template: azure-templates.yml
     parameters:
-      name: 'Nightly'
+      name: 'Weekly_Stable'
+
+  - template: azure-templates.yml
+    parameters:
+      name: 'Weekly_Dev'
+      astropyCmd: 'pip install git+https://github.com/astropy/astropy.git@master#egg=astropy'
+      pytestExtraArgs: '--remote-data'

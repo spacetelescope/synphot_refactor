@@ -6,6 +6,7 @@ parameters:
   numpyCmd: 'pip install numpy'
   astropyCmd: 'pip install astropy'
   pythonVersion: '3.7'
+  pytestExtraArgs: ''
 
 jobs:
 - job: ${{ parameters.name }}
@@ -21,10 +22,11 @@ jobs:
       architecture: 'x64'
 
   - script: |
+      export PYTEST_EXTRA_ARGS=${{ parameters.pytestExtraArgs }}
       sudo apt-get install libxml2-utils
       python -m pip install --upgrade pip setuptools
       ${{ parameters.numpyCmd }}
       pip install scipy pytest-astropy
       ${{ parameters.astropyCmd }}
-      python setup.py test --open-files
+      python setup.py test --open-files $(PYTEST_EXTRA_ARGS)
     displayName: 'Run tests'
