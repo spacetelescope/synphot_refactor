@@ -21,8 +21,20 @@ jobs:
       versionSpec: ${{ parameters.pythonVersion }}
       architecture: 'x64'
 
-  - script: |
+  - bash: |
       export PYTEST_EXTRA_ARGS=${{ parameters.pytestExtraArgs }}
+      echo "##vso[task.setvariable variable=PYTEST_EXTRA_ARGS]$PYTEST_EXTRA_ARGS"
+    condition: ne( variables['Agent.OS'], 'Windows_NT' )
+    displayName: Set var on Linux/Darwin
+
+  # Disable --remote-data for Windows regardless of pytestExtraArgs
+  - powershell: |
+      Set-Variable -Name PYTEST_EXTRA_ARGS -Value ''
+      Write-Host "##vso[task.setvariable variable=PYTEST_EXTRA_ARGS]$PYTEST_EXTRA_ARGS"
+    condition: eq( variables['Agent.OS'], 'Windows_NT' )
+    displayName: Set var on Windows
+
+  - script: |
       sudo apt-get install libxml2-utils
       python -m pip install --upgrade pip setuptools
       ${{ parameters.numpyCmd }}
