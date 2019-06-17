@@ -1,6 +1,10 @@
 synphot
 =======
 
+.. image:: https://img.shields.io/badge/ascl-1811.001-blue.svg?colorB=262255
+    :target: http://ascl.net/1811.001
+    :alt: ascl:1811.001
+
 .. image:: https://readthedocs.org/projects/synphot/badge/?version=latest
     :target: http://synphot.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
