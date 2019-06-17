@@ -54,9 +54,13 @@ packages:
 
 You can install **synphot** using one of the following ways:
 
-* From `AstroConda <http://astroconda.readthedocs.io/en/latest/>`_::
+* From `AstroConda <https://astroconda.readthedocs.io/en/latest/>`_::
 
     conda install synphot -c http://ssb.stsci.edu/astroconda
+
+* From ``conda-forge`` channel::
+
+    conda install synphot -c conda-forge
 
 * From standalone release::
 
@@ -68,7 +72,7 @@ You can install **synphot** using one of the following ways:
     cd synphot_refactor
     python setup.py install
 
-To use the pre-defined standard star, extinction laws, and bandpasses, it is 
+To use the pre-defined standard star, extinction laws, and bandpasses, it is
 recommended for non-internal STScI users to download the necessary data files to
 a local directory so you can avoid connecting directly to STScI HTTP service,
 which is slower and might not be available all the time. To download the files
@@ -80,7 +84,7 @@ via HTTP, create a local directory where you plan to store the data files
 
 Then copy `synphot.cfg <https://github.com/spacetelescope/synphot_refactor/blob/master/synphot/synphot.cfg>`_
 to your ``$HOME/.astropy/config/`` directory, and replace every instance of
-``/grp/hst/cdbs`` with ``/my/local/dir/cdbs`` so that ``synphot`` knows where to 
+``/grp/hst/cdbs`` with ``/my/local/dir/cdbs`` so that ``synphot`` knows where to
 look for these files.
 
 .. note::
