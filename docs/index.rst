@@ -31,7 +31,7 @@ observatory. If you use HST (and soon JWST), you might also be interested in
 covers synthetic photometry for the telescope(s).
 
 If you use **synphot** in your work, please see
-`CITATION <https://github.com/spacetelescope/synphot_refactor/blob/master/CITATION>`_
+`CITATION <https://github.com/spacetelescope/synphot_refactor/blob/master/CITATION.md>`_
 for details on how to cite it in your publications.
 
 If you have questions or concerns regarding the software, please open an issue
