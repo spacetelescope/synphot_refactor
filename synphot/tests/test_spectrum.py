@@ -24,6 +24,7 @@ from astropy.utils.data import get_pkg_data_filename
 # LOCAL
 from .test_units import _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
 from .. import exceptions, units
+from ..compat import ASTROPY_LT_4_0
 from ..models import (
     BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, Gaussian1D,
     GaussianAbsorption1D, GaussianFlux1D, Lorentz1D, MexicanHat1D,
@@ -756,10 +757,17 @@ class TestWaveset(object):
     def test_box1d(self):
         bp = SpectralElement(Box1D, x_0=2000, width=1)
         w = bp.waveset.value
+        w_true = bp.model.sampleset()
 
-        np.testing.assert_array_equal(w, bp.model.sampleset())
+        np.testing.assert_array_equal(w, w_true)
         np.testing.assert_allclose(
             w[([0, 1, -2, -1], )], bp.model.sampleset(minimal=True))
+
+        # Make sure scale does not change waveset
+        bp2 = bp * 2
+        bp3 = 0.5 * bp
+        np.testing.assert_array_equal(bp2.waveset.value, w_true)
+        np.testing.assert_array_equal(bp3.waveset.value, w_true)
 
     def test_composite_none(self):
         bp1 = SpectralElement(Box1D, amplitude=1, x_0=5000, width=10)
@@ -793,6 +801,31 @@ class TestWaveset(object):
         sp = SourceSpectrum(Const1D, amplitude=1, z=1.3)
         assert sp.waveset is None
 
+    def test_complicated_tree(self):
+        """Throw everything in and insert redshift and scale in the middle."""
+
+        # On one side, we have a composite bandpass.
+        bp1 = SpectralElement(Const1D, amplitude=1.01)
+        bp2 = SpectralElement(
+            Empirical1D, points=[4999, 5000.001, 5030], lookup_table=[0, 1, 0])
+        bp = bp1 * (0.8 * bp2)  # [4999, 5000.001, 5030]
+
+        # On the other side, we have composite spectrum with
+        # scale and redshift.
+        sp1 = SourceSpectrum(
+            Empirical1D, points=[5001, 5011, 5020], lookup_table=[0, 1, 0])
+        sp2 = SourceSpectrum(
+            Empirical1D, points=[5000, 5010, 5020], lookup_table=[0, 1, 0])
+        sp3 = sp2 + (sp1 * 0.5)  # [5000, 5001, 5010, 5011, 5020]
+        sp3.z = 0.01  # [5050, 5051.01, 5060.1, 5061.11, 5070.2]
+        sp = sp1 + sp3  # [5001, 5011, 5020, 5050, 5051.01, 5060.1, 5061.11, 5070.2]  # noqa
+
+        sp_final = sp * bp
+        np.testing.assert_array_equal(
+            sp_final.waveset.value,
+            [4999, 5000.001, 5001, 5011, 5020, 5030, 5050, 5051.01,
+             5060.1, 5061.11, 5070.2])
+
     def test_exceptions(self):
         with pytest.raises(exceptions.SynphotError):
             get_waveset('foo')
@@ -825,7 +858,10 @@ class TestRedShift(object):
         assert self.sp_z0.z_type == self.sp.z_type == 'wavelength_only'
 
         assert isinstance(self.sp_z0.model, Gaussian1D)
-        assert isinstance(self.sp.model, modeling.core._CompoundModel)
+        if ASTROPY_LT_4_0:
+            assert isinstance(self.sp.model, modeling.core._CompoundModel)
+        else:
+            assert isinstance(self.sp.model, modeling.core.CompoundModel)
 
     def test_composite_redshift(self):
         sp2 = self.sp_z0 + self.sp  # centers: 5000, 11500

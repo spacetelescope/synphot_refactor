@@ -14,15 +14,20 @@ import numpy as np
 from astropy import log
 from astropy import units as u
 from astropy.modeling import Model
-from astropy.modeling.core import _CompoundModel
 from astropy.modeling.models import RedshiftScaleFactor, Scale
 from astropy.utils.exceptions import AstropyUserWarning
 from astropy.utils import metadata
 
 # LOCAL
 from . import exceptions, specio, units, utils
+from .compat import ASTROPY_LT_4_0
 from .config import Conf, conf
 from .models import ConstFlux1D, Empirical1D, get_waveset, get_metadata
+
+if ASTROPY_LT_4_0:
+    from astropy.modeling.core import _CompoundModel as CompoundModel
+else:
+    from astropy.modeling.core import CompoundModel
 
 __all__ = ['BaseSpectrum', 'BaseSourceSpectrum', 'SourceSpectrum',
            'BaseUnitlessSpectrum', 'SpectralElement']
@@ -134,7 +139,7 @@ class BaseSpectrum(object):
         if isinstance(modelclass, Model):
             self._model = modelclass
 
-            if isinstance(modelclass, _CompoundModel):
+            if isinstance(modelclass, CompoundModel):
                 clean_meta = True
 
         elif isinstance(modelclass, BaseSpectrum):
@@ -1418,7 +1423,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             if ((isinstance(other.model, Empirical1D) and
                  other.model.is_tapered() or
                  not isinstance(other.model,
-                                (Empirical1D, _CompoundModel))) and
+                                (Empirical1D, CompoundModel))) and
                     np.allclose(other(x1[::x1.size - 1]).value, 0)):
                 result = 'full'
 

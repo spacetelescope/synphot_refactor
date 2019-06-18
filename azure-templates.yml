@@ -5,6 +5,7 @@ parameters:
   vmImage: 'Ubuntu-16.04'
   numpyCmd: 'pip install numpy'
   astropyCmd: 'pip install astropy'
+  scipyCmd: 'pip install scipy'
   pythonVersion: '3.7'
   pytestExtraArgs: ''
 
@@ -28,6 +29,7 @@ jobs:
     displayName: Set var on Linux/Darwin
 
   # Disable --remote-data for Windows regardless of pytestExtraArgs
+  # due to some problem with parsing the args in powershell
   - powershell: |
       Set-Variable -Name PYTEST_EXTRA_ARGS -Value ''
       Write-Host "##vso[task.setvariable variable=PYTEST_EXTRA_ARGS]$PYTEST_EXTRA_ARGS"
@@ -38,7 +40,8 @@ jobs:
       sudo apt-get install libxml2-utils
       python -m pip install --upgrade pip setuptools
       ${{ parameters.numpyCmd }}
-      pip install scipy pytest-astropy
+      ${{ parameters.scipyCmd }}
+      pip install pytest-astropy
       ${{ parameters.astropyCmd }}
       python setup.py test --open-files $(PYTEST_EXTRA_ARGS)
     displayName: 'Run tests'
