@@ -15,7 +15,6 @@ from scipy.optimize import fsolve
 # ASTROPY
 from astropy import log
 from astropy import units as u
-from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.exceptions import (AstropyUserWarning,
                                       AstropyDeprecationWarning)
 
@@ -907,7 +906,7 @@ def _t_with_small_errs(t, background_rate, darkcurrent_rate, gain_err,
 
     detector_noise = (background_rate * t + darkcurrent_rate * t +
                       gain_err ** 2 + readnoise ** 2)
-    radicand = countrate * t + (npix * (1 + npix/n_background) *
+    radicand = countrate * t + (npix * (1 + npix / n_background) *
                                 detector_noise)
 
     return countrate * t / np.sqrt(radicand)
