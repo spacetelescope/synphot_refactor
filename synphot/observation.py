@@ -22,7 +22,7 @@ from . import binning, exceptions, units, utils
 from .models import Empirical1D
 from .spectrum import BaseSourceSpectrum, SourceSpectrum, SpectralElement
 
-__all__ = ['Observation']
+__all__ = ['Observation', 'howell_snr', 'exptime_from_howell_snr']
 
 
 class Observation(BaseSourceSpectrum):
@@ -715,7 +715,7 @@ def howell_snr(counts,
                darkcurrent=0 * (u.electron / u.pixel),
                readnoise=0 * (u.electron / u.pixel),
                gain=1 * (u.electron / u.adu),
-               ad_err=ad_err_default):
+               ad_err=AD_ERR_DEFAULT):
     """
     A function to calculate the idealized theoretical signal to noise ratio
     (SNR) of an astronomical observation with a given number of counts. This
@@ -801,7 +801,7 @@ def exptime_from_howell_snr(snr, countrate,
                             darkcurrent_rate=0 * (u.electron / u.pixel / u.s),
                             readnoise=0 * (u.electron / u.pixel),
                             gain=1 * (u.electron / u.adu),
-                            ad_err=ad_err_default):
+                            ad_err=AD_ERR_DEFAULT):
     """
     Returns the exposure time needed in units of seconds to achieve
     the specified (idealized theoretical) signal to noise ratio
