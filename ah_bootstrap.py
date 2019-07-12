@@ -92,13 +92,10 @@ if os.path.exists('setup.cfg'):
         log.error(
             "Error reading setup.cfg: {0!r}\n{1} will not be "
             "automatically bootstrapped and package installation may fail."
-            "\n{2}".format(e, PACKAGE_NAME, _err_help_msg))
+            "".format(e, PACKAGE_NAME))
 
-# We used package_name in the package template for a while instead of name
 if SETUP_CFG.has_option('metadata', 'name'):
     parent_package = SETUP_CFG.get('metadata', 'name')
-elif SETUP_CFG.has_option('metadata', 'package_name'):
-    parent_package = SETUP_CFG.get('metadata', 'package_name')
 else:
     parent_package = None
 
