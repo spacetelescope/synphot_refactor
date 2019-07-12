@@ -10,7 +10,6 @@ import warnings
 
 # THIRD-PARTY
 import numpy as np
-from scipy.optimize import fsolve
 
 # ASTROPY
 from astropy import log
@@ -697,7 +696,8 @@ class Observation(BaseSourceSpectrum):
                               meta={'header': header})
 
 
-ad_err_default = np.sqrt(0.289) * u.adu / u.pixel
+# See ad_err documentation below.
+AD_ERR_DEFAULT = np.sqrt(0.289) * (u.adu / u.pixel)
 
 
 @u.quantity_input(counts=u.electron,
@@ -711,10 +711,10 @@ ad_err_default = np.sqrt(0.289) * u.adu / u.pixel
 def howell_snr(counts,
                npix=1 * u.pixel,
                n_background=np.inf * u.pixel,
-               background=0 * u.electron / u.pixel,
-               darkcurrent=0 * u.electron / u.pixel,
-               readnoise=0 * u.electron / u.pixel,
-               gain=1 * u.electron / u.adu,
+               background=0 * (u.electron / u.pixel),
+               darkcurrent=0 * (u.electron / u.pixel),
+               readnoise=0 * (u.electron / u.pixel),
+               gain=1 * (u.electron / u.adu),
                ad_err=ad_err_default):
     """
     A function to calculate the idealized theoretical signal to noise ratio
@@ -797,10 +797,10 @@ def howell_snr(counts,
 def exptime_from_howell_snr(snr, countrate,
                             npix=1 * u.pixel,
                             n_background=np.inf * u.pixel,
-                            background_rate=0 * u.electron / u.pixel / u.s,
-                            darkcurrent_rate=0 * u.electron / u.pixel / u.s,
-                            readnoise=0 * u.electron / u.pixel,
-                            gain=1 * u.electron / u.adu,
+                            background_rate=0 * (u.electron / u.pixel / u.s),
+                            darkcurrent_rate=0 * (u.electron / u.pixel / u.s),
+                            readnoise=0 * (u.electron / u.pixel),
+                            gain=1 * (u.electron / u.adu),
                             ad_err=ad_err_default):
     """
     Returns the exposure time needed in units of seconds to achieve
@@ -826,12 +826,12 @@ def exptime_from_howell_snr(snr, countrate,
         Photons per pixel per second due to the backround/sky with units of
         electrons/second/pixel.
         Default is 0 * (astropy.units.electron /
-                        astropy.units.second / astropy.units.pixel)
+        astropy.units.second / astropy.units.pixel)
     darkcurrent_rate : `~astropy.units.Quantity`, optional
         Electrons per pixel per second due to the dark current with units
         of electrons/second/pixel.
         Default is 0 * (astropy.units.electron /
-                        astropy.units.second / astropy.units.pixel)
+        astropy.units.second / astropy.units.pixel)
     readnoise : `~astropy.units.Quantity`, optional
         Electrons per pixel from the read noise with units of electrons/pixel.
         Default is 0 * astropy.units.electron / astropy.units.pixel.
@@ -875,6 +875,7 @@ def exptime_from_howell_snr(snr, countrate,
     t = (-B + np.sqrt(B ** 2 - 4 * A * C)) / (2 * A)
 
     if gain_err.value > 1 or not np.isfinite(n_background.value):
+        from scipy.optimize import fsolve
         # solve t numerically
         t = fsolve(_t_with_small_errs, t, args=(background_rate,
                                                 darkcurrent_rate,
@@ -888,7 +889,7 @@ def exptime_from_howell_snr(snr, countrate,
 def _get_shotnoise(detector_property):
     """
     Returns the shot noise (i.e. non-Poissonion noise) in the correct
-    units.
+    units. ``detector_property`` must be a Quantity.
     """
     # Ensure detector_property is in the correct units:
     detector_property = detector_property.to(u.electron / u.pixel)
