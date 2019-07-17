@@ -700,21 +700,21 @@ class Observation(BaseSourceSpectrum):
 AD_ERR_DEFAULT = np.sqrt(0.289) * (u.adu / u.pixel)
 
 
-@u.quantity_input(counts=u.electron,
+@u.quantity_input(counts=u.ct,
                   npix=u.pixel,
                   n_background=u.pixel,
-                  background=u.electron / u.pixel,
-                  darkcurrent=u.electron / u.pixel,
-                  readnoise=u.electron / u.pixel,
-                  gain=u.electron / u.adu,
+                  background=u.ct / u.pixel,
+                  darkcurrent=u.ct / u.pixel,
+                  readnoise=u.ct / u.pixel,
+                  gain=u.ct / u.adu,
                   ad_err=u.adu / u.pixel)
 def howell_snr(counts,
                npix=1 * u.pixel,
                n_background=np.inf * u.pixel,
-               background=0 * (u.electron / u.pixel),
-               darkcurrent=0 * (u.electron / u.pixel),
-               readnoise=0 * (u.electron / u.pixel),
-               gain=1 * (u.electron / u.adu),
+               background=0 * (u.ct / u.pixel),
+               darkcurrent=0 * (u.ct / u.pixel),
+               readnoise=0 * (u.ct / u.pixel),
+               gain=1 * (u.ct / u.adu),
                ad_err=AD_ERR_DEFAULT):
     """
     A function to calculate the idealized theoretical signal to noise ratio
@@ -725,7 +725,10 @@ def howell_snr(counts,
     ----------
     counts : `~astropy.units.Quantity`
         Total number of counts in an arbitrary exposure time with units of
-        electrons.
+        astropy.units.ct. Be aware that these units may refer to different
+        physical units for different instruments (e.g. one instrument may be
+        "count"ing electrons, while another may be counting analog-to-digital
+        units [ADU]).
     npix : `~astropy.units.Quantity`, optional
         Number of pixels under consideration for the signal with units of
         pixels. Default is 1 * astropy.units.pixel.
@@ -736,18 +739,18 @@ def howell_snr(counts,
         estimation. This assumes that n_background will be >> npix.
     background : `~astropy.units.Quantity`, optional
         Total photons per pixel due to the background/sky with units of
-        electrons/pixel.
-        Default is 0 * astropy.units.electron / astropy.units.pixel.
+        counts/pixel.
+        Default is 0 * astropy.units.ct / astropy.units.pixel.
     darkcurrent : `~astropy.units.Quantity`, optional
-        Total electrons per pixel due to the dark current with units
-        of electrons/pixel.
-        Default is 0 * astropy.units.electron / astropy.units.pixel.
+        Total counts per pixel due to the dark current with units
+        of counts/pixel.
+        Default is 0 * astropy.units.ct / astropy.units.pixel.
     readnoise : `~astropy.units.Quantity`, optional
-        Electrons per pixel from the read noise with units of electrons/pixel.
-        Default is 0 * astropy.units.electron / astropy.units.pixel.
+        Counts per pixel from the read noise with units of counts/pixel.
+        Default is 0 * astropy.units.ct / astropy.units.pixel.
     gain : `~astropy.units.Quantity`, optional
-        Gain of the CCD with units of electrons/ADU. Default is
-        1 * astropy.units.electron / astropy.units.adu such that the
+        Gain of the CCD with units of counts/ADU. Default is
+        1 * astropy.units.ct / astropy.units.adu such that the
         contribution to the error due to the gain is assumed to be small.
     ad_err : `~astropy.units.Quantity`, optional
         An estimate of the 1 sigma error within the A/D converter with units of
@@ -771,7 +774,7 @@ def howell_snr(counts,
     -------
     sn : `~astropy.units.Quantity`
         The signal to noise ratio of the given observation in units of
-        sqrt(electrons).
+        sqrt(counts).
     """
     readnoise = _get_shotnoise(readnoise)
     gain_err = _get_shotnoise(gain * ad_err)
@@ -785,22 +788,22 @@ def howell_snr(counts,
     return sn
 
 
-@u.quantity_input(snr=np.sqrt(1 * u.electron),
-                  countrate=u.electron / u.s,
+@u.quantity_input(snr=np.sqrt(1 * u.ct),
+                  countrate=u.ct / u.s,
                   npix=u.pixel,
                   n_background=u.pixel,
-                  background_rate=u.electron / u.pixel / u.s,
-                  darkcurrent_rate=u.electron / u.pixel / u.s,
-                  readnoise=u.electron / u.pixel,
-                  gain=u.electron / u.adu,
+                  background_rate=u.ct / u.pixel / u.s,
+                  darkcurrent_rate=u.ct / u.pixel / u.s,
+                  readnoise=u.ct / u.pixel,
+                  gain=u.ct / u.adu,
                   ad_err=u.adu / u.pixel)
 def exptime_from_howell_snr(snr, countrate,
                             npix=1 * u.pixel,
                             n_background=np.inf * u.pixel,
-                            background_rate=0 * (u.electron / u.pixel / u.s),
-                            darkcurrent_rate=0 * (u.electron / u.pixel / u.s),
-                            readnoise=0 * (u.electron / u.pixel),
-                            gain=1 * (u.electron / u.adu),
+                            background_rate=0 * (u.ct / u.pixel / u.s),
+                            darkcurrent_rate=0 * (u.ct / u.pixel / u.s),
+                            readnoise=0 * (u.ct / u.pixel),
+                            gain=1 * (u.ct / u.adu),
                             ad_err=AD_ERR_DEFAULT):
     """
     Returns the exposure time needed in units of seconds to achieve
@@ -811,9 +814,12 @@ def exptime_from_howell_snr(snr, countrate,
     ----------
     snr : `~astropy.units.Quantity`
         The signal to noise ratio of the given observation in units of
-        sqrt(electrons).
+        sqrt(counts).
     countrate : `~astropy.units.Quantity`
-        The counts per second with units of electron/second.
+        The counts per second with units of astropy.units.ct/second. Be aware
+        that the count unit may refer to different physical units for different
+        instruments (e.g. one instrument may be "count"ing electrons, while
+        another may be counting analog-to-digital units [ADU]).
     npix : `~astropy.units.Quantity`, optional
         Number of pixels under consideration for the signal with units of
         pixels. Default is 1 * astropy.units.pixel.
@@ -824,20 +830,20 @@ def exptime_from_howell_snr(snr, countrate,
         estimation. This assumes that n_background will be >> npix.
     background_rate : `~astropy.units.Quantity`, optional
         Photons per pixel per second due to the backround/sky with units of
-        electrons/second/pixel.
-        Default is 0 * (astropy.units.electron /
+        counts/second/pixel.
+        Default is 0 * (astropy.units.ct /
         astropy.units.second / astropy.units.pixel)
     darkcurrent_rate : `~astropy.units.Quantity`, optional
-        Electrons per pixel per second due to the dark current with units
-        of electrons/second/pixel.
-        Default is 0 * (astropy.units.electron /
+        Counts per pixel per second due to the dark current with units
+        of counts/second/pixel.
+        Default is 0 * (astropy.units.ct /
         astropy.units.second / astropy.units.pixel)
     readnoise : `~astropy.units.Quantity`, optional
-        Electrons per pixel from the read noise with units of electrons/pixel.
-        Default is 0 * astropy.units.electron / astropy.units.pixel.
+        Counts per pixel from the read noise with units of counts/pixel.
+        Default is 0 * astropy.units.ct / astropy.units.pixel.
     gain : `~astropy.units.Quantity`, optional
-        Gain of the CCD with units of electrons/ADU. Default is
-        1 * astropy.units.electron / astropy.units.adu such that the
+        Gain of the CCD with units of counts/ADU. Default is
+        1 * astropy.units.ct / astropy.units.adu such that the
         contribution to the error due to the gain is assumed to be small.
     ad_err : `~astropy.units.Quantity`, optional
         An estimate of the 1 sigma error within the A/D converter with units of
@@ -892,8 +898,8 @@ def _get_shotnoise(detector_property):
     units. ``detector_property`` must be a Quantity.
     """
     # Ensure detector_property is in the correct units:
-    detector_property = detector_property.to(u.electron / u.pixel)
-    return detector_property.value * np.sqrt(1 * u.electron / u.pixel)
+    detector_property = detector_property.to(u.ct / u.pixel)
+    return detector_property.value * np.sqrt(1 * u.ct / u.pixel)
 
 
 def _t_with_small_errs(t, background_rate, darkcurrent_rate, gain_err,

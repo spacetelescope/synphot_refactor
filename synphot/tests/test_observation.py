@@ -453,9 +453,9 @@ def test_howell_snr_calc():
         Cambridge University Press)
     """
     t = 300 * u.s
-    readnoise = 5 * (u.electron / u.pixel)
-    darkcurrent = 22 * t * (u.electron / u.pixel / u.hr)
-    gain = 5 * (u.electron / u.adu)
+    readnoise = 5 * (u.ct / u.pixel)
+    darkcurrent = 22 * t * (u.ct / u.pixel / u.hr)
+    gain = 5 * (u.ct / u.adu)
     background = 620 * (u.adu / u.pixel * gain)
     n_background = 200 * u.pixel
     npix = 1 * u.pixel
@@ -466,7 +466,7 @@ def test_howell_snr_calc():
                         gain=gain, n_background=n_background)
 
     # the value of the answer given in the text
-    ans_unit = np.sqrt(1 * u.electron)
+    ans_unit = np.sqrt(1 * u.ct)
     answer = 342 * ans_unit
 
     # allow error to be +/- 1 for this test
@@ -478,7 +478,7 @@ def test_snr_bright_object():
     Test that observation.howell_snr returns sqrt(counts), the expected value
     for a bright target.
     """
-    counts = 25e5 * u.electron
+    counts = 25e5 * u.ct
     result = howell_snr(counts)
     answer = np.sqrt(counts)
 
@@ -498,14 +498,14 @@ def test_t_exp_numeric():
         Cambridge University Press)
     """
     t = 300 * u.s
-    snr = 342 * np.sqrt(1 * u.electron)
-    gain = 5 * (u.electron / u.adu)
+    snr = 342 * np.sqrt(1 * u.ct)
+    gain = 5 * (u.ct / u.adu)
     countrate = 24013 * u.adu * gain / t
     npix = 1 * u.pixel
     n_background = 200 * u.pixel
     background_rate = 620 * (u.adu / u.pixel) * gain / t
-    darkcurrent_rate = 22 * (u.electron / u.pixel / u.hr)
-    readnoise = 5 * (u.electron / u.pixel)
+    darkcurrent_rate = 22 * (u.ct / u.pixel / u.hr)
+    readnoise = 5 * (u.ct / u.pixel)
 
     result = exptime_from_howell_snr(snr, countrate, npix=npix,
                                      n_background=n_background,
@@ -521,12 +521,12 @@ def test_t_exp_analytic():
     A test to check that the analytic method in
     observation.exptime_from_howell_snr is done correctly.
     """
-    snr_set = 50 * np.sqrt(1 * u.electron)
-    countrate = 1000 * (u.electron / u.s)
+    snr_set = 50 * np.sqrt(1 * u.ct)
+    countrate = 1000 * (u.ct / u.s)
     npix = 1 * u.pixel
-    background_rate = 100 * (u.electron / u.pixel / u.s)
-    darkcurrent_rate = 5 * (u.electron / u.pixel / u.s)
-    readnoise = 1 * (u.electron / u.pixel)
+    background_rate = 100 * (u.ct / u.pixel / u.s)
+    darkcurrent_rate = 5 * (u.ct / u.pixel / u.s)
+    readnoise = 1 * (u.ct / u.pixel)
 
     t = exptime_from_howell_snr(snr_set, countrate, npix=npix,
                                 background_rate=background_rate,
@@ -541,4 +541,11 @@ def test_t_exp_analytic():
                           readnoise=readnoise)
 
     assert_quantity_allclose(snr_calc, snr_set,
-                             atol=0.5 * np.sqrt(1 * u.electron))
+                             atol=0.5 * np.sqrt(1 * u.ct))
+
+
+def test_snr_with_countrate():
+    """
+    A test to make sure `howell_snr` works with what `countrate` returns.
+    """
+    
