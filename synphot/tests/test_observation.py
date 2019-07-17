@@ -546,6 +546,13 @@ def test_t_exp_analytic():
 
 def test_snr_with_countrate():
     """
-    A test to make sure `howell_snr` works with what `countrate` returns.
+    A test to make sure `howell_snr` works with the units that
+    `countrate` returns.
     """
-    
+    source_spec = SourceSpectrum(BlackBodyNorm1D)
+    bp = SpectralElement(Const1D)
+    obs = Observation(source_spec, bp, force='extrap')
+    counts = obs.countrate(1 * u.m ** 2) * 1 * u.s
+    snr = howell_snr(counts)
+
+    assert snr.unit == u.Unit("ct(1/2)")
