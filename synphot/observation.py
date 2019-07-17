@@ -880,14 +880,14 @@ def exptime_from_howell_snr(snr, countrate,
 
     t = (-B + np.sqrt(B ** 2 - 4 * A * C)) / (2 * A)
 
-    if gain_err.value > 1 or not np.isfinite(n_background.value):
+    if gain_err.value > 1 or np.isfinite(n_background.value):
         from scipy.optimize import fsolve
         # solve t numerically
         t = fsolve(_t_with_small_errs, t, args=(background_rate,
                                                 darkcurrent_rate,
                                                 gain_err, readnoise, countrate,
                                                 npix, n_background))
-        t = t * u.s
+        t = float(t) * u.s
 
     return t
 
