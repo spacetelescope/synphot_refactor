@@ -772,7 +772,7 @@ def howell_snr(counts,
 
     Returns
     -------
-    sn : `~astropy.units.Quantity`
+    snr : `~astropy.units.Quantity`
         The signal to noise ratio of the given observation in units of
         sqrt(counts).
     """
@@ -783,9 +783,7 @@ def howell_snr(counts,
     detector_noise = (background + darkcurrent +
                       readnoise ** 2 + gain_err ** 2)
 
-    sn = counts / np.sqrt(counts + pixel_terms * detector_noise)
-
-    return sn
+    return counts / np.sqrt(counts + pixel_terms * detector_noise)
 
 
 @u.quantity_input(snr=np.sqrt(1 * u.ct),
