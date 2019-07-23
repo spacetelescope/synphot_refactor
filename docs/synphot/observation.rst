@@ -94,24 +94,24 @@ one wavelength bin corresponds to one detector pixel::
     >>> countrate
     <Quantity 1.9249653e+10 ct / s>
 
-:func:`~synphot.observation.howell_snr` is a function which will compute the
+:func:`~synphot.observation.ccd_snr` is a function which will compute the
 signal to noise ratio of an observation given its count rate and exposure
 time::
 
-    >>> from synphot.observation import howell_snr
+    >>> from synphot.observation import ccd_snr
     >>> import astropy.units as u
     >>> exptime = 1 * u.s
-    >>> howell_snr(countrate * exptime)
+    >>> ccd_snr(countrate * exptime)
     <Quantity 138743.11880657 ct(1/2)>
 
 Or, to determine the exposure time needed to reach a certain signal to noise
-ratio, use the :func:`~synphot.observation.exptime_from_howell_snr`
+ratio, use the :func:`~synphot.observation.exptime_from_ccd_snr`
 function with the observation's count rate::
 
-    >>> from synphot.observation import exptime_from_howell_snr
+    >>> from synphot.observation import exptime_from_ccd_snr
     >>> import numpy as np
     >>> snr = 100 * np.sqrt(1 * u.ct)  # desired SNR of 100
-    >>> exptime_from_howell_snr(snr, countrate)
+    >>> exptime_from_ccd_snr(snr, countrate)
     <Quantity 5.19489883e-07 s>
 
 An observation can be converted to a **regular source spectrum** containing

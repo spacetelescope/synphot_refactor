@@ -227,16 +227,16 @@ Calculate the count rate of the observation above for an 2-meter telescope:
 
 Calculate the signal to noise ratio in a 1 second exposure from this count rate:
 
-    >>> from synphot.observation import howell_snr
+    >>> from synphot.observation import ccd_snr
     >>> exptime = 1 * u.s
-    >>> howell_snr(countrate * exptime)
+    >>> ccd_snr(countrate * exptime)
     <Quantity 4921.34644491 ct(1/2)>
 
 Determine the exposure time needed to reach a certain signal to noise ratio:
 
-    >>> from synphot.observation import exptime_from_howell_snr
+    >>> from synphot.observation import exptime_from_ccd_snr
     >>> snr = 100 * np.sqrt(1 * u.ct)
-    >>> exptime_from_howell_snr(snr, countrate)
+    >>> exptime_from_ccd_snr(snr, countrate)
     <Quantity 0.00041289 s>
 
 .. _synphot_using:
