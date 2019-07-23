@@ -466,11 +466,10 @@ def test_howell_snr_calc():
                         gain=gain, n_background=n_background)
 
     # the value of the answer given in the text
-    ans_unit = np.sqrt(1 * u.ct)
-    answer = 342 * ans_unit
+    answer = 342
 
     # allow error to be +/- 1 for this test
-    assert_quantity_allclose(result, answer, atol=1 * ans_unit)
+    assert_quantity_allclose(result, answer, atol=1)
 
 
 def test_snr_bright_object():
@@ -480,7 +479,7 @@ def test_snr_bright_object():
     """
     counts = 25e5 * u.ct
     result = howell_snr(counts)
-    answer = np.sqrt(counts)
+    answer = np.sqrt(counts.value)
 
     assert_quantity_allclose(result, answer)
 
@@ -498,7 +497,7 @@ def test_t_exp_numeric():
         Cambridge University Press)
     """
     t = 300 * u.s
-    snr = 342 * np.sqrt(1 * u.ct)
+    snr = 342
     gain = 5 * (u.ct / u.adu)
     countrate = 24013 * u.adu * gain / t
     npix = 1 * u.pixel
@@ -521,7 +520,7 @@ def test_t_exp_analytic():
     A test to check that the analytic method in
     observation.exptime_from_howell_snr is done correctly.
     """
-    snr_set = 50 * np.sqrt(1 * u.ct)
+    snr_set = 50
     countrate = 1000 * (u.ct / u.s)
     npix = 1 * u.pixel
     background_rate = 100 * (u.ct / u.pixel / u.s)
@@ -541,7 +540,7 @@ def test_t_exp_analytic():
                           readnoise=readnoise)
 
     assert_quantity_allclose(snr_calc, snr_set,
-                             atol=0.5 * np.sqrt(1 * u.ct))
+                             atol=0.5 * u.Unit(""))
 
 
 def test_snr_with_countrate():
@@ -555,4 +554,4 @@ def test_snr_with_countrate():
     counts = obs.countrate(1 * u.m ** 2) * 1 * u.s
     snr = howell_snr(counts)
 
-    assert snr.unit == u.Unit("ct(1/2)")
+    assert snr.unit == u.Unit("")

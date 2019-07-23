@@ -773,8 +773,8 @@ def howell_snr(counts,
     Returns
     -------
     snr : `~astropy.units.Quantity`
-        The signal to noise ratio of the given observation in units of
-        sqrt(counts).
+        The signal to noise ratio of the given observation in dimensionless
+        units.
     """
     readnoise = _get_shotnoise(readnoise)
     gain_err = _get_shotnoise(gain * ad_err)
@@ -783,11 +783,11 @@ def howell_snr(counts,
     detector_noise = (background + darkcurrent +
                       readnoise ** 2 + gain_err ** 2)
 
-    return counts / np.sqrt(counts + pixel_terms * detector_noise)
+    return (counts / np.sqrt(counts + pixel_terms * detector_noise) / 
+            np.sqrt(1 * u.ct))
 
 
-@u.quantity_input(snr=np.sqrt(1 * u.ct),
-                  countrate=u.ct / u.s,
+@u.quantity_input(countrate=u.ct / u.s,
                   npix=u.pixel,
                   n_background=u.pixel,
                   background_rate=u.ct / u.pixel / u.s,
@@ -810,9 +810,9 @@ def exptime_from_howell_snr(snr, countrate,
 
     Parameters
     ----------
-    snr : `~astropy.units.Quantity`
-        The signal to noise ratio of the given observation in units of
-        sqrt(counts).
+    snr : float, int, or `~astropy.units.Quantity`
+        The signal to noise ratio of the given observation in dimensionless
+        units.
     countrate : `~astropy.units.Quantity`
         The counts per second with units of astropy.units.ct/second. Be aware
         that the count unit may refer to different physical units for different
@@ -867,6 +867,8 @@ def exptime_from_howell_snr(snr, countrate,
         The exposure time needed (in seconds) to achieve the given signal
         to noise ratio.
     """
+    # necessary for units to work:
+    snr = snr * np.sqrt(1 * u.ct)
     readnoise = _get_shotnoise(readnoise)
     gain_err = _get_shotnoise(gain * ad_err)
 
