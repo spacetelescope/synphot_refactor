@@ -783,7 +783,7 @@ def howell_snr(counts,
     detector_noise = (background + darkcurrent +
                       readnoise ** 2 + gain_err ** 2)
 
-    return (counts / np.sqrt(counts + pixel_terms * detector_noise) / 
+    return (counts / np.sqrt(counts + pixel_terms * detector_noise) /
             np.sqrt(1 * u.ct))
 
 
