@@ -724,10 +724,13 @@ def ccd_snr(counts,
     ----------
     counts : `~astropy.units.Quantity`
         Total number of counts in an arbitrary exposure time with units of
-        astropy.units.ct. Be aware that these units may refer to different
+        either astropy.units.ct, astropy.units.electron, or
+        astropy.units.photon. Be aware that count units may refer to different
         physical units for different instruments (e.g. one instrument may be
         "count"ing electrons, while another may be counting analog-to-digital
-        units [ADU]).
+        units [ADU]). In the latter case, the user must first multiply their
+        counts by the instrument gain to reflect the correct number of counts
+        for their instrument.
     npix : `~astropy.units.Quantity`, optional
         Number of pixels under consideration for the signal with units of
         pixels. Default is 1 * astropy.units.pixel.
@@ -819,10 +822,14 @@ def exptime_from_ccd_snr(snr, countrate,
         The signal to noise ratio of the given observation in dimensionless
         units.
     countrate : `~astropy.units.Quantity`
-        The counts per second with units of astropy.units.ct/second. Be aware
-        that the count unit may refer to different physical units for different
-        instruments (e.g. one instrument may be "count"ing electrons, while
-        another may be counting analog-to-digital units [ADU]).
+        The counts per second with units of (either astropy.units.ct,
+        astropy.units.electron or astropy.units.photon) / astropy.units.s.
+        Be aware that count units may refer to different physical units for
+        different instruments (e.g. one instrument may be "count"ing
+        electrons, while another may be counting analog-to-digital
+        units [ADU]). In the latter case, the user must first multiply their
+        counts by the instrument gain to reflect the correct number of counts
+        for their instrument.
     npix : `~astropy.units.Quantity`, optional
         Number of pixels under consideration for the signal with units of
         pixels. Default is 1 * astropy.units.pixel.
