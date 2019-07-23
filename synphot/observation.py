@@ -22,7 +22,7 @@ from . import binning, exceptions, units, utils
 from .models import Empirical1D
 from .spectrum import BaseSourceSpectrum, SourceSpectrum, SpectralElement
 
-__all__ = ['Observation', 'howell_snr', 'exptime_from_howell_snr']
+__all__ = ['Observation', 'ccd_snr', 'exptime_from_ccd_snr']
 
 
 class Observation(BaseSourceSpectrum):
@@ -700,22 +700,21 @@ class Observation(BaseSourceSpectrum):
 AD_ERR_DEFAULT = np.sqrt(0.289) * (u.adu / u.pixel)
 
 
-@u.quantity_input(counts=u.ct,
-                  npix=u.pixel,
+@u.quantity_input(npix=u.pixel,
                   n_background=u.pixel,
                   background=u.ct / u.pixel,
                   darkcurrent=u.ct / u.pixel,
                   readnoise=u.ct / u.pixel,
                   gain=u.ct / u.adu,
                   ad_err=u.adu / u.pixel)
-def howell_snr(counts,
-               npix=1 * u.pixel,
-               n_background=np.inf * u.pixel,
-               background=0 * (u.ct / u.pixel),
-               darkcurrent=0 * (u.ct / u.pixel),
-               readnoise=0 * (u.ct / u.pixel),
-               gain=1 * (u.ct / u.adu),
-               ad_err=AD_ERR_DEFAULT):
+def ccd_snr(counts,
+            npix=1 * u.pixel,
+            n_background=np.inf * u.pixel,
+            background=0 * (u.ct / u.pixel),
+            darkcurrent=0 * (u.ct / u.pixel),
+            readnoise=0 * (u.ct / u.pixel),
+            gain=1 * (u.ct / u.adu),
+            ad_err=AD_ERR_DEFAULT):
     """
     A function to calculate the idealized theoretical signal to noise ratio
     (SNR) of an astronomical observation with a given number of counts. This
@@ -776,6 +775,13 @@ def howell_snr(counts,
         The signal to noise ratio of the given observation in dimensionless
         units.
     """
+    if counts.unit in (u.electron, u.photon):
+        counts = counts.value * u.ct
+    elif counts.unit != u.ct:
+        raise u.UnitsError('counts must have units of either '
+                           'astropy.units.ct, astropy.units.electron '
+                           'or astropy.units.photon')
+
     readnoise = _get_shotnoise(readnoise)
     gain_err = _get_shotnoise(gain * ad_err)
 
@@ -787,22 +793,21 @@ def howell_snr(counts,
             np.sqrt(1 * u.ct))
 
 
-@u.quantity_input(countrate=u.ct / u.s,
-                  npix=u.pixel,
+@u.quantity_input(npix=u.pixel,
                   n_background=u.pixel,
                   background_rate=u.ct / u.pixel / u.s,
                   darkcurrent_rate=u.ct / u.pixel / u.s,
                   readnoise=u.ct / u.pixel,
                   gain=u.ct / u.adu,
                   ad_err=u.adu / u.pixel)
-def exptime_from_howell_snr(snr, countrate,
-                            npix=1 * u.pixel,
-                            n_background=np.inf * u.pixel,
-                            background_rate=0 * (u.ct / u.pixel / u.s),
-                            darkcurrent_rate=0 * (u.ct / u.pixel / u.s),
-                            readnoise=0 * (u.ct / u.pixel),
-                            gain=1 * (u.ct / u.adu),
-                            ad_err=AD_ERR_DEFAULT):
+def exptime_from_ccd_snr(snr, countrate,
+                         npix=1 * u.pixel,
+                         n_background=np.inf * u.pixel,
+                         background_rate=0 * (u.ct / u.pixel / u.s),
+                         darkcurrent_rate=0 * (u.ct / u.pixel / u.s),
+                         readnoise=0 * (u.ct / u.pixel),
+                         gain=1 * (u.ct / u.adu),
+                         ad_err=AD_ERR_DEFAULT):
     """
     Returns the exposure time needed in units of seconds to achieve
     the specified (idealized theoretical) signal to noise ratio
@@ -867,6 +872,13 @@ def exptime_from_howell_snr(snr, countrate,
         The exposure time needed (in seconds) to achieve the given signal
         to noise ratio.
     """
+    if countrate.unit in (u.electron / u.s, u.photon / u.s):
+        countrate = countrate.value * u.ct / u.s
+    elif countrate.unit != u.ct / u.s:
+        raise u.UnitsError('countrate must have units of (either '
+                           'astropy.units.ct, astropy.units.electron or '
+                           'astropy.units.photon) / astropy.units.s')
+
     # necessary for units to work:
     snr = snr * np.sqrt(1 * u.ct)
     readnoise = _get_shotnoise(readnoise)

@@ -11,8 +11,8 @@ import pytest
 # ASTROPY
 from astropy import units as u
 from astropy.modeling.models import Const1D
-from astropy.tests.helper import catch_warnings
-from astropy.tests.helper import assert_quantity_allclose
+from astropy.tests.helper import (catch_warnings, assert_quantity_allclose,
+                                  raises)
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyDeprecationWarning
@@ -22,7 +22,7 @@ from .test_units import _area
 from .. import exceptions, units
 from ..models import (BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D,
                       GaussianFlux1D)
-from ..observation import Observation, howell_snr, exptime_from_howell_snr
+from ..observation import Observation, ccd_snr, exptime_from_ccd_snr
 from ..spectrum import SourceSpectrum, SpectralElement
 
 try:
@@ -442,9 +442,9 @@ def test_countrate_neg_leak():
     assert c_sub <= c_all
 
 
-def test_howell_snr_calc():
+def test_ccd_snr_calc():
     """
-    A test to check that the math in observation.howell_snr is done correctly.
+    A test to check that the math in observation.ccd_snr is done correctly.
     Based on the worked example on pg. 56-57 of [1]_.
 
     References
@@ -461,9 +461,9 @@ def test_howell_snr_calc():
     npix = 1 * u.pixel
     counts = 24013 * u.adu * gain
 
-    result = howell_snr(counts, npix=npix, background=background,
-                        darkcurrent=darkcurrent, readnoise=readnoise,
-                        gain=gain, n_background=n_background)
+    result = ccd_snr(counts, npix=npix, background=background,
+                     darkcurrent=darkcurrent, readnoise=readnoise,
+                     gain=gain, n_background=n_background)
 
     # the value of the answer given in the text
     answer = 342
@@ -474,11 +474,11 @@ def test_howell_snr_calc():
 
 def test_snr_bright_object():
     """
-    Test that observation.howell_snr returns sqrt(counts), the expected value
+    Test that observation.ccd_snr returns sqrt(counts), the expected value
     for a bright target.
     """
     counts = 25e5 * u.ct
-    result = howell_snr(counts)
+    result = ccd_snr(counts)
     answer = np.sqrt(counts.value)
 
     assert_quantity_allclose(result, answer)
@@ -487,7 +487,7 @@ def test_snr_bright_object():
 def test_t_exp_numeric():
     """
     A test to check that the numerical method in
-    observation.exptime_from_howell_snr (i.e. when the error in background
+    observation.exptime_from_ccd_snr (i.e. when the error in background
     noise or gain is non-negligible) is done correctly. Based on the worked
     example on pg. 56-57 of [1]_.
 
@@ -506,11 +506,11 @@ def test_t_exp_numeric():
     darkcurrent_rate = 22 * (u.ct / u.pixel / u.hr)
     readnoise = 5 * (u.ct / u.pixel)
 
-    result = exptime_from_howell_snr(snr, countrate, npix=npix,
-                                     n_background=n_background,
-                                     background_rate=background_rate,
-                                     darkcurrent_rate=darkcurrent_rate,
-                                     readnoise=readnoise, gain=gain)
+    result = exptime_from_ccd_snr(snr, countrate, npix=npix,
+                                  n_background=n_background,
+                                  background_rate=background_rate,
+                                  darkcurrent_rate=darkcurrent_rate,
+                                  readnoise=readnoise, gain=gain)
 
     assert_quantity_allclose(result, t, atol=1 * u.s)
 
@@ -518,7 +518,7 @@ def test_t_exp_numeric():
 def test_t_exp_analytic():
     """
     A test to check that the analytic method in
-    observation.exptime_from_howell_snr is done correctly.
+    observation.exptime_from_ccd_snr is done correctly.
     """
     snr_set = 50
     countrate = 1000 * (u.ct / u.s)
@@ -527,17 +527,17 @@ def test_t_exp_analytic():
     darkcurrent_rate = 5 * (u.ct / u.pixel / u.s)
     readnoise = 1 * (u.ct / u.pixel)
 
-    t = exptime_from_howell_snr(snr_set, countrate, npix=npix,
-                                background_rate=background_rate,
-                                darkcurrent_rate=darkcurrent_rate,
-                                readnoise=readnoise)
+    t = exptime_from_ccd_snr(snr_set, countrate, npix=npix,
+                             background_rate=background_rate,
+                             darkcurrent_rate=darkcurrent_rate,
+                             readnoise=readnoise)
 
-    # if t is correct, howell_snr() should return snr_set:
-    snr_calc = howell_snr(countrate * t,
-                          npix=npix,
-                          background=background_rate * t,
-                          darkcurrent=darkcurrent_rate * t,
-                          readnoise=readnoise)
+    # if t is correct, ccd_snr() should return snr_set:
+    snr_calc = ccd_snr(countrate * t,
+                       npix=npix,
+                       background=background_rate * t,
+                       darkcurrent=darkcurrent_rate * t,
+                       readnoise=readnoise)
 
     assert_quantity_allclose(snr_calc, snr_set,
                              atol=0.5 * u.Unit(""))
@@ -545,13 +545,31 @@ def test_t_exp_analytic():
 
 def test_snr_with_countrate():
     """
-    A test to make sure `howell_snr` works with the units that
+    A test to make sure `ccd_snr` works with the units that
     `countrate` returns.
     """
     source_spec = SourceSpectrum(BlackBodyNorm1D)
     bp = SpectralElement(Const1D)
     obs = Observation(source_spec, bp, force='extrap')
     counts = obs.countrate(1 * u.m ** 2) * 1 * u.s
-    snr = howell_snr(counts)
+    snr = ccd_snr(counts)
 
     assert snr.unit == u.Unit("")
+
+
+@raises(u.UnitsError)
+def test_counts_units():
+    """
+    A test to make sure `ccd_snr` raises a UnitError if the user
+    gives an incompatible unit for counts.
+    """
+    return ccd_snr(1 * u.m)
+
+
+@raises(u.UnitsError)
+def test_countrate_units():
+    """
+    A test to make sure `exptime_from_ccd_snr` raises a UnitError
+    if the user gives an incompatible countrate unit.
+    """
+    return exptime_from_ccd_snr(10, 1 * u.m)
