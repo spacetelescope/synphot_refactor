@@ -20,12 +20,14 @@ import pytest
 # ASTROPY
 import astropy
 from astropy import units as u
+from astropy.modeling.models import Const1D
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
 from .. import specio, units
-from ..models import BlackBody1D, ConstFlux1D, Empirical1D, PowerLawFlux1D
+from ..models import (BlackBody1D, ConstFlux1D, Empirical1D, PowerLawFlux1D,
+                      get_metadata)
 
 try:
     import scipy
@@ -257,3 +259,23 @@ class TestPowerLawFlux1D(object):
     def test_invalid_units(self, flux_unit):
         with pytest.raises(NotImplementedError):
             PowerLawFlux1D(amplitude=1 * flux_unit, x_0=5000, alpha=4)
+
+
+def test_get_metadata():
+    m1 = Const1D()
+    m1.meta['description'] = 'a constant'
+    m1.meta['foo'] = 42.0
+
+    m2 = Const1D()
+    m2.meta['description'] = 'another constant'
+
+    m3 = Const1D()
+    m3.meta[42] = 'answer'
+
+    m = (m1 + m2) * m3
+    meta = get_metadata(m)
+    keys = list(meta.keys())
+    assert len(keys) == 3
+    assert meta['description'] == 'another constant'
+    assert meta['foo'] == 42
+    assert meta[42] == 'answer'

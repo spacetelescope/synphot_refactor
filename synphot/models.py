@@ -3,7 +3,6 @@
 
 # STDLIB
 import warnings
-from collections import defaultdict
 from copy import deepcopy
 from functools import partial
 
@@ -15,7 +14,6 @@ from astropy import constants as const
 from astropy import units as u
 from astropy.modeling import Fittable1DModel, Model, Parameter
 from astropy.modeling import models as _models
-from astropy.modeling.core import _CompoundModel
 from astropy.modeling.models import Tabular1D
 from astropy.stats.funcs import gaussian_fwhm_to_sigma, gaussian_sigma_to_fwhm
 from astropy.utils import metadata
@@ -23,9 +21,14 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from . import units
-from .compat import ASTROPY_LT_2_0
+from .compat import ASTROPY_LT_2_0, ASTROPY_LT_4_0
 from .exceptions import SynphotError
 from .utils import merge_wavelengths
+
+if ASTROPY_LT_4_0:
+    from astropy.modeling.core import _CompoundModel as CompoundModel
+else:
+    from astropy.modeling.core import CompoundModel
 
 __all__ = ['BlackBody1D', 'BlackBodyNorm1D', 'Box1D', 'ConstFlux1D',
            'Empirical1D', 'Gaussian1D', 'GaussianAbsorption1D',
@@ -652,57 +655,102 @@ class Trapezoid1D(_models.Trapezoid1D):
 # Functions below are for sampleset magic.
 
 def _get_sampleset(model):
-    """Return sampleset of a model or `None` if undefined.
-    Model could be a real model or evaluated sampleset."""
-    if isinstance(model, Model):
-        if hasattr(model, 'sampleset'):
-            w = model.sampleset()
-        else:
-            w = None
-    else:
-        w = model  # Already a sampleset
+    """Return sampleset of a model or `None` if undefined."""
+    w = None
+    if isinstance(model, Model) and hasattr(model, 'sampleset'):
+        w = model.sampleset()
     return w
 
 
-def _merge_sampleset(model1, model2):
-    """Simple merge of samplesets."""
-    w1 = _get_sampleset(model1)
-    w2 = _get_sampleset(model2)
-    return merge_wavelengths(w1, w2)
+def _model_tree_evaluate_sampleset(root):
+    # Not a CompoundModel, grab sampleset and be done.
+    if not hasattr(root, 'op'):
+        return _get_sampleset(root)
 
+    model1 = root.left
+    model2 = root.right
 
-def _shift_wavelengths(model1, model2):
-    """One of the models is either ``RedshiftScaleFactor`` or ``Scale``.
-
-    Possible combos::
-
-        RedshiftScaleFactor | Model
-        Scale | Model
-        Model | Scale
-
-    """
+    # model2 is redshifted, apply the redshift if applicable.
     if isinstance(model1, _models.RedshiftScaleFactor):
-        val = _get_sampleset(model2)
+        val = _model_tree_evaluate_sampleset(model2)
         if val is None:
             w = val
         else:
             w = model1.inverse(val)
+
+    # This should not ever happen, so ignore the redshift.
+    elif isinstance(model2, _models.RedshiftScaleFactor):
+        w = _model_tree_evaluate_sampleset(model1)
+
+    # One of the models is scaled. Non-redshift scaling does
+    # not affect sampleset of the model.
     elif isinstance(model1, _models.Scale):
-        w = _get_sampleset(model2)
+        w = _model_tree_evaluate_sampleset(model2)
+    elif isinstance(model2, _models.Scale):
+        w = _model_tree_evaluate_sampleset(model1)
+
+    # Combine sampleset from both models.
     else:
-        w = _get_sampleset(model1)
+        w1 = _model_tree_evaluate_sampleset(model1)
+        w2 = _model_tree_evaluate_sampleset(model2)
+        w = merge_wavelengths(w1, w2)
+
     return w
 
 
-WAVESET_OPERATORS = {
-    '+': _merge_sampleset,
-    '-': _merge_sampleset,
-    '*': _merge_sampleset,
-    '/': _merge_sampleset,
-    '**': _merge_sampleset,
-    '|': _shift_wavelengths,
-    '&': _merge_sampleset
-}
+def _model_tree_evaluate_sampleset_compat(model):
+    """_model_tree_evaluate_sampleset for astropy<4"""
+
+    def _get_sampleset_compat(model):
+        # Return sampleset of a model or `None` if undefined.
+        # Model could be a real model or evaluated sampleset.
+        if isinstance(model, Model):
+            if hasattr(model, 'sampleset'):
+                w = model.sampleset()
+            else:
+                w = None
+        else:
+            w = model  # Already a sampleset
+        return w
+
+    def _merge_sampleset_compat(model1, model2):
+        # Simple merge of samplesets.
+        w1 = _get_sampleset_compat(model1)
+        w2 = _get_sampleset_compat(model2)
+        return merge_wavelengths(w1, w2)
+
+    def _shift_wavelengths_compat(model1, model2):
+        # One of the models is either ``RedshiftScaleFactor`` or ``Scale``.
+        # Possible combos::
+        #    RedshiftScaleFactor | Model
+        #    Scale | Model
+        #    Model | Scale
+        if isinstance(model1, _models.RedshiftScaleFactor):
+            val = _get_sampleset_compat(model2)
+            if val is None:
+                w = val
+            else:
+                w = model1.inverse(val)
+        elif isinstance(model1, _models.Scale):
+            w = _get_sampleset_compat(model2)
+        else:
+            w = _get_sampleset_compat(model1)
+        return w
+
+    WAVESET_OPERATORS = {
+        '+': _merge_sampleset_compat,
+        '-': _merge_sampleset_compat,
+        '*': _merge_sampleset_compat,
+        '/': _merge_sampleset_compat,
+        '**': _merge_sampleset_compat,
+        '|': _shift_wavelengths_compat,
+        '&': _merge_sampleset_compat}
+
+    if isinstance(model, CompoundModel):
+        waveset = model._tree.evaluate(WAVESET_OPERATORS, getter=None)
+    else:
+        waveset = _get_sampleset_compat(model)
+    return waveset
 
 
 def get_waveset(model):
@@ -727,35 +775,60 @@ def get_waveset(model):
     if not isinstance(model, Model):
         raise SynphotError('{0} is not a model.'.format(model))
 
-    if isinstance(model, _CompoundModel):
-        waveset = model._tree.evaluate(WAVESET_OPERATORS, getter=None)
+    if ASTROPY_LT_4_0:
+        waveset = _model_tree_evaluate_sampleset_compat(model)
     else:
-        waveset = _get_sampleset(model)
+        waveset = _model_tree_evaluate_sampleset(model)
 
     return waveset
 
 
 # Functions below are for meta magic.
 
-# This is for joining metadata in a compound model.
-METADATA_OPERATORS = defaultdict(lambda: _merge_meta)
-
-
 def _get_meta(model):
-    """Return metadata of a model.
-    Model could be a real model or evaluated metadata."""
+    """Return metadata of a model."""
+    w = {}
     if isinstance(model, Model):
         w = model.meta
-    else:
-        w = model  # Already metadata
     return w
 
 
-def _merge_meta(model1, model2):
-    """Simple merge of samplesets."""
-    w1 = _get_meta(model1)
-    w2 = _get_meta(model2)
-    return metadata.merge(w1, w2, metadata_conflicts='silent')
+def _model_tree_evaluate_metadata(root):
+    # Not a CompoundModel, grab metadata and be done.
+    if not hasattr(root, 'op'):
+        return _get_meta(root)
+
+    m1 = _model_tree_evaluate_metadata(root.left)
+    m2 = _model_tree_evaluate_metadata(root.right)
+    return metadata.merge(m1, m2, metadata_conflicts='silent')
+
+
+def _model_tree_evaluate_metadata_compat(model):
+    """_model_tree_evaluate_sampleset for astropy<4"""
+    from collections import defaultdict
+
+    def _get_meta_compat(model):
+        # Return metadata of a model.
+        # Model could be a real model or evaluated metadata.
+        if isinstance(model, Model):
+            w = model.meta
+        else:
+            w = model  # Already metadata
+        return w
+
+    def _merge_meta_compat(model1, model2):
+        # Simple merge of samplesets.
+        m1 = _get_meta_compat(model1)
+        m2 = _get_meta_compat(model2)
+        return metadata.merge(m1, m2, metadata_conflicts='silent')
+
+    if isinstance(model, CompoundModel):
+        meta = model._tree.evaluate(
+            defaultdict(lambda: _merge_meta_compat), getter=None)
+    else:
+        meta = deepcopy(model.meta)
+
+    return meta
 
 
 def get_metadata(model):
@@ -768,7 +841,7 @@ def get_metadata(model):
 
     Returns
     -------
-    metadata : dict
+    meta : dict
         Metadata for the model.
 
     Raises
@@ -780,9 +853,12 @@ def get_metadata(model):
     if not isinstance(model, Model):
         raise SynphotError('{0} is not a model.'.format(model))
 
-    if isinstance(model, _CompoundModel):
-        metadata = model._tree.evaluate(METADATA_OPERATORS, getter=None)
+    if ASTROPY_LT_4_0:
+        meta = _model_tree_evaluate_metadata_compat(model)
     else:
-        metadata = deepcopy(model.meta)
+        # Deep copy to make sure modiyfing returned metadata
+        # does not modify input model metadata, especially
+        # if input model is not a compound model.
+        meta = deepcopy(_model_tree_evaluate_metadata(model))
 
-    return metadata
+    return meta
