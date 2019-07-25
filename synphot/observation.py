@@ -726,7 +726,7 @@ def ccd_snr(counts,
         Total number of counts in an arbitrary exposure time with units of
         either astropy.units.ct, astropy.units.electron, or
         astropy.units.photon. Be aware that count units may refer to different
-        physical units for different instruments (e.g. one instrument may be
+        physical units for different instruments (e.g., one instrument may be
         "count"ing electrons, while another may be counting analog-to-digital
         units [ADU]). In the latter case, the user must first multiply their
         counts by the instrument gain to reflect the correct number of counts
@@ -782,7 +782,7 @@ def ccd_snr(counts,
         counts = counts.value * u.ct
     elif counts.unit != u.ct:
         raise u.UnitsError('counts must have units of either '
-                           'astropy.units.ct, astropy.units.electron '
+                           'astropy.units.ct, astropy.units.electron, '
                            'or astropy.units.photon')
 
     readnoise = _get_shotnoise(readnoise)
@@ -880,10 +880,10 @@ def exptime_from_ccd_snr(snr, countrate,
         to noise ratio.
     """
     if countrate.unit in (u.electron / u.s, u.photon / u.s):
-        countrate = countrate.value * u.ct / u.s
+        countrate = countrate.value * (u.ct / u.s)
     elif countrate.unit != u.ct / u.s:
         raise u.UnitsError('countrate must have units of (either '
-                           'astropy.units.ct, astropy.units.electron or '
+                           'astropy.units.ct, astropy.units.electron, or '
                            'astropy.units.photon) / astropy.units.s')
 
     # necessary for units to work:

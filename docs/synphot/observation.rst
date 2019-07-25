@@ -102,7 +102,7 @@ time::
     >>> import astropy.units as u
     >>> exptime = 1 * u.s
     >>> ccd_snr(countrate * exptime)
-    <Quantity 138743.11880657 ct(1/2)>
+    <Quantity 138743.11880657>
 
 Or, to determine the exposure time needed to reach a certain signal to noise
 ratio, use the :func:`~synphot.observation.exptime_from_ccd_snr`
@@ -110,7 +110,7 @@ function with the observation's count rate::
 
     >>> from synphot.observation import exptime_from_ccd_snr
     >>> import numpy as np
-    >>> snr = 100 * np.sqrt(1 * u.ct)  # desired SNR of 100
+    >>> snr = 100  # desired SNR of 100
     >>> exptime_from_ccd_snr(snr, countrate)
     <Quantity 5.19489883e-07 s>
 

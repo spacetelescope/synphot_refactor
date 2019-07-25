@@ -4,10 +4,10 @@
 - Removed Python 2 support. This version is only compatible with Python 3.5
   or later. [#185]
 - New ``synphot.observation.ccd_snr()`` function to calculate the signal
-  to noise ratio given a count rate and exposure time.
+  to noise ratio given a count rate and exposure time. [#204]
 - New ``synphot.observation.exptime_from_ccd_snr()`` function to
   determine the exposure time needed to achieve a given signal to noise
-  ratio.
+  ratio. [#204]
 
 0.1.3 (2019-03-24)
 ==================
