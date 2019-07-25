@@ -713,7 +713,7 @@ def ccd_snr(counts,
             background=0 * (u.ct / u.pixel),
             darkcurrent=0 * (u.ct / u.pixel),
             readnoise=0 * (u.ct / u.pixel),
-            gain=1 * (u.ct / u.adu),
+            gain=0 * (u.ct / u.adu),
             ad_err=AD_ERR_DEFAULT):
     """
     A function to calculate the idealized theoretical signal to noise ratio
@@ -752,8 +752,8 @@ def ccd_snr(counts,
         Default is 0 * astropy.units.ct / astropy.units.pixel.
     gain : `~astropy.units.Quantity`, optional
         Gain of the CCD with units of counts/ADU. Default is
-        1 * astropy.units.ct / astropy.units.adu such that the
-        contribution to the error due to the gain is assumed to be small.
+        0 * astropy.units.ct / astropy.units.adu such that the
+        contribution to the error due to the gain is assumed to be negligable.
     ad_err : `~astropy.units.Quantity`, optional
         An estimate of the 1 sigma error within the A/D converter with units of
         adu/pixel. Default is set to

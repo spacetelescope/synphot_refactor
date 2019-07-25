@@ -551,14 +551,15 @@ def test_snr_with_countrate():
     area = 1 * u.m ** 2
     bp = SpectralElement(Const1D)
     source_spec = SourceSpectrum(BlackBodyNorm1D)
-    source_spec = source_spec.normalize(
-        1 * u.ct, bp, force='extrap', wavelengths=source_spec.waveset, area=area)
+    source_spec = source_spec.normalize(1 * u.ct, bp,
+                                        force='extrap',
+                                        wavelengths=source_spec.waveset,
+                                        area=area)
     obs = Observation(source_spec, bp, force='extrap')
     counts = obs.countrate(area) * u.s
     snr = ccd_snr(counts)
 
-    assert snr.unit == u.Unit("")
-    np.testing.assert_allclose(snr.value, ???)
+    assert_quantity_allclose(snr, 1 * u.Unit(""), rtol=1e-3)
 
 
 @raises(u.UnitsError)
