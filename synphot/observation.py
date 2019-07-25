@@ -918,7 +918,7 @@ def _get_shotnoise(detector_property):
     """
     # Ensure detector_property is in the correct units:
     detector_property = detector_property.to(u.ct / u.pixel)
-    return detector_property.value * np.sqrt(1 * u.ct / u.pixel)
+    return detector_property.value * np.sqrt(1 * (u.ct / u.pixel))
 
 
 def _t_with_small_errs(t, background_rate, darkcurrent_rate, gain_err,

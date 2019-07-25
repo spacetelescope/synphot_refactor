@@ -548,19 +548,23 @@ def test_snr_with_countrate():
     A test to make sure `ccd_snr` works with the units that
     `countrate` returns.
     """
-    source_spec = SourceSpectrum(BlackBodyNorm1D)
+    area = 1 * u.m ** 2
     bp = SpectralElement(Const1D)
+    source_spec = SourceSpectrum(BlackBodyNorm1D)
+    source_spec = source_spec.normalize(
+        1 * u.ct, bp, force='extrap', wavelengths=source_spec.waveset, area=area)
     obs = Observation(source_spec, bp, force='extrap')
-    counts = obs.countrate(1 * u.m ** 2) * 1 * u.s
+    counts = obs.countrate(area) * u.s
     snr = ccd_snr(counts)
 
     assert snr.unit == u.Unit("")
+    np.testing.assert_allclose(snr.value, ???)
 
 
 @raises(u.UnitsError)
 def test_counts_units():
     """
-    A test to make sure `ccd_snr` raises a UnitError if the user
+    A test to make sure ``ccd_snr`` raises a UnitError if the user
     gives an incompatible unit for counts.
     """
     return ccd_snr(1 * u.m)
@@ -569,7 +573,7 @@ def test_counts_units():
 @raises(u.UnitsError)
 def test_countrate_units():
     """
-    A test to make sure `exptime_from_ccd_snr` raises a UnitError
+    A test to make sure ``exptime_from_ccd_snr`` raises a UnitError
     if the user gives an incompatible countrate unit.
     """
     return exptime_from_ccd_snr(10, 1 * u.m)
