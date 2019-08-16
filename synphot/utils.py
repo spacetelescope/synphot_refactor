@@ -252,14 +252,20 @@ def merge_wavelengths(waveset1, waveset2, threshold=1e-12):
     return out_wavelengths
 
 
-def download_data(cdbs_root, verbose=True, dry_run=False):
-    """Download CDBS data files to given root directory.
+def download_data(path_root=None, verbose=True, dry_run=False):
+    """Download synphot data files to given root directory or the astropy cache.
     Download is skipped if a data file already exists.
+
+    Note that if you have changed the path for the data files by providing a
+    synphot.cfg file pointing to local file, this function will not work. You
+    will need to have the configuration items point to wherever you wish to
+    download them from for this to work.
 
     Parameters
     ----------
-    cdbs_root : str
-        Root directory for CDBS data files.
+    path_root : str or None, optional
+        Root directory for data files. If None, download to the astropy cache
+        location instead of a specific directory.
 
     verbose : bool
         Print extra information to screen.
@@ -282,19 +288,23 @@ def download_data(cdbs_root, verbose=True, dry_run=False):
 
     """
     from .config import conf  # Avoid potential circular import
+    BASE_HOST = 'http://ssb.stsci.edu/cdbs/'
 
-    if not os.path.exists(cdbs_root):
-        os.makedirs(cdbs_root, exist_ok=True)
-        if verbose:  # pragma: no cover
-            print('Created {}'.format(cdbs_root))
-    elif not os.path.isdir(cdbs_root):
-        raise OSError('{} must be a directory'.format(cdbs_root))
+    if path_root is None:
+        usecache = True
+    else:
+        usecache = False
+        if not os.path.exists(path_root):
+            os.makedirs(path_root, exist_ok=True)
+            if verbose:  # pragma: no cover
+                print('Created {}'.format(path_root))
+        elif not os.path.isdir(path_root):
+            raise OSError('{} must be a directory'.format(path_root))
 
-    host = 'http://ssb.stsci.edu/cdbs/'
+        if not path_root.endswith(os.sep):
+            path_root += os.sep
+
     file_list = []
-
-    if not cdbs_root.endswith(os.sep):
-        cdbs_root += os.sep
 
     # See https://github.com/astropy/astropy/issues/8524
     for cfgitem in conf.__class__.__dict__.values():
@@ -304,33 +314,36 @@ def download_data(cdbs_root, verbose=True, dry_run=False):
 
         url = cfgitem()
 
-        if not url.startswith(host):
+        if not url.startswith(BASE_HOST):
             if verbose:  # pragma: no cover
                 print('{} is not from {}, skipping download'.format(
-                    url, host))
+                    url, BASE_HOST))
             continue
+        if not usecache:
+            dst = url.replace(BASE_HOST, path_root).replace('/', os.sep)
 
-        dst = url.replace(host, cdbs_root).replace('/', os.sep)
+            if os.path.exists(dst):
+                if verbose:  # pragma: no cover
+                    print('{} already exists, skipping download'.format(dst))
+                continue
 
-        if os.path.exists(dst):
-            if verbose:  # pragma: no cover
-                print('{} already exists, skipping download'.format(dst))
-            continue
-
-        # Create sub-directories, if needed.
-        subdirs = os.path.dirname(dst)
-        os.makedirs(subdirs, exist_ok=True)
+            # Create sub-directories, if needed.
+            subdirs = os.path.dirname(dst)
+            os.makedirs(subdirs, exist_ok=True)
 
         if not dry_run:  # pragma: no cover
             try:
-                src = download_file(url)
-                copyfile(src, dst)
+                src = download_file(url, cache=usecache)
+                if not usecache:
+                    copyfile(src, dst)
             except Exception as exc:
                 print('Download failed - {}'.format(str(exc)))
                 continue
-
-        file_list.append(dst)
+        if usecache:
+            file_list.append(src)
+        else:
+            file_list.append(dst)
         if verbose:  # pragma: no cover
-            print('{} downloaded to {}'.format(url, dst))
+            print('{} downloaded to {}'.format(url, file_list[-1]))
 
     return file_list
