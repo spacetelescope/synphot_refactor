@@ -654,10 +654,10 @@ class BaseSpectrum(object):
 
         if y1 != 0:
             x = np.insert(x, 0, w1)
-            y = np.insert(y, 0, 0.0)
+            y = np.insert(y, 0, 0.0 * y.unit)
         if y2 != 0:
             x = np.insert(x, x.size, w2)
-            y = np.insert(y, y.size, 0.0)
+            y = np.insert(y, y.size, 0.0 * y.unit)
 
         return self.__class__(Empirical1D, points=x, lookup_table=y)
 
