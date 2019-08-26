@@ -50,9 +50,8 @@ interpolation of internal lookup tables. But similar to ASTROLIB PYSYNPHOT,
 each individual model that goes into a
 :ref:`compound (composite) model <astropy:compound-models>` is stored
 separately and the final result is only calculated on evaluation.
-For simplicity, only 1D models and single
-:ref:`model set <astropy:modeling-getting-started-model-sets>`
-(``n_models=1``) are supported.
+For simplicity, only 1D models and single model set (``n_models=1``)
+are supported.
 
 At the time that this package was developed, some features needed for
 spectra manipulation were not (yet) available in Astropy models
