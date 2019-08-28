@@ -84,21 +84,22 @@ stages:
       name: 'OSX'
       vmImage: 'macOS-10.13'
 
-  - job: 'Doc'
-    pool:
-      vmImage: 'Ubuntu-16.04'
-
-    steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '3.6'
-
-    - script: |
-        sudo apt-get install graphviz
-        python -m pip install --upgrade pip setuptools
-        pip install numpy scipy matplotlib astropy sphinx-astropy
-        python setup.py build_docs -w
-      displayName: 'Doc build'
+  # DEV NOTE: We let RTD do this now?
+  #- job: 'Doc'
+  #  pool:
+  #    vmImage: 'Ubuntu-16.04'
+  #
+  #  steps:
+  #  - task: UsePythonVersion@0
+  #    inputs:
+  #      versionSpec: '3.6'
+  #
+  #  - script: |
+  #      sudo apt-get install graphviz
+  #      python -m pip install --upgrade pip setuptools
+  #      pip install numpy scipy matplotlib astropy sphinx-astropy
+  #      python setup.py build_docs -w
+  #    displayName: 'Doc build'
   # DEV NOTE:
   # Not very useful like this because I have to sign in with Microsoft account,
   # download a ZIP file, unzip on local disk, and then only I can preview the
