@@ -34,6 +34,21 @@ stages:
         flake8 synphot --count
       displayName: 'PEP 8 check'
 
+  - job: 'Audit'
+    pool:
+      vmImage: 'Ubuntu-16.04'
+
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.x'
+
+    - script: |
+        python -m pip install --upgrade pip setuptools
+        pip install bandit
+        bandit -r . -c .bandit.yaml
+      displayName: 'Security audit'
+
   - template: azure-templates.yml
 
 - stage: Comprehensive
