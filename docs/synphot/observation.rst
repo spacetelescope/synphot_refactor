@@ -1,5 +1,3 @@
-.. doctest-skip-all
-
 .. _synphot_observation:
 
 Observation
@@ -22,11 +20,27 @@ cases, the bandpass has an extra ``binset`` attribute (wavelength values for
 bin centers) that must be passed into an observation's constructor, as shown
 below::
 
-    >>> import stsynphot as STS
-    >>> from synphot import Observation
-    >>> sp = STS.Vega
-    >>> bp = STS.band('acs,wfc1,f555w')
-    >>> obs = Observation(sp, bp, binset=bp.binset)
+    >>> import stsynphot as stsyn  # doctest: +SKIP
+    >>> from astropy import units as u
+    >>> from synphot import Observation, SourceSpectrum
+    >>> from synphot.models import GaussianFlux1D
+    >>> sp = SourceSpectrum(GaussianFlux1D, amplitude=1*u.Jy,
+    ...                     mean=6000*u.AA, fwhm=100*u.AA)
+    >>> bp = stsyn.band('acs,hrc,f555w')  # doctest: +SKIP
+    >>> obs = Observation(sp, bp, binset=bp.binset)  # doctest: +SKIP
+
+.. testsetup::
+
+    >>> import os
+    >>> import numpy as np
+    >>> from astropy.utils.data import get_pkg_data_filename
+    >>> from synphot import SpectralElement
+    >>> filename = get_pkg_data_filename(
+    ...     os.path.join('data', 'hst_acs_hrc_f555w.fits'),
+    ...     package='synphot.tests')
+    >>> bp = SpectralElement.from_file(filename)
+    >>> binset = np.arange(1000, 11001, dtype=np.float)
+    >>> obs = Observation(sp, bp, binset=binset)
 
 It has these main general components:
 
@@ -52,18 +66,18 @@ for flux conversion). To get binned flux values, use
 :meth:`~synphot.observation.Observation.sample_binned`, where you must provide
 the exact bin center(s)::
 
-    >>> obs(6000.5)  # Native (not binned) sampling; Angstrom
-    <Quantity 160.95438045640773 PHOTLAM>
-    >>> obs.sample_binned([6000, 6001])  # Binned flux in given centers
-    <Quantity [ 161.19216632, 160.65695961] PHOTLAM>
+    >>> obs(6000.5)  # Native (not binned) sampling; Angstrom  # doctest: +FLOAT_CMP
+    <Quantity 0.03080553 PHOTLAM>
+    >>> obs.sample_binned([6000, 6001])  # Binned flux in given centers  # doctest: +FLOAT_CMP
+    <Quantity [0.03084873, 0.0307453 ] PHOTLAM>
 
 To calculate **bin properties** such as covered wavelength or pixel ranges,
 you can use its :meth:`~synphot.observation.Observation.binned_waverange` and
 :meth:`~synphot.observation.Observation.binned_pixelrange` as follows::
 
     >>> # Wavelength range covered by 10 pixels centered at 5500 Angstrom
-    >>> obs.binned_waverange(5500, 10)
-    <Quantity [ 5495.5, 5505.5] Angstrom>
+    >>> obs.binned_waverange(5500, 10)  # doctest: +FLOAT_CMP
+    <Quantity [5495.5, 5505.5] Angstrom>
     >>> # Pixel range covered by above wavelength range
     >>> obs.binned_pixelrange([5495.5, 5505.5])
     10
@@ -73,14 +87,14 @@ and :ref:`synphot-formula-effwave`, which can be calculated in a way
 that is consistent with ASTROLIB PYSYNPHOT::
 
     >>> # Effective stimulus in FLAM
-    >>> obs.effstim(flux_unit='flam')
-    <Quantity 3.78664384e-09 FLAM>
+    >>> obs.effstim(flux_unit='flam')  # doctest: +FLOAT_CMP
+    <Quantity 4.12569567e-14 FLAM>
     >>> # Effective wavelength for binned sampling in FLAM
-    >>> obs.effective_wavelength()
-    <Quantity 5332.62717945 Angstrom>
+    >>> obs.effective_wavelength()  # doctest: +FLOAT_CMP
+    <Quantity 5991.99794956 Angstrom>
     >>> # Repeat for "native" sampling
-    >>> obs.effective_wavelength(binned=False)
-    <Quantity 5332.62724394 Angstrom>
+    >>> obs.effective_wavelength(binned=False)  # doctest: +FLOAT_CMP
+    <Quantity 5991.99798818 Angstrom>
 
 :meth:`~synphot.observation.Observation.countrate` is probably the most often
 used method for an observation.
@@ -90,8 +104,8 @@ some binning. By default, it uses ``binset``, which should be defined such that
 one wavelength bin corresponds to one detector pixel::
 
     >>> area = 45238.93416  # HST, in cm^2
-    >>> obs.countrate(area)
-    <Quantity 1.9249653e+10 ct / s>
+    >>> obs.countrate(area)  # doctest: +FLOAT_CMP
+    <Quantity 137190.19332899 ct / s>
 
 An observation can be converted to a **regular source spectrum** containing
 only the wavelength set and sampled flux (binned by default) by using its

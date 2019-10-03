@@ -76,6 +76,25 @@ stages:
         codecov_token: $(CODECOV_TOKEN)
       displayName: 'Calculate coverage'
 
+  - job: 'LinkCheck'
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    strategy:
+      maxParallel: 4
+
+    steps:
+    - task: UsePythonVersion@0
+
+    - script: |
+        python -m pip install --upgrade pip setuptools
+        pip install sphinx-astropy
+        python setup.py install
+
+    - bash: |
+        cd docs
+        make linkcheck
+      displayName: 'Run docs link check'
+
   - template: azure-templates.yml
     parameters:
       name: 'Older_Versions'

@@ -12,6 +12,7 @@
 
 # STDLIB
 import os
+import warnings
 
 # THIRD-PARTY
 import numpy as np
@@ -23,6 +24,7 @@ from astropy import units as u
 from astropy.modeling.models import Const1D
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
+from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from .. import specio, units
@@ -180,8 +182,12 @@ class TestEmpirical1D(object):
         [(True, [-1.1, 0, 1.1]),
          (False, [0, 0, 1.1])])
     def test_neg_array(self, keep_neg, ans):
-        m2 = Empirical1D(points=[1, 2, 3], lookup_table=[-1.1, 0, 1.1],
-                         keep_neg=keep_neg)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                'ignore', message=r'.*contained negative flux or throughput.*',
+                category=AstropyUserWarning)
+            m2 = Empirical1D(points=[1, 2, 3], lookup_table=[-1.1, 0, 1.1],
+                             keep_neg=keep_neg)
         np.testing.assert_array_equal(m2([1, 2, 3]), ans)
         if not keep_neg:
             assert 'NegativeFlux' in m2.meta['warnings']
@@ -191,8 +197,12 @@ class TestEmpirical1D(object):
         [(True, -1),
          (False, 0)])
     def test_neg_scalar(self, keep_neg, ans):
-        m2 = Empirical1D(points=[1, 2, 3], lookup_table=[-1, 0, 1],
-                         keep_neg=keep_neg)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                'ignore', message=r'.*contained negative flux or throughput.*',
+                category=AstropyUserWarning)
+            m2 = Empirical1D(points=[1, 2, 3], lookup_table=[-1, 0, 1],
+                             keep_neg=keep_neg)
         np.testing.assert_array_equal(m2(1), ans)
         if not keep_neg:
             assert 'NegativeFlux' in m2.meta['warnings']

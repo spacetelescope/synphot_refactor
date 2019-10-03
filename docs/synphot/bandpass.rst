@@ -1,5 +1,3 @@
-.. doctest-skip-all
-
 .. _bandpass-main:
 
 Bandpass
@@ -33,8 +31,8 @@ To **evaluate** its transmission at a given wavelength, use its
     >>> from synphot import SpectralElement
     >>> from synphot.models import Box1D
     >>> bp = SpectralElement(Box1D, amplitude=1, x_0=5000, width=100)
-    >>> bp(500 * u.nm)
-    <Quantity 1.0>
+    >>> bp(500 * u.nm)  # doctest: +FLOAT_CMP
+    <Quantity 1.>
 
 Bandpass also has access to **photometric parameter** calculations akin to
 IRAF SYNPHOT ``bandpar`` task. (Also see :ref:`synphot_formulae` and respective
@@ -42,34 +40,34 @@ API documentations.) Some of these need the information of telescope collecting
 area, which will be set to HST value in the examples below::
 
     >>> area = 45238.93416 * (u.cm * u.cm)  # HST
-    >>> bp.avgwave()
-    <Quantity 4999.995000001091 Angstrom>
-    >>> bp.tlambda()
-    <Quantity 1.0>
-    >>> bp.tpeak()
-    <Quantity 1.0>
-    >>> bp.wpeak()  # For box, this is the first occurence of max throughput
-    <Quantity 4950.0 Angstrom>
-    >>> bp.efficiency()
-    <Quantity 0.020000686709115298>
-    >>> bp.equivwidth()
-    <Quantity 100.00000000218279 Angstrom>
-    >>> bp.rectwidth()
-    <Quantity 100.00000000218279 Angstrom>
-    >>> bp.rmswidth()
-    <Quantity 28.867513315773838 Angstrom>
-    >>> bp.photbw()
-    <Quantity 28.867032163097033 Angstrom>
-    >>> bp.fwhm()
-    <Quantity 67.97666597821402 Angstrom>
-    >>> bp.pivot()
-    <Quantity 4999.911663668414 Angstrom>
-    >>> bp.barlam()
-    <Quantity 4999.744993503255 Angstrom>
-    >>> bp.unit_response(area)
-    <Quantity 8.78202683842001e-19 FLAM>
-    >>> bp.emflx(area)
-    <Quantity 8.782026838611703e-17 FLAM>
+    >>> bp.avgwave()  # doctest: +FLOAT_CMP
+    <Quantity 4999.995 Angstrom>
+    >>> bp.tlambda()  # doctest: +FLOAT_CMP
+    <Quantity 1.>
+    >>> bp.tpeak()  # doctest: +FLOAT_CMP
+    <Quantity 1.>
+    >>> bp.wpeak()  # For box, this is the first occurence of max throughput # doctest: +FLOAT_CMP
+    <Quantity 4950. Angstrom>
+    >>> bp.efficiency()  # doctest: +FLOAT_CMP
+    <Quantity 0.02000069>
+    >>> bp.equivwidth()  # doctest: +FLOAT_CMP
+    <Quantity 100. Angstrom>
+    >>> bp.rectwidth()  # doctest: +FLOAT_CMP
+    <Quantity 100. Angstrom>
+    >>> bp.rmswidth()  # doctest: +FLOAT_CMP
+    <Quantity 28.86751332 Angstrom>
+    >>> bp.photbw()  # doctest: +FLOAT_CMP
+    <Quantity 28.86703216 Angstrom>
+    >>> bp.fwhm()  # doctest: +FLOAT_CMP
+    <Quantity 67.97666598 Angstrom>
+    >>> bp.pivot()  # doctest: +FLOAT_CMP
+    <Quantity 4999.91166367 Angstrom>
+    >>> bp.barlam()  # doctest: +FLOAT_CMP
+    <Quantity 4999.7449935 Angstrom>
+    >>> bp.unit_response(area)  # doctest: +FLOAT_CMP
+    <Quantity 8.78202761e-19 FLAM>
+    >>> bp.emflx(area)  # doctest: +FLOAT_CMP
+    <Quantity 8.78202761e-17 FLAM>
 
 To check the **overlap**, i.e., whether the wavelength range of another
 spectrum is defined everywhere within the a bandpass, you can use
@@ -82,24 +80,24 @@ any potential inaccurate representation of the result::
     >>> bp = SpectralElement(
     ...     Empirical1D, points=[2999.9, 3000, 6000, 6000.1],
     ...     lookup_table=[0, 1, 1, 0])
-    # Source spectrum is fully defined within bandpass waveset
+    >>> # Source spectrum is fully defined within bandpass waveset
     >>> sp_full = SourceSpectrum(
     ...     Empirical1D, points=[999.9, 1000, 9000, 9000.1],
     ...     lookup_table=[0, 1, 1, 0])
     >>> bp.check_overlap(sp_full)
     'full'
-    # 99% of spectrum's flux is in the overlap (not a concern)
+    >>> # 99% of spectrum's flux is in the overlap (not a concern)
     >>> sp_most = SourceSpectrum(
     ...     Empirical1D, points=[3005, 3005.1, 6000.1, 6000.2],
     ...     lookup_table=[0, 1, 1, 0])
     >>> bp.check_overlap(sp_most)
     'partial_most'
-    # Source spectrum needs significant extrapolation (guessing)
+    >>> # Source spectrum needs significant extrapolation (guessing)
     >>> sp_notmost = SourceSpectrum(
     ...     Empirical1D, points=[3999.9, 4500.1], lookup_table=[1, 1])
     >>> bp.check_overlap(sp_notmost)
     'partial_notmost'
-    # No overlap at all
+    >>> # No overlap at all
     >>> sp_none = SourceSpectrum(
     ...     Empirical1D, points=[99.9, 100, 2999.8, 2999.9],
     ...     lookup_table=[0, 1, 1, 0])
@@ -225,14 +223,14 @@ appropriate filter names:
 
 The example below loads and plots bandpasses from Johnson *BI*::
 
-    >>> import matplotlib.pyplot as plt
+    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
     >>> from synphot import SpectralElement
-    >>> b = SpectralElement.from_filter('johnson_b')
-    >>> i = SpectralElement.from_filter('johnson_i')
-    >>> plt.plot(b.waveset, b(b.waveset), 'b', i.waveset, i(i.waveset), 'r')
-    >>> plt.ylim(0, 1.1)
+    >>> b = SpectralElement.from_filter('johnson_b')  # doctest: +REMOTE_DATA
+    >>> i = SpectralElement.from_filter('johnson_i')  # doctest: +REMOTE_DATA
+    >>> plt.plot(b.waveset, b(b.waveset), 'b', i.waveset, i(i.waveset), 'r')  # doctest: +SKIP
+    >>> plt.ylim(0, 1.1)  # doctest: +SKIP
     >>> # Label comes from DESCRIP keyword from FITS header
-    >>> plt.legend([b.meta['header']['descrip'], i.meta['header']['descrip']])
+    >>> plt.legend([b.meta['header']['descrip'], i.meta['header']['descrip']])  # doctest: +SKIP
 
 .. image:: images/johnson_bi.png
     :width: 600px

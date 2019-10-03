@@ -5,6 +5,7 @@
 import os
 import shutil
 import tempfile
+import warnings
 
 # THIRD-PARTY
 import numpy as np
@@ -20,6 +21,7 @@ from astropy.modeling.models import (
     PowerLaw1D, RedshiftScaleFactor)
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
+from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from .test_units import _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
@@ -167,8 +169,10 @@ class TestEmpiricalSourceFromFile(object):
 
     def test_neg_flux(self):
         w = [1000, 5000, 9000]
-        sp = SourceSpectrum(
-            Empirical1D, points=w, lookup_table=[100, -45, 5e-17])
+        with pytest.warns(AstropyUserWarning,
+                          match=r'contained negative flux or throughput'):
+            sp = SourceSpectrum(
+                Empirical1D, points=w, lookup_table=[100, -45, 5e-17])
         np.testing.assert_array_equal(sp(w).value, [100, 0, 5e-17])
         assert 'NegativeFlux' in sp.warnings
 
@@ -646,7 +650,11 @@ class TestNormalize(object):
     def _compare_countrate(self, rn_sp, ans_countrate):
         # Observation is needed to compare with expected count rate
         # although it is tested in test_observation.py
-        obs = Observation(rn_sp, self.acs, force='extrap')
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                'ignore', message=r'.*Source spectrum will be evaluated '
+                r'outside pre-defined waveset.*', category=AstropyUserWarning)
+            obs = Observation(rn_sp, self.acs, force='extrap')
         ct_rate = obs.countrate(_area)
 
         # 0.1% agreement with IRAF SYNPHOT COUNTRATE
@@ -706,7 +714,9 @@ class TestNormalize(object):
         """Test force=True for 'partial_notmost' overlap."""
         sp = SourceSpectrum(Empirical1D, points=[5000, 6000],
                             lookup_table=[1, 1])
-        rn_sp = sp.normalize(1e-23 * u.Jy, band=self.acs, force=True)
+        with pytest.warns(AstropyUserWarning,
+                          match=r'Spectrum is not defined everywhere'):
+            rn_sp = sp.normalize(1e-23 * u.Jy, band=self.acs, force=True)
         assert 'PartialRenorm' in rn_sp.warnings
         assert 'PartialRenorm' not in sp.warnings
 
@@ -717,7 +727,9 @@ class TestNormalize(object):
     def test_renorm_partial_most(self):
         """Test 'partial_most' overlap."""
         bp = SpectralElement(Box1D, amplitude=1, x_0=5600, width=870)
-        rn_sp = self.em.normalize(1e-23 * u.Jy, band=bp)
+        with pytest.warns(AstropyUserWarning,
+                          match=r'Spectrum is not defined everywhere'):
+            rn_sp = self.em.normalize(1e-23 * u.Jy, band=bp)
         assert 'PartialRenorm' in rn_sp.warnings
         assert 'PartialRenorm' not in self.em.warnings
         assert '99%' in rn_sp.warnings['PartialRenorm']

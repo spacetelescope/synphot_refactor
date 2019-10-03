@@ -1,5 +1,3 @@
-.. doctest-skip-all
-
 .. _synphot_units:
 
 Units and Constants
@@ -216,15 +214,15 @@ for HST::
 
     >>> from synphot import units
     >>> area = 45238.93416 * units.AREA
-    >>> sp([499, 500, 501, 502] * u.nm, flux_unit='count', area=area)
-    <Quantity [ 219.25781807, 220.04014043, 220.81868137, 221.59342806] ct>
+    >>> sp([499, 500, 501, 502] * u.nm, flux_unit='count', area=area)  # doctest: +FLOAT_CMP
+    <Quantity [219.3785428 , 220.16129659, 220.94026689, 221.71544085] ct>
 
 Sample the source at 5E+15 Hz and obtain flux in FLAM::
 
-    >>> sp([5E+15] * u.Hz, flux_unit=units.FLAM)
-    <Quantity [  3.52271822e-29] FLAM>
+    >>> sp([5E+15] * u.Hz, flux_unit=units.FLAM)  # doctest: +FLOAT_CMP
+    <Quantity [3.52467344e-29] FLAM>
 
 Sample the source in internal units (Angstrom and PHOTLAM)::
 
-    >>> sp(6000)
-    <Quantity 0.0006152610208167509 PHOTLAM>
+    >>> sp(6000)  # doctest: +FLOAT_CMP
+    <Quantity 0.0006156 PHOTLAM>

@@ -1,5 +1,3 @@
-.. doctest-skip-all
-
 .. _synphot-c-ext:
 
 calcbinflux

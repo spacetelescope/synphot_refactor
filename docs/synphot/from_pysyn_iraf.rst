@@ -1,5 +1,3 @@
-.. doctest-skip-all
-
 .. _synphot-switcher:
 
 Switching from Legacy Software

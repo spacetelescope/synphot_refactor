@@ -15,6 +15,7 @@ from astropy import units as u
 from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
+from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from .. import exceptions, specio, units
@@ -67,11 +68,12 @@ class TestReadWriteFITS(object):
         outfile = os.path.join(self.outdir, 'outspec1.fits')
 
         # Write it out
-        specio.write_fits_spec(
-            outfile, self.wave.value, self.flux.value, pri_header=self.prihdr,
-            ext_header=self.scihdr, trim_zero=False, pad_zero_ends=False,
-            precision='single', wave_unit=self.wave.unit,
-            flux_unit=self.flux.unit)
+        with pytest.warns(AstropyUserWarning, match=r'rows are thrown out'):
+            specio.write_fits_spec(
+                outfile, self.wave.value, self.flux.value,
+                pri_header=self.prihdr, ext_header=self.scihdr,
+                trim_zero=False, pad_zero_ends=False, precision='single',
+                wave_unit=self.wave.unit, flux_unit=self.flux.unit)
 
         # Read it back in and check values (flux_unit should be ignored)
         hdr, wave, flux = specio.read_spec(outfile, flux_unit='foo')

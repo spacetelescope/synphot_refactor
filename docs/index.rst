@@ -1,5 +1,3 @@
-.. doctest-skip-all
-
 .. _astropy_synphot:
 
 ******************************
@@ -80,7 +78,7 @@ via HTTP, create a local directory where you plan to store the data files
 (e.g., ``/my/local/dir/cdbs``) and run the following:
 
     >>> from synphot.utils import download_data
-    >>> file_list = download_data('/my/local/dir/cdbs')
+    >>> file_list = download_data('/my/local/dir/cdbs')  # doctest: +SKIP
 
 Then copy `synphot.cfg <https://github.com/spacetelescope/synphot_refactor/blob/master/synphot/synphot.cfg>`_
 to your ``$HOME/.astropy/config/`` directory, and replace every instance of
@@ -103,6 +101,11 @@ can modify this line in your ``$HOME/.astropy/config/synphot.cfg`` file::
 
     johnson_v_file = /my/other/dir/my_johnson_v.fits
 
+.. testsetup::
+
+    >>> from synphot.config import conf
+    >>> conf.johnson_v_file = '/my/local/dir/cdbs/comp/nonhst/johnson_v_004_syn.fits'
+
 Alternately, you can also take advantage of :ref:`astropy:astropy_config`
 to manage **synphot** data files. For example, you can also temporarily use a
 different Johnson *V* throughput file::
@@ -115,6 +118,10 @@ different Johnson *V* throughput file::
     /my/other/dir/my_johnson_v.fits
     >>> print(conf.johnson_v_file)
     /my/local/dir/cdbs/comp/nonhst/johnson_v_004_syn.fits
+
+.. testsetup::
+
+    >>> conf.reset('johnson_v_file')
 
 
 .. _synphot_getting_started:
@@ -133,8 +140,41 @@ in Astropy. Despite this, some models like
 work, so they can be used directly. When in doubt, see if a model is in
 `synphot.models` first before using Astropy's.
 
+::
+
+    >>> from astropy import units as u
+    >>> from synphot import units, SourceSpectrum
+    >>> from synphot.models import (BlackBodyNorm1D, GaussianAbsorption1D,
+    ...                             GaussianFlux1D)
+    >>> from synphot.spectrum import BaseUnitlessSpectrum
+
+Create a Gaussian absorption profile that absorps 80% of the flux at
+4000 Angstrom with a sigma of 20 Angstrom::
+
+    >>> g_abs = BaseUnitlessSpectrum(GaussianAbsorption1D, amplitude=0.8,
+    ...                              mean=4000, stddev=20)
+
+Create a Gaussian emission line with the given total flux
+centered at 3000 Angstrom with FWHM of 100 Angstrom::
+
+    >>> g_em = SourceSpectrum(GaussianFlux1D,
+    ...                       total_flux=3.5e-13*u.erg/(u.cm**2 * u.s),
+    ...                       mean=3000, fwhm=100)
+
+Create a blackbody source spectrum with a temperature of 6000 K::
+
+    >>> bb = SourceSpectrum(BlackBodyNorm1D, temperature=6000)
+
+Combine the above components to create a source spectrum that is twice
+the original blackbody flux with the Gaussian emission and absorption lines::
+
+    >>> sp = g_abs * (g_em + 2 * bb)
+
+Plot the spectrum, zooming in on the line features::
+
+    >>> sp.plot(left=1, right=7000)  # doctest: +SKIP
+
 .. plot::
-    :include-source:
 
     from astropy import units as u
     from synphot import units, SourceSpectrum
@@ -161,37 +201,37 @@ work, so they can be used directly. When in doubt, see if a model is in
 
 Sample the spectrum at 0.3 micron::
 
-    >>> sp(0.3 * u.micron)
-    <Quantity 0.0012685 PHOTLAM>
+    >>> sp(0.3 * u.micron)  # doctest: +FLOAT_CMP
+    <Quantity 0.00129536 PHOTLAM>
 
 Or sample the same thing but in a different flux unit::
 
-    >>> sp(0.3 * u.micron, flux_unit=units.FLAM)
-    <Quantity 8.57716634e-15 FLAM>
+    >>> sp(0.3 * u.micron, flux_unit=units.FLAM)  # doctest: +FLOAT_CMP
+    <Quantity 8.57718043e-15 FLAM>
 
 Sample the spectrum at its native wavelength set::
 
-    >>> sp(sp.waveset)
+    >>> sp(sp.waveset)  # doctest: +FLOAT_CMP +ELLIPSIS
     <Quantity [0.00000000e+00, 0.00000000e+00, 0.00000000e+00, ...,
                4.47483287e-05, 4.34264666e-05, 4.21423394e-05] PHOTLAM>
 
 Models that built the spectrum::
 
-    >>> print(sp)
+    >>> print(sp)  # doctest: +ELLIPSIS
     SourceSpectrum at z=0.0
-    Model: CompoundModel2
+    Model: CompoundModel...
     Inputs: ('x',)
     Outputs: ('y',)
     Model set size: 1
     Expression: ([0] + ([1] | [2])) * [3]
     Components:
-        [0]: <GaussianFlux1D(amplitude=...>
-
-        [1]: <BlackBodyNorm1D(temperature=6000.0)>
-
-        [2]: <Scale(factor=2.0)>
-
-        [3]: <GaussianAbsorption1D(amplitude=0.8, mean=4000.0, stddev=20.0)>
+        [0]: <GaussianFlux1D(...>
+    <BLANKLINE>
+        [1]: <BlackBodyNorm1D(...)>
+    <BLANKLINE>
+        [2]: <Scale(...)>
+    <BLANKLINE>
+        [3]: <GaussianAbsorption1D(...)>
     Parameters:
         ...
 
@@ -210,8 +250,8 @@ Normalize the source spectrum to 1 Jy in a given box bandpass and
 integrate it::
 
     >>> sp_rn = sp.normalize(1 * u.Jy, band=bp)
-    >>> sp_rn.integrate()
-    <Quantity 12901.13466265 ph / (cm2 s)>
+    >>> sp_rn.integrate()  # doctest: +FLOAT_CMP
+    <Quantity 12883.09903646 ph / (cm2 s)>
 
 Create an observation by passing the redshifted and normalized source spectrum
 through the box bandpass::
@@ -223,10 +263,10 @@ Calculate the count rate of the observation above for an 2-meter telescope:
 
     >>> import numpy as np
     >>> area = np.pi * (1 * u.m) ** 2
-    >>> area
+    >>> area  # doctest: +FLOAT_CMP
     <Quantity 3.14159265 m2>
-    >>> obs.countrate(area=area)
-    <Quantity 24219651.1854991 ct / s>
+    >>> obs.countrate(area=area)  # doctest: +FLOAT_CMP
+    <Quantity 24219650.71772057 ct / s>
 
 
 .. _synphot_using:

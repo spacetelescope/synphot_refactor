@@ -1,5 +1,3 @@
-.. doctest-skip-all
-
 .. _source-spectrum-main:
 
 Source Spectrum
@@ -43,12 +41,12 @@ for flux conversion)::
     >>> from synphot.models import ConstFlux1D
     >>> sp = SourceSpectrum(ConstFlux1D, amplitude=1)  # PHOTLAM
     >>> wave = [1000, 10000]  # Angstrom
-    >>> sp(wave)
-    <Quantity [ 1., 1.] PHOTLAM>
-    >>> sp(wave, flux_unit=units.FNU)
-    <Quantity [  6.62606957e-24,  6.62606957e-23] FNU>
+    >>> sp(wave)  # doctest: +FLOAT_CMP
+    <Quantity [1., 1.] PHOTLAM>
+    >>> sp(wave, flux_unit=units.FNU)  # doctest: +FLOAT_CMP
+    <Quantity [6.62607015e-24, 6.62607015e-23] FNU>
     >>> area = 45238.93416 * units.AREA  # HST
-    >>> sp(wave, flux_unit=units.OBMAG, area=area)
+    >>> sp(wave, flux_unit=units.OBMAG, area=area)  # doctest: +FLOAT_CMP
     <Quantity [-21.52438718,-21.52438718] OBMAG>
 
 .. _synphot_reddening:
@@ -61,19 +59,19 @@ Astropy model) and then
 extinction curve with a given :math:`E(B-V)` value (negative value effectively
 de-reddens the spectrum), and then multiply it to the source::
 
-    >>> import matplotlib.pyplot as plt
+    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
     >>> from synphot import SourceSpectrum, ReddeningLaw
     >>> from synphot.models import BlackBodyNorm1D
     >>> em = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
     >>> ext = ReddeningLaw.from_extinction_model(
-    ...     'lmcavg').extinction_curve(0.1)
-    >>> sp = em * ext
+    ...     'lmcavg').extinction_curve(0.1)  # doctest: +REMOTE_DATA
+    >>> sp = em * ext  # doctest: +REMOTE_DATA
     >>> wave = em.waveset
-    >>> plt.plot(wave, em(wave), 'b', wave, sp(wave), 'r')
-    >>> plt.xlim(1000, 30000)
-    >>> plt.xlabel('Wavelength (Angstrom)')
-    >>> plt.ylabel('Flux (PHOTLAM)')
-    >>> plt.legend(['E(B-V)=0', 'E(B-V)=0.1'], loc='upper right')
+    >>> plt.plot(wave, em(wave), 'b', wave, sp(wave), 'r')  # doctest: +SKIP
+    >>> plt.xlim(1000, 30000)  # doctest: +SKIP
+    >>> plt.xlabel('Wavelength (Angstrom)')  # doctest: +SKIP
+    >>> plt.ylabel('Flux (PHOTLAM)')  # doctest: +SKIP
+    >>> plt.legend(['E(B-V)=0', 'E(B-V)=0.1'], loc='upper right')  # doctest: +SKIP
 
 .. image:: images/bb5000_lmcavg.png
    :width: 600px
@@ -167,20 +165,20 @@ bandpass using its :meth:`~synphot.spectrum.BaseSourceSpectrum.normalize`
 method. The resultant spectrum is basically the source multiplied with a factor
 necessary to achieve the desired normalization::
 
-    >>> import matplotlib.pyplot as plt
+    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
     >>> from synphot import SourceSpectrum, SpectralElement, units
     >>> from synphot.models import BlackBodyNorm1D
     >>> sp = SourceSpectrum(BlackBodyNorm1D, temperature=5000)
-    >>> bp = SpectralElement.from_filter('johnson_v')
-    >>> vega = SourceSpectrum.from_vega()  # For unit conversion
-    >>> sp_norm = sp.normalize(17 * units.VEGAMAG, bp, vegaspec=vega)
+    >>> bp = SpectralElement.from_filter('johnson_v')  # doctest: +REMOTE_DATA
+    >>> vega = SourceSpectrum.from_vega()  # For unit conversion  # doctest: +REMOTE_DATA
+    >>> sp_norm = sp.normalize(17 * units.VEGAMAG, bp, vegaspec=vega)  # doctest: +REMOTE_DATA
     >>> wave = sp.waveset
-    >>> plt.plot(wave, sp(wave), 'b', wave, sp_norm(wave), 'r')
-    >>> plt.xlim(1000, 30000)
-    >>> plt.xlabel('Wavelength (Angstrom)')
-    >>> plt.ylabel('Flux (PHOTLAM)')
-    >>> plt.title(sp.meta['expr'])
-    >>> plt.legend(['Original', 'Normalized'], loc='upper right')
+    >>> plt.plot(wave, sp(wave), 'b', wave, sp_norm(wave), 'r')  # doctest: +SKIP
+    >>> plt.xlim(1000, 30000)  # doctest: +SKIP
+    >>> plt.xlabel('Wavelength (Angstrom)')  # doctest: +SKIP
+    >>> plt.ylabel('Flux (PHOTLAM)')  # doctest: +SKIP
+    >>> plt.title(sp.meta['expr'])  # doctest: +SKIP
+    >>> plt.legend(['Original', 'Normalized'], loc='upper right')  # doctest: +SKIP
 
 .. image:: images/bb5000_renorm.png
    :width: 600px
@@ -192,13 +190,14 @@ method. It uses trapezoid integration (but could be expanded to perform
 analytical calculations instead in the future when that is supported by
 Astropy). By default, integration is done in internal units::
 
+    >>> from astropy import units as u
     >>> from synphot import SourceSpectrum, units
     >>> from synphot.models import GaussianFlux1D
     >>> sp = SourceSpectrum(GaussianFlux1D, mean=6000, fwhm=10,
     ...                     total_flux=1*u.erg/(u.cm**2 * u.s))
-    >>> sp.integrate()
-    <Quantity 3.02046763e+11 ph / (cm2 s)
-    >>> sp.integrate(flux_unit=units.FLAM)
+    >>> sp.integrate()  # doctest: +FLOAT_CMP
+    <Quantity 3.02046763e+11 ph / (cm2 s)>
+    >>> sp.integrate(flux_unit=units.FLAM)  # doctest: +FLOAT_CMP
     <Quantity 0.99999972 erg / (cm2 s)>
 
 
@@ -469,8 +468,8 @@ It is loaded from ``synphot.conf.vega_file`` using
 The example below loads and plots the built-in Vega spectrum::
 
     >>> from synphot import SourceSpectrum
-    >>> sp = SourceSpectrum.from_vega()
-    >>> sp.plot(right=12000, flux_unit='flam', title=sp.meta['expr'])
+    >>> sp = SourceSpectrum.from_vega()  # doctest: +REMOTE_DATA
+    >>> sp.plot(right=12000, flux_unit='flam', title=sp.meta['expr'])  # doctest: +SKIP
 
 .. image:: images/vega_spec.png
    :width: 600px
