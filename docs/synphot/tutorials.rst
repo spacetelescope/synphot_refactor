@@ -1,5 +1,3 @@
-.. doctest-skip-all
-
 .. _synphot-tutorials:
 
 Tutorials
@@ -15,7 +13,7 @@ Emission Line
 -------------
 
 This tutorial is adapted from
-`Exposure Time Calculator User's Guide on a similar topic <http://etc.stsci.edu/etcstatic/users_guide/1_ref_8.5_emlines.html#using-synphot-to-modify-emission-lines>`_.
+`Exposure Time Calculator User's Guide on a similar topic <http://etc.stsci.edu/etcstatic/users_guide/1_ref_8.5_emlines.html#using-pysynphot-to-modify-emission-lines>`_.
 In this tutorial, you will learn how to manipulate and superimpose
 an emission line to a continuum spectrum.
 
@@ -28,6 +26,7 @@ Create a continuum spectrum of a 5500 K blackbody with z=0.6::
 Create a Gaussian emission line with 8E-14 FLAM total flux,
 FWHM of 100 Angstrom, and centered at 7000 Angstrom::
 
+    >>> from astropy import units as u
     >>> from synphot import units
     >>> from synphot.models import GaussianFlux1D
     >>> em = SourceSpectrum(
@@ -43,12 +42,12 @@ to the composite spectrum::
 
     >>> from synphot import ReddeningLaw
     >>> ext = ReddeningLaw.from_extinction_model(
-    ...     'lmcavg').extinction_curve(1.3)
-    >>> my_spec = sp * ext
+    ...     'lmcavg').extinction_curve(1.3)  # doctest: +REMOTE_DATA
+    >>> my_spec = sp * ext  # doctest: +REMOTE_DATA
 
 Plot the result::
 
-    >>> my_spec.plot(right=45000)
+    >>> my_spec.plot(right=45000)  # doctest: +SKIP
 
 .. image:: images/tutorial_em_line.png
    :width: 600px
@@ -114,17 +113,17 @@ Read in the real data. If your own data has a different format, you need to
 adjust the example accordingly::
 
     >>> from astropy.io import fits
-    >>> with fits.open('/path/to/combined_13330_G130M_v40_bin4.fits') as pf:
-    ...     dat = pf[1].data
-    ...     wave = dat.field('WAVELENGTH').flatten()  # Angstrom
-    ...     flux = dat.field('FLUX').flatten()  # FLAM
+    >>> with fits.open('/path/to/combined_13330_G130M_v40_bin4.fits') as pf:  # doctest: +SKIP
+    ...     dat = pf[1].data  # doctest: +SKIP
+    ...     wave = dat.field('WAVELENGTH').flatten()  # Angstrom  # doctest: +SKIP
+    ...     flux = dat.field('FLUX').flatten()  # FLAM  # doctest: +SKIP
 
 For a good fit, only use data around the feature of interest. In this example,
 the feature is between 1202 and 1211 Angstrom::
 
-    >>> mask = (wave >= 1202) & (wave <= 1211)
-    >>> x = wave[mask]
-    >>> y = flux[mask]
+    >>> mask = (wave >= 1202) & (wave <= 1211)  # doctest: +SKIP
+    >>> x = wave[mask]  # doctest: +SKIP
+    >>> y = flux[mask]  # doctest: +SKIP
 
 Create a composite model with some initial parameters close to the desired
 result (usually sufficient to guess from looking at a plot of the data) and
@@ -136,17 +135,17 @@ iterations are required for a good fit)::
     >>> gs = models.Gaussian1D(amplitude=3.5E-14, mean=1206, stddev=1)
     >>> init_model = bg - gs
     >>> fitter = fitting.LevMarLSQFitter()
-    >>> fit_model = fitter(init_model, x, y)
-    >>> y_fit = fit_model(x)
-    >>> print(fit_model)
-    Model: CompoundModel1
+    >>> fit_model = fitter(init_model, x, y)  # doctest: +SKIP
+    >>> y_fit = fit_model(x)  # doctest: +SKIP
+    >>> print(fit_model)  # doctest: +SKIP
+    Model: CompoundModel...
     Inputs: ('x',)
     Outputs: ('y',)
     Model set size: 1
     Expression: [0] - [1]
     Components:
         [0]: <Const1D(amplitude=3.5e-14)>
-
+    <BLANKLINE>
         [1]: <Gaussian1D(amplitude=3.5e-14, mean=1206.0, stddev=1.0)>
     Parameters:
            amplitude_0       amplitude_1        mean_1       stddev_1
@@ -155,15 +154,15 @@ iterations are required for a good fit)::
 
 Plot the fitted model on top of input data::
 
-    >>> import matplotlib.pyplot as plt
-    >>> from matplotlib import ticker
-    >>> fig, ax = plt.subplots()
-    >>> ax.plot(x, y, 'b', x, y_fit, 'r')
+    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
+    >>> from matplotlib import ticker  # doctest: +SKIP
+    >>> fig, ax = plt.subplots()  # doctest: +SKIP
+    >>> ax.plot(x, y, 'b', x, y_fit, 'r')  # doctest: +SKIP
     >>> ax.get_xaxis().set_major_formatter(
-    ...     ticker.FuncFormatter(ticker.FormatStrFormatter('%.0f')))
-    >>> ax.set_xlabel('Wavelength (Angstrom)')
-    >>> ax.set_ylabel('Flux (FLAM)')
-    >>> ax.legend(['Data', 'Fit'], loc='lower right')
+    ...     ticker.FuncFormatter(ticker.FormatStrFormatter('%.0f')))  # doctest: +SKIP
+    >>> ax.set_xlabel('Wavelength (Angstrom)')  # doctest: +SKIP
+    >>> ax.set_ylabel('Flux (FLAM)')  # doctest: +SKIP
+    >>> ax.legend(['Data', 'Fit'], loc='lower right')  # doctest: +SKIP
 
 .. image:: images/tutorial_fit_ab.png
    :width: 600px
@@ -173,9 +172,9 @@ Calculate equivalent width using the fitted model::
 
     >>> import math
     >>> area = (math.sqrt(2 * math.pi) * fit_model.amplitude_1 *
-    ...     fit_model.stddev_1)  # Area under curve
-    >>> height = fit_model.amplitude_0  # Continuum level
-    >>> print('EW = {:.4f} Angstrom'.format(area / height))
+    ...     fit_model.stddev_1)  # Area under curve  # doctest: +SKIP
+    >>> height = fit_model.amplitude_0  # Continuum level  # doctest: +SKIP
+    >>> print('EW = {:.4f} Angstrom'.format(area / height))  # doctest: +SKIP
     EW = 0.5937 Angstrom
 
 

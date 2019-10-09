@@ -15,6 +15,7 @@ from astropy import units as u
 from astropy.io import fits
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
+from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from .. import exceptions, units
@@ -85,8 +86,9 @@ class TestExtinction(object):
             os.path.join('data', 'qso_template_001.dat')))
         extcurve = self.redlaw.extinction_curve(1.0 * u.mag)
         spext = qso * extcurve
-        sp = spext.normalize(25 * u.STmag, bp)
-        obs = Observation(sp, bp, force='taper')
+        with pytest.warns(AstropyUserWarning):
+            sp = spext.normalize(25 * u.STmag, bp)
+            obs = Observation(sp, bp, force='taper')
         area = 45238.93416  # HST cm^2
         c = obs.countrate(area)
         ans = 1.104404103799421e-07  # From similar setup in Astrolib PySynphot

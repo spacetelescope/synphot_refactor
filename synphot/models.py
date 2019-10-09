@@ -276,7 +276,7 @@ class Empirical1D(Tabular1D):
 
     .. note::
 
-        This model requires `SciPy <http://www.scipy.org>`_ 0.14
+        This model requires `SciPy <https://www.scipy.org>`_ 0.14
         or later to be installed.
 
     Parameters

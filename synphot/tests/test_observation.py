@@ -3,6 +3,7 @@
 
 # STDLIB
 import os
+import warnings
 
 # THIRD-PARTY
 import numpy as np
@@ -14,7 +15,8 @@ from astropy.modeling.models import Const1D
 from astropy.tests.helper import catch_warnings
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
-from astropy.utils.exceptions import AstropyDeprecationWarning
+from astropy.utils.exceptions import (AstropyDeprecationWarning,
+                                      AstropyUserWarning)
 
 # LOCAL
 from .test_units import _area
@@ -144,7 +146,10 @@ class TestObservation(object):
         sp = SourceSpectrum(
             GaussianFlux1D, mean=5000, total_flux=(1 * tf_unit), fwhm=10)
         bp = SpectralElement(Const1D, amplitude=1)
-        obs2 = Observation(sp, bp, force='extrap')
+        with pytest.warns(AstropyUserWarning,
+                          match=r'Source spectrum will be evaluated outside '
+                          r'pre-defined waveset'):
+            obs2 = Observation(sp, bp, force='extrap')
         np.testing.assert_array_equal(obs2.binset, sp.waveset)
 
     def test_undefined_binset(self):
@@ -177,7 +182,11 @@ class TestInitWithForce(object):
         [('taper', 0),
          ('extrap', 0.75)])
     def test_force(self, force_type, ans):
-        obs = Observation(self.sp, self.bp, force=force_type)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                'ignore', message=r'.*Source spectrum.*',
+                category=AstropyUserWarning)
+            obs = Observation(self.sp, self.bp, force=force_type)
         assert obs(4005).value == ans
         assert force_type in obs.warnings['PartialOverlap']
 
@@ -387,8 +396,11 @@ class TestCountRate(object):
          ([999, 1016], 172.75)])
     def test_force(self, w, ans):
         """Force calculation for partial overlap."""
-        np.testing.assert_allclose(
-            self.obs.countrate(_area, waverange=w, force=True).value, ans)
+        with pytest.warns(AstropyUserWarning, match=r'Count rate calculated '
+                          r'only for wavelengths in the overlap between '
+                          r'observation and given range'):
+            np.testing.assert_allclose(
+                self.obs.countrate(_area, waverange=w, force=True).value, ans)
 
         # Must raise error without force
         with pytest.raises(exceptions.PartialOverlap):
@@ -412,7 +424,11 @@ class TestCountRateNegFlux(object):
         [(True, 1510.219531414891),
          (False, 1627.8250215634343)])
     def test_neg_handling(self, keep_neg, ans):
-        sp = SourceSpectrum.from_file(self.spfile, keep_neg=keep_neg)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                'ignore', message=r'.*contained negative flux or throughput.*',
+                category=AstropyUserWarning)
+            sp = SourceSpectrum.from_file(self.spfile, keep_neg=keep_neg)
         obs = Observation(sp, self.bp)
         c = obs.countrate(_area)
         np.testing.assert_allclose(c.value, ans, rtol=1e-4)

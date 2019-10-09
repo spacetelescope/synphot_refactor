@@ -1,5 +1,3 @@
-.. doctest-skip-all
-
 .. _synphot_formulae:
 
 Photometric Properties
@@ -58,9 +56,9 @@ equivalent to IRAF SYNPHOT ``bandpar`` results for ``avglam``,
 
 Example::
 
-    >>> bp.avgwave()
+    >>> bp.avgwave()  # doctest: +FLOAT_CMP
     <Quantity 5367.903565874441 Angstrom>
-    >>> bp.tlambda()
+    >>> bp.tlambda()  # doctest: +FLOAT_CMP
     <Quantity 0.22807748889452203>
 
 
@@ -77,9 +75,9 @@ if peak value is not unique).
 
 Example::
 
-    >>> bp.tpeak()
+    >>> bp.tpeak()  # doctest: +FLOAT_CMP
     <Quantity 0.24144500494003296>
-    >>> bp.wpeak()
+    >>> bp.wpeak()  # doctest: +FLOAT_CMP
     <Quantity 5059.8212890625 Angstrom>
 
 
@@ -98,7 +96,7 @@ result for ``qtlam``.
 
 Example::
 
-    >>> bp.efficiency()
+    >>> bp.efficiency()  # doctest: +FLOAT_CMP
     <Quantity 0.05090165033079963>
 
 
@@ -118,9 +116,9 @@ IRAF SYNPHOT ``bandpar`` result for ``equvw``.
 
 Example::
 
-    >>> bp.equivwidth()
+    >>> bp.equivwidth()  # doctest: +FLOAT_CMP
     <Quantity 272.0108162945954 Angstrom>
-    >>> bp.integrate()
+    >>> bp.integrate()  # doctest: +FLOAT_CMP
     <Quantity 272.0108162945954 Angstrom>
 
 
@@ -139,7 +137,7 @@ the rectangular width. It is equivalent to IRAF SYNPHOT ``bandpar`` result for
 
 Example::
 
-    >>> bp.rectwidth()
+    >>> bp.rectwidth()  # doctest: +FLOAT_CMP
     <Quantity 1126.5953352903448 Angstrom>
 
 
@@ -159,7 +157,7 @@ the bandpass RMS width as defined in
 
 Example::
 
-    >>> bp.rmswidth()
+    >>> bp.rmswidth()  # doctest: +FLOAT_CMP
     <Quantity 359.56457676412236 Angstrom>
 
 
@@ -179,7 +177,7 @@ as :ref:`synphot-formula-rmswidth`.
 
 Example::
 
-    >>> bp.photbw()
+    >>> bp.photbw()  # doctest: +FLOAT_CMP
     <Quantity 357.17951791474843 Angstrom>
 
 
@@ -198,7 +196,7 @@ is :ref:`synphot-formula-bandw`.
 
 Example::
 
-    >>> bp.fwhm()
+    >>> bp.fwhm()  # doctest: +FLOAT_CMP
     <Quantity 841.0934884601406 Angstrom>
 
 
@@ -220,7 +218,7 @@ It is equivalent to IRAF SYNPHOT ``bandpar`` results for ``barlam``.
 
 Example::
 
-    >>> bp.barlam()
+    >>> bp.barlam()  # doctest: +FLOAT_CMP
     <Quantity 5331.8648495386 Angstrom>
 
 
@@ -240,7 +238,7 @@ It is equivalent to IRAF SYNPHOT ``bandpar`` result for ``uresp``.
 
 Example::
 
-    >>> bp.unit_response(area)
+    >>> bp.unit_response(area)  # doctest: +FLOAT_CMP
     <Quantity 3.007277127274156e-19 FLAM>
 
 
@@ -262,7 +260,7 @@ In the formula below, ``uresp``, ``equvw``, and :math:`\lambda_{0}` are
 
 Example::
 
-    >>> bp.emflx(area)
+    >>> bp.emflx(area)  # doctest: +FLOAT_CMP
     <Quantity 3.586552579909415e-16 FLAM>
 
 .. _synphot-formula-effstim:
@@ -283,15 +281,15 @@ The default binning behavior is to be consistent with ASTROLIB PYSYNPHOT.
 
 Example::
 
-    >>> obs.effstim()
+    >>> obs.effstim()  # doctest: +FLOAT_CMP
     <Quantity 0.00053744 PHOTLAM>
-    >>> obs.effstim('flam')
+    >>> obs.effstim('flam')  # doctest: +FLOAT_CMP
     <Quantity 1.99333435e-15 FLAM>
-    >>> obs.effstim('count', area=area)  # Not binned
+    >>> obs.effstim('count', area=area)  # Not binned  # doctest: +FLOAT_CMP
     <Quantity 6628.36886854 ct / s>
-    >>> obs.countrate(area=area, binned=False)
+    >>> obs.countrate(area=area, binned=False)  # doctest: +FLOAT_CMP
     <Quantity 6628.36886854 ct / s>
-    >>> obs.countrate(area=area)  # Binned
+    >>> obs.countrate(area=area)  # Binned  # doctest: +FLOAT_CMP
     <Quantity 6628.36888121 ct / s>
 
 
@@ -317,11 +315,11 @@ The default binning behavior is to be consistent with ASTROLIB PYSYNPHOT.
 
 Example::
 
-    >>> obs.effective_wavelength()  # Binned
-    <Quantity 5401.267857308841 Angstrom>
-    >>> obs.effective_wavelength(mode='efflphot')  # Deprecated
+    >>> obs.effective_wavelength()  # Binned  # doctest: +FLOAT_CMP
+    <Quantity 5401.26785017 Angstrom>
+    >>> obs.effective_wavelength(mode='efflphot')  # Deprecated  # doctest: +SKIP
     WARNING: AstropyDeprecationWarning: Usage of EFFLPHOT is deprecated. [...]
-    <Quantity 5424.929868234263 Angstrom>
+    <Quantity 5424.92986116 Angstrom>
 
 
 .. _synphot-formula-pivwv:
@@ -341,7 +339,7 @@ The formula shown applies to a bandpass. For a source, replace
 
 Example::
 
-    >>> bp.pivot()
+    >>> bp.pivot()  # doctest: +FLOAT_CMP
     <Quantity 5355.863596422958 Angstrom>
-    >>> obs.pivot()  # Not binned
+    >>> obs.pivot()  # Not binned  # doctest: +FLOAT_CMP
     <Quantity 5389.368734064575 Angstrom>
