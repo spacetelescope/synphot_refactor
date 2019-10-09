@@ -149,3 +149,9 @@ intersphinx_mapping.update({
         'astropy': ('http://docs.astropy.org/en/latest/', None)})
 #intersphinx_mapping.update({
 #        'stsynphot': ('http://stsynphot.readthedocs.org/en/latest/', None)})
+
+# -- Options for linkcheck output -------------------------------------------
+linkcheck_retry = 5
+linkcheck_ignore = ['https://hsthelp.stsci.edu']
+linkcheck_timeout = 180
+linkcheck_anchors = False

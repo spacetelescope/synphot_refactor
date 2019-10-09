@@ -291,9 +291,7 @@ Using **synphot**
 A Brief History
 ===============
 
-A brief history: First, there was
-`STSDAS SYNPHOT <http://stsdas.stsci.edu/cgi-bin/gethelp.cgi?synphot.sys>`_.
-Then, there was
+A brief history: First, there was STSDAS SYNPHOT (IRAF). Then, there was
 ASTROLIB PYSYNPHOT (:ref:`Lim et al. 2015 <synphot-ref-lim2015>`), which
 aimed at replacing STSDAS SYNPHOT using Python. In order to take advantage of
 :ref:`astropy:astropy-modeling` and :ref:`astropy:astropy-units` and to

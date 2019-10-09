@@ -13,7 +13,7 @@ Emission Line
 -------------
 
 This tutorial is adapted from
-`Exposure Time Calculator User's Guide on a similar topic <http://etc.stsci.edu/etcstatic/users_guide/1_ref_8.5_emlines.html#using-synphot-to-modify-emission-lines>`_.
+`Exposure Time Calculator User's Guide on a similar topic <http://etc.stsci.edu/etcstatic/users_guide/1_ref_8.5_emlines.html#using-pysynphot-to-modify-emission-lines>`_.
 In this tutorial, you will learn how to manipulate and superimpose
 an emission line to a continuum spectrum.
 
