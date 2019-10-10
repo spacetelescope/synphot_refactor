@@ -342,7 +342,7 @@ class TestObsPar(object):
         vspec = SourceSpectrum.from_vega()
         np.testing.assert_allclose(
             self.obs.effstim(flux_unit=units.VEGAMAG, vegaspec=vspec).value,
-            ans)
+            ans, rtol=1e-4)
 
     @pytest.mark.parametrize('flux_unit', [u.mag, units.VEGAMAG])
     def test_effstim_exceptions(self, flux_unit):
