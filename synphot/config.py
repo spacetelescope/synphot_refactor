@@ -23,7 +23,7 @@ class Conf(ConfigNamespace):
 
     # STANDARD STARS
     vega_file = ConfigItem(
-        'http://ssb.stsci.edu/cdbs/calspec/alpha_lyr_stis_008.fits', 'Vega')
+        'http://ssb.stsci.edu/cdbs/calspec/alpha_lyr_stis_009.fits', 'Vega')
 
     # REDDENING/EXTINCTION LAWS
     lmc30dor_file = ConfigItem(
