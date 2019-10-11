@@ -14,126 +14,221 @@ from astropy import constants as const
 from astropy import units as u
 from astropy.modeling import Fittable1DModel, Model, Parameter
 from astropy.modeling import models as _models
+from astropy.modeling.functional_models import FLOAT_EPSILON
 from astropy.modeling.models import Tabular1D
 from astropy.stats.funcs import gaussian_fwhm_to_sigma, gaussian_sigma_to_fwhm
 from astropy.utils import metadata
+from astropy.utils.decorators import deprecated
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from . import units
-from .compat import ASTROPY_LT_2_0, ASTROPY_LT_4_0
+from .compat import ASTROPY_LT_4_0
 from .exceptions import SynphotError
 from .utils import merge_wavelengths
 
 if ASTROPY_LT_4_0:
+    from astropy.modeling.blackbody import blackbody_nu
     from astropy.modeling.core import _CompoundModel as CompoundModel
+    from astropy.modeling.models import MexicanHat1D as _RickerWavelet1D
+
+    class BlackBody1D(Fittable1DModel):
+        """Create a :ref:`blackbody spectrum <synphot-planck-law>`
+        model with given temperature.
+
+        Parameters
+        ----------
+        temperature : `~astropy.units.quantity.Quantity`
+            Blackbody temperature.
+
+        """
+        temperature = Parameter(default=5000, min=0, unit=u.K)
+        _input_units_allow_dimensionless = True
+        input_units_equivalencies = {'x': u.spectral()}
+
+        def __init__(self, *args, **kwargs):
+            super(BlackBody1D, self).__init__(*args, **kwargs)
+            self.meta['expr'] = 'bb({0})'.format(self.temperature.value)
+
+        @property
+        def lambda_max(self):
+            """Peak wavelength in Angstrom when the curve is expressed as
+            power density."""
+            return ((const.b_wien.value / self.temperature) * u.m).to(u.AA)
+
+        def bounding_box(self, factor=10.0):
+            """Tuple defining the default ``bounding_box`` limits,
+            ``(x_low, x_high)``.
+
+            .. math::
+
+                x_{\\mathrm{low}} = 0
+
+                x_{\\mathrm{high}} = \\log(\\lambda_{\\mathrm{max}} \\;\
+                (1 + \\mathrm{factor}))
+
+            Parameters
+            ----------
+            factor : float
+                Used to calculate ``x_high``.
+
+            """
+            w0 = self.lambda_max.value
+            return [w0 * 0, np.log10(w0 + factor * w0)]
+
+        def sampleset(self, factor_bbox=10.0, num=1000):
+            """Return ``x`` array that samples the feature.
+
+            Parameters
+            ----------
+            factor_bbox : float
+                Factor for ``bounding_box`` calculations.
+
+            num : int
+                Number of points to generate.
+
+            """
+            w1, w2 = self.bounding_box(factor=factor_bbox)
+
+            if self._n_models == 1:
+                w = np.logspace(w1, w2, num)
+            else:
+                w = list(map(partial(np.logspace, num=num), w1, w2))
+
+            return np.asarray(w) * self.lambda_max.value
+
+        @property
+        def input_units(self):
+            return {'x': u.AA}
+
+        def _parameter_units_for_data_units(self, inputs_unit, outputs_unit):
+            return {'temperature': u.K}
+
+        @staticmethod
+        def evaluate(x, temperature):
+            # Silence Numpy
+            old_np_err_cfg = np.seterr(all='ignore')
+
+            if not isinstance(x, u.Quantity):
+                wave = np.ascontiguousarray(x) * u.AA
+            else:
+                wave = x
+
+            bbnu_flux = blackbody_nu(wave, temperature)
+            bbflux = (bbnu_flux * u.sr).to(
+                units.PHOTLAM, u.spectral_density(wave)) / u.sr  # PHOTLAM/sr
+
+            # Restore Numpy settings
+            np.seterr(**old_np_err_cfg)
+
+            # If the temperature parameter has no unit, we should return a
+            # unitless value. This occurs for instance during fitting,
+            # since we drop the units temporarily.
+            if hasattr(temperature, 'unit'):
+                return bbflux
+            else:
+                return bbflux.value
+
 else:
     from astropy.modeling.core import CompoundModel
+    from astropy.modeling.physical_models import BlackBody
+    from astropy.modeling.models import RickerWavelet1D as _RickerWavelet1D
+
+    class BlackBody1D(BlackBody):
+        """Create a :ref:`blackbody spectrum <synphot-planck-law>`
+        model with given temperature.
+
+        See :class:`astropy.modeling.physical_models.BlackBody`.
+
+        """
+        def __init__(self, *args, **kwargs):
+            super(BlackBody1D, self).__init__(*args, **kwargs)
+            self.meta['expr'] = 'bb({0})'.format(self.temperature.value)
+
+        def bounding_box(self, factor=10.0):
+            """Tuple defining the default ``bounding_box`` limits,
+            ``(x_low, x_high)`` in Angstrom.
+
+            .. math::
+
+                x_{\\mathrm{low}} = 0
+
+                x_{\\mathrm{high}} = \\log(\\lambda_{\\mathrm{max}} \\;\
+                (1 + \\mathrm{factor}))
+
+            Parameters
+            ----------
+            factor : float
+                Used to calculate ``x_high``.
+
+            """
+            w0 = self.lambda_max.to(u.AA).value
+            return (w0 * 0, np.log10(w0 + factor * w0))
+
+        def sampleset(self, factor_bbox=10.0, num=1000):
+            """Return ``x`` array that samples the feature.
+
+            Parameters
+            ----------
+            factor_bbox : float
+                Factor for ``bounding_box`` calculations.
+
+            num : int
+                Number of points to generate.
+
+            """
+            w1, w2 = self.bounding_box(factor=factor_bbox)
+
+            if self._n_models == 1:
+                w = np.logspace(w1, w2, num)
+            else:
+                w = list(map(partial(np.logspace, num=num), w1, w2))
+
+            return np.asarray(w) * u.AA
+
+        @property
+        def input_units(self):
+            return {'x': u.AA}
+
+        def evaluate(self, x, temperature, scale):
+            """Evaluate the model.
+
+            This is similar to
+            :meth:`astropy.modeling.physical_models.BlackBody.evaluate`,
+            except that Numpy warnings are suppressed already and
+            evaluated flux is not Quantity but is always in the unit of
+            PHOTLAM per steradian. This is for backward compatibility.
+
+            """
+            # Silence Numpy
+            old_np_err_cfg = np.seterr(all='ignore')
+
+            if isinstance(x, u.Quantity):
+                wave = x
+            else:
+                wave = np.ascontiguousarray(x) * u.AA
+
+            bbnu_flux = super(BlackBody1D, self).evaluate(
+                wave, temperature, scale)
+            bbflux = (bbnu_flux).to(
+                units.PHOTLAM / u.sr, u.spectral_density(wave))
+
+            # Restore Numpy settings
+            np.seterr(**old_np_err_cfg)
+
+            # If the temperature parameter has no unit, we should return a
+            # unitless value. This occurs for instance during fitting,
+            # since we drop the units temporarily.
+            if hasattr(temperature, 'unit'):
+                return bbflux
+            else:
+                return bbflux.value
+
 
 __all__ = ['BlackBody1D', 'BlackBodyNorm1D', 'Box1D', 'ConstFlux1D',
            'Empirical1D', 'Gaussian1D', 'GaussianAbsorption1D',
-           'GaussianFlux1D', 'Lorentz1D', 'MexicanHat1D', 'PowerLawFlux1D',
+           'GaussianFlux1D', 'Lorentz1D', 'RickerWavelet1D', 'PowerLawFlux1D',
            'Trapezoid1D', 'get_waveset', 'get_metadata']
-
-
-class BlackBody1D(Fittable1DModel):
-    """Create a :ref:`blackbody spectrum <synphot-planck-law>`
-    model with given temperature.
-
-    Parameters
-    ----------
-    temperature : float
-        Blackbody temperature in Kelvin.
-
-    """
-    temperature = Parameter(default=5000)
-
-    def __init__(self, *args, **kwargs):
-        super(BlackBody1D, self).__init__(*args, **kwargs)
-        self.meta['expr'] = 'bb({0})'.format(self.temperature.value)
-
-    @property
-    def lambda_max(self):
-        """Peak wavelength in Angstrom when the curve is expressed as
-        power density."""
-        return ((const.b_wien.value / self.temperature) * u.m).to(u.AA).value
-
-    def bounding_box(self, factor=10.0):
-        """Tuple defining the default ``bounding_box`` limits,
-        ``(x_low, x_high)``.
-
-        .. math::
-
-            x_{\\mathrm{low}} = 0
-
-            x_{\\mathrm{high}} = \\log(\\lambda_{\\mathrm{max}} \\;\
-            (1 + \\mathrm{factor}))
-
-        Parameters
-        ----------
-        factor : float
-            Used to calculate ``x_high``.
-
-        """
-        w0 = self.lambda_max
-        return (w0 * 0, np.log10(w0 + factor * w0))
-
-    def sampleset(self, factor_bbox=10.0, num=1000):
-        """Return ``x`` array that samples the feature.
-
-        Parameters
-        ----------
-        factor_bbox : float
-            Factor for ``bounding_box`` calculations.
-
-        num : int
-            Number of points to generate.
-
-        """
-        w1, w2 = self.bounding_box(factor=factor_bbox)
-
-        if self._n_models == 1:
-            w = np.logspace(w1, w2, num)
-        else:
-            w = list(map(partial(np.logspace, num=num), w1, w2))
-
-        return np.asarray(w)
-
-    @staticmethod
-    def evaluate(x, temperature):
-        """Evaluate the model.
-
-        Parameters
-        ----------
-        x : number or ndarray
-            Wavelengths in Angstrom.
-
-        temperature : number
-            Temperature in Kelvin.
-
-        Returns
-        -------
-        y : number or ndarray
-            Blackbody radiation in PHOTLAM per steradian.
-
-        """
-        if ASTROPY_LT_2_0:
-            from astropy.analytic_functions.blackbody import blackbody_nu
-        else:
-            from astropy.modeling.blackbody import blackbody_nu
-
-        # Silence Numpy
-        old_np_err_cfg = np.seterr(all='ignore')
-
-        wave = np.ascontiguousarray(x) * u.AA
-        bbnu_flux = blackbody_nu(wave, temperature)
-        bbflux = (bbnu_flux * u.sr).to(
-            units.PHOTLAM, u.spectral_density(wave)) / u.sr  # PHOTLAM/sr
-
-        # Restore Numpy settings
-        np.seterr(**old_np_err_cfg)
-
-        return bbflux.value
 
 
 class BlackBodyNorm1D(BlackBody1D):
@@ -149,33 +244,26 @@ class BlackBodyNorm1D(BlackBody1D):
 
     Parameters
     ----------
-    temperature : float
-        Blackbody temperature in Kelvin.
+    temperature : `~astropy.units.quantity.Quantity`
+        Blackbody temperature.
 
     """
     def __init__(self, *args, **kwargs):
         super(BlackBodyNorm1D, self).__init__(*args, **kwargs)
-        self._omega = np.pi * (const.R_sun / const.kpc).value ** 2  # steradian
+        self._omega = np.pi * (const.R_sun / const.kpc).value ** 2 * u.sr
 
-    def evaluate(self, x, temperature):
-        """Evaluate the model.
+    def evaluate(self, x, temperature, *args):
+        """Evaluate the model."""
+        bbflux = super(BlackBodyNorm1D, self).evaluate(*args)
+        y = bbflux * self._omega
 
-        Parameters
-        ----------
-        x : number or ndarray
-            Wavelengths in Angstrom.
-
-        temperature : number
-            Temperature in Kelvin.
-
-        Returns
-        -------
-        y : number or ndarray
-            Blackbody radiation in PHOTLAM.
-
-        """
-        bbflux = super(BlackBodyNorm1D, self).evaluate(x, temperature)
-        return bbflux * self._omega
+        # If the temperature parameter has no unit, we should return a
+        # unitless value. This occurs for instance during fitting,
+        # since we drop the units temporarily.
+        if hasattr(temperature, 'unit'):
+            return y
+        else:
+            return y.value
 
 
 class Box1D(_models.Box1D):
@@ -183,6 +271,11 @@ class Box1D(_models.Box1D):
     ``sampleset`` defined.
 
     """
+    x_0 = Parameter(default=0, unit=u.AA)
+    width = Parameter(default=1, unit=u.AA)
+    _input_units_allow_dimensionless = True
+    input_units_equivalencies = {'x': u.spectral()}
+
     @staticmethod
     def _calc_sampleset(w1, w2, step, minimal):
         """Calculate sampleset for each model."""
@@ -209,34 +302,35 @@ class Box1D(_models.Box1D):
         w1, w2 = self.bounding_box
 
         if self._n_models == 1:
-            w = self._calc_sampleset(w1, w2, step, minimal)
+            w = self._calc_sampleset(w1.value, w2.value, step, minimal)
         else:
             w = list(map(partial(
-                self._calc_sampleset, step=step, minimal=minimal), w1, w2))
+                self._calc_sampleset, step=step, minimal=minimal),
+                w1.value, w2.value))
 
-        return np.asarray(w)
+        return w * w1.unit
 
 
 class ConstFlux1D(_models.Const1D):
     """One dimensional constant flux model.
 
     Flux that is constant in a given unit might not be constant in
-    another unit. During evaluation, flux is always converted to PHOTLAM.
+    another unit.
 
     For multiple ``n_models``, this model only accepts amplitudes of the
-    same flux unit; e.g., ``[1, 2]`` or ``Quantity([1, 2], 'photlam')``.
+    same flux unit; e.g., ``Quantity([1, 2], 'photlam')``.
 
     Parameters
     ----------
-    amplitude : number or `~astropy.units.quantity.Quantity`
+    amplitude : `~astropy.units.quantity.Quantity`
         Value and unit of the constant function.
-        If not Quantity, assume the unit of PHOTLAM.
 
     """
-    def __init__(self, amplitude, **kwargs):
-        if not isinstance(amplitude, u.Quantity):
-            amplitude = amplitude * units.PHOTLAM
+    amplitude = Parameter(default=1, unit=units.PHOTLAM)
+    _input_units_allow_dimensionless = True
+    input_units_equivalencies = {'x': u.spectral()}
 
+    def __init__(self, amplitude=amplitude.default * amplitude.unit, **kwargs):
         if amplitude.unit == u.STmag:
             a = units.convert_flux(1, amplitude, units.FLAM)
         elif amplitude.unit == u.ABmag:
@@ -249,35 +343,25 @@ class ConstFlux1D(_models.Const1D):
             raise NotImplementedError(
                 '{0} not supported.'.format(amplitude.unit))
 
-        self._flux_unit = a.unit
-        super(ConstFlux1D, self).__init__(amplitude=a.value, **kwargs)
+        super(ConstFlux1D, self).__init__(amplitude=a, **kwargs)
+
+    @property
+    def input_units(self):
+        return {'x': u.AA}
+
+    def _parameter_units_for_data_units(self, inputs_unit, outputs_unit):
+        return {'amplitude': outputs_unit['y']}
 
     def evaluate(self, x, *args):
-        """One dimensional constant flux model function.
-
-        Parameters
-        ----------
-        x : number or ndarray
-            Wavelengths in Angstrom.
-
-        Returns
-        -------
-        y : number or ndarray
-            Flux in PHOTLAM.
-
-        """
-        a = (self.amplitude * np.ones_like(x)) * self._flux_unit
-        y = units.convert_flux(x, a, units.PHOTLAM)
-        return y.value
+        if hasattr(x, "unit"):
+            y = self.amplitude * np.ones_like(x.value)
+        else:
+            y = self.amplitude.value * np.ones_like(x)
+        return y
 
 
 class Empirical1D(Tabular1D):
     """Empirical (sampled) spectrum or bandpass model.
-
-    .. note::
-
-        This model requires `SciPy <https://www.scipy.org>`_ 0.14
-        or later to be installed.
 
     Parameters
     ----------
@@ -343,10 +427,14 @@ class Empirical1D(Tabular1D):
                 old_y = y
                 y = 0
         else:
-            x = np.asarray(x)  # In case input is just pure list
-            y = np.asarray(y)
-            i = np.where(y < 0)
-            n_neg = len(i[0])
+            # In case input is just pure list
+            if not isinstance(x, u.Quantity):
+                x = np.asarray(x)
+            if not isinstance(y, u.Quantity):
+                y = np.asarray(y)
+
+            i = y < 0
+            n_neg = np.count_nonzero(i)
             if n_neg > 0:
                 old_x = x[i]
                 old_y = y[i]
@@ -363,27 +451,16 @@ class Empirical1D(Tabular1D):
         return y
 
     def is_tapered(self):
-        return np.array_equal(
-            self.lookup_table[::self.lookup_table.size - 1], [0, 0])
+        y = self.lookup_table[::self.lookup_table.size - 1]
+        if isinstance(y, u.Quantity):
+            y = y.value
+        return np.array_equal(y, [0, 0])
 
     def sampleset(self):
         """Return array that samples the feature."""
         return np.squeeze(self.points)
 
     def evaluate(self, inputs):
-        """Evaluate the model.
-
-        Parameters
-        ----------
-        inputs : number or ndarray
-            Wavelengths in same unit as ``points``.
-
-        Returns
-        -------
-        y : number or ndarray
-            Flux or throughput in same unit as ``lookup_table``.
-
-        """
         y = super(Empirical1D, self).evaluate(inputs)
 
         # Assume NaN at both ends need to be extrapolated based on
@@ -404,8 +481,8 @@ class Empirical1D(Tabular1D):
         return self._process_neg_flux(inputs, y)
 
 
-class BaseGaussian1D(_models.Gaussian1D):
-    """Same as `astropy.modeling.functional_models.BaseGaussian1D`, except with
+class Gaussian1D(_models.Gaussian1D):
+    """Same as `astropy.modeling.functional_models.Gaussian1D`, except with
     ``sampleset`` defined.
 
     """
@@ -428,29 +505,26 @@ class BaseGaussian1D(_models.Gaussian1D):
             kwargs['factor'] = 5.0
 
         w1, w2 = self.bounding_box(**kwargs)
-        dw = factor_step * self.stddev
-
-        if self._n_models == 1:
-            w = np.arange(w1, w2, dw)
+        if isinstance(w1, u.Quantity):
+            dw = (factor_step * self.stddev).to(w1.unit, u.spectral())
+            if self._n_models == 1:
+                w = np.arange(w1.value, w2.value, dw.value) * w1.unit
+            else:
+                w = list(map(
+                    np.arange, w1.value, w2.value, dw.value)) * w1.unit
         else:
-            w = list(map(np.arange, w1, w2, dw))
+            dw = factor_step * self.stddev
+            if self._n_models == 1:
+                w = np.arange(w1, w2, dw)
+            else:
+                w = np.asarray(list(map(np.arange, w1, w2, dw)))
 
-        return np.asarray(w)
-
-
-class Gaussian1D(BaseGaussian1D):
-    """Same as `astropy.modeling.functional_models.Gaussian1D`, except with
-    ``sampleset`` defined.
-
-    """
-    pass
+        return w
 
 
-class GaussianAbsorption1D(BaseGaussian1D):
-    """Same as ``astropy.modeling.functional_models.GaussianAbsorption1D``,
-    except with ``sampleset`` defined.
-
-    """
+# TODO: Deprecate this?
+class GaussianAbsorption1D(Gaussian1D):
+    """Model to calculate ``1 - Gaussian1D``."""
     @staticmethod
     def evaluate(x, amplitude, mean, stddev):
         """
@@ -469,60 +543,76 @@ class GaussianAbsorption1D(BaseGaussian1D):
 
 
 class GaussianFlux1D(Gaussian1D):
-    """Same as `Gaussian1D` but accepts extra keywords below.
+    """Same as `Gaussian1D` but accepts ``fwhm`` and ``total_flux`` also.
 
     Parameters
     ----------
-    amplitude : float
-        Amplitude of the Gaussian in PHOTLAM.
+    amplitude : `~astropy.units.quantity.Quantity`
+        Amplitude of the Gaussian.
         Also see ``total_flux``.
 
-    mean : float
-        Mean of the Gaussian in Angstrom.
+    mean : `~astropy.units.quantity.Quantity`
+        Mean of the Gaussian.
 
-    stddev : float
-        Standard deviation of the Gaussian in Angstrom.
+    stddev : `~astropy.units.quantity.Quantity`
+        Standard deviation of the Gaussian.
         Also see ``fwhm``.
 
-    fwhm : float
-        Full width at half maximum of the Gaussian in Angstrom.
+    fwhm : float or `~astropy.units.quantity.Quantity`
+        Full width at half maximum of the Gaussian.
+        Assume Angstrom if no unit given.
         If given, this overrides ``stddev``.
 
-    total_flux : float
-        Total flux under the Gaussian in ``erg/s/cm^2``.
+    total_flux : float or `~astropy.units.quantity.Quantity`
+        Total flux under the Gaussian.
+        Assume ``erg/s/cm^2`` if no unit given.
         If given, this overrides ``amplitude``.
 
     """
-    def __init__(self, *args, **kwargs):
-        fwhm = kwargs.pop('fwhm', None)
-        total_flux = kwargs.pop('total_flux', None)
+    amplitude = Parameter(default=1, unit=units.PHOTLAM)
+    mean = Parameter(default=0, unit=u.AA)
 
-        super(GaussianFlux1D, self).__init__(*args, **kwargs)
+    # Ensure stddev makes sense if its bounds are not explicitly set.
+    # stddev must be non-zero and positive.
+    stddev = Parameter(default=1, bounds=(FLOAT_EPSILON, None), unit=u.AA)
 
+    def __init__(self, amplitude=amplitude.default * amplitude.unit,
+                 mean=mean.default * mean.unit,
+                 stddev=stddev.default * stddev.unit,
+                 fwhm=None, total_flux=None, **kwargs):
         if fwhm is None:
-            fwhm = self.stddev * gaussian_sigma_to_fwhm
+            fwhm = stddev * gaussian_sigma_to_fwhm
         else:
-            self.stddev = fwhm * gaussian_fwhm_to_sigma
+            if not isinstance(fwhm, u.Quantity):
+                fwhm = fwhm * u.AA
+            stddev = fwhm * gaussian_fwhm_to_sigma
 
-        gaussian_amp_to_totflux = np.sqrt(2.0 * np.pi) * self.stddev
+        # Taken from PySynphot
+        gaussian_amp_to_totflux = np.sqrt(2.0 * np.pi) * stddev.to(
+            u.AA, u.spectral())
 
         if total_flux is None:
             u_str = 'PHOTLAM'
-            total_flux = self.amplitude * gaussian_amp_to_totflux
+            total_flux = ((amplitude.to(u.AA, u.spectral()).value *
+                           gaussian_amp_to_totflux.value) *
+                          (u.ph / (u.cm * u.cm * u.s)))
         else:
             u_str = 'FLAM'
-            # total_flux is passed in unaltered, any conversion error would
-            # happen here.
             tf_unit = u.erg / (u.cm * u.cm * u.s)
-            if isinstance(total_flux, u.Quantity):
-                total_flux = total_flux.to(tf_unit)
-            else:
+            if not isinstance(total_flux, u.Quantity):
                 total_flux = total_flux * tf_unit
-            self.amplitude = (total_flux / (gaussian_amp_to_totflux * u.AA)).to(units.PHOTLAM, u.spectral_density(self.mean.value * u.AA)).value  # noqa
-            total_flux = total_flux.value
+            amplitude = (total_flux / gaussian_amp_to_totflux).to(
+                units.PHOTLAM, u.spectral_density(mean)).value * u.AA
 
+        super(GaussianFlux1D, self).__init__(
+            amplitude=amplitude, mean=mean, stddev=stddev, **kwargs)
+
+        # TODO: Allow FWHM and total flux to be property
+        self.fwhm = fwhm
+        self.total_flux = total_flux
         self.meta['expr'] = 'em({0:g}, {1:g}, {2:g}, {3})'.format(
-            self.mean.value, fwhm, total_flux, u_str)
+            mean.to(u.AA, u.spectral()).value,
+            fwhm.to(u.AA, u.spectral()).value, total_flux.value, u_str)
 
 
 class Lorentz1D(_models.Lorentz1D):
@@ -544,18 +634,26 @@ class Lorentz1D(_models.Lorentz1D):
 
         """
         w1, w2 = self.bounding_box(**kwargs)
-        dw = factor_step * self.fwhm
 
-        if self._n_models == 1:
-            w = np.arange(w1, w2, dw)
+        if isinstance(w1, u.Quantity):
+            dw = (factor_step * self.fwhm).to(w1.unit, u.spectral())
+            if self._n_models == 1:
+                w = np.arange(w1.value, w2.value, dw.value) * w1.unit
+            else:
+                w = np.asarray(list(map(
+                    np.arange, w1.value, w2.value, dw.value))) * w1.unit
         else:
-            w = list(map(np.arange, w1, w2, dw))
+            dw = factor_step * self.fwhm
+            if self._n_models == 1:
+                w = np.arange(w1, w2, dw)
+            else:
+                w = np.asarray(list(map(np.arange, w1, w2, dw)))
 
-        return np.asarray(w)
+        return w
 
 
-class MexicanHat1D(_models.MexicanHat1D):
-    """Same as `astropy.modeling.models.MexicanHat1D`, except with
+class RickerWavelet1D(_RickerWavelet1D):
+    """Same as ``astropy`` ``MexicanHat1D`` or ``RickerWavelet1D``, except with
     ``sampleset`` defined.
 
     """
@@ -573,63 +671,82 @@ class MexicanHat1D(_models.MexicanHat1D):
 
         """
         w1, w2 = self.bounding_box(**kwargs)
-        dw = factor_step * self.sigma
 
-        if self._n_models == 1:
-            w = np.arange(w1, w2, dw)
+        if isinstance(w1, u.Quantity):
+            dw = (factor_step * self.sigma).to(w1.unit, u.spectral())
+            if self._n_models == 1:
+                w = np.arange(w1.value, w2.value, dw.value) * w1.unit
+            else:
+                w = np.asarray(list(map(
+                    np.arange, w1.value, w2.value, dw.value))) * w1.unit
         else:
-            w = list(map(np.arange, w1, w2, dw))
+            dw = factor_step * self.sigma
+            if self._n_models == 1:
+                w = np.arange(w1, w2, dw)
+            else:
+                w = np.asarray(list(map(np.arange, w1, w2, dw)))
 
-        return np.asarray(w)
+        return w
+
+
+@deprecated('2.0', alternative='synphot.models.RickerWavelet1D')
+class MexicanHat1D(RickerWavelet1D):
+    """This model is deprecated. Use `RickerWavelet1D`."""
+    pass
 
 
 class PowerLawFlux1D(_models.PowerLaw1D):
     """One dimensional power law model with proper flux handling.
 
     For multiple ``n_models``, this model only accepts parameters of the
-    same unit; e.g., ``amplitude=[1, 2]`` or
-    ``amplitude=Quantity([1, 2], 'photlam')``.
+    same unit; e.g., ``amplitude=Quantity([1, 2], 'photlam')``.
 
     Also see `~astropy.modeling.powerlaws.PowerLaw1D`.
 
     Parameters
     ----------
-    amplitude : number or `~astropy.units.quantity.Quantity`
+    amplitude : `~astropy.units.quantity.Quantity`
         Model amplitude at the reference point.
-        If not Quantity, assume the unit of PHOTLAM.
 
-    x_0 : number or `~astropy.units.quantity.Quantity`
+    x_0 : `~astropy.units.quantity.Quantity`
         Reference point.
-        If not Quantity, assume the unit of Angstrom.
 
     alpha : float
         Power law index.
 
     """
-    def __init__(self, amplitude, x_0, alpha, **kwargs):
-        if not isinstance(amplitude, u.Quantity):
-            amplitude = amplitude * units.PHOTLAM
+    amplitude = Parameter(default=1, unit=units.PHOTLAM)
+    x_0 = Parameter(default=1, unit=u.AA)
+    alpha = Parameter(default=1)
 
-        if (amplitude.unit.physical_type in
+    _input_units_allow_dimensionless = True
+    input_units_equivalencies = {'x': u.spectral()}
+
+    def __init__(self, amplitude=amplitude.default * amplitude.unit,
+                 x_0=x_0.default * x_0.unit, alpha=alpha.default, **kwargs):
+        if (amplitude.unit.physical_type not in
                 ('spectral flux density', 'spectral flux density wav',
                  'photon flux density', 'photon flux density wav')):
-            self._flux_unit = amplitude.unit
-        else:
             raise NotImplementedError(
                 '{0} not supported.'.format(amplitude.unit))
 
-        if isinstance(x_0, u.Quantity):
-            x_0 = x_0.to(u.AA, u.spectral()).value
-
         super(PowerLawFlux1D, self).__init__(
-            amplitude=amplitude.value, x_0=x_0, alpha=alpha, **kwargs)
+            amplitude=amplitude, x_0=x_0, alpha=alpha, **kwargs)
+
+    @property
+    def input_units(self):
+        return {'x': u.AA}
+
+    def _parameter_units_for_data_units(self, inputs_unit, outputs_unit):
+        return {'x_0', inputs_unit['x'],
+                'amplitude', outputs_unit['y']}
 
     def evaluate(self, x, *args):
-        """Return flux in PHOTLAM. Assume input wavelength is in Angstrom."""
-        xx = x / self.x_0
-        y = (self.amplitude * xx ** (-self.alpha)) * self._flux_unit
-        flux = units.convert_flux(x, y, units.PHOTLAM)
-        return flux.value
+        if hasattr(x, 'unit'):
+            y = self.amplitude * (x / self.x_0) ** (-self.alpha)
+        else:
+            y = self.amplitude.value * (x / self.x_0.value) ** (-self.alpha)
+        return y
 
 
 class Trapezoid1D(_models.Trapezoid1D):
@@ -640,16 +757,26 @@ class Trapezoid1D(_models.Trapezoid1D):
     def sampleset(self):
         """Return ``x`` array that samples the feature."""
         x1, x4 = self.bounding_box
-        dw = self.width * 0.5
-        x2 = self.x_0 - dw
-        x3 = self.x_0 + dw
 
-        if self._n_models == 1:
-            w = [x1, x2, x3, x4]
+        if isinstance(x1, u.Quantity):
+            dw = self.width.to(x1.unit, u.spectral()) * 0.5
+            x0 = self.x_0.to(x1.unit, u.spectral())
+            x2 = x0 - dw
+            x3 = x0 + dw
+            if self._n_models == 1:
+                w = [x1.value, x2.value, x3.value, x4.value] * x1.unit
+            else:
+                w = list(zip(x1.value, x2.value, x3.value, x4.value)) * x1.unit
         else:
-            w = list(zip(x1, x2, x3, x4))
+            dw = self.width * 0.5
+            x2 = self.x_0 - dw
+            x3 = self.x_0 + dw
+            if self._n_models == 1:
+                w = np.asarray([x1, x2, x3, x4])
+            else:
+                w = np.asarray(list(zip(x1, x2, x3, x4)))
 
-        return np.asarray(w)
+        return w
 
 
 # Functions below are for sampleset magic.

@@ -19,15 +19,16 @@ import numpy as np
 import pytest
 
 # ASTROPY
-import astropy
 from astropy import units as u
 from astropy.modeling.models import Const1D
+from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from .. import specio, units
+from ..compat import ASTROPY_LT_4_0
 from ..models import (BlackBody1D, ConstFlux1D, Empirical1D, PowerLawFlux1D,
                       get_metadata)
 
@@ -39,28 +40,32 @@ else:
     HAS_SCIPY = True
 
 HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
-ASTROPY_LT_20 = not minversion(astropy, '2.0')
 
 
 def setup_module(module):
     # https://github.com/astropy/astropy/issues/6383
-    if not ASTROPY_LT_20:
-        import astropy.constants as const
-        from astropy.constants import si, astropyconst13
+    import astropy.constants as const
+    from astropy.constants import si, astropyconst13
 
-        const.sigma_sb = si.sigma_sb = astropyconst13.sigma_sb
-        const.h = si.h = astropyconst13.h
-        const.k_B = si.k_B = astropyconst13.k_B
+    const.sigma_sb = si.sigma_sb = astropyconst13.sigma_sb
+    const.h = si.h = astropyconst13.h
+    const.k_B = si.k_B = astropyconst13.k_B
 
 
 def teardown_module(module):
     # https://github.com/astropy/astropy/issues/6383
-    if not ASTROPY_LT_20:
-        import astropy.constants as const
-        from astropy.constants import si, astropyconst20
+    import astropy.constants as const
+    from astropy.constants import si
+    if ASTROPY_LT_4_0:
+        from astropy.constants import astropyconst20
         const.sigma_sb = si.sigma_sb = astropyconst20.sigma_sb
         const.h = si.h = astropyconst20.h
         const.k_B = si.k_B = astropyconst20.k_B
+    else:
+        from astropy.constants import astropyconst40
+        const.sigma_sb = si.sigma_sb = astropyconst40.sigma_sb
+        const.h = si.h = astropyconst40.h
+        const.k_B = si.k_B = astropyconst40.k_B
 
 
 class TestBlackBody1D(object):
@@ -69,7 +74,11 @@ class TestBlackBody1D(object):
         self.m1 = BlackBody1D(temperature=5500)
 
     def test_lambda_max(self):
-        np.testing.assert_allclose(self.m1.lambda_max, 5268.67, rtol=1e-5)
+        if ASTROPY_LT_4_0:
+            np.testing.assert_allclose(self.m1.lambda_max, 5268.67, rtol=1e-5)
+        else:
+            assert_quantity_allclose(self.m1.lambda_max, 5268.67 * u.AA,
+                                     rtol=1e-5)
 
     def test_sampleset(self):
         f1 = self.m1(self.m1.sampleset())
@@ -84,11 +93,20 @@ class TestBlackBody1D(object):
              1.36493780e+17, 1.38491010e+17])
 
     def test_multi_n_models(self):
-        m2 = BlackBody1D(temperature=[100, 10000], n_models=2)
-        np.testing.assert_allclose(
-            m2.lambda_max, [2.8977685e5, 2897.7685], rtol=1e-5)
+        kwargs = {'temperature': [100, 10000],
+                  'n_models': 2}
+        if not ASTROPY_LT_4_0:
+            kwargs['scale'] = [1, 1]
+        m2 = BlackBody1D(**kwargs)
         np.testing.assert_allclose(
             m2(20000), [2.14331496e-14, 3.55819086e+17])
+
+        if ASTROPY_LT_4_0:
+            np.testing.assert_allclose(
+                m2.lambda_max, [2.8977685e5, 2897.7685], rtol=1e-5)
+        else:
+            assert_quantity_allclose(
+                m2.lambda_max, [2.8977685e5, 2897.7685] * u.AA, rtol=1e-5)
 
 
 class TestConstFlux1D(object):

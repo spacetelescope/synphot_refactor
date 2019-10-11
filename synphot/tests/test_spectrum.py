@@ -42,7 +42,6 @@ else:
     HAS_SCIPY = True
 
 HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
-ASTROPY_LT_20 = not minversion(astropy, '2.0')
 
 # GLOBAL VARIABLES
 _vspec = None  # Loaded in test_load_vspec()
@@ -50,23 +49,28 @@ _vspec = None  # Loaded in test_load_vspec()
 
 def setup_module(module):
     # https://github.com/astropy/astropy/issues/6383
-    if not ASTROPY_LT_20:
-        import astropy.constants as const
-        from astropy.constants import si, astropyconst13
+    import astropy.constants as const
+    from astropy.constants import si, astropyconst13
 
-        const.sigma_sb = si.sigma_sb = astropyconst13.sigma_sb
-        const.h = si.h = astropyconst13.h
-        const.k_B = si.k_B = astropyconst13.k_B
+    const.sigma_sb = si.sigma_sb = astropyconst13.sigma_sb
+    const.h = si.h = astropyconst13.h
+    const.k_B = si.k_B = astropyconst13.k_B
 
 
 def teardown_module(module):
     # https://github.com/astropy/astropy/issues/6383
-    if not ASTROPY_LT_20:
-        import astropy.constants as const
-        from astropy.constants import si, astropyconst20
+    import astropy.constants as const
+    from astropy.constants import si
+    if ASTROPY_LT_4_0:
+        from astropy.constants import astropyconst20
         const.sigma_sb = si.sigma_sb = astropyconst20.sigma_sb
         const.h = si.h = astropyconst20.h
         const.k_B = si.k_B = astropyconst20.k_B
+    else:
+        from astropy.constants import astropyconst40
+        const.sigma_sb = si.sigma_sb = astropyconst40.sigma_sb
+        const.h = si.h = astropyconst40.h
+        const.k_B = si.k_B = astropyconst40.k_B
 
 
 @pytest.mark.remote_data

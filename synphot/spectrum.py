@@ -124,7 +124,7 @@ class BaseSpectrum(object):
         'PowerLaw1D': 'x_0',
         'Trapezoid1D': 'x_0'}
 
-    def __init__(self, modelclass, clean_meta=False, **kwargs):
+    def __init__(self, modelclass, *, clean_meta=False, **kwargs):
 
         # Does not handle multiple model sets for now; too complicated.
         n_models = kwargs.pop('n_models', 1)
@@ -247,7 +247,7 @@ class BaseSpectrum(object):
     def _process_generic_param(pval, def_unit, equivalencies=[]):
         """Process generic model parameter."""
         if isinstance(pval, u.Quantity):
-            outval = pval.to(def_unit, equivalencies).value
+            outval = pval.to(def_unit, equivalencies)
         else:  # Assume already in desired unit
             outval = pval
         return outval
@@ -464,22 +464,20 @@ class BaseSpectrum(object):
         #       make sure that this actually works, and gives correct unit.
         # https://github.com/astropy/astropy/issues/5033
         # https://github.com/astropy/astropy/pull/5108
-        try:
+        if hasattr(self.model, 'integral'):  # pragma: no cover
             m = self.model.integral
-        except (AttributeError, NotImplementedError):
-            if conf.default_integrator == 'trapezoid':
-                y = self(x, **kwargs)
-                result = abs(np.trapz(y.value, x=x.value))
-                result_unit = y.unit
-            else:  # pragma: no cover
-                raise NotImplementedError(
-                    'Analytic integral not available and default integrator '
-                    '{0} is not supported'.format(conf.default_integrator))
-        else:  # pragma: no cover
             start = x[0].value
             stop = x[-1].value
             result = (m(stop) - m(start))
             result_unit = self._internal_flux_unit
+        elif conf.default_integrator == 'trapezoid':
+            y = self(x, **kwargs)
+            result = abs(np.trapz(y.value, x=x.value))
+            result_unit = y.unit
+        else:  # pragma: no cover
+            raise NotImplementedError(
+                'Analytic integral not available and default integrator '
+                '{0} is not supported'.format(conf.default_integrator))
 
         # Ensure final unit takes account of integration across wavelength
         if result_unit != units.THROUGHPUT:
