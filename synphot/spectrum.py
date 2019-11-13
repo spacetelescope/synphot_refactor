@@ -39,7 +39,7 @@ class BaseSpectrum(object):
 
     .. note::
 
-        Until `astropy.modeling` can handle units, all parameters
+        For backward compatibility, all parameters
         are converted to pre-defined internal units.
 
     Parameters
@@ -98,6 +98,8 @@ class BaseSpectrum(object):
             'alpha': u.dimensionless_unscaled,
             'beta': u.dimensionless_unscaled},
         'Lorentz1D': {'amplitude': 'flux', 'x_0': 'wave', 'fwhm': 'wave'},
+        'RickerWavelet1D': {
+            'amplitude': 'flux', 'x_0': 'wave', 'sigma': 'wave'},
         'MexicanHat1D': {'amplitude': 'flux', 'x_0': 'wave', 'sigma': 'wave'},
         'PowerLaw1D': {
             'amplitude': 'flux', 'x_0': 'wave',
@@ -120,6 +122,7 @@ class BaseSpectrum(object):
         'GaussianFlux1D': 'mean',
         'LogParabola1D': 'x_0',
         'Lorentz1D': 'x_0',
+        'RickerWavelet1D': 'x_0',
         'MexicanHat1D': 'x_0',
         'PowerLaw1D': 'x_0',
         'Trapezoid1D': 'x_0'}
