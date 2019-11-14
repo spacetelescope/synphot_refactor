@@ -56,7 +56,7 @@ def validate_totalflux(totalflux):
 
     Parameters
     ----------
-    totalflux : float
+    totalflux : float or `~astropy.units.quantity.Quantity`
         Integrated flux.
 
     Raises
@@ -205,7 +205,7 @@ def generate_wavelengths(minwave=500, maxwave=26000, num=10000, delta=None,
     return waveset.astype(np.float64) * wave_unit, waveset_str
 
 
-def merge_wavelengths(waveset1, waveset2, threshold=1e-12):
+def merge_wavelengths(waveset1, waveset2, threshold=(1e-12 * u.AA)):
     """Return the union of the two sets of wavelengths using
     :func:`numpy.union1d`.
 
@@ -222,10 +222,10 @@ def merge_wavelengths(waveset1, waveset2, threshold=1e-12):
         Wavelength values, assumed to be in the same unit already.
         Also see :func:`~synphot.models.get_waveset`.
 
-    threshold : float, optional
+    threshold : `~astropy.units.quantity.Quantity`, optional
         Merged wavelength values are considered "too close together"
         when the difference is smaller than this number.
-        The default is 1e-12.
+        The default is 1e-12 Angstrom.
 
     Returns
     -------

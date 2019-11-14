@@ -254,7 +254,7 @@ class BlackBodyNorm1D(BlackBody1D):
 
     def evaluate(self, x, temperature, *args):
         """Evaluate the model."""
-        bbflux = super(BlackBodyNorm1D, self).evaluate(*args)
+        bbflux = super(BlackBodyNorm1D, self).evaluate(x, temperature, *args)
         y = bbflux * self._omega
 
         # If the temperature parameter has no unit, we should return a
