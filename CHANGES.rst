@@ -1,6 +1,9 @@
-0.2.0 (unreleased)
+0.2.0 (2019-11-19)
 ==================
 
+- Use updated Vega spectrum for VEGAMAG. [#222]
+- Compatibility with Numpy 1.17. [#212]
+- Compatibility with ``astropy`` 4.0 models. [#201]
 - Removed Python 2 support. This version is only compatible with Python 3.5
   or later. [#185]
 
