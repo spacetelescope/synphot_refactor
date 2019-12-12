@@ -464,6 +464,8 @@ class Observation(BaseSourceSpectrum):
         # Special handling of VEGAMAG.
         # This is basically effstim(self)/effstim(Vega)
         if flux_unit_name == units.VEGAMAG.to_string():
+            if not isinstance(vegaspec, SourceSpectrum):
+                raise exceptions.SynphotError('Vega spectrum is missing.')
             num = self.integrate(wavelengths=wavelengths)
             den = (vegaspec * self.bandpass).integrate()
             utils.validate_totalflux(num)
