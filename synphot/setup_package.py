@@ -6,7 +6,8 @@ import os
 from setuptools import Extension
 
 # ASTROPY
-from astropy_helpers import setup_helpers
+from extension_helpers import setup_helpers
+from extension_helpers.utils import import_file, write_if_different
 
 LOCALROOT = os.path.relpath(os.path.dirname(__file__))
 
@@ -19,7 +20,7 @@ def string_escape(s):
 
 
 def generate_c_docstrings():
-    from synphot import docstrings
+    docstrings = import_file(os.path.join(LOCALROOT, 'docstrings.py'))
     docstrings = docstrings.__dict__
     keys = [
         key for key, val in docstrings.items()
@@ -50,7 +51,7 @@ void fill_docstrings(void);
         h_file.write('extern char doc_{0}[{1}];\n'.format(key, len(val)))
     h_file.write("\n#endif\n\n")
 
-    setup_helpers.write_if_different(
+    write_if_different(
         os.path.join(LOCALROOT, 'include', 'docstrings.h'),
         h_file.getvalue().encode('utf-8'))
 
@@ -95,16 +96,19 @@ MSVC, do not support string literals greater than 256 characters.
 
     c_file.write("#endif\n")
 
-    setup_helpers.write_if_different(
+    write_if_different(
         os.path.join(LOCALROOT, 'src', 'docstrings.c'),
         c_file.getvalue().encode('utf-8'))
 
 
 def get_extensions():
+    import numpy
     generate_c_docstrings()
 
     cfg = setup_helpers.DistutilsExtensionArgs()
-    cfg['include_dirs'].extend(['numpy', os.path.join(LOCALROOT, "include")])
+    cfg['include_dirs'].extend([
+        numpy.get_include(),
+        os.path.join(LOCALROOT, "include")])
     cfg['sources'] = [
         str(os.path.join(LOCALROOT, 'src', 'synphot_utils.c')),
         str(os.path.join(LOCALROOT, 'src', 'docstrings.c'))]

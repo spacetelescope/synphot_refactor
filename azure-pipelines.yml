@@ -6,19 +6,6 @@ trigger:
 stages:
 - stage: Initial
   jobs:
-  - job: 'EggInfo'
-    pool:
-      vmImage: 'Ubuntu-16.04'
-
-    steps:
-    - task: UsePythonVersion@0
-
-    # Make sure that egg_info works without dependencies
-    - script: |
-        python -m pip install --upgrade pip setuptools
-        python setup.py egg_info
-      displayName: 'egg_info'
-
   - job: 'PEP8'
     pool:
       vmImage: 'Ubuntu-16.04'
@@ -67,8 +54,9 @@ stages:
     - script: |
         sudo apt-get install libxml2-utils
         python -m pip install --upgrade pip setuptools
-        pip install numpy scipy astropy pytest-astropy codecov
-        python setup.py test --coverage --open-files --remote-data
+        pip install numpy scipy astropy pytest-cov pytest-astropy codecov
+        pip install -e .
+        pytest --pyargs synphot docs --cov --cov-report html --open-files --remote-data
       displayName: 'Run tests'
 
     - script: codecov -t $codecov_token
@@ -88,7 +76,7 @@ stages:
     - script: |
         python -m pip install --upgrade pip setuptools
         pip install sphinx-astropy
-        python setup.py install
+        pip install -e .
 
     - bash: |
         cd docs

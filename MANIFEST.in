@@ -3,20 +3,16 @@ include CHANGES.rst
 include LICENSE.rst
 include CITATION.md
 
-include ah_bootstrap.py
 include setup.cfg
+include pyproject.toml
 include synphot/include/.gitignore
 
-recursive-include *.pyx *.c *.pxd
+recursive-include *.c
 recursive-include docs *
 recursive-include licenses *
 
 prune build
 prune docs/_build
 prune docs/api
-
-recursive-include astropy_helpers *
-exclude astropy_helpers/.git
-exclude astropy_helpers/.gitignore
 
 global-exclude *.pyc *.o

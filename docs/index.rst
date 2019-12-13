@@ -201,7 +201,7 @@ Plot the spectrum, zooming in on the line features::
 
 Sample the spectrum at 0.3 micron::
 
-    >>> sp(0.3 * u.micron)  # doctest: +FLOAT_CMP
+    >>> sp(0.3 * u.micron)  # doctest: +FLOAT_CMP +IGNORE_WARNINGS
     <Quantity 0.00129536 PHOTLAM>
 
 Or sample the same thing but in a different flux unit::

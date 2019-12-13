@@ -1,22 +1,21 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-
 """
 This is an Astropy affiliated package.
 """
+# Set up the version
+from pkg_resources import get_distribution, DistributionNotFound
 
-# Affiliated packages may add whatever they like to this file, but
-# should keep this content at the top.
-# ----------------------------------------------------------------------------
-from ._astropy_init import *
-# ----------------------------------------------------------------------------
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    __version__ = 'unknown'
 
-# For egg_info test builds to pass, put package imports here.
-if not _ASTROPY_SETUP_:
-    # SYNPHOT UI
-    from .config import conf
-    from .utils import generate_wavelengths
-    from .models import *
-    from .observation import *
-    from .reddening import *
-    from .thermal import *
-    from .spectrum import SourceSpectrum, SpectralElement, BaseUnitlessSpectrum
+# SYNPHOT UI
+from .config import conf  # noqa
+from .utils import generate_wavelengths  # noqa
+from .models import *  # noqa
+from .observation import *  # noqa
+from .reddening import *  # noqa
+from .thermal import *  # noqa
+from .spectrum import SourceSpectrum, SpectralElement, BaseUnitlessSpectrum  # noqa
