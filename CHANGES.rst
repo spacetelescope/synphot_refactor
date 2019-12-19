@@ -1,6 +1,8 @@
 0.3.0 (unreleased)
 ==================
 
+- ``effstim`` now raises ``SynphotError`` properly when Vega spectrum
+  is not given for VEGAMAG calculation. [#228]
 - Infrastructure update in accordance to Astropy APE 17. [#229]
 
 0.2.0 (2019-11-19)
