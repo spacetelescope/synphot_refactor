@@ -68,7 +68,7 @@ You can install **synphot** using one of the following ways:
 
     git clone https://github.com/spacetelescope/synphot_refactor.git
     cd synphot_refactor
-    python setup.py install
+    pip install -e .
 
 To use the pre-defined standard star, extinction laws, and bandpasses, it is
 recommended for non-internal STScI users to download the necessary data files to

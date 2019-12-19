@@ -6,6 +6,20 @@ trigger:
 stages:
 - stage: Initial
   jobs:
+  - job: 'PEP517'
+    pool:
+      vmImage: 'Ubuntu-16.04'
+
+    steps:
+    - task: UsePythonVersion@0
+
+    # Make sure that sdist works for packaging
+    - script: |
+        python -m pip install --upgrade pip setuptools pep517 twine
+        python -m pep517.build --source .
+        twine check dist/*
+      displayName: 'pep517 build'
+
   - job: 'PEP8'
     pool:
       vmImage: 'Ubuntu-16.04'
