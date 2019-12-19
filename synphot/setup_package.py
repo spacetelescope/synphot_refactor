@@ -6,7 +6,6 @@ import os
 from setuptools import Extension
 
 # ASTROPY
-from extension_helpers import setup_helpers
 from extension_helpers import import_file, write_if_different
 
 LOCALROOT = os.path.relpath(os.path.dirname(__file__))
@@ -102,10 +101,11 @@ MSVC, do not support string literals greater than 256 characters.
 
 
 def get_extensions():
+    from collections import defaultdict
     import numpy
     generate_c_docstrings()
 
-    cfg = setup_helpers.DistutilsExtensionArgs()
+    cfg = defaultdict(list)
     cfg['include_dirs'].extend([
         numpy.get_include(),
         os.path.join(LOCALROOT, "include")])
