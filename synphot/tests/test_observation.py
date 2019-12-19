@@ -348,6 +348,8 @@ class TestObsPar(object):
     def test_effstim_exceptions(self, flux_unit):
         with pytest.raises(exceptions.SynphotError):
             self.obs.effstim(flux_unit=flux_unit)
+        with pytest.raises(exceptions.SynphotError):
+            self.obs.effstim(units.VEGAMAG)
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
