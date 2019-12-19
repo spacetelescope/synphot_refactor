@@ -13,7 +13,7 @@ stages:
     steps:
     - task: UsePythonVersion@0
 
-    # Make sure that sdist works for packaging
+    # Make sure that packaging will work
     - script: |
         python -m pip install --upgrade pip setuptools pep517 twine
         python -m pep517.build --source .
@@ -119,3 +119,10 @@ stages:
     parameters:
       name: 'OSX'
       vmImage: 'macOS-10.13'
+
+schedules:
+- cron: "0 6 * * 1"
+  displayName: Weekly Monday 6AM build
+  branches:
+    include:
+    - master
