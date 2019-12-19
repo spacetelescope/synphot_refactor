@@ -348,7 +348,7 @@ class TestObsPar(object):
     def test_effstim_exceptions(self, flux_unit):
         with pytest.raises(exceptions.SynphotError):
             self.obs.effstim(flux_unit=flux_unit)
-        with pytest.raises(exceptions.SysnphotError):
+        with pytest.raises(exceptions.SynphotError):
             self.obs.effstim(units.VEGAMAG)
 
 
