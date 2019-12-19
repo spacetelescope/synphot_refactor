@@ -1,4 +1,2 @@
 exclude_dirs:
-  - ah_bootstrap.py
-  - astropy_helpers
   - synphot/tests

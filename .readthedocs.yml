@@ -12,12 +12,10 @@ python:
   version: 3.7
   system_packages: true
   install:
-    - requirements: docs/rtd-pip-requirements
-    - method: setuptools
+    - method: pip
       path: .
-
-submodules:
-  include: all
+      extra_requirements:
+        - docs
 
 # Don't build any extra formats
 formats: []

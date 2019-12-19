@@ -214,7 +214,7 @@ for HST::
 
     >>> from synphot import units
     >>> area = 45238.93416 * units.AREA
-    >>> sp([499, 500, 501, 502] * u.nm, flux_unit='count', area=area)  # doctest: +FLOAT_CMP
+    >>> sp([499, 500, 501, 502] * u.nm, flux_unit='count', area=area)  # doctest: +FLOAT_CMP +IGNORE_WARNINGS
     <Quantity [219.3785428 , 220.16129659, 220.94026689, 221.71544085] ct>
 
 Sample the source at 5E+15 Hz and obtain flux in FLAM::
