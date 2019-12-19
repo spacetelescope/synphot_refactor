@@ -68,7 +68,7 @@ You can install **synphot** using one of the following ways:
 
     git clone https://github.com/spacetelescope/synphot_refactor.git
     cd synphot_refactor
-    python setup.py install
+    pip install -e .
 
 To use the pre-defined standard star, extinction laws, and bandpasses, it is
 recommended for non-internal STScI users to download the necessary data files to
@@ -201,7 +201,7 @@ Plot the spectrum, zooming in on the line features::
 
 Sample the spectrum at 0.3 micron::
 
-    >>> sp(0.3 * u.micron)  # doctest: +FLOAT_CMP
+    >>> sp(0.3 * u.micron)  # doctest: +FLOAT_CMP +IGNORE_WARNINGS
     <Quantity 0.00129536 PHOTLAM>
 
 Or sample the same thing but in a different flux unit::

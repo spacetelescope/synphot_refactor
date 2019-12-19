@@ -1,6 +1,7 @@
 0.3.0 (unreleased)
 ==================
 
+- Infrastructure update in accordance to Astropy APE 17. [#229]
 
 0.2.0 (2019-11-19)
 ==================

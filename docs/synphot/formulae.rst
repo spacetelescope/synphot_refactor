@@ -35,7 +35,7 @@ with a blackbody::
     ...     os.path.join('data', 'hst_acs_hrc_f555w.fits'),
     ...     package='synphot.tests'))
     >>> binset = range(1000, 11001)
-    >>> obs = Observation(sp, bp, binset=binset)
+    >>> obs = Observation(sp, bp, binset=binset)  # doctest: +IGNORE_WARNINGS
 
 
 .. _synphot-formula-avgwv:
