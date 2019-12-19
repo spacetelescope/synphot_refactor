@@ -5,7 +5,7 @@ import sys
 from setuptools import setup
 
 try:
-    from extension_helpers.setup_helpers import get_extensions
+    from extension_helpers import get_extensions
 except ModuleNotFoundError:
     print("""
 extension-helpers is not detected, please install with:

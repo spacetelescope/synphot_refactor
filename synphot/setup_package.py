@@ -7,7 +7,7 @@ from setuptools import Extension
 
 # ASTROPY
 from extension_helpers import setup_helpers
-from extension_helpers.utils import import_file, write_if_different
+from extension_helpers import import_file, write_if_different
 
 LOCALROOT = os.path.relpath(os.path.dirname(__file__))
 
