@@ -7,7 +7,7 @@ include setup.cfg
 include pyproject.toml
 include synphot/include/.gitignore
 
-recursive-include *.c
+recursive-include synphot *.c
 recursive-include docs *
 recursive-include licenses *
 
