@@ -8,7 +8,7 @@ ASTROLIB PYSYNPHOT or IRAF SYNPHOT. This guide is not meant to be
 all-inclusive; Therefore, not all legacy commands are listed here.
 This is because a legacy command can be reproduced in several different ways
 using **synphot** or has no equivalent implementation.
-Naming convention used is the same as :ref:`synphot-quick-guide`
+Naming convention used is the same as :ref:`synphot-quick-guide`.
 Please contact `STScI Help Desk <https://hsthelp.stsci.edu>`_ if you have
 any questions.
 
