@@ -42,6 +42,7 @@ jobs:
       ${{ parameters.numpyCmd }}
       ${{ parameters.scipyCmd }}
       pip install pytest-astropy
+      pip install -U git+https://github.com/astrofrog/pytest-astropy-header.git@fix-astropy-helpers
       ${{ parameters.astropyCmd }}
       pip install -e .
       pytest --pyargs synphot docs --open-files $(PYTEST_EXTRA_ARGS)
