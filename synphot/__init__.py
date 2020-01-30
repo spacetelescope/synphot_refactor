@@ -3,12 +3,11 @@
 This is an Astropy affiliated package.
 """
 
-# Set up the version
-try:
-    from .version import version as __version__
-except ImportError:
-    # package is not installed
-    __version__ = 'unknown'
+# Packages may add whatever they like to this file, but
+# should keep this content at the top.
+# ----------------------------------------------------------------------------
+from ._astropy_init import *  # noqa
+# ----------------------------------------------------------------------------
 
 # SYNPHOT UI
 from .config import conf  # noqa
