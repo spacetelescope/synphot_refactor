@@ -236,6 +236,10 @@ The example below loads and plots bandpasses from Johnson *BI*::
     :width: 600px
     :alt: Johnson BI bandpass.
 
+For more extensive selection of filter systems, please use
+:ref:`stsynphot:stsynphot_index` and see its
+:ref:`stsynphot:stsynphot-appendixb-nonhst`.
+
 
 .. _synphot-bandpass-uniform:
 
