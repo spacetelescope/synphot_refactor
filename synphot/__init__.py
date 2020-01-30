@@ -2,12 +2,11 @@
 """
 This is an Astropy affiliated package.
 """
-# Set up the version
-from pkg_resources import get_distribution, DistributionNotFound
 
+# Set up the version
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
+    from .version import version as __version__
+except ImportError:
     # package is not installed
     __version__ = 'unknown'
 
