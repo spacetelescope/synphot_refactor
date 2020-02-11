@@ -778,6 +778,67 @@ class BaseSpectrum(object):
         w, y = self._get_arrays(wavelengths)
         self._do_plot(w, y, **kwargs)
 
+    @classmethod
+    def from_Spectrum1D(cls, spec, keep_neg=False):
+        """Create a spectrum from `specutils.Spectrum1D` object.
+
+        Parameters
+        ----------
+        spec : `specutils.Spectrum1D`
+
+        keep_neg : bool
+            See `~synphot.models.Empirical1D`.
+
+        Returns
+        -------
+        sp : `BaseSourceSpectrum`
+            Empirical spectrum.
+
+        """
+        # Spectrum1D is designed to be immutable, so no need to make
+        # copies of spectral_axis nor flux.
+        return cls(Empirical1D, points=spec.spectral_axis,
+                   lookup_table=spec.flux, keep_neg=keep_neg,
+                   meta={'header': spec.meta.copy()})
+
+    def to_Spectrum1D(self, wavelengths=None, **kwargs):
+        """Create a `specutils.Spectrum1D` object from spectrum.
+
+        Parameters
+        ----------
+        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
+            Wavelength values for sampling.
+            If not a Quantity, assumed to be in Angstrom.
+            If `None`, ``self.waveset`` is used.
+
+        flux_unit : str or `~astropy.units.core.Unit` or `None`
+            This option is not applicable to unitless spectrum like bandpass.
+            Flux is converted to this unit before written out.
+            If not given, internal unit is used.
+            Count and magnitudes are not supported.
+
+        Returns
+        -------
+        spec : `specutils.Spectrum1D`
+
+        Raises
+        ------
+        ImportError
+            ``specutils`` is not installed.
+
+        """
+        from .compat import HAS_SPECUTILS
+
+        if not HAS_SPECUTILS:  # pragma: no cover
+            raise ImportError('specutils must be installed to use this method')
+
+        import specutils
+
+        w, y = self._get_arrays(wavelengths, **kwargs)
+
+        return specutils.Spectrum1D(spectral_axis=w, flux=y,
+                                    meta=self.meta.copy())
+
 
 class BaseSourceSpectrum(BaseSpectrum):
     """Base class to handle spectrum with flux unit like source spectrum

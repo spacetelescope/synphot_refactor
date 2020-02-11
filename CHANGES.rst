@@ -1,6 +1,9 @@
 0.3.0 (unreleased)
 ==================
 
+- ``SourceSpectrum`` and ``SpectralElement`` now have ``to_Spectrum1D`` and
+  ``from_Spectrum1D`` to write to and read from ``specutils.Spectrum1D``
+  object, respectively. [#243]
 
 0.2.1 (2019-12-20)
 ==================

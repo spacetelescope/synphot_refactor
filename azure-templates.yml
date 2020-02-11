@@ -6,6 +6,7 @@ parameters:
   numpyCmd: 'pip install numpy'
   astropyCmd: 'pip install astropy'
   scipyCmd: 'pip install scipy'
+  specutilsCmd: 'pip install specutils'
   pythonVersion: '3.7'
   pytestExtraArgs: ''
 
@@ -42,6 +43,7 @@ jobs:
       ${{ parameters.numpyCmd }}
       ${{ parameters.scipyCmd }}
       ${{ parameters.astropyCmd }}
+      ${{ parameters.specutilsCmd }}
       pip install -e .[test]
       pytest --pyargs synphot docs --open-files $(PYTEST_EXTRA_ARGS)
     displayName: 'Run tests'
