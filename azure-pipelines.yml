@@ -68,8 +68,8 @@ stages:
     - script: |
         sudo apt-get install libxml2-utils
         python -m pip install --upgrade pip setuptools
-        pip install numpy scipy astropy pytest-cov pytest-astropy codecov
-        pip install -e .
+        pip install -e .[test]
+        pip install pytest-cov codecov
         pytest --pyargs synphot docs --cov --cov-report html --open-files --remote-data
       displayName: 'Run tests'
 
@@ -100,7 +100,7 @@ stages:
   - template: azure-templates.yml
     parameters:
       name: 'Older_Versions'
-      numpyCmd: 'pip install numpy==1.15.4'
+      numpyCmd: 'pip install numpy==1.16.6'
       astropyCmd: 'pip install astropy==2.0.12'
       scipyCmd: 'pip install scipy==1.1.0'
       pythonVersion: '3.6'

@@ -41,8 +41,7 @@ jobs:
       python -m pip install --upgrade pip setuptools
       ${{ parameters.numpyCmd }}
       ${{ parameters.scipyCmd }}
-      pip install pytest-astropy
       ${{ parameters.astropyCmd }}
-      pip install -e .
+      pip install -e .[test]
       pytest --pyargs synphot docs --open-files $(PYTEST_EXTRA_ARGS)
     displayName: 'Run tests'
