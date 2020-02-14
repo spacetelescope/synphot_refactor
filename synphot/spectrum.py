@@ -795,11 +795,20 @@ class BaseSpectrum(object):
             Empirical spectrum.
 
         """
+        # Remove masking here if specutils does it natively, see
+        # https://github.com/astropy/specutils/issues/585
+        if spec.mask is not None:
+            msk = ~spec.mask
+            points = spec.spectral_axis[msk]
+            lookup_table = spec.flux[msk]
+        else:
+            points = spec.spectral_axis
+            lookup_table = spec.flux
+
         # Spectrum1D is designed to be immutable, so no need to make
         # copies of spectral_axis nor flux.
-        return cls(Empirical1D, points=spec.spectral_axis,
-                   lookup_table=spec.flux, keep_neg=keep_neg,
-                   meta={'header': spec.meta.copy()})
+        return cls(Empirical1D, points=points, lookup_table=lookup_table,
+                   keep_neg=keep_neg, meta={'header': spec.meta.copy()})
 
     def to_spectrum1d(self, wavelengths=None, **kwargs):
         """Create a `specutils.Spectrum1D` object from spectrum.

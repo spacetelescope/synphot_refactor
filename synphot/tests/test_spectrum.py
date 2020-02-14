@@ -1123,6 +1123,20 @@ class TestSpecutilsBridge:
         sp.meta['header']['source'][0] = 100
         assert spec.meta['source'] == [1, 99, 3]
 
+    def test_from_spectrum1d_Empirical1D_source_masked(self):
+        import specutils
+
+        lamb = [1000, 5000, 10000] * u.AA
+        flux = [0, -0.5e-17, 5.6e-17] * units.FLAM
+        mask = np.array([False, True, False])
+        spec = specutils.Spectrum1D(spectral_axis=lamb, flux=flux, mask=mask)
+        sp = SourceSpectrum.from_spectrum1d(spec, keep_neg=False)
+
+        w = sp.waveset
+        y = sp(w, flux_unit=units.FLAM)
+        assert_quantity_allclose(w, [1000, 10000] * u.AA)
+        assert_quantity_allclose(y, [0, 5.6e-17] * units.FLAM)
+
     def test_to_spectrum1d_Empirical1D_source(self):
         lamb = [1000, 5000, 10000] * u.AA
         flux = [1.5, 0.5, 99.9] * u.nJy
@@ -1205,6 +1219,20 @@ class TestSpecutilsBridge:
         assert isinstance(bp.model, Empirical1D)
         assert_quantity_allclose(w, lamb)
         assert_quantity_allclose(bp(w), [0, 1, 0])
+
+    def test_from_spectrum1d_Empirical1D_bandpass_masked(self):
+        import specutils
+
+        lamb = [1000, 5000, 10000] * u.AA
+        thru = [0, 1, -1] * units.THROUGHPUT
+        mask = np.array([False, False, True])
+        spec = specutils.Spectrum1D(spectral_axis=lamb, flux=thru, mask=mask)
+        bp = SpectralElement.from_spectrum1d(spec, keep_neg=False)
+
+        w = bp.waveset
+        assert isinstance(bp.model, Empirical1D)
+        assert_quantity_allclose(w, [1000, 5000] * u.AA)
+        assert_quantity_allclose(bp(w), [0, 1])
 
     def test_to_spectrum1d_Empirical1D_bandpass(self):
         lamb = [1000, 5000, 10000] * u.AA
