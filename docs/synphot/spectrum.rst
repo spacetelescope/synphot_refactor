@@ -462,7 +462,7 @@ object in the flux unit of Jansky:
     >>> from synphot.models import GaussianFlux1D
     >>> sp = SourceSpectrum(GaussianFlux1D, mean=1.8*u.micron, fwhm=200*u.nm,
     ...                     total_flux=1e-26*u.W/(u.m**2))
-    >>> spec = sp.to_Spectrum1D(flux_unit=u.Jy)
+    >>> spec = sp.to_spectrum1d(flux_unit=u.Jy)
 
 Meanwhile, this example reads in a source from a `~specutils.Spectrum1D`
 object:
@@ -473,7 +473,7 @@ object:
     >>> from specutils import Spectrum1D
     >>> from synphot import SourceSpectrum
     >>> spec = Spectrum1D(spectral_axis=[100, 300]*u.nm, flux=[0.1, 0.8]*u.nJy)
-    >>> sp = SourceSpectrum.from_Spectrum1D(spec)
+    >>> sp = SourceSpectrum.from_spectrum1d(spec)
 
 
 .. _synphot_thermal:

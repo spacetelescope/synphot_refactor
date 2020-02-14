@@ -779,7 +779,7 @@ class BaseSpectrum(object):
         self._do_plot(w, y, **kwargs)
 
     @classmethod
-    def from_Spectrum1D(cls, spec, keep_neg=False):
+    def from_spectrum1d(cls, spec, keep_neg=False):
         """Create a spectrum from `specutils.Spectrum1D` object.
 
         Parameters
@@ -801,7 +801,7 @@ class BaseSpectrum(object):
                    lookup_table=spec.flux, keep_neg=keep_neg,
                    meta={'header': spec.meta.copy()})
 
-    def to_Spectrum1D(self, wavelengths=None, **kwargs):
+    def to_spectrum1d(self, wavelengths=None, **kwargs):
         """Create a `specutils.Spectrum1D` object from spectrum.
 
         Parameters

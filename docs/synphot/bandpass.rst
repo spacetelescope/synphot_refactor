@@ -290,7 +290,7 @@ The example below writes a :ref:`synphot-box-bandpass` to a
     >>> from synphot import SpectralElement
     >>> from synphot.models import Box1D
     >>> bp = SpectralElement(Box1D, amplitude=1, x_0=600*u.nm, width=10*u.nm)
-    >>> spec = bp.to_Spectrum1D()
+    >>> spec = bp.to_spectrum1d()
 
 Meanwhile, this example reads in a bandpass from a
 `~specutils.Spectrum1D` object:
@@ -302,4 +302,4 @@ Meanwhile, this example reads in a bandpass from a
     >>> from synphot import SpectralElement
     >>> spec = Spectrum1D(spectral_axis=[100, 300]*u.nm,
     ...                   flux=[0.1, 0.8]*u.dimensionless_unscaled)
-    >>> bp = SpectralElement.from_Spectrum1D(spec)
+    >>> bp = SpectralElement.from_spectrum1d(spec)

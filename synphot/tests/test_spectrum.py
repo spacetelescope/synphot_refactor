@@ -1099,7 +1099,7 @@ class TestWriteSpec:
 
 @pytest.mark.skipif('not HAS_SPECUTILS')
 class TestSpecutilsBridge:
-    def test_from_Spectrum1D_Empirical1D_source(self):
+    def test_from_spectrum1d_Empirical1D_source(self):
         import specutils
 
         lamb = [1000, 5000, 10000] * u.AA
@@ -1108,7 +1108,7 @@ class TestSpecutilsBridge:
         spec.meta['source'] = [1, 2, 3]
         with pytest.warns(AstropyUserWarning,
                           match=r'contained negative flux or throughput'):
-            sp = SourceSpectrum.from_Spectrum1D(spec, keep_neg=False)
+            sp = SourceSpectrum.from_spectrum1d(spec, keep_neg=False)
 
         w = sp.waveset
         y = sp(w, flux_unit=units.FLAM)
@@ -1123,12 +1123,12 @@ class TestSpecutilsBridge:
         sp.meta['header']['source'][0] = 100
         assert spec.meta['source'] == [1, 99, 3]
 
-    def test_to_Spectrum1D_Empirical1D_source(self):
+    def test_to_spectrum1d_Empirical1D_source(self):
         lamb = [1000, 5000, 10000] * u.AA
         flux = [1.5, 0.5, 99.9] * u.nJy
         sp = SourceSpectrum(Empirical1D, points=lamb, lookup_table=flux,
                             meta={'source': 'foo'})
-        spec = sp.to_Spectrum1D(flux_unit=u.nJy)
+        spec = sp.to_spectrum1d(flux_unit=u.nJy)
 
         assert_quantity_allclose(spec.spectral_axis, lamb)
         assert_quantity_allclose(spec.flux, flux)
@@ -1142,17 +1142,17 @@ class TestSpecutilsBridge:
 
         # Unsupported flux unit
         with pytest.raises(exceptions.SynphotError) as e:
-            sp.to_Spectrum1D(flux_unit=u.count)
+            sp.to_spectrum1d(flux_unit=u.count)
         assert 'Area is compulsory' in str(e.value)
 
-    def test_to_Spectrum1D_GaussianFlux1D(self):
+    def test_to_spectrum1d_GaussianFlux1D(self):
         from specutils.analysis import gaussian_fwhm
 
         total_flux = 1 * (u.erg / u.s / u.cm / u.cm)
         fwhm = 10 * u.AA
         sp = SourceSpectrum(GaussianFlux1D, mean=5000 * u.AA, fwhm=fwhm,
                             total_flux=total_flux)
-        spec = sp.to_Spectrum1D(flux_unit=units.FLAM)
+        spec = sp.to_spectrum1d(flux_unit=units.FLAM)
 
         assert_quantity_allclose(spec.spectral_axis, sp.waveset)
         assert_quantity_allclose(
@@ -1160,22 +1160,22 @@ class TestSpecutilsBridge:
         assert_quantity_allclose(gaussian_fwhm(spec), fwhm, rtol=1e-5)
         assert spec.meta['expr'] == 'em(5000, 10, 1, FLAM)'
 
-    def test_to_Spectrum1D_ConstFlux1D(self):
+    def test_to_spectrum1d_ConstFlux1D(self):
         flux = 1 * units.PHOTLAM
         sp = SourceSpectrum(ConstFlux1D, amplitude=flux)
 
         with pytest.raises(exceptions.SynphotError) as e:
-            spec = sp.to_Spectrum1D()
+            spec = sp.to_spectrum1d()
         assert 'Provide wavelengths for sampling' in str(e.value)
 
         w = [100, 500, 1000] * u.nm
-        spec = sp.to_Spectrum1D(wavelengths=w)
+        spec = sp.to_spectrum1d(wavelengths=w)
 
         assert_quantity_allclose(spec.spectral_axis, w)
         assert_quantity_allclose(spec.flux, flux)
         assert len(spec.meta) == 0
 
-    def test_to_Spectrum1D_compound_source(self):
+    def test_to_spectrum1d_compound_source(self):
         from specutils.analysis import line_flux
 
         total_flux = 0.5 * (u.erg / u.s / u.cm / u.cm)
@@ -1185,13 +1185,13 @@ class TestSpecutilsBridge:
         g2 = SourceSpectrum(GaussianFlux1D, mean=400 * u.nm, fwhm=fwhm,
                             total_flux=total_flux)
         sp = g1 + g2
-        spec = sp.to_Spectrum1D(flux_unit=units.FLAM)
+        spec = sp.to_spectrum1d(flux_unit=units.FLAM)
         integrated_flux = sp.integrate(flux_unit=units.FLAM)
         assert_quantity_allclose(
             integrated_flux, 1 * total_flux.unit, rtol=0.002)
         assert_quantity_allclose(integrated_flux, line_flux(spec), rtol=1e-5)
 
-    def test_from_Spectrum1D_Empirical1D_bandpass(self):
+    def test_from_spectrum1d_Empirical1D_bandpass(self):
         import specutils
 
         lamb = [1000, 5000, 10000] * u.AA
@@ -1199,43 +1199,43 @@ class TestSpecutilsBridge:
         spec = specutils.Spectrum1D(spectral_axis=lamb, flux=thru)
         with pytest.warns(AstropyUserWarning,
                           match=r'contained negative flux or throughput'):
-            bp = SpectralElement.from_Spectrum1D(spec, keep_neg=False)
+            bp = SpectralElement.from_spectrum1d(spec, keep_neg=False)
 
         w = bp.waveset
         assert isinstance(bp.model, Empirical1D)
         assert_quantity_allclose(w, lamb)
         assert_quantity_allclose(bp(w), [0, 1, 0])
 
-    def test_to_Spectrum1D_Empirical1D_bandpass(self):
+    def test_to_spectrum1d_Empirical1D_bandpass(self):
         lamb = [1000, 5000, 10000] * u.AA
         thru = [0, 1, 0]
         bp = SpectralElement(Empirical1D, points=lamb, lookup_table=thru)
-        spec = bp.to_Spectrum1D()
+        spec = bp.to_spectrum1d()
 
         assert_quantity_allclose(spec.spectral_axis, lamb)
         assert_quantity_allclose(spec.flux, thru)
 
-    def test_to_Spectrum1D_Const1D(self):
+    def test_to_spectrum1d_Const1D(self):
         thru = 0.88
         bp = SpectralElement(Const1D, amplitude=thru)
 
         with pytest.raises(exceptions.SynphotError) as e:
-            spec = bp.to_Spectrum1D()
+            spec = bp.to_spectrum1d()
         assert 'Provide wavelengths for sampling' in str(e.value)
 
         w = [100, 500, 1000] * u.nm
-        spec = bp.to_Spectrum1D(wavelengths=w)
+        spec = bp.to_spectrum1d(wavelengths=w)
 
         assert_quantity_allclose(spec.spectral_axis, w)
         assert_quantity_allclose(spec.flux, thru)
 
-    def test_to_Spectrum1D_compound_bandpass(self):
+    def test_to_spectrum1d_compound_bandpass(self):
         from specutils.analysis import line_flux
 
         box = SpectralElement(
             Box1D, amplitude=0.5, x_0=5000 * u.AA, width=1 * u.AA)
         bp = box * box
-        spec = bp.to_Spectrum1D()
+        spec = bp.to_spectrum1d()
 
         w = bp.waveset
         integrated_thru = bp.integrate()
