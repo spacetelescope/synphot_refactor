@@ -68,7 +68,7 @@ stages:
     - script: |
         sudo apt-get install libxml2-utils
         python -m pip install --upgrade pip setuptools
-        pip install -e .[test]
+        pip install -e .[test,all]
         pip install pytest-cov codecov
         pytest --pyargs synphot docs --cov --cov-report html --open-files --remote-data
       displayName: 'Run tests'
@@ -101,14 +101,17 @@ stages:
     parameters:
       name: 'Older_Versions'
       numpyCmd: 'pip install numpy==1.16.6'
-      astropyCmd: 'pip install astropy==2.0.12'
+      astropyCmd: 'pip install astropy==3.2.2'
       scipyCmd: 'pip install scipy==1.1.0'
+      specutilsCmd: 'echo "Skipping specutils install"'
       pythonVersion: '3.6'
 
   - template: azure-templates.yml
     parameters:
       name: 'Dev_Astropy'
       astropyCmd: 'pip install git+https://github.com/astropy/astropy.git@master#egg=astropy'
+      specutilsCmd: 'pip install git+https://github.com/astropy/specutils.git@master#egg=specutils'
+      pythonVersion: '3.8'
 
   - template: azure-templates.yml
     parameters:

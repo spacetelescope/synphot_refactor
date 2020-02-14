@@ -14,6 +14,7 @@ A bandpass can be constructed by one of the following methods:
   keywords needed to define it into a
   :class:`~synphot.spectrum.SpectralElement` object.
 * Build a composite bandpass using :ref:`synphot-spec-math-op`.
+* Build an empirical bandpass using :ref:`synphot-bandpass-specutils`.
 
 It has various :ref:`photometric properties <synphot_formulae>` and these
 main components:
@@ -269,3 +270,36 @@ set at 0.8:
     from synphot import SpectralElement
     bp = SpectralElement(Const1D, amplitude=0.8)
     bp.plot([1000, 10000], title='Flat Bandpass')
+
+
+.. _synphot-bandpass-specutils:
+
+specutils
+---------
+
+A bandpass can be constructed from and written to `specutils.Spectrum1D`
+object. See :ref:`specutils documentation <specutils:specutils>` for more
+information on how to use `~specutils.Spectrum1D`.
+
+The example below writes a :ref:`synphot-box-bandpass` to a
+`~specutils.Spectrum1D` object:
+
+.. doctest-requires:: specutils
+
+    >>> from astropy import units as u
+    >>> from synphot import SpectralElement
+    >>> from synphot.models import Box1D
+    >>> bp = SpectralElement(Box1D, amplitude=1, x_0=600*u.nm, width=10*u.nm)
+    >>> spec = bp.to_spectrum1d()
+
+Meanwhile, this example reads in a bandpass from a
+`~specutils.Spectrum1D` object:
+
+.. doctest-requires:: specutils
+
+    >>> from astropy import units as u
+    >>> from specutils import Spectrum1D
+    >>> from synphot import SpectralElement
+    >>> spec = Spectrum1D(spectral_axis=[100, 300]*u.nm,
+    ...                   flux=[0.1, 0.8]*u.dimensionless_unscaled)
+    >>> bp = SpectralElement.from_spectrum1d(spec)

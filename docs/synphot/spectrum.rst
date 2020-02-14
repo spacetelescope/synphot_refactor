@@ -21,6 +21,7 @@ A source spectrum can be constructed by one of the following methods:
   :meth:`~synphot.thermal.ThermalSpectralElement.thermal_source`.
 * Build a composite source using :ref:`synphot-spec-math-op`.
   (Also see example in :ref:`synphot_getting_started`.)
+* Build an empirical source using :ref:`synphot-source-specutils`.
 
 It has these main components:
 
@@ -440,6 +441,39 @@ wavelength of 1 micron and an index of -2:
     sp.plot(wavelengths=wave, xlog=True, ylog=True, bottom=0.1, top=1000)
     plt.axvline(sp.model.x_0, color='k', ls='--')  # Ref wave
     plt.axhline(sp.model.amplitude, color='k', ls='--')  # Ref flux
+
+
+.. _synphot-source-specutils:
+
+specutils
+---------
+
+A source can be constructed from and written to `specutils.Spectrum1D`
+object. See :ref:`specutils documentation <specutils:specutils>` for more
+information on how to use `~specutils.Spectrum1D`.
+
+The example below writes a :ref:`synphot-gaussian` to a `~specutils.Spectrum1D`
+object in the flux unit of Jansky:
+
+.. doctest-requires:: specutils
+
+    >>> from astropy import units as u
+    >>> from synphot import SourceSpectrum
+    >>> from synphot.models import GaussianFlux1D
+    >>> sp = SourceSpectrum(GaussianFlux1D, mean=1.8*u.micron, fwhm=200*u.nm,
+    ...                     total_flux=1e-26*u.W/(u.m**2))
+    >>> spec = sp.to_spectrum1d(flux_unit=u.Jy)
+
+Meanwhile, this example reads in a source from a `~specutils.Spectrum1D`
+object:
+
+.. doctest-requires:: specutils
+
+    >>> from astropy import units as u
+    >>> from specutils import Spectrum1D
+    >>> from synphot import SourceSpectrum
+    >>> spec = Spectrum1D(spectral_axis=[100, 300]*u.nm, flux=[0.1, 0.8]*u.nJy)
+    >>> sp = SourceSpectrum.from_spectrum1d(spec)
 
 
 .. _synphot_thermal:

@@ -19,6 +19,7 @@ from astropy.io import fits
 from astropy.modeling.models import (
     BrokenPowerLaw1D, Const1D, ExponentialCutoffPowerLaw1D, LogParabola1D,
     PowerLaw1D, RedshiftScaleFactor)
+from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
@@ -26,7 +27,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 # LOCAL
 from .test_units import _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
 from .. import exceptions, units
-from ..compat import ASTROPY_LT_4_0
+from ..compat import ASTROPY_LT_4_0, HAS_SPECUTILS  # noqa
 from ..models import (
     BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, Gaussian1D,
     GaussianAbsorption1D, GaussianFlux1D, Lorentz1D, MexicanHat1D,
@@ -129,7 +130,7 @@ def test_filter_exception():
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
-class TestEmpiricalSourceFromFile(object):
+class TestEmpiricalSourceFromFile:
     """This is the most common model used in ASTROLIB PYSYNPHOT."""
     def setup_class(self):
         specfile = get_pkg_data_filename(
@@ -215,7 +216,7 @@ class TestEmpiricalSourceFromFile(object):
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
-class TestEmpiricalBandpassFromFile(object):
+class TestEmpiricalBandpassFromFile:
     """This is the most common model used in ASTROLIB PYSYNPHOT."""
     def setup_class(self):
         bandfile = get_pkg_data_filename(
@@ -338,7 +339,7 @@ class TestEmpiricalBandpassFromFile(object):
         assert f.unit == units.FLAM
 
 
-class TestBoxBandpass(object):
+class TestBoxBandpass:
     """Test bandpass with Box1D model."""
     def setup_class(self):
         self.bp = SpectralElement(Box1D, amplitude=1, x_0=5000, width=100)
@@ -373,7 +374,7 @@ class TestBoxBandpass(object):
                 width=[100, 1], n_models=2)
 
 
-class TestBlackBodySource(object):
+class TestBlackBodySource:
     """Test source spectrum with BlackBody1D model."""
     def setup_class(self):
         self.sp = SourceSpectrum(BlackBodyNorm1D, temperature=5500)
@@ -388,7 +389,7 @@ class TestBlackBodySource(object):
             rtol=2.5e-3)
 
 
-class TestGaussianSource(object):
+class TestGaussianSource:
     """Test source spectrum with GaussianFlux1D model."""
     def setup_class(self):
         tf = 4.96611456e-12 * u.erg / (u.cm * u.cm * u.s)
@@ -444,7 +445,7 @@ def test_gaussian_source_watts():
     np.testing.assert_allclose(tf.to(flux.unit), flux, rtol=1e-4)
 
 
-class TestPowerLawSource(object):
+class TestPowerLawSource:
     """Test source spectrum with PowerLawFlux1D model."""
     def setup_class(self):
         self.sp = SourceSpectrum(PowerLawFlux1D, amplitude=1, x_0=6000,
@@ -469,7 +470,7 @@ class TestPowerLawSource(object):
         np.testing.assert_allclose(self.sp(600 * u.nm).value, 1)
 
 
-class TestBuildModels(object):
+class TestBuildModels:
     """Test compatiblity with other models not tested above."""
     def test_BrokenPowerLaw1D(self):
         sp = SourceSpectrum(
@@ -529,7 +530,7 @@ class TestBuildModels(object):
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
-class TestCheckOverlap(object):
+class TestCheckOverlap:
     """Test spectrum overlap check. This method is ever only used
     in the form of ``bp.check_overlap(sp)``, so that is what is
     tested here.
@@ -590,7 +591,7 @@ class TestCheckOverlap(object):
             self.bp.check_overlap(1)
 
 
-class TestForceExtrap(object):
+class TestForceExtrap:
     """Test forcing extrapolation on a source spectrum."""
 
     @pytest.mark.skipif('not HAS_SCIPY')
@@ -618,7 +619,7 @@ class TestForceExtrap(object):
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
-class TestNormalize(object):
+class TestNormalize:
     """Test source spectrum normalization."""
     def setup_class(self):
         """``expr`` stores the equivalent IRAF SYNPHOT command."""
@@ -754,7 +755,7 @@ class TestNormalize(object):
             sp.normalize(100 * u.ct, band=self.abox, area=_area)
 
 
-class TestWaveset(object):
+class TestWaveset:
     """Tests related to spectrum waveset."""
     def test_none(self):
         sp = SourceSpectrum(Const1D, amplitude=1)
@@ -843,7 +844,7 @@ class TestWaveset(object):
             get_waveset('foo')
 
 
-class TestRedShift(object):
+class TestRedShift:
     """Test redshifted source spectrum.
 
     ``waveset`` already tested in `TestWaveset`.
@@ -896,7 +897,7 @@ class TestRedShift(object):
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
-class TestMathOperators(object):
+class TestMathOperators:
     """Test spectrum math operators."""
     def setup_class(self):
         self.sp_1 = SourceSpectrum(
@@ -1032,7 +1033,7 @@ class TestMathOperators(object):
 
     def test_bandpass_mul_div_exceptions(self):
         """Only mul is tested but truediv uses the same validation."""
-        class DummyObject(object):
+        class DummyObject:
             pass
 
         with pytest.raises(exceptions.IncompatibleSources):
@@ -1052,7 +1053,7 @@ class TestMathOperators(object):
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
-class TestWriteSpec(object):
+class TestWriteSpec:
     """Test spectrum to_fits() method."""
     def setup_class(self):
         self.outdir = tempfile.mkdtemp()
@@ -1094,3 +1095,179 @@ class TestWriteSpec(object):
 
     def teardown_class(self):
         shutil.rmtree(self.outdir)
+
+
+@pytest.mark.skipif('not HAS_SPECUTILS')
+class TestSpecutilsBridge:
+    def test_from_spectrum1d_Empirical1D_source(self):
+        import specutils
+
+        lamb = [1000, 5000, 10000] * u.AA
+        flux = [0, -0.5e-17, 5.6e-17] * units.FLAM
+        spec = specutils.Spectrum1D(spectral_axis=lamb, flux=flux)
+        spec.meta['source'] = [1, 2, 3]
+        with pytest.warns(AstropyUserWarning,
+                          match=r'contained negative flux or throughput'):
+            sp = SourceSpectrum.from_spectrum1d(spec, keep_neg=False)
+
+        w = sp.waveset
+        y = sp(w, flux_unit=units.FLAM)
+        assert isinstance(sp.model, Empirical1D)
+        assert sp.meta['header']['source'] == spec.meta['source']
+        assert_quantity_allclose(w, lamb)
+        assert_quantity_allclose(y, [0, 0, 5.6e-17] * units.FLAM)
+
+        # Ensure metadata is copied, not referenced
+        spec.meta['source'][1] = 99
+        assert sp.meta['header']['source'] == [1, 2, 3]
+        sp.meta['header']['source'][0] = 100
+        assert spec.meta['source'] == [1, 99, 3]
+
+    def test_from_spectrum1d_Empirical1D_source_masked(self):
+        import specutils
+
+        lamb = [1000, 5000, 10000] * u.AA
+        flux = [0, -0.5e-17, 5.6e-17] * units.FLAM
+        mask = np.array([False, True, False])
+        spec = specutils.Spectrum1D(spectral_axis=lamb, flux=flux, mask=mask)
+        sp = SourceSpectrum.from_spectrum1d(spec, keep_neg=False)
+
+        w = sp.waveset
+        y = sp(w, flux_unit=units.FLAM)
+        assert_quantity_allclose(w, [1000, 10000] * u.AA)
+        assert_quantity_allclose(y, [0, 5.6e-17] * units.FLAM)
+
+    def test_to_spectrum1d_Empirical1D_source(self):
+        lamb = [1000, 5000, 10000] * u.AA
+        flux = [1.5, 0.5, 99.9] * u.nJy
+        sp = SourceSpectrum(Empirical1D, points=lamb, lookup_table=flux,
+                            meta={'source': 'foo'})
+        spec = sp.to_spectrum1d(flux_unit=u.nJy)
+
+        assert_quantity_allclose(spec.spectral_axis, lamb)
+        assert_quantity_allclose(spec.flux, flux)
+        assert spec.meta['source'] == 'foo'
+
+        # Ensure redshifting does not change Spectrum1D
+        sp.z = 0.1
+        assert_quantity_allclose(spec.flux, flux)
+        with pytest.raises(AssertionError):
+            assert_quantity_allclose(sp(lamb, flux_unit=u.nJy), flux)
+
+        # Unsupported flux unit
+        with pytest.raises(exceptions.SynphotError) as e:
+            sp.to_spectrum1d(flux_unit=u.count)
+        assert 'Area is compulsory' in str(e.value)
+
+    def test_to_spectrum1d_GaussianFlux1D(self):
+        from specutils.analysis import gaussian_fwhm
+
+        total_flux = 1 * (u.erg / u.s / u.cm / u.cm)
+        fwhm = 10 * u.AA
+        sp = SourceSpectrum(GaussianFlux1D, mean=5000 * u.AA, fwhm=fwhm,
+                            total_flux=total_flux)
+        spec = sp.to_spectrum1d(flux_unit=units.FLAM)
+
+        assert_quantity_allclose(spec.spectral_axis, sp.waveset)
+        assert_quantity_allclose(
+            spec.flux, sp(sp.waveset, flux_unit=units.FLAM))
+        assert_quantity_allclose(gaussian_fwhm(spec), fwhm, rtol=1e-5)
+        assert spec.meta['expr'] == 'em(5000, 10, 1, FLAM)'
+
+    def test_to_spectrum1d_ConstFlux1D(self):
+        flux = 1 * units.PHOTLAM
+        sp = SourceSpectrum(ConstFlux1D, amplitude=flux)
+
+        with pytest.raises(exceptions.SynphotError) as e:
+            spec = sp.to_spectrum1d()
+        assert 'Provide wavelengths for sampling' in str(e.value)
+
+        w = [100, 500, 1000] * u.nm
+        spec = sp.to_spectrum1d(wavelengths=w)
+
+        assert_quantity_allclose(spec.spectral_axis, w)
+        assert_quantity_allclose(spec.flux, flux)
+        assert len(spec.meta) == 0
+
+    def test_to_spectrum1d_compound_source(self):
+        from specutils.analysis import line_flux
+
+        total_flux = 0.5 * (u.erg / u.s / u.cm / u.cm)
+        fwhm = 1 * u.AA
+        g1 = SourceSpectrum(GaussianFlux1D, mean=300 * u.nm, fwhm=fwhm,
+                            total_flux=total_flux)
+        g2 = SourceSpectrum(GaussianFlux1D, mean=400 * u.nm, fwhm=fwhm,
+                            total_flux=total_flux)
+        sp = g1 + g2
+        spec = sp.to_spectrum1d(flux_unit=units.FLAM)
+        integrated_flux = sp.integrate(flux_unit=units.FLAM)
+        assert_quantity_allclose(
+            integrated_flux, 1 * total_flux.unit, rtol=0.002)
+        assert_quantity_allclose(integrated_flux, line_flux(spec), rtol=1e-5)
+
+    def test_from_spectrum1d_Empirical1D_bandpass(self):
+        import specutils
+
+        lamb = [1000, 5000, 10000] * u.AA
+        thru = [0, 1, -1] * units.THROUGHPUT
+        spec = specutils.Spectrum1D(spectral_axis=lamb, flux=thru)
+        with pytest.warns(AstropyUserWarning,
+                          match=r'contained negative flux or throughput'):
+            bp = SpectralElement.from_spectrum1d(spec, keep_neg=False)
+
+        w = bp.waveset
+        assert isinstance(bp.model, Empirical1D)
+        assert_quantity_allclose(w, lamb)
+        assert_quantity_allclose(bp(w), [0, 1, 0])
+
+    def test_from_spectrum1d_Empirical1D_bandpass_masked(self):
+        import specutils
+
+        lamb = [1000, 5000, 10000] * u.AA
+        thru = [0, 1, -1] * units.THROUGHPUT
+        mask = np.array([False, False, True])
+        spec = specutils.Spectrum1D(spectral_axis=lamb, flux=thru, mask=mask)
+        bp = SpectralElement.from_spectrum1d(spec, keep_neg=False)
+
+        w = bp.waveset
+        assert isinstance(bp.model, Empirical1D)
+        assert_quantity_allclose(w, [1000, 5000] * u.AA)
+        assert_quantity_allclose(bp(w), [0, 1])
+
+    def test_to_spectrum1d_Empirical1D_bandpass(self):
+        lamb = [1000, 5000, 10000] * u.AA
+        thru = [0, 1, 0]
+        bp = SpectralElement(Empirical1D, points=lamb, lookup_table=thru)
+        spec = bp.to_spectrum1d()
+
+        assert_quantity_allclose(spec.spectral_axis, lamb)
+        assert_quantity_allclose(spec.flux, thru)
+
+    def test_to_spectrum1d_Const1D(self):
+        thru = 0.88
+        bp = SpectralElement(Const1D, amplitude=thru)
+
+        with pytest.raises(exceptions.SynphotError) as e:
+            spec = bp.to_spectrum1d()
+        assert 'Provide wavelengths for sampling' in str(e.value)
+
+        w = [100, 500, 1000] * u.nm
+        spec = bp.to_spectrum1d(wavelengths=w)
+
+        assert_quantity_allclose(spec.spectral_axis, w)
+        assert_quantity_allclose(spec.flux, thru)
+
+    def test_to_spectrum1d_compound_bandpass(self):
+        from specutils.analysis import line_flux
+
+        box = SpectralElement(
+            Box1D, amplitude=0.5, x_0=5000 * u.AA, width=1 * u.AA)
+        bp = box * box
+        spec = bp.to_spectrum1d()
+
+        w = bp.waveset
+        integrated_thru = bp.integrate()
+        assert_quantity_allclose(spec.spectral_axis, w)
+        assert_quantity_allclose(spec.flux, bp(w))
+        assert_quantity_allclose(integrated_thru, 0.25 * u.AA)
+        assert_quantity_allclose(integrated_thru, line_flux(spec))

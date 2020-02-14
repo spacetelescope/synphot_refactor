@@ -1,6 +1,11 @@
 0.3.0 (unreleased)
 ==================
 
+- ``SourceSpectrum`` and ``SpectralElement`` now have ``to_spectrum1d`` and
+  ``from_spectrum1d`` to write to and read from ``specutils.Spectrum1D``
+  object, respectively. [#243]
+- Dropped support for Python 3.5 and ``astropy`` 2.x. This version is only
+  compatible with Python 3.6 or later and ``astropy`` 3.x or later. [#243]
 
 0.2.1 (2019-12-20)
 ==================
