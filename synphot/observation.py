@@ -35,7 +35,7 @@ class Observation(BaseSourceSpectrum):
 
     Parameters
     ----------
-    spec : `~synphot.spectrum.SourceSpectrum`
+    spec : `~synphot.spectrum.SourceSpectrum` or `specutils.Spectrum1D`
         Source spectrum.
 
     band : `~synphot.spectrum.SpectralElement`
@@ -78,6 +78,10 @@ class Observation(BaseSourceSpectrum):
 
         if not isinstance(band, SpectralElement):
             raise exceptions.SynphotError('Invalid bandpass.')
+
+        # Duck-type specutils.Spectrum1D to avoid hard dependency on specutils
+        if hasattr(spec, 'flux') and hasattr(spec, 'spectral_axis'):
+            spec = SourceSpectrum.from_spectrum1D(spec)
 
         # Inherit input warnings like ASTROLIB PYSYNPHOT
         warn = {}
