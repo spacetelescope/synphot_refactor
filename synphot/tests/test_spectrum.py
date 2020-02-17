@@ -1097,6 +1097,7 @@ class TestWriteSpec:
         shutil.rmtree(self.outdir)
 
 
+@pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.skipif('not HAS_SPECUTILS')
 class TestSpecutilsBridge:
     def test_from_spectrum1d_Empirical1D_source(self):

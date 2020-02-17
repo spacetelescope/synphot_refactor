@@ -147,3 +147,21 @@ histogram using ``binset`` as mid-points, as shown below:
     plt.ylabel('Flux (count)')
     plt.title('bb(5000) * acs,hrc,f555w')
     plt.legend(loc='lower right', numpoints=1)
+
+
+.. _synphot-obs-specutils:
+
+specutils
+---------
+
+A `specutils.Spectrum1D` object can be passed directly into
+`~synphot.observation.Observation` as a source spectrum. For example:
+
+.. doctest-requires:: specutils
+
+    >>> from specutils import Spectrum1D
+    >>> spec = Spectrum1D(spectral_axis=[499, 500, 600, 601]*u.nm,
+    ...                   flux=[0, 0.1, 0.8, 0]*u.nJy)
+    >>> obs = Observation(spec, bp, binset=binset)
+    >>> obs.effstim(u.ABmag)  # doctest: +FLOAT_CMP
+    <Magnitude 32.70048821 mag(AB)>

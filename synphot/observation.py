@@ -73,15 +73,15 @@ class Observation(BaseSourceSpectrum):
 
     """
     def __init__(self, spec, band, binset=None, force='none'):
+        # Duck-type specutils.Spectrum1D to avoid hard dependency on specutils
+        if hasattr(spec, 'flux') and hasattr(spec, 'spectral_axis'):
+            spec = SourceSpectrum.from_spectrum1d(spec)
+
         if not isinstance(spec, SourceSpectrum):
             raise exceptions.SynphotError('Invalid source spectrum.')
 
         if not isinstance(band, SpectralElement):
             raise exceptions.SynphotError('Invalid bandpass.')
-
-        # Duck-type specutils.Spectrum1D to avoid hard dependency on specutils
-        if hasattr(spec, 'flux') and hasattr(spec, 'spectral_axis'):
-            spec = SourceSpectrum.from_spectrum1D(spec)
 
         # Inherit input warnings like ASTROLIB PYSYNPHOT
         warn = {}
