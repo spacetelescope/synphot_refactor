@@ -228,3 +228,18 @@ redshifted wavelength:
     plt.ylabel('Lyman-alpha Forest "Throughput"')
     plt.legend(loc='center right')
     plt.grid()
+
+
+.. _tutorial_xmm_area:
+
+Setting Area for XMM-OM
+-----------------------
+
+Some telescopes (e.g., XMM-OM by ESA) provide throughput curves with effective
+area information embedded in them already. In the case of XMM-OM, its
+throughput curves are in ``effective_area * 100`` meter squared, for which we
+would divide each throughput curve loaded into ``SpectralElement`` by 100.
+We also would set the primary area, when it is needed, as follows:
+
+    >>> from astropy import units as u
+    >>> area = 1 * (u.m * u.m)
