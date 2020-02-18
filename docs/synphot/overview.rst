@@ -109,7 +109,7 @@ and special notes:
 |`~synphot.models.Lorentz1D`                              |**synphot**|Like `astropy.modeling.functional_models.Lorentz1D`           |
 |                                                         |           |but with ``sampleset`` and ``bounding_box``.                  |
 +---------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.MexicanHat1D`                           |**synphot**|Like `astropy.modeling.functional_models.MexicanHat1D`        |
+|`~synphot.models.RickerWavelet1D`                        |**synphot**|Like `astropy.modeling.functional_models.RickerWavelet1D`     |
 |                                                         |           |but with ``sampleset`` and ``bounding_box``.                  |
 +---------------------------------------------------------+-----------+--------------------------------------------------------------+
 |`~astropy.modeling.powerlaws.PowerLaw1D`                 |Astropy    ||note_flux_conv_incorrect|                                    |

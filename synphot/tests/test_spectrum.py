@@ -12,7 +12,6 @@ import numpy as np
 import pytest
 
 # ASTROPY
-import astropy
 from astropy import modeling
 from astropy import units as u
 from astropy.io import fits
@@ -30,7 +29,7 @@ from .. import exceptions, units
 from ..compat import ASTROPY_LT_4_0, HAS_SPECUTILS  # noqa
 from ..models import (
     BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, Gaussian1D,
-    GaussianAbsorption1D, GaussianFlux1D, Lorentz1D, MexicanHat1D,
+    GaussianAbsorption1D, GaussianFlux1D, Lorentz1D, RickerWavelet1D,
     PowerLawFlux1D, get_waveset)
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
@@ -43,31 +42,26 @@ else:
     HAS_SCIPY = True
 
 HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
-ASTROPY_LT_20 = not minversion(astropy, '2.0')
 
 # GLOBAL VARIABLES
 _vspec = None  # Loaded in test_load_vspec()
 
 
 def setup_module(module):
-    # https://github.com/astropy/astropy/issues/6383
-    if not ASTROPY_LT_20:
-        import astropy.constants as const
-        from astropy.constants import si, astropyconst13
+    import astropy.constants as const
+    from astropy.constants import si, astropyconst13
 
-        const.sigma_sb = si.sigma_sb = astropyconst13.sigma_sb
-        const.h = si.h = astropyconst13.h
-        const.k_B = si.k_B = astropyconst13.k_B
+    const.sigma_sb = si.sigma_sb = astropyconst13.sigma_sb
+    const.h = si.h = astropyconst13.h
+    const.k_B = si.k_B = astropyconst13.k_B
 
 
 def teardown_module(module):
-    # https://github.com/astropy/astropy/issues/6383
-    if not ASTROPY_LT_20:
-        import astropy.constants as const
-        from astropy.constants import si, astropyconst20
-        const.sigma_sb = si.sigma_sb = astropyconst20.sigma_sb
-        const.h = si.h = astropyconst20.h
-        const.k_B = si.k_B = astropyconst20.k_B
+    import astropy.constants as const
+    from astropy.constants import si, astropyconst20
+    const.sigma_sb = si.sigma_sb = astropyconst20.sigma_sb
+    const.h = si.h = astropyconst20.h
+    const.k_B = si.k_B = astropyconst20.k_B
 
 
 @pytest.mark.remote_data
@@ -517,8 +511,8 @@ class TestBuildModels:
         np.testing.assert_allclose(
             y.value, [0.00249377, 1, 0.00249377], rtol=1e-5)
 
-    def test_MexicanHat1D(self):
-        sp = SourceSpectrum(MexicanHat1D, amplitude=1, x_0=6000, sigma=100)
+    def test_RickerWavelet1D(self):
+        sp = SourceSpectrum(RickerWavelet1D, amplitude=1, x_0=6000, sigma=100)
         y = sp([5000, 6000, 7000])
         np.testing.assert_allclose(
             y.value, [-1.90946235e-20, 1, -1.90946235e-20])

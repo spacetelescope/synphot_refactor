@@ -21,19 +21,21 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from . import units
-from .compat import ASTROPY_LT_2_0, ASTROPY_LT_4_0
+from .compat import ASTROPY_LT_4_0
 from .exceptions import SynphotError
 from .utils import merge_wavelengths
 
 if ASTROPY_LT_4_0:
     from astropy.modeling.core import _CompoundModel as CompoundModel
+    from astropy.modeling.models import MexicanHat1D as _RickerWavelet1D
 else:
     from astropy.modeling.core import CompoundModel
+    from astropy.modeling.models import RickerWavelet1D as _RickerWavelet1D
 
 __all__ = ['BlackBody1D', 'BlackBodyNorm1D', 'Box1D', 'ConstFlux1D',
            'Empirical1D', 'Gaussian1D', 'GaussianAbsorption1D',
-           'GaussianFlux1D', 'Lorentz1D', 'MexicanHat1D', 'PowerLawFlux1D',
-           'Trapezoid1D', 'get_waveset', 'get_metadata']
+           'GaussianFlux1D', 'Lorentz1D', 'MexicanHat1D', 'RickerWavelet1D',
+           'PowerLawFlux1D', 'Trapezoid1D', 'get_waveset', 'get_metadata']
 
 
 class BlackBody1D(Fittable1DModel):
@@ -117,10 +119,7 @@ class BlackBody1D(Fittable1DModel):
             Blackbody radiation in PHOTLAM per steradian.
 
         """
-        if ASTROPY_LT_2_0:
-            from astropy.analytic_functions.blackbody import blackbody_nu
-        else:
-            from astropy.modeling.blackbody import blackbody_nu
+        from synphot.blackbody import blackbody_nu
 
         # Silence Numpy
         old_np_err_cfg = np.seterr(all='ignore')
@@ -554,8 +553,8 @@ class Lorentz1D(_models.Lorentz1D):
         return np.asarray(w)
 
 
-class MexicanHat1D(_models.MexicanHat1D):
-    """Same as `astropy.modeling.models.MexicanHat1D`, except with
+class RickerWavelet1D(_RickerWavelet1D):
+    """Same as `astropy.modeling.models.RickerWavelet1D`, except with
     ``sampleset`` defined.
 
     """
@@ -581,6 +580,12 @@ class MexicanHat1D(_models.MexicanHat1D):
             w = list(map(np.arange, w1, w2, dw))
 
         return np.asarray(w)
+
+
+# TODO: Emit proper deprecation warning.
+# https://github.com/spacetelescope/synphot_refactor/issues/249
+class MexicanHat1D(RickerWavelet1D):
+    """This is the deprecated name for `RickerWavelet1D`."""
 
 
 class PowerLawFlux1D(_models.PowerLaw1D):
