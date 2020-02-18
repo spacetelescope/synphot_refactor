@@ -3,5 +3,7 @@ To reference synphot in publications, please cite
 
 #### Other forms of citation
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3673988.svg)](https://doi.org/10.5281/zenodo.3673988)
+
 Lim, P. L., et al. 2016, synphot User's Guide (Baltimore, MD: STScI),
 http://synphot.readthedocs.io/en/latest/
