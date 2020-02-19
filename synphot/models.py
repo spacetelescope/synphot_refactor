@@ -554,8 +554,8 @@ class Lorentz1D(_models.Lorentz1D):
 
 
 class RickerWavelet1D(_RickerWavelet1D):
-    """Same as `astropy.modeling.models.RickerWavelet1D`, except with
-    ``sampleset`` defined.
+    """Same as `astropy.modeling.functional_models.RickerWavelet1D`, except
+    with ``sampleset`` defined.
 
     """
     def sampleset(self, factor_step=0.1, **kwargs):
