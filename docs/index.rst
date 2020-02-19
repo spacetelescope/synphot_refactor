@@ -315,6 +315,9 @@ Also imports this C-extension to local namespace:
 
    synphot/c_ext
 
+.. automodapi:: synphot.blackbody
+   :no-inheritance-diagram:
+
 .. automodapi:: synphot.config
    :no-inheritance-diagram:
 
