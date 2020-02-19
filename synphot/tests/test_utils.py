@@ -123,6 +123,9 @@ def test_download_bad_root(tmpdir):
     with pytest.raises(OSError):
         utils.download_data(cdbs_root, verbose=False)
 
+    with pytest.raises(FileNotFoundError):
+        utils.download_data('', verbose=False)
+
 
 def test_download_data(tmpdir):
     """Test data download helper in dry run mode."""
@@ -151,10 +154,23 @@ def test_download_data(tmpdir):
         f.write('\n')
 
     # Use case where user redefined data file to be non-STScI.
+    # While the given file will be used, default Vega is downloaded anyway.
     filename = [fname for fname in file_list_1
                 if fname.endswith('alpha_lyr_stis_009.fits')][0]
     os.remove(filename)
     with conf.set_temp('vega_file', '/custom/host/my_vega.fits'):
         file_list_2 = utils.download_data(
             cdbs_root, verbose=False, dry_run=True)
-    assert len(file_list_2) == 0
+    assert len(file_list_2) == 1 and file_list_2[0] == filename
+
+
+def test_download_data_cache_only():
+    """Test data download helper in dry run mode (cache only)."""
+
+    # Use case where user downloads all data into new dir.
+    # The other use cases in test_download_data() will depend on the native
+    # behavior of astropy caching and not tested here.
+    file_list_1 = utils.download_data(None, verbose=False, dry_run=True)
+    filename = file_list_1[0]
+    assert len(file_list_1) == 21
+    assert filename.startswith('http')
