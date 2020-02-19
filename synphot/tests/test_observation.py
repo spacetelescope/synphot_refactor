@@ -12,7 +12,7 @@ import pytest
 # ASTROPY
 from astropy import units as u
 from astropy.modeling.models import Const1D
-from astropy.tests.helper import catch_warnings
+from astropy.tests.helper import catch_warnings, assert_quantity_allclose
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import (AstropyDeprecationWarning,
@@ -21,6 +21,7 @@ from astropy.utils.exceptions import (AstropyDeprecationWarning,
 # LOCAL
 from .test_units import _area
 from .. import exceptions, units
+from ..compat import HAS_SPECUTILS  # noqa
 from ..models import (BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D,
                       GaussianFlux1D)
 from ..observation import Observation
@@ -43,7 +44,7 @@ _bandfile = get_pkg_data_filename(
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
-class TestObservation(object):
+class TestObservation:
     """Test Observation (most of them)."""
     def setup_class(self):
         sp = SourceSpectrum(
@@ -166,7 +167,7 @@ class TestObservation(object):
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
-class TestInitWithForce(object):
+class TestInitWithForce:
     """Test forced initialization."""
     def setup_class(self):
         x = np.arange(3000, 4000)
@@ -197,7 +198,7 @@ class TestInitWithForce(object):
             Observation(self.sp, self.bp, force='foo')
 
 
-class TestMathOperators(object):
+class TestMathOperators:
     """Test Observation math operators."""
     def setup_class(self):
         sp = SourceSpectrum(ConstFlux1D, amplitude=1)
@@ -229,7 +230,7 @@ class TestMathOperators(object):
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
-class TestObsPar(object):
+class TestObsPar:
     """Test Observation values from IRAF SYNPHOT CALCPHOT,
     unless noted otherwise.
 
@@ -353,34 +354,42 @@ class TestObsPar(object):
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
-class TestCountRate(object):
+class TestCountRate:
     """Test countrate with Observation with well-defined ranges.
 
     .. note:: Use binned data except for :func:`test_waverange_no_bin`.
 
     """
     def setup_class(self):
-        x = np.arange(1000, 1100, 0.5)
+        x = np.arange(1000, 1100, 0.5) * u.AA
         y = units.convert_flux(
-            x, (x - 1000) * u.count, units.PHOTLAM, area=_area).value
-        sp = SourceSpectrum(Empirical1D, points=x, lookup_table=y,
-                            meta={'expr': 'slope1'})
-        bp = SpectralElement(
-            Empirical1D, points=[1009.95, 1010, 1030, 1030.05],
+            x, (x.value - 1000) * u.count, units.PHOTLAM, area=_area)
+        self.sp = SourceSpectrum(Empirical1D, points=x, lookup_table=y,
+                                 meta={'expr': 'slope1'})
+        self.bp = SpectralElement(
+            Empirical1D, points=[1009.95, 1010, 1030, 1030.05] * u.AA,
             lookup_table=[0, 1, 1, 0], meta={'expr': 'handmade_box'})
-        self.obs = Observation(sp, bp, binset=np.arange(1000, 1020))
+        self.binset = np.arange(1000, 1020) * u.AA
+        self.obs = Observation(self.sp, self.bp, binset=self.binset)
+
+    @pytest.mark.skipif('not HAS_SPECUTILS')
+    def test_spectrum1d_source(self):
+        # Should round-trip. See also: test_waverange(w=None)
+        spec = self.sp.to_spectrum1d()
+        obs = Observation(spec, self.bp, binset=self.binset)
+        assert_quantity_allclose(
+            obs.countrate(_area), 280.75 * (u.count / u.s))
 
     @pytest.mark.parametrize(
         ('w', 'ans'),
-        [(None, 280.75),
-         ([1000, 1019], 280.75),
-         ([1013, 1016], 116),
-         ([1012.8, 1016], 116),
-         ([1013.2, 1016], 116)])
+        [(None, 280.75 * (u.count / u.s)),
+         ([1000, 1019] * u.AA, 280.75 * (u.count / u.s)),
+         ([1013, 1016] * u.AA, 116 * (u.count / u.s)),
+         ([1012.8, 1016] * u.AA, 116 * (u.count / u.s)),
+         ([1013.2, 1016] * u.AA, 116 * (u.count / u.s))])
     def test_waverange(self, w, ans):
         """Use given wavelength range on binned data."""
-        np.testing.assert_allclose(
-            self.obs.countrate(_area, waverange=w).value, ans)
+        assert_quantity_allclose(self.obs.countrate(_area, waverange=w), ans)
 
     def test_waverange_no_bin(self):
         """Use given wavelength range on native dataset.
@@ -414,7 +423,7 @@ class TestCountRate(object):
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
-class TestCountRateNegFlux(object):
+class TestCountRateNegFlux:
     """Test countrate with files containing negative flux/throughput values."""
     def setup_class(self):
         self.bp = SpectralElement.from_file(get_pkg_data_filename(

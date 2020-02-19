@@ -35,7 +35,7 @@ class Observation(BaseSourceSpectrum):
 
     Parameters
     ----------
-    spec : `~synphot.spectrum.SourceSpectrum`
+    spec : `~synphot.spectrum.SourceSpectrum` or `specutils.Spectrum1D`
         Source spectrum.
 
     band : `~synphot.spectrum.SpectralElement`
@@ -73,6 +73,10 @@ class Observation(BaseSourceSpectrum):
 
     """
     def __init__(self, spec, band, binset=None, force='none'):
+        # Duck-type specutils.Spectrum1D to avoid hard dependency on specutils
+        if hasattr(spec, 'flux') and hasattr(spec, 'spectral_axis'):
+            spec = SourceSpectrum.from_spectrum1d(spec)
+
         if not isinstance(spec, SourceSpectrum):
             raise exceptions.SynphotError('Invalid source spectrum.')
 
