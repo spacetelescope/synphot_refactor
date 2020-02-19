@@ -252,20 +252,21 @@ def merge_wavelengths(waveset1, waveset2, threshold=1e-12):
     return out_wavelengths
 
 
-def download_data(path_root=None, verbose=True, dry_run=False):
-    """Download synphot data files to given root directory or the astropy cache.
+def download_data(path_root, verbose=True, dry_run=False):
+    """Download ``synphot`` data files to given root directory or
+    the ``astropy`` cache.
     Download is skipped if a data file already exists.
 
-    Note that if you have changed the path for the data files by providing a
-    synphot.cfg file pointing to local file, this function will not work. You
-    will need to have the configuration items point to wherever you wish to
-    download them from for this to work.
+    .. warning::
+
+        Downloading data to ``astropy`` cache only is not recommended
+        if you plan to provide a custom ``synphot.cfg``.
 
     Parameters
     ----------
-    path_root : str or None, optional
-        Root directory for data files. If None, download to the astropy cache
-        location instead of a specific directory.
+    path_root : str or `None`
+        Root directory for data files. If `None`, download to the ``astropy``
+        cache location instead of a specific directory.
 
     verbose : bool
         Print extra information to screen.
@@ -273,7 +274,8 @@ def download_data(path_root=None, verbose=True, dry_run=False):
     dry_run : bool
         Go through the logic but skip the actual download.
         This would return a list of files that *would have been*
-        downloaded without network calls.
+        downloaded without network calls. The sub-directories
+        would still be created regardless.
         Use this option for debugging or testing.
 
     Raises
@@ -290,10 +292,7 @@ def download_data(path_root=None, verbose=True, dry_run=False):
     from .config import conf  # Avoid potential circular import
     BASE_HOST = 'http://ssb.stsci.edu/cdbs/'
 
-    if path_root is None:
-        usecache = True
-    else:
-        usecache = False
+    if path_root is not None:
         if not os.path.exists(path_root):
             os.makedirs(path_root, exist_ok=True)
             if verbose:  # pragma: no cover
@@ -312,14 +311,15 @@ def download_data(path_root=None, verbose=True, dry_run=False):
                 not cfgitem.name.endswith('file')):
             continue
 
-        url = cfgitem()
+        url = cfgitem.defaultvalue
 
         if not url.startswith(BASE_HOST):
             if verbose:  # pragma: no cover
                 print('{} is not from {}, skipping download'.format(
                     url, BASE_HOST))
             continue
-        if not usecache:
+
+        if path_root is not None:
             dst = url.replace(BASE_HOST, path_root).replace('/', os.sep)
 
             if os.path.exists(dst):
@@ -333,16 +333,21 @@ def download_data(path_root=None, verbose=True, dry_run=False):
 
         if not dry_run:  # pragma: no cover
             try:
-                src = download_file(url, cache=usecache)
-                if not usecache:
+                src = download_file(url, cache=True)
+                if path_root is not None:
                     copyfile(src, dst)
             except Exception as exc:
                 print('Download failed - {}'.format(str(exc)))
                 continue
-        if usecache:
-            file_list.append(src)
+
+        if path_root is None:
+            if dry_run:
+                file_list.append(url)
+            else:  # pragma: no cover
+                file_list.append(src)
         else:
             file_list.append(dst)
+
         if verbose:  # pragma: no cover
             print('{} downloaded to {}'.format(url, file_list[-1]))
 

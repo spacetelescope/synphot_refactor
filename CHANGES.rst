@@ -9,7 +9,8 @@
 - Added support for ``RickerWavelet1D`` model that is the renamed version
   of ``MexicanHat1D`` model to be consistent with ``astropy`` 4.0. [#250]
 - Added option for ``synphot.utils.download_data()`` to download to the cache
-  instead of a specific location. [#211]
+  instead of a specific location. Please note that new option is not fully
+  compatible with customization using ``synphot.cfg``. [#211]
 
 0.2.1 (2019-12-20)
 ==================

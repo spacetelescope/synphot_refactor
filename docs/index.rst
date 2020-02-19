@@ -82,9 +82,15 @@ via HTTP, create a local directory where you plan to store the data files
     >>> file_list = download_data('/my/local/dir/cdbs')  # doctest: +SKIP
 
 Then copy `synphot.cfg <https://github.com/spacetelescope/synphot_refactor/blob/master/synphot/synphot.cfg>`_
-to your ``$HOME/.astropy/config/`` directory, and replace every instance of
+to your ``$HOME/.astropy/config/`` directory, if it is not there already.
+Uncomment and replace every instance of
 ``/grp/hst/cdbs`` with ``/my/local/dir/cdbs`` so that ``synphot`` knows where to
 look for these files.
+
+On the contrary, if you wish to rely solely on Astropy caching mechanism,
+you can use ``download_data(None)``, but make sure that you do *not*
+modify your default ``$HOME/.astropy/config/synphot.cfg`` file. Otherwise,
+``synphot`` will try to use what is in ``synphot.cfg`` instead.
 
 .. note::
 
