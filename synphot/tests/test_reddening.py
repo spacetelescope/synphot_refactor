@@ -81,6 +81,7 @@ class TestExtinction(object):
         extcurve = redlaw.extinction_curve(ebv, wavelengths=wav)
 
         assert_quantity_allclose(extcurve(wav), ans)
+        assert extcurve.meta['header']['ReddeningLaw'] == '<CCM89(Rv=3.1)>'
 
     def test_mul_spec(self):
         """Apply extinction curve in inverse micron to flat spectrum in

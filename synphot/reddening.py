@@ -81,7 +81,7 @@ class ReddeningLaw(BaseUnitlessSpectrum):
         # Duck-typing dust-extinction package API.
         if HAS_DUST_EXTINCTION and hasattr(self.model, 'extinguish'):
             y = self.model.extinguish(x, self.model.Rv * ebv)
-            header['ReddeningLaw'] = '{}'.format(self.model)
+            header['ReddeningLaw'] = '{!r}'.format(self.model)
         else:
             y = 10 ** (-0.4 * self(x).value * ebv)
             header['ReddeningLaw'] = self.meta.get('expr', 'unknown')
