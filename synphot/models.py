@@ -388,8 +388,14 @@ class Empirical1D(Tabular1D):
         # Assume NaN at both ends need to be extrapolated based on
         # nearest end point.
         if self.fill_value is np.nan:
-            # Cannot use sampleset() due to ExtinctionModel1D
+            # Cannot use sampleset() due to ExtinctionModel1D.
             x = np.squeeze(self.points)
+
+            # np.squeeze may throw unit away.
+            if (isinstance(self.points, tuple) and
+                    isinstance(self.points[0], u.Quantity) and
+                    not isinstance(x, u.Quantity)):
+                x = x * self.points[0].unit
 
             if np.isscalar(y):  # pragma: no cover
                 if inputs < x[0]:

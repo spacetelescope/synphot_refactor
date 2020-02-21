@@ -104,7 +104,8 @@ de-reddens the spectrum), and then multiply it to the source::
 .. |xg_ext_ref| replace:: :ref:`Calzetti et al. (2000) <synphot-ref-extinction-calzetti2000>`
 
 For extinction due to Lyman-alpha forest, see :ref:`tutorial_lyman_alpha`
-tutorial.
+tutorial. To use a model from the ``dust-extinction`` package, see
+:ref:`tutorial_dust_extinction`.
 
 You can **redshift** a source spectrum in several ways (shown in example
 below), either by setting its ``z`` attribute or passing in a ``z`` keyword

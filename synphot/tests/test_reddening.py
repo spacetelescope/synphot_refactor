@@ -13,12 +13,14 @@ import pytest
 # ASTROPY
 from astropy import units as u
 from astropy.io import fits
+from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from .. import exceptions, units
+from ..compat import HAS_DUST_EXTINCTION  # noqa
 from ..models import ConstFlux1D, Empirical1D
 from ..observation import Observation
 from ..reddening import ReddeningLaw, etau_madau
@@ -64,6 +66,21 @@ class TestExtinction(object):
         y = self.extcurve(w)
         np.testing.assert_array_equal(w, self.redlaw.waveset)
         np.testing.assert_allclose(y, 10 ** (-0.4 * self.redlaw(w) * 0.3))
+
+    @pytest.mark.skipif('not HAS_DUST_EXTINCTION')
+    def test_extcurve_call_2(self):
+        from dust_extinction.parameter_averages import CCM89
+
+        Av = 2
+        wav = np.arange(0.1, 3, 0.001) * u.micron
+        ext = CCM89(Rv=3.1)
+        ans = ext.extinguish(wav, Av)
+
+        ebv = Av / ext.Rv
+        redlaw = ReddeningLaw(ext)
+        extcurve = redlaw.extinction_curve(ebv, wavelengths=wav)
+
+        assert_quantity_allclose(extcurve(wav), ans)
 
     def test_mul_spec(self):
         """Apply extinction curve in inverse micron to flat spectrum in

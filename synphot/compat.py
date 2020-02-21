@@ -11,6 +11,14 @@ except ImportError:
 else:
     HAS_SPECUTILS = True
 
-__all__ = ['ASTROPY_LT_4_0', 'HAS_SPECUTILS']
+try:
+    import dust_extinction  # noqa
+except ImportError:
+    HAS_DUST_EXTINCTION = False
+else:
+    HAS_DUST_EXTINCTION = True
+
+
+__all__ = ['ASTROPY_LT_4_0', 'HAS_SPECUTILS', 'HAS_DUST_EXTINCTION']
 
 ASTROPY_LT_4_0 = not minversion(astropy, '4.0')

@@ -10,6 +10,7 @@ from astropy import units as u
 
 # LOCAL
 from . import exceptions, specio, units
+from .compat import HAS_DUST_EXTINCTION
 from .config import Conf
 from .models import Empirical1D
 from .spectrum import BaseUnitlessSpectrum
@@ -74,11 +75,16 @@ class ReddeningLaw(BaseUnitlessSpectrum):
         elif not isinstance(ebv, numbers.Real):
             raise exceptions.SynphotError('E(B-V)={0} is invalid.'.format(ebv))
 
-        x = self._validate_wavelengths(wavelengths).value
-        y = 10 ** (-0.4 * self(x).value * ebv)
-        header = {
-            'E(B-V)': ebv,
-            'ReddeningLaw': self.meta.get('expr', 'unknown')}
+        x = self._validate_wavelengths(wavelengths)
+        header = {'E(B-V)': ebv}
+
+        # Duck-typing dust-extinction package API.
+        if HAS_DUST_EXTINCTION and hasattr(self.model, 'extinguish'):
+            y = self.model.extinguish(x, self.model.Rv * ebv)
+            header['ReddeningLaw'] = '{}'.format(self.model)
+        else:
+            y = 10 ** (-0.4 * self(x).value * ebv)
+            header['ReddeningLaw'] = self.meta.get('expr', 'unknown')
 
         return ExtinctionCurve(ExtinctionModel1D, points=x, lookup_table=y,
                                meta={'header': header})

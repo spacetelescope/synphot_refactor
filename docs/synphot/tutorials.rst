@@ -98,6 +98,34 @@ continuum-normalized spectrum.
     plt.axhline(1, ls='--', color='k')
 
 
+.. _tutorial_dust_extinction:
+
+Using dust-extinction model
+---------------------------
+
+In this tutorial, you will learn how to apply an extinction curve using a
+model from the ``dust-extinction`` package:
+
+.. doctest-requires:: dust-extinction
+
+    >>> import numpy as np
+    >>> from astropy import units as u
+    >>> from dust_extinction.parameter_averages import CCM89
+    >>> from synphot import SourceSpectrum, ReddeningLaw
+    >>> from synphot.models import BlackBodyNorm1D
+    >>> ccm89_model = CCM89(Rv=3.1)
+    >>> wav = np.arange(0.1, 3, 0.001) * u.micron
+    >>> ebv = 0.1  # E(B-V)
+    >>> redlaw = ReddeningLaw(ccm89_model)
+    >>> extcurve = redlaw.extinction_curve(ebv, wavelengths=wav)
+    >>> bb = SourceSpectrum(BlackBodyNorm1D, temperature=5000 * u.K)
+    >>> bb.integrate()  # doctest: +FLOAT_CMP
+    <Quantity 9.31004974 ph / (cm2 s)>
+    >>> sp = bb * extcurve
+    >>> sp.integrate()  # doctest: +FLOAT_CMP
+    <Quantity 8.27106961 ph / (cm2 s)>
+
+
 .. _tutorial_fit_ew:
 
 Fitting, Equivalent Width
