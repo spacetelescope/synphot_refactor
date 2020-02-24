@@ -104,7 +104,8 @@ Using dust-extinction model
 ---------------------------
 
 In this tutorial, you will learn how to apply an extinction curve using a
-model from the ``dust-extinction`` package:
+model from the
+:ref:`dust-extinction <dust-extinction:dust-extinction-mainpage>` package:
 
 .. doctest-requires:: dust-extinction
 
