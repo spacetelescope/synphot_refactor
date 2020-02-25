@@ -10,6 +10,7 @@
   compatible with Python 3.6 or later and ``astropy`` 3.x or later. [#243]
 - Added support for ``RickerWavelet1D`` model that is the renamed version
   of ``MexicanHat1D`` model to be consistent with ``astropy`` 4.0. [#250]
+- Added support for extinction curve from ``dust-extinction``. [#251]
 - Added option for ``synphot.utils.download_data()`` to download to the cache
   instead of a specific location. Please note that new option is not fully
   compatible with customization using ``synphot.cfg``. [#211]
