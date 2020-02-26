@@ -2,6 +2,7 @@
 """Spectrum models not in `astropy.modeling`."""
 
 # STDLIB
+import math
 import warnings
 from copy import deepcopy
 from functools import partial
@@ -134,6 +135,9 @@ class BlackBody1D(Fittable1DModel):
 
         return bbflux.value
 
+    def integrate(self, *args):
+        return const.sigma_sb * (self.temperature ** 4)
+
 
 class BlackBodyNorm1D(BlackBody1D):
     """Create a normalized :ref:`blackbody spectrum <synphot-planck-law>`
@@ -176,6 +180,9 @@ class BlackBodyNorm1D(BlackBody1D):
         bbflux = super(BlackBodyNorm1D, self).evaluate(x, temperature)
         return bbflux * self._omega
 
+    def integrate(self, *args):
+        return super().integrate(*args) * self._omega
+
 
 class Box1D(_models.Box1D):
     """Same as `astropy.modeling.functional_models.Box1D`, except with
@@ -214,6 +221,10 @@ class Box1D(_models.Box1D):
                 self._calc_sampleset, step=step, minimal=minimal), w1, w2))
 
         return np.asarray(w)
+
+    def integrate(self, *args):
+        # TODO: Remove unit hardcoding when we use model with units natively.
+        return self.amplitude * (self.width * u.AA)
 
 
 class ConstFlux1D(_models.Const1D):
@@ -268,6 +279,9 @@ class ConstFlux1D(_models.Const1D):
         a = (self.amplitude * np.ones_like(x)) * self._flux_unit
         y = units.convert_flux(x, a, units.PHOTLAM)
         return y.value
+
+    def integrate(self, x):
+        return (max(x) - min(x)) * (self.amplitude * self._flux_unit)
 
 
 class Empirical1D(Tabular1D):
@@ -414,6 +428,8 @@ class BaseGaussian1D(_models.Gaussian1D):
     ``sampleset`` defined.
 
     """
+    _sqrt_2_pi = math.sqrt(2 * math.pi)
+
     def sampleset(self, factor_step=0.1, **kwargs):
         """Return ``x`` array that samples the feature.
 
@@ -448,9 +464,13 @@ class Gaussian1D(BaseGaussian1D):
     ``sampleset`` defined.
 
     """
-    pass
+    # TODO: Remove unit hardcoding when we use model with units natively.
+    def integrate(self, *args):
+        return self.amplitude * (self.stddev * u.AA) * self._sqrt_2_pi
 
 
+# TODO: Deprecate this?
+# This is not really supported anymore but kept for backward compatibility.
 class GaussianAbsorption1D(BaseGaussian1D):
     """Same as ``astropy.modeling.functional_models.GaussianAbsorption1D``,
     except with ``sampleset`` defined.
@@ -509,7 +529,7 @@ class GaussianFlux1D(Gaussian1D):
         else:
             self.stddev = fwhm * gaussian_fwhm_to_sigma
 
-        gaussian_amp_to_totflux = np.sqrt(2.0 * np.pi) * self.stddev
+        gaussian_amp_to_totflux = self._sqrt_2_pi * self.stddev
 
         if total_flux is None:
             u_str = 'PHOTLAM'
@@ -528,6 +548,10 @@ class GaussianFlux1D(Gaussian1D):
 
         self.meta['expr'] = 'em({0:g}, {1:g}, {2:g}, {3})'.format(
             self.mean.value, fwhm, total_flux, u_str)
+
+    # TODO: Remove unit hardcoding when we use model with units natively.
+    def integrate(self, *args):
+        super(GaussianFlux1D, self).integrate(*args) * units.PHOTLAM
 
 
 class Lorentz1D(_models.Lorentz1D):
@@ -558,6 +582,13 @@ class Lorentz1D(_models.Lorentz1D):
 
         return np.asarray(w)
 
+    # TODO: Remove unit hardcoding when we use model with units natively.
+    def integrate(self, x):
+        gamma = self.fwhm * 0.5
+        a1 = np.arctan((min(x) - self.x_0) / gamma)
+        a2 = np.arctan((max(x) - self.x_0) / gamma)
+        return self.amplitude * (gamma * u.AA) * (a2 - a1)
+
 
 class RickerWavelet1D(_RickerWavelet1D):
     """Same as `astropy.modeling.functional_models.RickerWavelet1D`, except
@@ -586,6 +617,16 @@ class RickerWavelet1D(_RickerWavelet1D):
             w = list(map(np.arange, w1, w2, dw))
 
         return np.asarray(w)
+
+    # TODO: Remove unit hardcoding when we use model with units natively.
+    def integrate(self, x):
+        # TODO: Fix the formula, apply units, check for n_models>1
+        sig2 = self.sigma * self.sigma
+        dx_min = min(x) - self.x_0
+        dx_max = max(x) - self.x_0
+        a1 = dx_min * np.exp(-0.5 * dx_min * dx_min / sig2)
+        a2 = dx_max * np.exp(-0.5 * dx_max * dx_max / sig2)
+        return -1 * self.amplitude * (a2 - a1) / sig2
 
 
 # TODO: Emit proper deprecation warning.
@@ -642,6 +683,16 @@ class PowerLawFlux1D(_models.PowerLaw1D):
         flux = units.convert_flux(x, y, units.PHOTLAM)
         return flux.value
 
+    def integrate(self, x):
+        fac = 1 - self.alpha
+        denom = self.x_0 ** -self.alpha * fac
+        if np.allclose(denom, 0):
+            raise ValueError('Cannot calculate analytic integral for x_0={} '
+                             'and alpha={}'.format(self.x_0, self.alpha))
+        a = self.amplitude / denom
+        # TODO: Remove unit hardcoding when we use model with units natively.
+        return a * (max(x) ** fac - min(x) ** fac) * (self._flux_unit * u.AA)
+
 
 class Trapezoid1D(_models.Trapezoid1D):
     """Same as `astropy.modeling.functional_models.Trapezoid1D`, except with
@@ -661,6 +712,11 @@ class Trapezoid1D(_models.Trapezoid1D):
             w = list(zip(x1, x2, x3, x4))
 
         return np.asarray(w)
+
+    def integrate(self, *args):
+        # TODO: Remove unit hardcoding when we use model with units natively.
+        return self.amplitude * ((self.width * u.AA) +
+                                 (self.amplitude / self.slope))
 
 
 # Functions below are for sampleset magic.

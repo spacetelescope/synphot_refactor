@@ -20,7 +20,8 @@ class Const1D(Box1D):
         return Polynomial1D(1, c1=1)  # f(x) = x
 
 
-# TODO: Update test when Astropy models have integral.
+# TODO: Rewrite this file to test all supported models as sp and bp, with and
+# without analytic. Compare analytic with trapezoid.
 def test_analytic_source():
     """Test integration using built-in analytic integral."""
     sp = SourceSpectrum(Const1D)

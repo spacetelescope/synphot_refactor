@@ -97,8 +97,7 @@ and special notes:
 |`~synphot.models.Gaussian1D`                             |**synphot**|Like `astropy.modeling.functional_models.Gaussian1D`          |
 |                                                         |           |but with ``sampleset``.                                       |
 +---------------------------------------------------------+-----------+--------------------------------------------------------------+
-|`~synphot.models.GaussianAbsorption1D`                   |**synphot**|Like `astropy.modeling.functional_models.GaussianAbsorption1D`|
-|                                                         |           |but with ``sampleset``.                                       |
+|`~synphot.models.GaussianAbsorption1D`                   |**synphot**|This is ``1 - Gaussian1D`` model.                             |
 +---------------------------------------------------------+-----------+--------------------------------------------------------------+
 |`~synphot.models.GaussianFlux1D`                         |**synphot**|Like `~synphot.models.Gaussian1D` but allows                  |
 |                                                         |           |backward-compatible parameters like total flux and            |
