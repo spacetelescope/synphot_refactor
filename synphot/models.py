@@ -626,7 +626,7 @@ class RickerWavelet1D(_RickerWavelet1D):
         dx_max = max(x) - self.x_0
         a1 = dx_min * np.exp(-0.5 * dx_min * dx_min / sig2)
         a2 = dx_max * np.exp(-0.5 * dx_max * dx_max / sig2)
-        return -1 * self.amplitude * (a2 - a1) / sig2
+        return self.amplitude * (a2 - a1)
 
 
 # TODO: Emit proper deprecation warning.
