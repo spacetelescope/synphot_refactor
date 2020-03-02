@@ -136,7 +136,8 @@ class BlackBody1D(Fittable1DModel):
         return bbflux.value
 
     def integrate(self, *args):
-        return const.sigma_sb * (self.temperature ** 4)
+        return (const.sigma_sb * (u.Quantity(self.temperature, u.K) ** 4) /
+                math.pi)  # per steradian
 
 
 class BlackBodyNorm1D(BlackBody1D):
@@ -281,6 +282,15 @@ class ConstFlux1D(_models.Const1D):
         return y.value
 
     def integrate(self, x):
+        # TODO: Remove unit hardcoding when we use model with units natively.
+        # TODO: We do not handle wav_unit as wave number nor energy for now.
+        if 'wav' in self._flux_unit.physical_type:
+            wav_unit = u.AA
+        else:
+            wav_unit = u.Hz
+        with u.add_enabled_equivalencies(u.spectral()):
+            x = u.Quantity(x, wav_unit)
+
         return (max(x) - min(x)) * (self.amplitude * self._flux_unit)
 
 
@@ -551,7 +561,7 @@ class GaussianFlux1D(Gaussian1D):
 
     # TODO: Remove unit hardcoding when we use model with units natively.
     def integrate(self, *args):
-        super(GaussianFlux1D, self).integrate(*args) * units.PHOTLAM
+        return super(GaussianFlux1D, self).integrate(*args) * units.PHOTLAM
 
 
 class Lorentz1D(_models.Lorentz1D):
@@ -584,10 +594,15 @@ class Lorentz1D(_models.Lorentz1D):
 
     # TODO: Remove unit hardcoding when we use model with units natively.
     def integrate(self, x):
-        gamma = self.fwhm * 0.5
-        a1 = np.arctan((min(x) - self.x_0) / gamma)
-        a2 = np.arctan((max(x) - self.x_0) / gamma)
-        return self.amplitude * (gamma * u.AA) * (a2 - a1)
+        with u.add_enabled_equivalencies(u.spectral()):
+            x = u.Quantity(x, u.AA)
+            x_0 = u.Quantity(self.x_0, u.AA)
+            gamma = u.Quantity(self.fwhm, u.AA) * 0.5
+
+        a1 = np.arctan((min(x) - x_0) / gamma)
+        a2 = np.arctan((max(x) - x_0) / gamma)
+        da = (a2 - a1).to(u.dimensionless_unscaled, u.dimensionless_angles())
+        return self.amplitude * gamma * da
 
 
 class RickerWavelet1D(_RickerWavelet1D):
@@ -618,15 +633,36 @@ class RickerWavelet1D(_RickerWavelet1D):
 
         return np.asarray(w)
 
-    # TODO: Remove unit hardcoding when we use model with units natively.
     def integrate(self, x):
-        # TODO: Fix the formula, apply units, check for n_models>1
-        sig2 = self.sigma * self.sigma
-        dx_min = min(x) - self.x_0
-        dx_max = max(x) - self.x_0
-        a1 = dx_min * np.exp(-0.5 * dx_min * dx_min / sig2)
-        a2 = dx_max * np.exp(-0.5 * dx_max * dx_max / sig2)
-        return self.amplitude * (a2 - a1)
+        # TODO: Remove unit hardcoding when we use model with units natively.
+        with u.add_enabled_equivalencies(u.spectral()):
+            x = u.Quantity(x, u.AA)
+            x_0 = u.Quantity(self.x_0, u.AA)
+            sig = u.Quantity(self.sigma, u.AA)
+
+        # Roots, where y=0
+        root_left = x_0 - sig
+        root_right = x_0 + sig
+
+        x_min = min(x)
+        x_max = max(x)
+        if x_min >= root_left or x_max <= root_right:
+            raise NotImplementedError(
+                'Partial analytic integration not supported')
+
+        sig2 = sig * sig
+
+        def _int_subregion(xx1, xx2):
+            dx_min = xx1 - x_0
+            dx_max = xx2 - x_0
+            a1 = dx_min * np.exp(-0.5 * dx_min * dx_min / sig2)
+            a2 = dx_max * np.exp(-0.5 * dx_max * dx_max / sig2)
+            return abs(a2 - a1)
+
+        # Unsigned area
+        return self.amplitude * (_int_subregion(x_min, root_left) +
+                                 _int_subregion(root_left, root_right) +
+                                 _int_subregion(root_right, x_max))
 
 
 # TODO: Emit proper deprecation warning.
@@ -684,14 +720,15 @@ class PowerLawFlux1D(_models.PowerLaw1D):
         return flux.value
 
     def integrate(self, x):
-        fac = 1 - self.alpha
-        denom = self.x_0 ** -self.alpha * fac
-        if np.allclose(denom, 0):
-            raise ValueError('Cannot calculate analytic integral for x_0={} '
-                             'and alpha={}'.format(self.x_0, self.alpha))
-        a = self.amplitude / denom
         # TODO: Remove unit hardcoding when we use model with units natively.
-        return a * (max(x) ** fac - min(x) ** fac) * (self._flux_unit * u.AA)
+        with u.add_enabled_equivalencies(u.spectral()):
+            x = u.Quantity(x, u.AA)
+            x_0 = u.Quantity(self.x_0, u.AA)
+            amp = u.Quantity(self.amplitude, self._flux_unit)
+
+        fac = 1 - self.alpha
+        denom = x_0 ** -self.alpha * fac
+        return amp * (max(x) ** fac - min(x) ** fac) / denom
 
 
 class Trapezoid1D(_models.Trapezoid1D):
@@ -715,8 +752,11 @@ class Trapezoid1D(_models.Trapezoid1D):
 
     def integrate(self, *args):
         # TODO: Remove unit hardcoding when we use model with units natively.
-        return self.amplitude * ((self.width * u.AA) +
-                                 (self.amplitude / self.slope))
+        with u.add_enabled_equivalencies(u.spectral()):
+            width = u.Quantity(self.width, u.AA)
+            slope = u.Quantity(self.slope, 1 / u.AA)
+
+        return self.amplitude * (width + self.amplitude / slope)
 
 
 # Functions below are for sampleset magic.

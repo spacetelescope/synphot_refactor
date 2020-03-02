@@ -12,7 +12,7 @@ import pytest
 from astropy import units as u
 
 # LOCAL
-from .. import exceptions, utils
+from .. import exceptions, utils, units
 
 
 @pytest.mark.parametrize(
@@ -30,18 +30,19 @@ def test_overlap_status(a, b, ans):
 
 def test_validate_totalflux():
     """Test integrated flux validation."""
-    # Valid integrated flux
     utils.validate_totalflux(0.01)
+    utils.validate_totalflux(0.01 * units.FLAM)
 
-    # Invalid integrated flux
+
+@pytest.mark.parametrize(
+    'val', (-0.01, -0.01 * units.FLAM,
+            0, 0 * units.PHOTLAM,
+            np.inf, np.inf * u.Jy,
+            np.nan, np.nan * units.FLAM))
+def test_validate_totalflux_invalid(val):
+    """Invalid integrated flux."""
     with pytest.raises(exceptions.SynphotError):
-        utils.validate_totalflux(-0.01)
-    with pytest.raises(exceptions.SynphotError):
-        utils.validate_totalflux(0)
-    with pytest.raises(exceptions.SynphotError):
-        utils.validate_totalflux(np.inf)
-    with pytest.raises(exceptions.SynphotError):
-        utils.validate_totalflux(np.nan)
+        utils.validate_totalflux(val)
 
 
 def test_validate_wavelengths():

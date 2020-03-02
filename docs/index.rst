@@ -173,7 +173,7 @@ Create a blackbody source spectrum with a temperature of 6000 K::
 Combine the above components to create a source spectrum that is twice
 the original blackbody flux with the Gaussian emission and absorption lines::
 
-    >>> sp =  2 * bb + g_em - g_abs
+    >>> sp = 2 * bb + g_em - g_abs
 
 Plot the spectrum, zooming in on the line features::
 

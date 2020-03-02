@@ -447,9 +447,18 @@ class BaseSpectrum(object):
             integration is requested but no possible, trapezoid integration
             is done anyway.
 
+        flux_unit : str, `~astropy.units.core.Unit`, or `None`
+            **This option is only available for source spectrum.**
+            For trapezoid integration, flux is converted to this unit for
+            sampling before integration. For analytical integration, while
+            calculation is done differently, providing this option would
+            result in equivalent behavior as trapezoid integration, where
+            possible, for consistency. If not given, internal unit is used.
+
         kwargs : dict
-            Optional keywords to ``__call__`` for sampling when integration
-            type is not analytical.
+            **This option is only available for source spectrum.**
+            Other optional keywords besides ``flux_unit`` to ``__call__``
+            for sampling when integration type is not analytical.
 
         Returns
         -------
@@ -466,11 +475,19 @@ class BaseSpectrum(object):
             natively in the given ``flux_unit``.
 
         """
+        # For non-analytical integration:
         # Cannot integrate per Hz units natively across wavelength
         # without converting them to per Angstrom unit first, so
         # less misleading to just disallow that option for now.
-        if 'flux_unit' in kwargs:
-            self._validate_flux_unit(kwargs['flux_unit'], wav_only=True)
+        # For analytical integration: Keep the same behavior for consistency.
+        flux_unit = kwargs.get('flux_unit')
+        is_unitless = self._internal_flux_unit == units.THROUGHPUT
+        if flux_unit is not None:
+            if is_unitless:
+                raise exceptions.SynphotError(
+                    'flux_unit cannot be used with unitless spectrum')
+            else:
+                self._validate_flux_unit(flux_unit, wav_only=True)
 
         x = self._validate_wavelengths(wavelengths)
 
@@ -485,7 +502,7 @@ class BaseSpectrum(object):
             integration_type = 'trapezoid'
 
         if integration_type == 'trapezoid':
-            y = self(x, **kwargs)
+            y = abs(self(x, **kwargs))  # Unsigned area
             result = abs(np.trapz(y, x=x))
 
         elif integration_type == 'analytical':
@@ -493,10 +510,20 @@ class BaseSpectrum(object):
 
             # TODO: Remove unit hardcoding when we use model with units
             #       natively.
-            if (self._internal_flux_unit != units.THROUGHPUT and
-                    result.unit.physical_type == 'length'):
+            if not is_unitless and result.unit.physical_type == 'length':
                 result = result * self._internal_flux_unit
 
+            # NOTE: flux_unit is flux density, not integrated.
+            # Use wavelength for unit conversion, if applicable.
+            if not is_unitless and flux_unit is not None:
+                modelname = self.model.__class__.__name__
+                if modelname in self._model_fconv_wav:
+                    pname_wav = self._model_fconv_wav[modelname]
+                    wav = getattr(self.model, pname_wav).value
+                    with u.add_enabled_equivalencies(u.spectral()):
+                        wav = u.Quantity(wav, self._internal_wave_unit)
+                    to_unit = flux_unit * self._internal_wave_unit
+                    result = units.convert_flux(wav, result, to_unit)
         else:
             raise NotImplementedError(
                 '{} is not a supported integration '
@@ -504,11 +531,12 @@ class BaseSpectrum(object):
 
         # Ensure final unit takes account of integration across wavelength
         # and make it pretty, where applicable.
-        result_unit_str = result.unit.to_string()
-        if 'ph' in result_unit_str or 'PHOTLAM' in result_unit_str:
-            result = result.to(u.photon / (u.cm**2 * u.s))
-        elif self._internal_flux_unit != units.THROUGHPUT:
-            result = result.to(u.erg / (u.cm**2 * u.s))
+        if not is_unitless:
+            result_unit_str = result.unit.to_string()
+            if 'ph' in result_unit_str or 'PHOTLAM' in result_unit_str:
+                result = result.to(u.photon / (u.cm**2 * u.s))
+            else:  # FLAM
+                result = result.to(u.erg / (u.cm**2 * u.s))
 
         return result
 
@@ -835,7 +863,7 @@ class BaseSpectrum(object):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
 
-        flux_unit : str or `~astropy.units.core.Unit` or `None`
+        flux_unit : str, `~astropy.units.core.Unit`, or `None`
             This option is not applicable to unitless spectrum like bandpass.
             Flux is converted to this unit before written out.
             If not given, internal unit is used.
@@ -900,7 +928,7 @@ class BaseSourceSpectrum(BaseSpectrum):
             Wavelength values for sampling. If not a Quantity,
             assumed to be in Angstrom.
 
-        flux_unit : str or `~astropy.units.core.Unit` or `None`
+        flux_unit : str, `~astropy.units.core.Unit`, or `None`
             Flux is converted to this unit.
             If not given, internal unit is used.
 
@@ -1243,7 +1271,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
 
-        flux_unit : str or `~astropy.units.core.Unit` or `None`
+        flux_unit : str, `~astropy.units.core.Unit`, or `None`
             Flux is converted to this unit for plotting.
             If not given, internal unit is used.
 
@@ -1277,7 +1305,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
 
-        flux_unit : str or `~astropy.units.core.Unit` or `None`
+        flux_unit : str, `~astropy.units.core.Unit`, or `None`
             Flux is converted to this unit before written out.
             If not given, internal unit is used.
 

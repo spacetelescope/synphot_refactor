@@ -87,14 +87,12 @@ def test_flux_conversion_vega(in_q, out_u, ans):
 
     """
     result = units.convert_flux(_wave, in_q, out_u, vegaspec=_vspec)
-    np.testing.assert_allclose(result.value, ans.value, rtol=1e-2)
-    assert result.unit == ans.unit
+    assert_quantity_allclose(result, ans, rtol=1e-2)
 
     # Scalar
     i = 0
     result = units.convert_flux(_wave[i], in_q[i], out_u, vegaspec=_vspec)
-    np.testing.assert_allclose(result.value, ans[i].value, rtol=1e-2)
-    assert result.unit == ans[i].unit
+    assert_quantity_allclose(result, ans[i], rtol=1e-2)
 
 
 @pytest.mark.remote_data
@@ -150,17 +148,17 @@ class TestEmpiricalSourceFromFile:
         assert self.sp.meta['header']['SIMPLE']  # From FITS header
         assert self.sp.warnings == {}
         assert self.sp.z == 0
-        np.testing.assert_allclose(
-            self.sp.waverange.value, [3479.99902344, 10500.00097656])
+        assert_quantity_allclose(
+            self.sp.waverange, [3479.99902344, 10500.00097656] * u.AA)
 
     def test_call(self):
         w = self.sp.model.points[0][5000:5004]
-        y = units.convert_flux(w, self.sp(w), units.FLAM)
+        y = self.sp(w, flux_unit=units.FLAM)
+        y_ans = [1.87284130e-15, 1.85656811e-15, 1.84030867e-15,
+                 1.82404183e-15] * units.FLAM
         np.testing.assert_allclose(
             w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
-        np.testing.assert_allclose(
-            y.value,
-            [1.87284130e-15, 1.85656811e-15, 1.84030867e-15, 1.82404183e-15])
+        assert_quantity_allclose(y, y_ans)
 
     def test_neg_flux(self):
         w = [1000, 5000, 9000]
@@ -174,20 +172,21 @@ class TestEmpiricalSourceFromFile:
     def test_conversion(self):
         x = 0.60451641 * u.micron
         w, y = self.sp._get_arrays(x, flux_unit=units.FNU)
-        np.testing.assert_allclose(x.value, w.value)
-        np.testing.assert_allclose(y.value, 2.282950185743497e-26, rtol=1e-6)
+        assert_quantity_allclose(x, w)
+        assert_quantity_allclose(y, 2.282950185743497e-26 * units.FNU,
+                                 rtol=1e-6)
 
     def test_integrate(self):
         expected_unit = u.erg / (u.cm**2 * u.s)
         # Whole range
         f = self.sp.integrate(flux_unit=units.FLAM)
-        np.testing.assert_allclose(f.value, 8.460125829057308e-12, rtol=1e-5)
-        assert f.unit == expected_unit
+        assert_quantity_allclose(f, 8.460125829057308e-12 * expected_unit,
+                                 rtol=1e-5)
 
         # Given range
         f = self.sp.integrate(wavelengths=_wave, flux_unit=units.FLAM)
-        np.testing.assert_allclose(f.value, 4.810058069909525e-14, rtol=1e-5)
-        assert f.unit == expected_unit
+        assert_quantity_allclose(f, 4.810058069909525e-14 * expected_unit,
+                                 rtol=1e-5)
 
         # Unsupported unit
         with pytest.raises(exceptions.SynphotError):
@@ -203,10 +202,11 @@ class TestEmpiricalSourceFromFile:
             Empirical1D, points=_wave, lookup_table=_flux_photlam)
         sp = sp2.taper()
         x, y = sp._get_arrays(None, flux_unit=units.FLAM)
-        np.testing.assert_allclose(
-            x.value, [4954.05152484, 4956.8, 4959.55, 4962.3, 4965.05152484])
-        np.testing.assert_allclose(
-            y.value, [0, 3.9135e-14, 4.0209e-14, 3.9169e-14, 0], rtol=1e-6)
+        assert_quantity_allclose(
+            x, [4954.05152484, 4956.8, 4959.55, 4962.3, 4965.05152484] * u.AA)
+        assert_quantity_allclose(
+            y,
+            [0, 3.9135e-14, 4.0209e-14, 3.9169e-14, 0] * units.FLAM, rtol=1e-6)
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -233,57 +233,54 @@ class TestEmpiricalBandpassFromFile:
     def test_integrate(self):
         # Whole range (same as EQUVW)
         f = self.bp.integrate()
-        np.testing.assert_allclose(f.value, 272.01081629459344)
-        assert f.unit == u.AA
+        assert_quantity_allclose(f, 272.01081629459344 * u.AA)
 
         # Given range
         f = self.bp.integrate(wavelengths=_wave)
-        np.testing.assert_allclose(f.value, 1.2062975715374322, rtol=2.5e-6)
-        assert f.unit == u.AA
+        assert_quantity_allclose(f, 1.2062975715374322 * u.AA, rtol=2.5e-6)
 
     def test_avgwave(self):
         """Compare AVGWAVE with old SYNPHOT result."""
         w = self.bp.avgwave()
-        np.testing.assert_allclose(w.value, 5367.9, rtol=1e-5)
+        assert_quantity_allclose(w, 5367.9 * u.AA, rtol=1e-5)
 
     def test_barlam(self):
         """Test BARLAM (no old SYNPHOT result available)."""
         w = self.bp.barlam()
-        np.testing.assert_allclose(w.value, 5331.8945, rtol=1e-5)
+        assert_quantity_allclose(w, 5331.8945 * u.AA, rtol=1e-5)
 
     def test_pivot(self):
         """Compare PIVWV with ASTROLIB PYSYNPHOT result."""
         w = self.bp.pivot()
-        np.testing.assert_allclose(w.value, 5355.863596422962, rtol=1e-6)
+        assert_quantity_allclose(w, 5355.863596422962 * u.AA, rtol=1e-6)
 
     def test_uresp(self):
         """Compare URESP with old SYNPHOT result."""
         uresp = self.bp.unit_response(area=_area)
-        np.testing.assert_allclose(uresp.value, 3.00737e-19, rtol=1e-4)
-        assert uresp.unit == units.FLAM
+        assert_quantity_allclose(uresp, 3.00737e-19 * units.FLAM, rtol=1e-4)
 
     def test_rmswidth(self):
         w = self.bp.rmswidth()
-        np.testing.assert_allclose(w.value, 359.55954282883687, rtol=1e-4)
+        assert_quantity_allclose(w, 359.55954282883687 * u.AA, rtol=1e-4)
 
         w = self.bp.rmswidth(threshold=0.01 * u.dimensionless_unscaled)
-        np.testing.assert_allclose(w.value, 357.43298216917754, rtol=1e-4)
+        assert_quantity_allclose(w, 357.43298216917754 * u.AA, rtol=1e-4)
 
         # Invalid threshold must raise exception
         with pytest.raises(exceptions.SynphotError):
-            w = self.bp.rmswidth(threshold=0.01 * u.AA)
+            self.bp.rmswidth(threshold=0.01 * u.AA)
         with pytest.raises(exceptions.SynphotError):
-            w = self.bp.rmswidth(threshold=[0.01, 0.02])
+            self.bp.rmswidth(threshold=[0.01, 0.02])
         with pytest.raises(exceptions.SynphotError):
-            w = self.bp.rmswidth(threshold='foo')
+            self.bp.rmswidth(threshold='foo')
 
     def test_fwhm(self):
         """This also calls PHOTBW."""
         w = self.bp.fwhm()
-        np.testing.assert_allclose(w.value, 841.09, rtol=2.5e-5)
+        assert_quantity_allclose(w, 841.09 * u.AA, rtol=2.5e-5)
 
         w = self.bp.fwhm(threshold=0.01 * u.dimensionless_unscaled)
-        np.testing.assert_allclose(w.value, 836.2879507505378, rtol=2.5e-5)
+        assert_quantity_allclose(w, 836.2879507505378 * u.AA, rtol=2.5e-5)
 
         # Zero value
         w = self.bp.fwhm(wavelengths=[2e6, 2.1e6])
@@ -291,46 +288,43 @@ class TestEmpiricalBandpassFromFile:
 
         # Invalid threshold must raise exception
         with pytest.raises(exceptions.SynphotError):
-            w = self.bp.fwhm(threshold=0.01 * u.AA)
+            self.bp.fwhm(threshold=0.01 * u.AA)
         with pytest.raises(exceptions.SynphotError):
-            w = self.bp.fwhm(threshold=[0.01, 0.02])
+            self.bp.fwhm(threshold=[0.01, 0.02])
         with pytest.raises(exceptions.SynphotError):
-            w = self.bp.fwhm(threshold='foo')
+            self.bp.fwhm(threshold='foo')
 
     def test_tlambda(self):
         f = self.bp.tlambda()
-        np.testing.assert_allclose(f.value, 0.22808, rtol=1e-4)
+        assert_quantity_allclose(f, 0.22808, rtol=1e-4)
 
     def test_tpeak(self):
         """Compare TPEAK with old SYNPHOT result."""
         f = self.bp.tpeak()
-        np.testing.assert_allclose(f.value, 0.241445)
+        assert_quantity_allclose(f, 0.241445)
 
     def test_wpeak(self):
         w = self.bp.wpeak()
-        np.testing.assert_allclose(w.value, 5059.8, rtol=1e-5)
+        assert_quantity_allclose(w, 5059.8 * u.AA, rtol=1e-5)
 
     def test_equivwidth(self):
         """Compare EQUVW with ASTROLIB PYSYNPHOT result."""
         w = self.bp.equivwidth()
-        np.testing.assert_allclose(w.value, 272.01081629459344, rtol=1e-6)
-        assert w.unit == u.AA
+        assert_quantity_allclose(w, 272.01081629459344 * u.AA, rtol=1e-6)
 
     def test_rectw(self):
         """Compare RECTW with old SYNPHOT result."""
         w = self.bp.rectwidth()
-        np.testing.assert_allclose(w.value, 1126.588, rtol=1e-5)
+        assert_quantity_allclose(w, 1126.588 * u.AA, rtol=1e-5)
 
     def test_qtlam(self):
         qtlam = self.bp.efficiency()
-        np.testing.assert_allclose(qtlam.value, 0.050901, rtol=1e-4)
-        assert qtlam.unit == u.dimensionless_unscaled
+        assert_quantity_allclose(qtlam, 0.050901, rtol=1e-4)
 
     def test_emflx(self):
         """Compare EMFLX with old SYNPHOT result."""
         f = self.bp.emflx(area=_area)
-        np.testing.assert_allclose(f.value, 3.586622e-16, rtol=2.5e-5)
-        assert f.unit == units.FLAM
+        assert_quantity_allclose(f, 3.586622e-16 * units.FLAM, rtol=2.5e-5)
 
 
 class TestBoxBandpass:
@@ -352,13 +346,23 @@ class TestBoxBandpass:
     def test_fwhm(self):
         # You would think FWHM of a box is the width but
         # not according to IRAF SYNPHOT.
-        np.testing.assert_allclose(self.bp.fwhm().value, 67.977,
-                                   rtol=1e-3)  # 0.1%
+        assert_quantity_allclose(self.bp.fwhm(), 67.977 * u.AA,
+                                 rtol=1e-3)  # 0.1%
 
     def test_taper(self):
         bp2 = self.bp.taper(np.arange(499, 501.01, 0.01) * u.nm)
         y = bp2([498.9, 499, 500, 501, 501.1] * u.nm)
-        np.testing.assert_allclose(y.value, [0, 1, 1, 1, 0])
+        assert_quantity_allclose(y, [0, 1, 1, 1, 0])
+
+    def test_integrate(self):
+        ans = 100 * u.AA
+        assert_quantity_allclose(self.bp.integrate(), ans)
+        assert_quantity_allclose(
+            self.bp.integrate(integration_type='analytical'), ans)
+
+        with pytest.raises(exceptions.SynphotError,
+                           match='flux_unit cannot be used'):
+            self.bp.integrate(integration_type='analytical', flux_unit='flam')
 
     def test_multi_n_models(self):
         """This is not allowed."""
@@ -376,48 +380,80 @@ class TestBlackBodySource:
     def test_eval(self):
         w = np.arange(3000, 3100, 10)
         y = self.sp(w)
-        np.testing.assert_allclose(
-            y.value,
+        assert_quantity_allclose(
+            y,
             [0.00019318, 0.00019623, 0.0001993, 0.00020238, 0.00020549,
-             0.00020861, 0.00021175, 0.00021491, 0.00021809, 0.00022128],
+             0.00020861, 0.00021175, 0.00021491, 0.00021809,
+             0.00022128] * units.PHOTLAM,
             rtol=2.5e-3)
+
+    def test_integrate(self):
+        ans_photlam = 12.39167258 * (u.ph / (u.cm * u.cm * u.s))
+        ans_flam = 2.62716011e-11 * (u.erg / (u.cm * u.cm * u.s))
+
+        assert_quantity_allclose(self.sp.integrate(), ans_photlam, rtol=1e-5)
+        assert_quantity_allclose(
+            self.sp.integrate(flux_unit='flam'), ans_flam, rtol=1e-5)
+        assert_quantity_allclose(
+            self.sp.integrate(integration_type='analytical', flux_unit='flam'),
+            ans_flam, rtol=5e-3)
+
+    @pytest.mark.xfail(reason='Cannot convert unit in analytical mode')
+    def test_integrate_fixme(self):
+        """Merge this into ``test_integrate()`` above when fixed."""
+        ans_photlam = 12.39167258 * (u.ph / (u.cm * u.cm * u.s))
+        assert_quantity_allclose(
+            self.sp.integrate(integration_type='analytical'), ans_photlam)
 
 
 class TestGaussianSource:
     """Test source spectrum with GaussianFlux1D model."""
     def setup_class(self):
-        tf = 4.96611456e-12 * u.erg / (u.cm * u.cm * u.s)
+        tf = 4.96611456e-12 * (u.erg / (u.cm * u.cm * u.s))
         self.sp = SourceSpectrum(
             GaussianFlux1D, total_flux=tf, mean=4000, fwhm=100)
 
     def test_eval(self):
         y = self.sp([3900, 4000, 4060])
-        np.testing.assert_allclose(
-            y.value, [0.00058715, 0.00939437, 0.00346246], rtol=1e-5)
+        assert_quantity_allclose(
+            y, [0.00058715, 0.00939437, 0.00346246] * units.PHOTLAM, rtol=1e-5)
 
     def test_totalflux(self):
+        """Test Gaussian source integration.
+
+        .. note::
+
+            Analytic integral is more accurate because it does not rely on
+            waveset definition.
+
+        """
         # PHOTLAM
-        f = self.sp.integrate()
-        np.testing.assert_allclose(f.value, 1, rtol=1e-5)
-        assert f.unit == u.photon / (u.cm**2 * u.s)
+        f_ans = 1 * (u.ph / (u.cm**2 * u.s))
+        assert_quantity_allclose(self.sp.integrate(), f_ans, rtol=1e-5)
+        assert_quantity_allclose(
+            self.sp.integrate(integration_type='analytical'), f_ans)
 
         # FLAM
-        x0 = (400 * u.nm).to(u.AA).value
-        fwhm = (10 * u.nm).to(u.AA)
+        x0 = 400 * u.nm
+        fwhm = 10 * u.nm
         sp2 = SourceSpectrum(
             GaussianFlux1D, total_flux=1, mean=x0, fwhm=fwhm)
-        val = sp2.integrate(flux_unit=units.FLAM).value
-        np.testing.assert_allclose(val, 1, rtol=1e-3)
+        val_ans = 1 * (u.erg / (u.cm * u.cm * u.s))
+        assert_quantity_allclose(
+            sp2.integrate(flux_unit=units.FLAM), val_ans, rtol=1e-3)
+        assert_quantity_allclose(
+            sp2.integrate(flux_unit=units.FLAM, integration_type='analytical'),
+            val_ans)
 
     def test_symmetry(self):
-        np.testing.assert_allclose(self.sp(3950), self.sp(4050))
+        assert_quantity_allclose(self.sp(3950), self.sp(4050))
 
     def test_fwhm(self):
         """Should round-trip back to the same bandpass FWHM."""
         m = self.sp.model
         bp = SpectralElement(
             Gaussian1D, mean=m.mean, amplitude=m.amplitude, stddev=m.stddev)
-        np.testing.assert_allclose(bp.fwhm().value, 100, rtol=1e-3)  # 0.1%
+        assert_quantity_allclose(bp.fwhm(), 100 * u.AA, rtol=1e-3)  # 0.1%
 
     def test_alt_source(self):
         """Same source, different way to init."""
@@ -425,43 +461,68 @@ class TestGaussianSource:
             GaussianFlux1D, amplitude=self.sp.model.amplitude.value,
             mean=self.sp.model.mean.value, stddev=self.sp.model.stddev.value)
         w = [3900, 4000, 4060] * u.AA
-        np.testing.assert_allclose(sp2(w), self.sp(w))
+        assert_quantity_allclose(sp2(w), self.sp(w))
 
 
 def test_gaussian_source_watts():
     """https://github.com/spacetelescope/synphot_refactor/issues/153"""
     mu = 1 * u.um
     fwhm = (0.01 / 0.42466) * u.um
-    flux = 1 * u.W / u.m**2
+    flux = 1 * (u.W / u.m**2)
 
     sp = SourceSpectrum(GaussianFlux1D, mean=mu, fwhm=fwhm, total_flux=flux)
     tf = sp.integrate(flux_unit=units.FLAM)
-    np.testing.assert_allclose(tf.to(flux.unit), flux, rtol=1e-4)
+    assert_quantity_allclose(tf, flux, rtol=1e-4)
 
 
 class TestPowerLawSource:
     """Test source spectrum with PowerLawFlux1D model."""
     def setup_class(self):
-        self.sp = SourceSpectrum(PowerLawFlux1D, amplitude=1, x_0=6000,
-                                 alpha=4)
+        self.sp = SourceSpectrum(PowerLawFlux1D, amplitude=1 * units.PHOTLAM,
+                                 x_0=6000 * u.AA, alpha=4)
+        self.w = np.arange(3000, 3100, 10) * u.AA
 
     def test_no_default_wave(self):
         assert self.sp.waverange == [None, None]
 
-        with pytest.raises(exceptions.SynphotError):
+        with pytest.raises(exceptions.SynphotError,
+                           match='waveset is undefined'):
             self.sp(None)
 
     def test_eval(self):
-        w = np.arange(3000, 3100, 10)
-        y = self.sp(w)
-        np.testing.assert_allclose(
-            y.value,
+        y = self.sp(self.w)
+        assert_quantity_allclose(
+            y,
             [16, 15.78843266, 15.58035072, 15.37568551, 15.17436992,
-             14.97633838, 14.78152682, 14.5898726, 14.40131453, 14.21579277],
+             14.97633838, 14.78152682, 14.5898726, 14.40131453,
+             14.21579277] * units.PHOTLAM,
             rtol=1e-6)
 
     def test_normalization(self):
-        np.testing.assert_allclose(self.sp(600 * u.nm).value, 1)
+        assert_quantity_allclose(self.sp(600 * u.nm), 1 * units.PHOTLAM)
+
+    def test_integrate(self):
+        ans_photlam = 1357.75787527 * (u.ph / (u.cm * u.cm * u.s))
+        ans_flam = 8.8608168e-09 * (u.erg / (u.cm * u.cm * u.s))
+        assert_quantity_allclose(
+            self.sp.integrate(wavelengths=self.w), ans_photlam)
+        assert_quantity_allclose(
+            self.sp.integrate(wavelengths=self.w, flux_unit='flam'), ans_flam)
+        assert_quantity_allclose(
+            self.sp.integrate(wavelengths=self.w,
+                              integration_type='analytical'),
+            ans_photlam, rtol=1e-4)
+
+    @pytest.mark.xfail(reason='Cannot convert unit of analytic integral')
+    def test_integrate_wontfix(self):
+        """Powerlaw in one flux unit might not be powerlaw anymore in
+        another, so we cannot convert flux unit of analytical integration
+        easily.
+        """
+        ans_flam = 8.8608168e-09 * (u.erg / (u.cm * u.cm * u.s))
+        assert_quantity_allclose(
+            self.sp.integrate(wavelengths=self.w, flux_unit='flam',
+                              integration_type='analytical'), ans_flam)
 
 
 class TestBuildModels:
@@ -471,56 +532,56 @@ class TestBuildModels:
             BrokenPowerLaw1D, amplitude=1, x_break=6000, alpha_1=1,
             alpha_2=4)
         y = sp([5000, 6000, 7000])
-        np.testing.assert_allclose(y.value, [1.2, 1, 0.53977509])
+        assert_quantity_allclose(y, [1.2, 1, 0.53977509] * units.PHOTLAM)
 
     def test_Const1D(self):
         sp = SourceSpectrum(Const1D, amplitude=1)
         y = sp([1, 1000, 1e6])
-        np.testing.assert_array_equal(y.value, 1)
+        assert_quantity_allclose(y, 1 * units.PHOTLAM)
 
     def test_ConstFlux1D(self):
         sp = SourceSpectrum(ConstFlux1D, amplitude=1 * u.Jy)
-        w = [1, 1000, 1e6]
-        y = units.convert_flux(w, sp(w), u.Jy)
-        np.testing.assert_allclose(y.value, 1)
+        w = [1, 1000, 1e6] * u.AA
+        with u.add_enabled_equivalencies(u.spectral_density(w)):
+            assert_quantity_allclose(sp(w), 1 * u.Jy)
 
     def test_ExponentialCutoffPowerLaw1D(self):
         sp = SourceSpectrum(
             ExponentialCutoffPowerLaw1D, amplitude=1, x_0=6000,
             x_cutoff=10000, alpha=4)
         y = sp([5000, 6000, 10000])
-        np.testing.assert_allclose(
-            y.value, [1.25770198, 0.54881164, 0.04767718])
+        assert_quantity_allclose(
+            y, [1.25770198, 0.54881164, 0.04767718] * units.PHOTLAM)
 
     def test_GaussianAbsorption1D(self):
         """This should be unitless, not a source spectrum."""
         bp = SpectralElement(
             GaussianAbsorption1D, amplitude=0.8, mean=5500, stddev=50)
         y = bp([5300, 5500, 5700])
-        np.testing.assert_allclose(y.value, [0.99973163, 0.2, 0.99973163])
+        assert_quantity_allclose(y, [0.99973163, 0.2, 0.99973163])
 
     def test_LogParabola1D(self):
         sp = SourceSpectrum(
             LogParabola1D, amplitude=1, x_0=6000, alpha=1, beta=4)
         y = sp([5000, 6000, 7000])
-        np.testing.assert_allclose(y.value, [1.0505953, 1, 0.77942375])
+        assert_quantity_allclose(y, [1.0505953, 1, 0.77942375] * units.PHOTLAM)
 
     def test_Lorentz1D(self):
         sp = SourceSpectrum(Lorentz1D, amplitude=1, x_0=6000, fwhm=100)
         y = sp([5000, 6000, 7000])
-        np.testing.assert_allclose(
-            y.value, [0.00249377, 1, 0.00249377], rtol=1e-5)
+        assert_quantity_allclose(
+            y, [0.00249377, 1, 0.00249377] * units.PHOTLAM, rtol=1e-5)
 
     def test_RickerWavelet1D(self):
         sp = SourceSpectrum(RickerWavelet1D, amplitude=1, x_0=6000, sigma=100)
         y = sp([5000, 6000, 7000])
-        np.testing.assert_allclose(
-            y.value, [-1.90946235e-20, 1, -1.90946235e-20])
+        assert_quantity_allclose(
+            y, [-1.90946235e-20, 1, -1.90946235e-20] * units.PHOTLAM)
 
     def test_PowerLaw1D(self):
         sp = SourceSpectrum(PowerLaw1D, amplitude=1, x_0=6000, alpha=4)
         y = sp([5000, 6000, 7000])
-        np.testing.assert_allclose(y.value, [2.0736, 1, 0.53977509])
+        assert_quantity_allclose(y, [2.0736, 1, 0.53977509] * units.PHOTLAM)
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -595,21 +656,21 @@ class TestForceExtrap:
                             lookup_table=[0.5, 0.6, 10.6, 1.5], fill_value=0)
         sp.z = z
         w = [900, 4300]
-        np.testing.assert_allclose(sp(w).value, 0)  # No extrapolation
+        assert_quantity_allclose(sp(w), 0 * units.PHOTLAM)  # No extrapolation
 
         is_forced = sp.force_extrapolation()  # Force extrapolation
         assert is_forced
-        np.testing.assert_allclose(sp(w).value, [0.5, 1.5])
+        assert_quantity_allclose(sp(w), [0.5, 1.5] * units.PHOTLAM)
 
     def test_analytical(self):
         """Forcing is not possible."""
         sp = SourceSpectrum(GaussianFlux1D, mean=5500, total_flux=1, fwhm=10)
         w = [100, 10000]
-        np.testing.assert_allclose(sp(w).value, 0)
+        assert_quantity_allclose(sp(w), 0 * units.PHOTLAM)
 
         is_forced = sp.force_extrapolation()
         assert not is_forced
-        np.testing.assert_allclose(sp(w).value, 0)
+        assert_quantity_allclose(sp(w), 0 * units.PHOTLAM)
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -653,7 +714,8 @@ class TestNormalize:
         ct_rate = obs.countrate(_area)
 
         # 0.2% agreement with IRAF SYNPHOT COUNTRATE
-        np.testing.assert_allclose(ct_rate.value, ans_countrate, rtol=2e-3)
+        assert_quantity_allclose(
+            ct_rate, ans_countrate * (u.ct / u.s), rtol=2e-3)
 
     @pytest.mark.parametrize(
         ('sp_type', 'rn_val', 'ans_countrate'),
@@ -792,8 +854,9 @@ class TestWaveset:
             GaussianFlux1D, total_flux=totflux, mean=7500, fwhm=5)
         sp = SpectralElement(Box1D, x_0=1000, width=1) * (g1 + g2 + g3)
         np.testing.assert_allclose(
-            sp.waveset.value[::100],
-            [999.49, 1000.49, 5019.95906231, 6699.59062307, 7509.7672007])
+            sp.waveset[::100],
+            [999.49, 1000.49, 5019.95906231, 6699.59062307,
+             7509.7672007] * u.AA)
 
     def test_redshift(self):
         tf_unit = u.erg / (u.cm * u.cm * u.s)
@@ -801,8 +864,8 @@ class TestWaveset:
             GaussianFlux1D, total_flux=(1 * tf_unit), mean=5000, fwhm=10)
         sp.z = 1.3
         m = RedshiftScaleFactor(z=1.3)
-        w_step25_z0 = [4978.76695499, 4989.3834775, 5000, 5010.6165225]
-        np.testing.assert_allclose(sp.waveset.value[::25], m(w_step25_z0))
+        w_step25_z0 = [4978.76695499, 4989.3834775, 5000, 5010.6165225] * u.AA
+        assert_quantity_allclose(sp.waveset[::25], m(w_step25_z0))
 
     def test_redshift_none(self):
         sp = SourceSpectrum(Const1D, amplitude=1, z=1.3)
@@ -873,21 +936,21 @@ class TestRedShift:
     def test_composite_redshift(self):
         sp2 = self.sp_z0 + self.sp  # centers: 5000, 11500
         sp2.z = 0.5  # centers: 7500, 17250
-        np.testing.assert_allclose(sp2([7500, 17250]), self.sp_z0(5000))
+        assert_quantity_allclose(sp2([7500, 17250]), self.sp_z0(5000))
 
     def test_const_flux_redshift(self):
         """Constant flux in Jy is not constant in PHOTLAM."""
         sp_z0 = SourceSpectrum(ConstFlux1D, amplitude=1 * u.Jy)
         sp = SourceSpectrum(ConstFlux1D, amplitude=1 * u.Jy, z=1.3)
-        np.testing.assert_allclose(sp_z0(3000), sp(6900))
+        assert_quantity_allclose(sp_z0(3000), sp(6900))
 
     def test_conserve_flux_redshift(self):
         """Test redshift behavior that conserves flux."""
         sp = SourceSpectrum(self.sp_z0.model, z=1.3, z_type='conserve_flux')
         fac = 1 / (1 + sp.z)
         wave = [5000, 11500]
-        np.testing.assert_allclose(sp(wave), self.sp(wave) * fac)
-        np.testing.assert_allclose(sp.integrate(), self.sp_z0.integrate())
+        assert_quantity_allclose(sp(wave), self.sp(wave) * fac)
+        assert_quantity_allclose(sp.integrate(), self.sp_z0.integrate())
 
 
 @pytest.mark.skipif('not HAS_SCIPY')
@@ -907,24 +970,25 @@ class TestMathOperators:
     def test_source_add(self):
         """Compare with ASTROLIB PYSYNPHOT."""
         ans = self.sp_1 + self.sp_2
-        np.testing.assert_allclose(
-            ans(ans.waveset).value,
+        assert_quantity_allclose(
+            ans(ans.waveset),
             [0.00976521, 0.01681283, 0.01970276, 0.01998463, 0.0197387,
-             0.01985257, 0.02337638, 0.00978454], rtol=1e-4)
+             0.01985257, 0.02337638, 0.00978454] * units.PHOTLAM, rtol=1e-4)
 
     def test_source_sub(self):
         """Compare with ASTROLIB PYSYNPHOT."""
         ans = self.sp_1 - self.sp_2
-        np.testing.assert_allclose(
-            ans(ans.waveset).value,
+        assert_quantity_allclose(
+            ans(ans.waveset),
             [-9.76520783e-03, -2.71758275e-03, 1.72346256e-04, -9.29051118e-05,
-             1.69629843e-04, 2.83499328e-04, 3.80731187e-03, -9.78453651e-03],
+             1.69629843e-04, 2.83499328e-04, 3.80731187e-03,
+             -9.78453651e-03] * units.PHOTLAM,
             rtol=1e-4)
 
     def test_source_addsub_circular(self):
         """sp = sp + sp - sp"""
         ans = self.sp_1 + self.sp_1 - self.sp_1
-        np.testing.assert_array_equal(ans(ans.waveset), self.sp_1(ans.waveset))
+        assert_quantity_allclose(ans(ans.waveset), self.sp_1(ans.waveset))
 
     def test_source_addsub_exception(self):
         with pytest.raises(exceptions.IncompatibleSources):
@@ -932,41 +996,44 @@ class TestMathOperators:
 
     @pytest.mark.parametrize('x', [2, 2 * u.dimensionless_unscaled])
     def test_source_mul_div_scalar(self, x):
-        w = self.sp_1.waveset.value
+        w = self.sp_1.waveset
 
         ans1 = self.sp_1 * x
-        np.testing.assert_allclose(
-            ans1(w).value, [0, 0.01409552, 0.02013646, 0.02718424, 0],
+        assert_quantity_allclose(
+            ans1(w),
+            [0, 0.01409552, 0.02013646, 0.02718424, 0] * units.PHOTLAM,
             rtol=1e-6)
 
         # rmul does not work with Quantity
         if not isinstance(x, u.Quantity):
             ans2 = x * self.sp_1
-            np.testing.assert_array_equal(ans1(w), ans2(w))
+            assert_quantity_allclose(ans1(w), ans2(w))
 
         ans3 = self.sp_1 / x
-        np.testing.assert_allclose(
-            ans3(w).value, [0, 0.00352388, 0.00503411, 0.00679606, 0],
-            atol=1e-7)
+        assert_quantity_allclose(
+            ans3(w),
+            [0, 0.00352388, 0.00503411, 0.00679606, 0] * units.PHOTLAM,
+            atol=1e-7 * units.PHOTLAM)
 
     def test_source_mul_div_spec(self):
         """Compare mul with ASTROLIB PYSYNPHOT. Also test bp * sp."""
         ans1 = self.sp_1 * self.bp_1
         ans2 = self.bp_1 * self.sp_1
         w = ans1.waveset[:-1]
-        np.testing.assert_allclose(
-            ans1(w).value,
+        assert_quantity_allclose(
+            ans1(w),
             [0, 3.52381254e-04, 7.04792712e-04, 2.01360717e-03, 3.97184014e-03,
-             4.03718269e-05, 0], rtol=1e-4)
-        np.testing.assert_array_equal(ans1(w), ans2(w))
+             4.03718269e-05, 0] * units.PHOTLAM, rtol=1e-4)
+        assert_quantity_allclose(ans1(w), ans2(w))
 
         ans3 = self.sp_1 / self.bp_1
-        np.testing.assert_allclose(
-            ans3(w).value,
-            [0, 0.14095528, 0.07048066, 0.05034117, 0.04413243, 4.57601236, 0])
+        assert_quantity_allclose(
+            ans3(w),
+            [0, 0.14095528, 0.07048066, 0.05034117, 0.04413243, 4.57601236,
+             0] * units.PHOTLAM)
 
         ans4 = self.sp_1 / self.sp_1
-        np.testing.assert_allclose(
+        assert_quantity_allclose(
             ans4([4000, 5000, 6000]), 1 * u.dimensionless_unscaled)
 
         # Dividing throughput by flux does not make sense.
@@ -1003,27 +1070,27 @@ class TestMathOperators:
 
     @pytest.mark.parametrize('x', [2.0, 2.0 * u.dimensionless_unscaled])
     def test_bandpass_mul_div_scalar(self, x):
-        w = self.bp_1.waveset.value
+        w = self.bp_1.waveset
 
         ans1 = self.bp_1 * x
-        np.testing.assert_allclose(ans1(w).value, [0, 0.2, 0.4, 0.6, 0])
+        assert_quantity_allclose(ans1(w), [0, 0.2, 0.4, 0.6, 0])
 
         # rmul does not work with Quantity
         if not isinstance(x, u.Quantity):
             ans2 = x * self.bp_1
-            np.testing.assert_array_equal(ans1(w), ans2(w))
+            assert_quantity_allclose(ans1(w), ans2(w))
 
         ans3 = self.bp_1 / x
-        np.testing.assert_allclose(ans3(w).value, [0, 0.05, 0.1, 0.15, 0])
+        assert_quantity_allclose(ans3(w), [0, 0.05, 0.1, 0.15, 0])
 
     def test_bandpass_mul_div_bandpass(self):
         ans1 = self.bp_1 * self.bp_1
-        np.testing.assert_allclose(
-            ans1(ans1.waveset).value, [0, 0.01, 0.04, 0.09, 0])
+        assert_quantity_allclose(
+            ans1(ans1.waveset), [0, 0.01, 0.04, 0.09, 0])
 
         w = [4000.1, 5000, 5900]  # Avoid div by zero
         ans2 = self.bp_1 / self.bp_1
-        np.testing.assert_allclose(ans2(w), 1)
+        assert_quantity_allclose(ans2(w), 1)
 
     def test_bandpass_mul_div_exceptions(self):
         """Only mul is tested but truediv uses the same validation."""

@@ -196,17 +196,19 @@ By default, trapezoid integration is done in internal units::
     >>> from astropy import units as u
     >>> from synphot import SourceSpectrum, units, conf
     >>> from synphot.models import GaussianFlux1D
-    >>> sp = SourceSpectrum(GaussianFlux1D, mean=6000, fwhm=10,
-    ...                     total_flux=1*u.erg/(u.cm**2 * u.s))
+    >>> sp = SourceSpectrum(GaussianFlux1D, mean=6000*u.AA, fwhm=10*u.AA,
+    ...                     total_flux=1*(u.erg/(u.cm**2 * u.s)))
     >>> sp.integrate()  # doctest: +FLOAT_CMP
-    <Quantity 3.02046763e+11 ph / (cm2 s)>
+    <Quantity 3.02046758e+11 ph / (cm2 s)>
     >>> with conf.set_temp('default_integrator', 'analytical'):
-    ...     sp.integrate()  # doctest: +FLOAT_CMP
-    <Quantity 3.02046763e+11 ph / (cm2 s)>
+    ...     print(f'{repr(sp.integrate())}')  # doctest: +FLOAT_CMP
+    <Quantity 3.02046994e+11 ph / (cm2 s)>
     >>> sp.integrate(integration_type='analytical')  # doctest: +FLOAT_CMP
-    <Quantity 3.02046763e+11 ph / (cm2 s)>
+    <Quantity 3.02046994e+11 ph / (cm2 s)>
     >>> sp.integrate(flux_unit=units.FLAM)  # doctest: +FLOAT_CMP
     <Quantity 0.99999972 erg / (cm2 s)>
+    >>> sp.integrate(flux_unit=units.FLAM, integration_type='analytical')  # doctest: +FLOAT_CMP
+    <Quantity 1. erg / (cm2 s)>
 
 
 .. _synphot-empirical-source:
