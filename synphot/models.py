@@ -136,8 +136,10 @@ class BlackBody1D(Fittable1DModel):
         return bbflux.value
 
     def integrate(self, *args):
-        return (const.sigma_sb * (u.Quantity(self.temperature, u.K) ** 4) /
-                math.pi)  # per steradian
+        with u.add_enabled_equivalencies(u.temperature()):
+            t = u.Quantity(self.temperature, u.K)
+
+        return (const.sigma_sb * t ** 4 / math.pi)  # per steradian
 
 
 class BlackBodyNorm1D(BlackBody1D):
@@ -225,7 +227,10 @@ class Box1D(_models.Box1D):
 
     def integrate(self, *args):
         # TODO: Remove unit hardcoding when we use model with units natively.
-        return self.amplitude * (self.width * u.AA)
+        with u.add_enabled_equivalencies(u.spectral()):
+            w = u.Quantity(self.width, u.AA)
+
+        return self.amplitude * w
 
 
 class ConstFlux1D(_models.Const1D):
@@ -290,8 +295,9 @@ class ConstFlux1D(_models.Const1D):
             wav_unit = u.Hz
         with u.add_enabled_equivalencies(u.spectral()):
             x = u.Quantity(x, wav_unit)
+            amp = u.Quantity(self.amplitude, self._flux_unit)
 
-        return (max(x) - min(x)) * (self.amplitude * self._flux_unit)
+        return (max(x) - min(x)) * amp
 
 
 class Empirical1D(Tabular1D):
@@ -474,9 +480,12 @@ class Gaussian1D(BaseGaussian1D):
     ``sampleset`` defined.
 
     """
-    # TODO: Remove unit hardcoding when we use model with units natively.
     def integrate(self, *args):
-        return self.amplitude * (self.stddev * u.AA) * self._sqrt_2_pi
+        # TODO: Remove unit hardcoding when we use model with units natively.
+        with u.add_enabled_equivalencies(u.spectral()):
+            stddev = u.Quantity(self.stddev, u.AA)
+
+        return self.amplitude * stddev * self._sqrt_2_pi
 
 
 # TODO: Deprecate this?
@@ -559,8 +568,8 @@ class GaussianFlux1D(Gaussian1D):
         self.meta['expr'] = 'em({0:g}, {1:g}, {2:g}, {3})'.format(
             self.mean.value, fwhm, total_flux, u_str)
 
-    # TODO: Remove unit hardcoding when we use model with units natively.
     def integrate(self, *args):
+        # TODO: Remove unit hardcoding when we use model with units natively.
         return super(GaussianFlux1D, self).integrate(*args) * units.PHOTLAM
 
 
@@ -592,8 +601,8 @@ class Lorentz1D(_models.Lorentz1D):
 
         return np.asarray(w)
 
-    # TODO: Remove unit hardcoding when we use model with units natively.
     def integrate(self, x):
+        # TODO: Remove unit hardcoding when we use model with units natively.
         with u.add_enabled_equivalencies(u.spectral()):
             x = u.Quantity(x, u.AA)
             x_0 = u.Quantity(self.x_0, u.AA)

@@ -157,6 +157,14 @@ def test_bandpass_RickerWavelet1D():
     assert_quantity_allclose(bp.equivwidth(integration_type='analytical'),
                              ans, rtol=5e-3)
 
+    with pytest.raises(NotImplementedError, match='Partial analytic'):
+        bp.equivwidth(integration_type='analytical',
+                      wavelengths=np.arange(4900, 5200) * u.AA)
+
+    with pytest.raises(NotImplementedError, match='Partial analytic'):
+        bp.equivwidth(integration_type='analytical',
+                      wavelengths=np.arange(4800, 5100) * u.AA)
+
 
 def test_source_RickerWavelet1D():
     pytest.xfail(

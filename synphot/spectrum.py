@@ -1539,7 +1539,7 @@ class SpectralElement(BaseUnitlessSpectrum):
                  other.model.is_tapered() or
                  not isinstance(other.model,
                                 (Empirical1D, CompoundModel))) and
-                    np.allclose(other(x1[::x1.size - 1]), 0)):
+                    np.allclose(other(x1[::x1.size - 1]).value, 0)):
                 result = 'full'
 
             # Check if the lack of overlap is significant.
