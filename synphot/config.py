@@ -16,10 +16,9 @@ __all__ = ['conf']
 class Conf(ConfigNamespace):
     """Configuration parameters."""
 
-    # TODO: Add more options here in the future
+    # First option in list is the default.
     default_integrator = ConfigItem(
-        ['trapezoid'],
-        'Default integrator to use when analytical integration is unavailable')
+        ['trapezoid', 'analytical'], 'Default integrator to use')
 
     # STANDARD STARS
     vega_file = ConfigItem(

@@ -151,15 +151,13 @@ work, so they can be used directly. When in doubt, see if a model is in
 
     >>> from astropy import units as u
     >>> from synphot import units, SourceSpectrum
-    >>> from synphot.models import (BlackBodyNorm1D, GaussianAbsorption1D,
-    ...                             GaussianFlux1D)
-    >>> from synphot.spectrum import BaseUnitlessSpectrum
+    >>> from synphot.models import BlackBodyNorm1D, GaussianFlux1D
 
-Create a Gaussian absorption profile that absorps 80% of the flux at
+Create a Gaussian absorption line with the given amplitude centered at
 4000 Angstrom with a sigma of 20 Angstrom::
 
-    >>> g_abs = BaseUnitlessSpectrum(GaussianAbsorption1D, amplitude=0.8,
-    ...                              mean=4000, stddev=20)
+    >>> g_abs = SourceSpectrum(GaussianFlux1D, amplitude=1*u.mJy,
+    ...                        mean=4000, stddev=20)
 
 Create a Gaussian emission line with the given total flux
 centered at 3000 Angstrom with FWHM of 100 Angstrom::
@@ -175,7 +173,7 @@ Create a blackbody source spectrum with a temperature of 6000 K::
 Combine the above components to create a source spectrum that is twice
 the original blackbody flux with the Gaussian emission and absorption lines::
 
-    >>> sp = g_abs * (g_em + 2 * bb)
+    >>> sp = 2 * bb + g_em - g_abs
 
 Plot the spectrum, zooming in on the line features::
 
@@ -185,30 +183,19 @@ Plot the spectrum, zooming in on the line features::
 
     from astropy import units as u
     from synphot import units, SourceSpectrum
-    from synphot.models import (BlackBodyNorm1D, GaussianAbsorption1D,
-                                GaussianFlux1D)
-    from synphot.spectrum import BaseUnitlessSpectrum
-    # Create a Gaussian absorption profile that absorps 80% of the flux at
-    # 4000 Angstrom with a sigma of 20 Angstrom
-    g_abs = BaseUnitlessSpectrum(GaussianAbsorption1D, amplitude=0.8,
-                                 mean=4000, stddev=20)
-    # Create a Gaussian emission line with the given total flux
-    # centered at 3000 Angstrom with FWHM of 100 Angstrom
+    from synphot.models import BlackBodyNorm1D, GaussianFlux1D
+    g_abs = SourceSpectrum(GaussianFlux1D, amplitude=1*u.mJy,
+                           mean=4000, stddev=20)
     g_em = SourceSpectrum(GaussianFlux1D,
                           total_flux=3.5e-13*u.erg/(u.cm**2 * u.s),
                           mean=3000, fwhm=100)
-    # Create a blackbody source spectrum with a temperature of 6000 K
     bb = SourceSpectrum(BlackBodyNorm1D, temperature=6000)
-    # Combine the above components to create a source spectrum that is twice
-    # the original blackbody flux with the Gaussian emission and absorption
-    # lines
-    sp = g_abs * (g_em + 2 * bb)
-    # Plot the spectrum, zooming in on the line features
+    sp = 2 * bb + g_em - g_abs
     sp.plot(left=1, right=7000)
 
 Sample the spectrum at 0.3 micron::
 
-    >>> sp(0.3 * u.micron)  # doctest: +FLOAT_CMP +IGNORE_WARNINGS
+    >>> sp(0.3 * u.micron)  # doctest: +FLOAT_CMP
     <Quantity 0.00129536 PHOTLAM>
 
 Or sample the same thing but in a different flux unit::
@@ -220,7 +207,7 @@ Sample the spectrum at its native wavelength set::
 
     >>> sp(sp.waveset)  # doctest: +FLOAT_CMP +ELLIPSIS
     <Quantity [0.00000000e+00, 0.00000000e+00, 0.00000000e+00, ...,
-               4.47483287e-05, 4.34264666e-05, 4.21423394e-05] PHOTLAM>
+               4.47483872e-05, 4.34265235e-05, 4.21423946e-05] PHOTLAM>
 
 Models that built the spectrum::
 
@@ -230,15 +217,15 @@ Models that built the spectrum::
     Inputs: ('x',)
     Outputs: ('y',)
     Model set size: 1
-    Expression: ([0] + ([1] | [2])) * [3]
+    Expression: ([0] | [1]) + [2] - [3]
     Components:
-        [0]: <GaussianFlux1D(...>
+        [0]: <BlackBodyNorm1D(...)>
     <BLANKLINE>
-        [1]: <BlackBodyNorm1D(...)>
+        [1]: <Scale(...)>
     <BLANKLINE>
-        [2]: <Scale(...)>
+        [2]: <GaussianFlux1D(...)>
     <BLANKLINE>
-        [3]: <GaussianAbsorption1D(...)>
+        [3]: <GaussianFlux1D(...)>
     Parameters:
         ...
 
@@ -258,7 +245,7 @@ integrate it::
 
     >>> sp_rn = sp.normalize(1 * u.Jy, band=bp)
     >>> sp_rn.integrate()  # doctest: +FLOAT_CMP
-    <Quantity 12883.09903646 ph / (cm2 s)>
+    <Quantity 12540.4613615 ph / (cm2 s)>
 
 Create an observation by passing the redshifted and normalized source spectrum
 through the box bandpass::
@@ -273,7 +260,7 @@ Calculate the count rate of the observation above for an 2-meter telescope:
     >>> area  # doctest: +FLOAT_CMP
     <Quantity 3.14159265 m2>
     >>> obs.countrate(area=area)  # doctest: +FLOAT_CMP
-    <Quantity 24219650.71772057 ct / s>
+    <Quantity 24219649.46880912 ct / s>
 
 
 .. _synphot_using:

@@ -416,30 +416,49 @@ class BaseSpectrum(object):
         """
         return self.__truediv__(other)
 
-    def integrate(self, wavelengths=None, **kwargs):
+    def integrate(self, wavelengths=None, integration_type=None, **kwargs):
         """Perform integration.
 
-        This uses any analytical integral that the
-        underlying model has (i.e., ``self.model.integral``).
-        If unavailable, it uses the default fall-back integrator
-        set in the ``default_integrator`` configuration item.
-
-        If wavelengths are provided, flux or throughput is first resampled.
+        When integration is not analytical and wavelengths are provided,
+        flux or throughput is first resampled.
         This is useful when user wants to integrate at specific end points
         or use custom spacing; In that case, user can pass in desired
         sampling array generated with :func:`numpy.linspace`,
         :func:`numpy.logspace`, etc.
         If not provided, then `waveset` is used.
 
+        When integration is analytical, wavelengths provided are only used
+        if applicable for the particular model. If the model does not
+        support analytical integration, it will fall back to simple
+        trapezoid integration.
+
         Parameters
         ----------
         wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for integration.
+            This is ignored by analytical integration if not applicable.
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `waveset` is used.
 
+        integration_type : {None, 'trapezoid', 'analytical'}
+            Defines how the integration is done, either by simple trapezoid
+            integration or analytical formula. If `None`, the option is pulled
+            from ``synphot.config.conf.default_integrator``. If analytical
+            integration is requested but no possible, trapezoid integration
+            is done anyway.
+
+        flux_unit : str, `~astropy.units.core.Unit`, or `None`
+            **This option is only available for source spectrum.**
+            For trapezoid integration, flux is converted to this unit for
+            sampling before integration. For analytical integration, while
+            calculation is done differently, providing this option would
+            result in equivalent behavior as trapezoid integration, where
+            possible, for consistency. If not given, internal unit is used.
+
         kwargs : dict
-            Optional keywords to ``__call__`` for sampling.
+            **This option is only available for source spectrum.**
+            Other optional keywords besides ``flux_unit`` to ``__call__``
+            for sampling when integration type is not analytical.
 
         Returns
         -------
@@ -449,57 +468,77 @@ class BaseSpectrum(object):
         Raises
         ------
         NotImplementedError
-            Invalid default integrator.
+            Invalid integration type.
 
         synphot.exceptions.SynphotError
             `waveset` is needed but undefined or cannot integrate
             natively in the given ``flux_unit``.
 
         """
+        # For non-analytical integration:
         # Cannot integrate per Hz units natively across wavelength
         # without converting them to per Angstrom unit first, so
         # less misleading to just disallow that option for now.
-        if 'flux_unit' in kwargs:
-            self._validate_flux_unit(kwargs['flux_unit'], wav_only=True)
+        # For analytical integration: Keep the same behavior for consistency.
+        flux_unit = kwargs.get('flux_unit')
+        is_unitless = self._internal_flux_unit == units.THROUGHPUT
+        if flux_unit is not None:
+            if is_unitless:
+                raise exceptions.SynphotError(
+                    'flux_unit cannot be used with unitless spectrum')
+            else:
+                self._validate_flux_unit(flux_unit, wav_only=True)
 
         x = self._validate_wavelengths(wavelengths)
 
-        # TODO: When astropy.modeling.models supports this, need to
-        #       make sure that this actually works, and gives correct unit.
-        # https://github.com/astropy/astropy/issues/5033
-        # https://github.com/astropy/astropy/pull/5108
-        try:
-            m = self.model.integral
-        except (AttributeError, NotImplementedError):
-            if conf.default_integrator == 'trapezoid':
-                y = self(x, **kwargs)
-                result = abs(np.trapz(y.value, x=x.value))
-                result_unit = y.unit
-            else:  # pragma: no cover
-                raise NotImplementedError(
-                    'Analytic integral not available and default integrator '
-                    '{0} is not supported'.format(conf.default_integrator))
-        else:  # pragma: no cover
-            start = x[0].value
-            stop = x[-1].value
-            result = (m(stop) - m(start))
-            result_unit = self._internal_flux_unit
+        if integration_type is None:
+            integration_type = conf.default_integrator
+
+        # NOTE: Emitting warning is not done because it overcomplicates
+        #       the logic here.
+        # Fallback to trapezoid if analytical not possible.
+        if (integration_type == 'analytical' and
+                not hasattr(self.model, 'integrate')):
+            integration_type = 'trapezoid'
+
+        if integration_type == 'trapezoid':
+            y = abs(self(x, **kwargs))  # Unsigned area
+            result = abs(np.trapz(y, x=x))
+
+        elif integration_type == 'analytical':
+            result = self.model.integrate(x)
+
+            # TODO: Remove unit hardcoding when we use model with units
+            #       natively.
+            if not is_unitless and result.unit.physical_type == 'length':
+                result = result * self._internal_flux_unit
+
+            # NOTE: flux_unit is flux density, not integrated.
+            # Use wavelength for unit conversion, if applicable.
+            if not is_unitless and flux_unit is not None:
+                modelname = self.model.__class__.__name__
+                if modelname in self._model_fconv_wav:
+                    pname_wav = self._model_fconv_wav[modelname]
+                    wav = getattr(self.model, pname_wav).value
+                    with u.add_enabled_equivalencies(u.spectral()):
+                        wav = u.Quantity(wav, self._internal_wave_unit)
+                    to_unit = flux_unit * self._internal_wave_unit
+                    result = units.convert_flux(wav, result, to_unit)
+        else:
+            raise NotImplementedError(
+                '{} is not a supported integration '
+                'type'.format(integration_type))
 
         # Ensure final unit takes account of integration across wavelength
-        if result_unit != units.THROUGHPUT:
-            if result_unit == units.PHOTLAM:
-                result_unit = u.photon / (u.cm**2 * u.s)
-            elif result_unit == units.FLAM:
-                result_unit = u.erg / (u.cm**2 * u.s)
-            else:  # pragma: no cover
-                raise NotImplementedError(
-                    'Integration of {0} is not supported'.format(result_unit))
-        else:
-            # Ideally flux can use this too but unfortunately this
-            # operation results in confusing output unit for flux.
-            result_unit *= self._internal_wave_unit
+        # and make it pretty, where applicable.
+        if not is_unitless:
+            result_unit_str = result.unit.to_string()
+            if 'ph' in result_unit_str or 'PHOTLAM' in result_unit_str:
+                result = result.to(u.photon / (u.cm**2 * u.s))
+            else:  # FLAM
+                result = result.to(u.erg / (u.cm**2 * u.s))
 
-        return result * result_unit
+        return result
 
     def avgwave(self, wavelengths=None):
         """Calculate the :ref:`average wavelength <synphot-formula-avgwv>`.
@@ -824,7 +863,7 @@ class BaseSpectrum(object):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
 
-        flux_unit : str or `~astropy.units.core.Unit` or `None`
+        flux_unit : str, `~astropy.units.core.Unit`, or `None`
             This option is not applicable to unitless spectrum like bandpass.
             Flux is converted to this unit before written out.
             If not given, internal unit is used.
@@ -889,7 +928,7 @@ class BaseSourceSpectrum(BaseSpectrum):
             Wavelength values for sampling. If not a Quantity,
             assumed to be in Angstrom.
 
-        flux_unit : str or `~astropy.units.core.Unit` or `None`
+        flux_unit : str, `~astropy.units.core.Unit`, or `None`
             Flux is converted to this unit.
             If not given, internal unit is used.
 
@@ -1029,7 +1068,8 @@ class BaseSourceSpectrum(BaseSpectrum):
             totalflux = flux_tmp.sum().value
             stdflux = 1.0
         else:
-            totalflux = sp.integrate(wavelengths=wavelengths).value
+            totalflux = sp.integrate(wavelengths=wavelengths,
+                                     integration_type='trapezoid')
 
             # VEGAMAG
             if renorm_unit_name == units.VEGAMAG.to_string():
@@ -1055,7 +1095,8 @@ class BaseSourceSpectrum(BaseSpectrum):
                 raise NotImplementedError('Must provide a bandpass')
             else:
                 up = stdspec * band
-                stdflux = up.integrate(wavelengths=wavelengths).value
+                stdflux = up.integrate(wavelengths=wavelengths,
+                                       integration_type='trapezoid')
 
         utils.validate_totalflux(totalflux)
 
@@ -1230,7 +1271,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
 
-        flux_unit : str or `~astropy.units.core.Unit` or `None`
+        flux_unit : str, `~astropy.units.core.Unit`, or `None`
             Flux is converted to this unit for plotting.
             If not given, internal unit is used.
 
@@ -1264,7 +1305,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
 
-        flux_unit : str or `~astropy.units.core.Unit` or `None`
+        flux_unit : str, `~astropy.units.core.Unit`, or `None`
             Flux is converted to this unit before written out.
             If not given, internal unit is used.
 
@@ -1483,9 +1524,9 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         x1 = self._validate_wavelengths(wavelengths)
         y1 = self(x1)
-        a = x1[y1 > 0].value
+        a = x1[y1 > 0]
 
-        b = other._validate_wavelengths(wavelengths).value
+        b = other._validate_wavelengths(wavelengths)
 
         result = utils.overlap_status(a, b)
 
@@ -1504,20 +1545,23 @@ class SpectralElement(BaseUnitlessSpectrum):
             # Check if the lack of overlap is significant.
             else:
                 # Get all the flux
-                totalflux = self.integrate(wavelengths=wavelengths).value
+                totalflux = self.integrate(wavelengths=wavelengths,
+                                           integration_type='trapezoid')
                 utils.validate_totalflux(totalflux)
 
                 a_min, a_max = a.min(), a.max()
                 b_min, b_max = b.min(), b.max()
 
                 # Now get the other two pieces
-                excluded = 0.0
+                excluded = 0.0 * totalflux.unit
                 if a_min < b_min:
                     excluded += self.integrate(
-                        wavelengths=np.array([a_min, b_min])).value
+                        wavelengths=u.Quantity([a_min, b_min]),
+                        integration_type='trapezoid')
                 if a_max > b_max:
                     excluded += self.integrate(
-                        wavelengths=np.array([b_max, a_max])).value
+                        wavelengths=u.Quantity([b_max, a_max]),
+                        integration_type='trapezoid')
 
                 if excluded / totalflux < threshold:
                     result = 'partial_most'
@@ -1551,13 +1595,13 @@ class SpectralElement(BaseUnitlessSpectrum):
         a = units.validate_quantity(area, units.AREA)
 
         # Only correct if wavelengths are in Angstrom.
-        x = self._validate_wavelengths(wavelengths).value
+        x = self._validate_wavelengths(wavelengths).to(u.AA)
 
-        y = self(x).value * x
+        y = self(x) * x
         int_val = abs(np.trapz(y, x=x))
         uresp = units.HC / (a.cgs * int_val)
 
-        return uresp.value * units.FLAM
+        return (uresp / u.s).to(units.FLAM)
 
     def rmswidth(self, wavelengths=None, threshold=None):
         """Calculate the :ref:`bandpass RMS width <synphot-formula-rmswidth>`.
@@ -1586,33 +1630,32 @@ class SpectralElement(BaseUnitlessSpectrum):
             Threshold is invalid.
 
         """
-        x = self._validate_wavelengths(wavelengths).value
-        y = self(x).value
+        x = self._validate_wavelengths(wavelengths)
+        y = self(x)
 
         if threshold is None:
             wave = x
             thru = y
         else:
-            if (isinstance(threshold, numbers.Real) or
-                (isinstance(threshold, u.Quantity) and
-                 threshold.unit == self._internal_flux_unit)):
+            try:
                 mask = y >= threshold
-            else:
+            except Exception as e:
                 raise exceptions.SynphotError(
-                    '{0} is not a valid threshold'.format(threshold))
+                    '{0} is not a valid threshold: '
+                    '{1}'.format(threshold, str(e)))
             wave = x[mask]
             thru = y[mask]
 
-        a = self.avgwave(wavelengths=wavelengths).value
+        a = self.avgwave(wavelengths=wavelengths)
         num = np.trapz((wave - a) ** 2 * thru, x=wave)
         den = np.trapz(thru, x=wave)
 
         if den == 0:  # pragma: no cover
-            rms_width = 0.0
+            rms_width = 0.0 * a.unit
         else:
             rms_width = np.sqrt(abs(num / den))
 
-        return rms_width * self._internal_wave_unit
+        return rms_width
 
     def photbw(self, wavelengths=None, threshold=None):
         """Calculate the
@@ -1644,37 +1687,36 @@ class SpectralElement(BaseUnitlessSpectrum):
             Threshold is invalid.
 
         """
-        x = self._validate_wavelengths(wavelengths).value
-        y = self(x).value
+        x = self._validate_wavelengths(wavelengths)
+        y = self(x)
 
         if threshold is None:
             wave = x
             thru = y
         else:
-            if (isinstance(threshold, numbers.Real) or
-                (isinstance(threshold, u.Quantity) and
-                 threshold.unit == self._internal_flux_unit)):
+            try:
                 mask = y >= threshold
-            else:
+            except Exception as e:
                 raise exceptions.SynphotError(
-                    '{0} is not a valid threshold'.format(threshold))
+                    '{0} is not a valid threshold: '
+                    '{1}'.format(threshold, str(e)))
             wave = x[mask]
             thru = y[mask]
 
-        a = self.barlam(wavelengths=wavelengths).value
+        a = self.barlam(wavelengths=wavelengths)
 
         if a == 0:
-            bandw = 0.0
+            bandw = 0.0 * a.unit
         else:
             num = np.trapz(thru * np.log(wave / a) ** 2 / wave, x=wave)
             den = np.trapz(thru / wave, x=wave)
 
             if den == 0:  # pragma: no cover
-                bandw = 0.0
+                bandw = 0.0 * a.unit
             else:
                 bandw = a * np.sqrt(abs(num / den))
 
-        return bandw * self._internal_wave_unit
+        return bandw
 
     def fwhm(self, **kwargs):
         """Calculate :ref:`synphot-formula-fwhm` of equivalent gaussian.
@@ -1725,7 +1767,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             Peak bandpass throughput.
 
         """
-        x = self._validate_wavelengths(wavelengths).value
+        x = self._validate_wavelengths(wavelengths)
         return self(x).max()
 
     def wpeak(self, wavelengths=None):
@@ -1751,15 +1793,13 @@ class SpectralElement(BaseUnitlessSpectrum):
         x = self._validate_wavelengths(wavelengths)
         return x[self(x) == self.tpeak(wavelengths=wavelengths)][0]
 
-    def equivwidth(self, wavelengths=None):
+    def equivwidth(self, **kwargs):
         """Calculate :ref:`bandpass equivalent width <synphot-formula-equvw>`.
 
         Parameters
         ----------
-        wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
-            Wavelength values for sampling.
-            If not a Quantity, assumed to be in Angstrom.
-            If `None`, ``self.waveset`` is used.
+        kwargs : dict
+            See :meth:`integrate`.
 
         Returns
         -------
@@ -1767,7 +1807,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             Bandpass equivalent width.
 
         """
-        return self.integrate(wavelengths=wavelengths)
+        return self.integrate(**kwargs)
 
     def rectwidth(self, wavelengths=None):
         """Calculate :ref:`bandpass rectangular width <synphot-formula-rectw>`.
@@ -1785,7 +1825,8 @@ class SpectralElement(BaseUnitlessSpectrum):
             Bandpass rectangular width.
 
         """
-        equvw = self.equivwidth(wavelengths=wavelengths)
+        equvw = self.equivwidth(wavelengths=wavelengths,
+                                integration_type='trapezoid')
         tpeak = self.tpeak(wavelengths=wavelengths)
 
         if tpeak.value == 0:  # pragma: no cover
@@ -1811,10 +1852,9 @@ class SpectralElement(BaseUnitlessSpectrum):
             Dimensionless efficiency.
 
         """
-        x = self._validate_wavelengths(wavelengths).value
-        y = self(x).value
-        qtlam = abs(np.trapz(y / x, x=x))
-        return qtlam * u.dimensionless_unscaled
+        x = self._validate_wavelengths(wavelengths)
+        y = self(x)
+        return abs(np.trapz(y / x, x=x))
 
     def emflx(self, area, wavelengths=None):
         """Calculate
@@ -1837,8 +1877,9 @@ class SpectralElement(BaseUnitlessSpectrum):
             em_flux = 0.0 * units.FLAM
         else:
             uresp = self.unit_response(area, wavelengths=wavelengths)
-            equvw = self.equivwidth(wavelengths=wavelengths).value
-            em_flux = uresp * equvw / t_lambda
+            equvw = self.equivwidth(wavelengths=wavelengths,
+                                    integration_type='trapezoid')
+            em_flux = uresp * equvw / (t_lambda * self._internal_wave_unit)
 
         return em_flux
 

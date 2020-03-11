@@ -188,20 +188,27 @@ necessary to achieve the desired normalization::
    :alt: Renormalize blackbody.
 
 **Integration** is done with the
-:meth:`~synphot.spectrum.BaseSpectrum.integrate`
-method. It uses trapezoid integration (but could be expanded to perform
-analytical calculations instead in the future when that is supported by
-Astropy). By default, integration is done in internal units::
+:meth:`~synphot.spectrum.BaseSpectrum.integrate` method. It can use trapezoid
+or analytical integration (if the latter is available). The type of integration
+being done can be controlled with software configuration or keyword.
+By default, trapezoid integration is done in internal units::
 
     >>> from astropy import units as u
-    >>> from synphot import SourceSpectrum, units
+    >>> from synphot import SourceSpectrum, units, conf
     >>> from synphot.models import GaussianFlux1D
-    >>> sp = SourceSpectrum(GaussianFlux1D, mean=6000, fwhm=10,
-    ...                     total_flux=1*u.erg/(u.cm**2 * u.s))
+    >>> sp = SourceSpectrum(GaussianFlux1D, mean=6000*u.AA, fwhm=10*u.AA,
+    ...                     total_flux=1*(u.erg/(u.cm**2 * u.s)))
     >>> sp.integrate()  # doctest: +FLOAT_CMP
-    <Quantity 3.02046763e+11 ph / (cm2 s)>
+    <Quantity 3.02046758e+11 ph / (cm2 s)>
+    >>> with conf.set_temp('default_integrator', 'analytical'):
+    ...     print(f'{repr(sp.integrate())}')  # doctest: +FLOAT_CMP
+    <Quantity 3.02046994e+11 ph / (cm2 s)>
+    >>> sp.integrate(integration_type='analytical')  # doctest: +FLOAT_CMP
+    <Quantity 3.02046994e+11 ph / (cm2 s)>
     >>> sp.integrate(flux_unit=units.FLAM)  # doctest: +FLOAT_CMP
     <Quantity 0.99999972 erg / (cm2 s)>
+    >>> sp.integrate(flux_unit=units.FLAM, integration_type='analytical')  # doctest: +FLOAT_CMP
+    <Quantity 1. erg / (cm2 s)>
 
 
 .. _synphot-empirical-source:
@@ -343,10 +350,9 @@ The example below creates and plots a flat source with the amplitude of
 Gaussian Absorption
 -------------------
 
-There are two ways to create a Gaussian absorption feature;
-You can choose whichever method that better suits your needs.
-One is to first create :ref:`synphot-gaussian` and then subtract it from
-a continuum (e.g., :ref:`synphot-flat-spec`):
+To create a Gaussian absorption feature, you can first create
+:ref:`synphot-gaussian` and then subtract it from a continuum
+(e.g., :ref:`synphot-flat-spec`):
 
 .. plot::
     :include-source:
@@ -358,22 +364,6 @@ a continuum (e.g., :ref:`synphot-flat-spec`):
                         total_flux=3.3e-12*u.erg/(u.cm**2 * u.s))
     bg = SourceSpectrum(ConstFlux1D, amplitude=2)
     sp = bg - em
-    sp.plot()
-
-The other way is to create a unitless absorption profile and then multiply it
-to a continuum (e.g., :ref:`synphot-flat-spec`):
-
-.. plot::
-    :include-source:
-
-    from astropy.stats.funcs import gaussian_fwhm_to_sigma
-    from synphot import SourceSpectrum, BaseUnitlessSpectrum
-    from synphot.models import GaussianAbsorption1D, ConstFlux1D
-    sig = 10 * gaussian_fwhm_to_sigma
-    ab = BaseUnitlessSpectrum(GaussianAbsorption1D, mean=6000, stddev=sig,
-                              amplitude=0.047)
-    bg = SourceSpectrum(ConstFlux1D, amplitude=2)
-    sp = bg * ab
     sp.plot()
 
 

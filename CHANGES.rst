@@ -14,6 +14,10 @@
 - Added option for ``synphot.utils.download_data()`` to download to the cache
   instead of a specific location. Please note that new option is not fully
   compatible with customization using ``synphot.cfg``. [#211]
+- Added option to use analytic integral for some models. However, for backward
+  compatibility, the default is still trapezoid integration. [#252]
+- Trapezoid integration now provides unsigned area for ``RickerWavelet1D``.
+  [#252]
 
 0.2.1 (2019-12-20)
 ==================

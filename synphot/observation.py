@@ -471,7 +471,8 @@ class Observation(BaseSourceSpectrum):
             if not isinstance(vegaspec, SourceSpectrum):
                 raise exceptions.SynphotError('Vega spectrum is missing.')
             num = self.integrate(wavelengths=wavelengths)
-            den = (vegaspec * self.bandpass).integrate()
+            den = (vegaspec * self.bandpass).integrate(
+                integration_type='trapezoid')
             utils.validate_totalflux(num)
             utils.validate_totalflux(den)
             return (2.5 * (math.log10(den.value) -
