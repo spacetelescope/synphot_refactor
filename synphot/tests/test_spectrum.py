@@ -537,7 +537,7 @@ class TestBuildModels:
     def test_Const1D(self):
         sp = SourceSpectrum(Const1D, amplitude=1)
         y = sp([1, 1000, 1e6])
-        assert_quantity_allclose(y, 1 * units.PHOTLAM)
+        assert_quantity_allclose(y, 1 * units.PHOTLAM, rtol=0)
 
     def test_ConstFlux1D(self):
         sp = SourceSpectrum(ConstFlux1D, amplitude=1 * u.Jy)
@@ -853,7 +853,7 @@ class TestWaveset:
         g3 = SourceSpectrum(
             GaussianFlux1D, total_flux=totflux, mean=7500, fwhm=5)
         sp = SpectralElement(Box1D, x_0=1000, width=1) * (g1 + g2 + g3)
-        np.testing.assert_allclose(
+        assert_quantity_allclose(
             sp.waveset[::100],
             [999.49, 1000.49, 5019.95906231, 6699.59062307,
              7509.7672007] * u.AA)
@@ -1007,7 +1007,7 @@ class TestMathOperators:
         # rmul does not work with Quantity
         if not isinstance(x, u.Quantity):
             ans2 = x * self.sp_1
-            assert_quantity_allclose(ans1(w), ans2(w))
+            assert_quantity_allclose(ans1(w), ans2(w), rtol=0)
 
         ans3 = self.sp_1 / x
         assert_quantity_allclose(
@@ -1024,7 +1024,7 @@ class TestMathOperators:
             ans1(w),
             [0, 3.52381254e-04, 7.04792712e-04, 2.01360717e-03, 3.97184014e-03,
              4.03718269e-05, 0] * units.PHOTLAM, rtol=1e-4)
-        assert_quantity_allclose(ans1(w), ans2(w))
+        assert_quantity_allclose(ans1(w), ans2(w), rtol=0)
 
         ans3 = self.sp_1 / self.bp_1
         assert_quantity_allclose(
@@ -1078,7 +1078,7 @@ class TestMathOperators:
         # rmul does not work with Quantity
         if not isinstance(x, u.Quantity):
             ans2 = x * self.bp_1
-            assert_quantity_allclose(ans1(w), ans2(w))
+            assert_quantity_allclose(ans1(w), ans2(w), rtol=0)
 
         ans3 = self.bp_1 / x
         assert_quantity_allclose(ans3(w), [0, 0.05, 0.1, 0.15, 0])
