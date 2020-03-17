@@ -1,4 +1,4 @@
-0.3.0 (unreleased)
+0.3.0 (2020-03-17)
 ==================
 
 - ``SourceSpectrum`` and ``SpectralElement`` now have ``to_spectrum1d`` and
