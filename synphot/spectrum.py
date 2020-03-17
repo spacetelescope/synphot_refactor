@@ -34,7 +34,7 @@ __all__ = ['BaseSpectrum', 'BaseSourceSpectrum', 'SourceSpectrum',
 
 
 # TODO: Update model logic when astropy.modeling supports Quantity.
-class BaseSpectrum(object):
+class BaseSpectrum:
     """Base class to handle spectrum or bandpass.
 
     .. note::

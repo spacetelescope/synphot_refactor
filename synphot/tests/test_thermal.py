@@ -10,21 +10,11 @@ import pytest
 
 # ASTROPY
 from astropy import units as u
-from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
 from .. import exceptions
 from ..thermal import ThermalSpectralElement
-
-try:
-    import scipy
-except ImportError:
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
-
-HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
 
 
 def setup_module(module):
@@ -45,8 +35,7 @@ def teardown_module(module):
     const.k_B = si.k_B = astropyconst20.k_B
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
-class TestThermalSpectralElement(object):
+class TestThermalSpectralElement:
     """Test ``ThermalSpectralElement``."""
     def setup_class(self):
         thfile = get_pkg_data_filename(

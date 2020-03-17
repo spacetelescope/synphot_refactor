@@ -34,6 +34,7 @@ def test_validate_totalflux():
     utils.validate_totalflux(0.01 * units.FLAM)
 
 
+@pytest.mark.filterwarnings('ignore:invalid value')
 @pytest.mark.parametrize(
     'val', (-0.01, -0.01 * units.FLAM,
             0, 0 * units.PHOTLAM,
@@ -88,7 +89,7 @@ def test_genwave(num, delta, log, ans):
     assert isinstance(wave_str, str)
 
 
-class TestMergeWave(object):
+class TestMergeWave:
     """Test wavelengths merging."""
     def setup_class(self):
         self.thres = 1e-12
