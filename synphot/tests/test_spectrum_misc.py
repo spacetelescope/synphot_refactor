@@ -16,25 +16,33 @@ from astropy import units as u
 from astropy.io import fits
 from astropy.modeling.models import Const1D, RedshiftScaleFactor
 from astropy.tests.helper import assert_quantity_allclose
-from astropy.utils import minversion
 
 # LOCAL
 from .test_units import _wave, _flux_jy, _flux_photlam
 from .. import exceptions, units
+from ..compat import ASTROPY_LT_4_0
 from ..models import Box1D, Empirical1D, GaussianFlux1D, get_waveset
 from ..spectrum import SourceSpectrum, SpectralElement
 
-try:
-    import scipy
-except ImportError:
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
 
-HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
+def setup_module(module):
+    import astropy.constants as const
+    from astropy.constants import si, astropyconst13
+
+    const.h = si.h = astropyconst13.h
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
+def teardown_module(module):
+    import astropy.constants as const
+
+    if ASTROPY_LT_4_0:
+        from astropy.constants import si, astropyconst20
+        const.h = si.h = astropyconst20.h
+    else:
+        from astropy.constants import si, astropyconst40
+        const.h = si.h = astropyconst40.h
+
+
 class TestCheckOverlap:
     """Test spectrum overlap check. This method is ever only used
     in the form of ``bp.check_overlap(sp)``, so that is what is
@@ -99,7 +107,6 @@ class TestCheckOverlap:
 class TestForceExtrap:
     """Test forcing extrapolation on a source spectrum."""
 
-    @pytest.mark.skipif('not HAS_SCIPY')
     @pytest.mark.parametrize('z', [0, 0.03])
     def test_empirical(self, z):
         sp = SourceSpectrum(Empirical1D, points=[1000, 2000, 3000, 4000],
@@ -213,7 +220,6 @@ class TestWaveset:
             get_waveset('foo')
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 class TestMathOperators:
     """Test spectrum math operators."""
     def setup_class(self):
@@ -373,7 +379,6 @@ class TestMathOperators:
             self.bp_1 * (1 - 1j)
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 class TestWriteSpec:
     """Test spectrum to_fits() method."""
     def setup_class(self):

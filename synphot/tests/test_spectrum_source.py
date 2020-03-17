@@ -17,7 +17,6 @@ from astropy.modeling.models import (
     BrokenPowerLaw1D, Const1D, ExponentialCutoffPowerLaw1D, LogParabola1D,
     PowerLaw1D, RedshiftScaleFactor)
 from astropy.tests.helper import assert_quantity_allclose
-from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
@@ -31,15 +30,6 @@ from ..models import (
     GaussianFlux1D, Lorentz1D, RickerWavelet1D, PowerLawFlux1D)
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
-
-try:
-    import scipy
-except ImportError:
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
-
-HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
 
 # GLOBAL VARIABLES
 _vspec = None  # Loaded in test_load_vspec()
@@ -56,14 +46,20 @@ def setup_module(module):
 
 def teardown_module(module):
     import astropy.constants as const
-    from astropy.constants import si, astropyconst20
-    const.sigma_sb = si.sigma_sb = astropyconst20.sigma_sb
-    const.h = si.h = astropyconst20.h
-    const.k_B = si.k_B = astropyconst20.k_B
+
+    if ASTROPY_LT_4_0:
+        from astropy.constants import si, astropyconst20
+        const.sigma_sb = si.sigma_sb = astropyconst20.sigma_sb
+        const.h = si.h = astropyconst20.h
+        const.k_B = si.k_B = astropyconst20.k_B
+    else:
+        from astropy.constants import si, astropyconst40
+        const.sigma_sb = si.sigma_sb = astropyconst40.sigma_sb
+        const.h = si.h = astropyconst40.h
+        const.k_B = si.k_B = astropyconst40.k_B
 
 
 @pytest.mark.remote_data
-@pytest.mark.skipif('not HAS_SCIPY')
 def test_load_vspec():
     """Load VEGA spectrum once here to be used later."""
     global _vspec
@@ -71,7 +67,6 @@ def test_load_vspec():
 
 
 @pytest.mark.remote_data
-@pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.parametrize(
     ('in_q', 'out_u', 'ans'),
     [(_flux_photlam, units.VEGAMAG, _flux_vegamag),
@@ -93,7 +88,6 @@ def test_flux_conversion_vega(in_q, out_u, ans):
     assert_quantity_allclose(result, ans[i], rtol=1e-2)
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 class TestEmpiricalSourceFromFile:
     """This is the most common model used in ASTROLIB PYSYNPHOT."""
     def setup_class(self):
@@ -386,7 +380,6 @@ class TestBuildModelsSource:
         assert_quantity_allclose(y, [2.0736, 1, 0.53977509] * units.PHOTLAM)
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 class TestNormalize:
     """Test source spectrum normalization."""
     def setup_class(self):
@@ -576,7 +569,6 @@ class TestRedShift:
         assert_quantity_allclose(sp.integrate(), self.sp_z0.integrate())
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.skipif('not HAS_SPECUTILS')
 class TestSpecutilsBridgeSource:
     def test_from_spectrum1d_Empirical1D_source(self):

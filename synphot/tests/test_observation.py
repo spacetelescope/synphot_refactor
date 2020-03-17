@@ -13,7 +13,6 @@ import pytest
 from astropy import units as u
 from astropy.modeling.models import Const1D
 from astropy.tests.helper import catch_warnings, assert_quantity_allclose
-from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import (AstropyDeprecationWarning,
                                       AstropyUserWarning)
@@ -27,15 +26,6 @@ from ..models import (BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D,
 from ..observation import Observation
 from ..spectrum import SourceSpectrum, SpectralElement
 
-try:
-    import scipy
-except ImportError:
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
-
-HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
-
 # Global test data files
 _specfile = get_pkg_data_filename(
     os.path.join('data', 'grw_70d5824_stisnic_005.fits'))
@@ -43,7 +33,6 @@ _bandfile = get_pkg_data_filename(
     os.path.join('data', 'hst_acs_hrc_f555w.fits'))
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 class TestObservation:
     """Test Observation (most of them)."""
     def setup_class(self):
@@ -166,7 +155,6 @@ class TestObservation:
             sp1(sp1.waveset), sp2(sp2.waveset), rtol=1e-3)
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 class TestInitWithForce:
     """Test forced initialization."""
     def setup_class(self):
@@ -229,7 +217,6 @@ class TestMathOperators:
             self.obs - self.obs
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 class TestObsPar:
     """Test Observation values from IRAF SYNPHOT CALCPHOT,
     unless noted otherwise.
@@ -353,7 +340,6 @@ class TestObsPar:
             self.obs.effstim(units.VEGAMAG)
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 class TestCountRate:
     """Test countrate with Observation with well-defined ranges.
 
@@ -422,7 +408,6 @@ class TestCountRate:
             self.obs.countrate(_area, waverange=[1020, 1030])
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 class TestCountRateNegFlux:
     """Test countrate with files containing negative flux/throughput values."""
     def setup_class(self):
@@ -448,7 +433,6 @@ class TestCountRateNegFlux:
             assert 'NegativeFlux' in obs.warnings
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 def test_countrate_neg_leak():
     """Test countrate of sub-sampling not exceeding total countrate.
     https://github.com/spacetelescope/synphot_refactor/issues/126

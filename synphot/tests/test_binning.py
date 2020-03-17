@@ -73,7 +73,7 @@ def test_calculate_bin_exceptions(arr):
         binning.calculate_bin_centers(arr)
 
 
-class TestBinRange(object):
+class TestBinRange:
     """Test wavelength and pixel range calculations."""
     def setup_class(self):
         self.bins = generate_wavelengths(

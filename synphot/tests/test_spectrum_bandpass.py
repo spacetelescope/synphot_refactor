@@ -12,7 +12,6 @@ import pytest
 from astropy import units as u
 from astropy.modeling.models import Const1D
 from astropy.tests.helper import assert_quantity_allclose
-from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
@@ -23,18 +22,8 @@ from ..compat import HAS_SPECUTILS  # noqa
 from ..models import Box1D, Empirical1D, GaussianAbsorption1D
 from ..spectrum import SpectralElement
 
-try:
-    import scipy
-except ImportError:
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
-
-HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
-
 
 @pytest.mark.remote_data
-@pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.parametrize(
     'filtername',
     ['bessel_j', 'bessel_h', 'bessel_k', 'cousins_r', 'cousins_i',
@@ -59,7 +48,6 @@ def test_filter_exception():
         SpectralElement.from_filter('foo')
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 class TestEmpiricalBandpassFromFile:
     """This is the most common model used in ASTROLIB PYSYNPHOT."""
     def setup_class(self):
@@ -232,7 +220,6 @@ class TestBuildModelsBandpass:
         assert_quantity_allclose(y, [0.99973163, 0.2, 0.99973163])
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.skipif('not HAS_SPECUTILS')
 class TestSpecutilsBridgeBandpass:
     def test_from_spectrum1d_Empirical1D_bandpass(self):

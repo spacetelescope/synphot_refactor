@@ -88,7 +88,7 @@ def test_genwave(num, delta, log, ans):
     assert isinstance(wave_str, str)
 
 
-class TestMergeWave(object):
+class TestMergeWave:
     """Test wavelengths merging."""
     def setup_class(self):
         self.thres = 1e-12

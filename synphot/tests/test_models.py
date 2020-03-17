@@ -21,7 +21,6 @@ import pytest
 # ASTROPY
 from astropy import units as u
 from astropy.modeling.models import Const1D
-from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
@@ -29,15 +28,6 @@ from astropy.utils.exceptions import AstropyUserWarning
 from .. import specio, units
 from ..models import (BlackBody1D, ConstFlux1D, Empirical1D, PowerLawFlux1D,
                       get_metadata)
-
-try:
-    import scipy
-except ImportError:
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
-
-HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
 
 
 def setup_module(module):
@@ -58,7 +48,7 @@ def teardown_module(module):
     const.k_B = si.k_B = astropyconst20.k_B
 
 
-class TestBlackBody1D(object):
+class TestBlackBody1D:
     """Test BlackBody1D model."""
     def setup_class(self):
         self.m1 = BlackBody1D(temperature=5500)
@@ -86,7 +76,7 @@ class TestBlackBody1D(object):
             m2(20000), [2.14331496e-14, 3.55819086e+17])
 
 
-class TestConstFlux1D(object):
+class TestConstFlux1D:
     """Test ConstFlux1D model."""
     def setup_class(self):
         self.w = np.arange(1, 21000, 5000)
@@ -129,8 +119,7 @@ class TestConstFlux1D(object):
             ConstFlux1D(amplitude=1 * flux_unit)
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
-class TestEmpirical1D(object):
+class TestEmpirical1D:
     """Test Empirical1D model."""
     def setup_class(self):
         filename = get_pkg_data_filename(
@@ -223,7 +212,7 @@ class TestEmpirical1D(object):
             m2([900, 1000, 1500, 10000]), [0.01, 0.01, 2.505, 1.5])
 
 
-class TestPowerLawFlux1D(object):
+class TestPowerLawFlux1D:
     """Test PowerLawFlux1D model."""
     def setup_class(self):
         self.w = np.arange(3000, 3100, 10)

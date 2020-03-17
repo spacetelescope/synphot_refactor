@@ -14,7 +14,6 @@ import pytest
 from astropy import units as u
 from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
-from astropy.utils import minversion
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
@@ -26,18 +25,8 @@ from ..observation import Observation
 from ..reddening import ReddeningLaw, etau_madau
 from ..spectrum import SourceSpectrum, SpectralElement
 
-try:
-    import scipy
-except ImportError:
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
 
-HAS_SCIPY = HAS_SCIPY and minversion(scipy, '0.14')
-
-
-@pytest.mark.skipif('not HAS_SCIPY')
-class TestExtinction(object):
+class TestExtinction:
     """Test ReddeningLaw and ExtinctionCurve classes (most methods)."""
     def setup_class(self):
         rfile = get_pkg_data_filename(
@@ -114,7 +103,6 @@ class TestExtinction(object):
 
 
 # See https://github.com/spacetelescope/synphot_refactor/issues/77
-@pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.parametrize(
     ('z', 'ans'),
     ([0, [0.99514224, 0.99572959, 0.99630696, 0.99640647, 1]],
@@ -142,7 +130,6 @@ def test_etau_madau_exceptions():
 
 
 @pytest.mark.remote_data
-@pytest.mark.skipif('not HAS_SCIPY')
 @pytest.mark.parametrize(
     'modelname',
     ['lmc30dor', 'lmcavg', 'mwavg', 'mwdense', 'mwrv21', 'mwrv40',
@@ -159,14 +146,12 @@ def test_redlaw_from_model(modelname):
     assert 'descrip' in redlaw.meta['header']
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
 def test_redlaw_from_model_exception():
     with pytest.raises(exceptions.SynphotError):
         ReddeningLaw.from_extinction_model('foo')
 
 
-@pytest.mark.skipif('not HAS_SCIPY')
-class TestWriteReddeningLaw(object):
+class TestWriteReddeningLaw:
     """Test ReddeningLaw ``to_fits()`` method."""
     def setup_class(self):
         self.outdir = tempfile.mkdtemp()

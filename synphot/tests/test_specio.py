@@ -51,7 +51,7 @@ def test_read_ascii_spec():
     assert hdr == {}
 
 
-class TestReadWriteFITS(object):
+class TestReadWriteFITS:
     """Test read/write FITS spectrum."""
     def setup_class(self):
         self.epsilon = 0.00031
