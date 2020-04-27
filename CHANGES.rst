@@ -14,6 +14,8 @@
 1.1.0 (2021-06-23)
 ==================
 
+- New ``filter_parameterization`` subpackage to handle filter parameterization,
+  adapted from ``tynt`` package written by Brett Morris. [#257]
 - ``synphot.synphot_utils`` C-extension is no longer optional. Your
   installation will fail if it cannot build. [#297]
 
