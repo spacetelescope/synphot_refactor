@@ -1,18 +1,29 @@
 """Handle Fast Fourier Transform (FFT) for filter parameterization."""
 
 import numpy as np
-from astropy.modeling import models
-from astropy.modeling.models import Sine1D
+from astropy import units as u
 from astropy.table import Table
 
+from synphot.models import Empirical1D
 from synphot.spectrum import SpectralElement
+from synphot.units import validate_quantity
 
-__all__ = ['filter_to_fft', 'filter_from_fft']
+__all__ = ['filter_to_fft', 'filter_from_fft', 'filters_to_fft_table']
 
 
 def _simplified_wavelength(n_lambda, lambda_0, delta_lambda):
-    return np.arange(lambda_0, (n_lambda + 1) * delta_lambda + lambda_0,
-                     delta_lambda)
+    # tynt assumed everything was in Angstrom, which coincides with
+    # synphot internal wavelength unit.
+    wave_unit = SpectralElement._internal_wave_unit
+
+    lambda_0 = validate_quantity(
+        lambda_0, wave_unit, equivalencies=u.spectral())
+    delta_lambda = validate_quantity(
+        delta_lambda, wave_unit, equivalencies=u.spectral())
+    lambda_max = (n_lambda + 1) * delta_lambda + lambda_0
+
+    return np.arange(lambda_0.value, lambda_max.value,
+                     delta_lambda.value) * wave_unit
 
 
 def filter_to_fft(bp, wavelengths=None, n_terms=10):
@@ -36,13 +47,13 @@ def filter_to_fft(bp, wavelengths=None, n_terms=10):
     n_lambda : int
         Number of elements in ``wl``.
 
-    lambda_0 : float
+    lambda_0 : `~astropy.units.quantity.Quantity`
         Minimum value of ``wl``.
 
-    delta_lambda : float
+    delta_lambda : `~astropy.units.quantity.Quantity`
         Median delta wavelength.
 
-    tr_max : float
+    tr_max : `~astropy.units.quantity.Quantity`
         Maximum value of ``tr``.
 
     fft_parameters : list of complex
@@ -73,6 +84,9 @@ def filter_to_fft(bp, wavelengths=None, n_terms=10):
     return n_lambda, lambda_0, delta_lambda, tr_max, fft.tolist()
 
 
+# TODO: Option to construct Sine1D compound model instead of empirical?
+#       See implementation in tynt/core.py for model=True. It was not ported
+#       due to https://github.com/bmorris3/tynt/issues/9
 def filter_from_fft(n_lambda, lambda_0, delta_lambda, tr_max, fft_parameters):
     """Reconstruct a filter from given FFT parameters.
     The inputs for this function can be obtained from :func:`filter_to_fft`.
@@ -82,14 +96,17 @@ def filter_from_fft(n_lambda, lambda_0, delta_lambda, tr_max, fft_parameters):
     n_lambda : int
         Number of elements in original wavelength array.
 
-    lambda_0 : float
+    lambda_0 : float or `~astropy.units.quantity.Quantity`
         Minimum value of original wavelength array.
+        If not a Quantity, assumed to be in Angstrom.
 
-    delta_lambda : float
+    delta_lambda : float or `~astropy.units.quantity.Quantity`
         Median delta wavelength of original wavelength array.
+        If not a Quantity, assumed to be in Angstrom.
 
-    tr_max : float
+    tr_max : float or `~astropy.units.quantity.Quantity`
         Maximum value of transmittance curve.
+        If a Quantity, must be unitless.
 
     fft_parameters : list of complex
         List of complex values that are FFT parameters representing the
@@ -103,41 +120,10 @@ def filter_from_fft(n_lambda, lambda_0, delta_lambda, tr_max, fft_parameters):
     """
     wavelength = _simplified_wavelength(n_lambda, lambda_0, delta_lambda)
     n_wave = len(wavelength)
-
-    # NOTE: This is not used when astropy model is returned. But the formula
-    # is kept here in case we need sampled data instead of model in the future.
-    # To calculate sampled transmittance:
-    # ifft = np.fft.ifft(fft_parameters, n=n_wave)
-    # transmittance = ((ifft.real - ifft.real.min()) * tr_max / ifft.real.ptp())  # noqa
-
-    n_fft_pars = len(fft_parameters)
-
-    m = (np.sum([Sine1D(amplitude=fft_parameters[i].real / n_wave,
-                        frequency=i / n_wave, phase=0.25)
-                 for i in range(n_fft_pars)]) -
-         np.sum([Sine1D(amplitude=fft_parameters[i].imag / n_wave,
-                        frequency=i / n_wave)
-                 for i in range(n_fft_pars)]))
-
-    @models.custom_model
-    def fft_model(x):
-        """
-        Approximate Fourier reconstruction of an astronomical filter
-
-        Parameters
-        ----------
-        x : array-like
-            Wavelength in Angstroms.
-
-        Returns
-        -------
-        transmittance : array-like
-            Transmittance curve.
-        """
-        mo = m((x - wavelength.min()) / (wavelength[1] - wavelength[0]))
-        return (mo - mo.min()) * tr_max / mo.ptp()
-
-    return SpectralElement(fft_model())
+    ifft = np.fft.ifft(fft_parameters, n=n_wave)
+    transmittance = ((ifft.real - ifft.real.min()) * tr_max / ifft.real.ptp())  # noqa
+    return SpectralElement(
+        Empirical1D, points=wavelength, lookup_table=transmittance)
 
 
 def filters_to_fft_table(filters_mapping, n_terms=10):
@@ -164,10 +150,14 @@ def filters_to_fft_table(filters_mapping, n_terms=10):
         Use its ``write`` method to save it to file.
 
     """  # noqa
+    wave_unit = SpectralElement._internal_wave_unit
+
     fft_table = Table(names=['filter', 'n_lambda', 'lambda_0', 'delta_lambda',
                              'tr_max'] + [f'fft_{i}' for i in range(n_terms)],
-                      dtype=[np.str, np.int, np.float, np.float, np.float] +
-                      [np.complex] * n_terms)
+                      dtype=[np.str, np.int32, np.float32, np.float32,
+                             np.float32] + [np.complex] * n_terms)
+    fft_table['lambda_0'].unit = wave_unit
+    fft_table['delta_lambda'].unit = wave_unit
 
     for key, (bp, wavelengths) in filters_mapping.items():
         n_lambda, lambda_0, delta_lambda, tr_max, fft_pars = filter_to_fft(
