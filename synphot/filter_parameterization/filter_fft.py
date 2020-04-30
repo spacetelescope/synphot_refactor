@@ -2,13 +2,15 @@
 
 import numpy as np
 from astropy import units as u
+from astropy.modeling.models import custom_model, Sine1D
 from astropy.table import Table
 
 from synphot.models import Empirical1D
 from synphot.spectrum import SpectralElement
 from synphot.units import validate_quantity
 
-__all__ = ['filter_to_fft', 'filter_from_fft', 'filters_to_fft_table']
+__all__ = ['filter_to_fft', 'filter_from_fft', 'analytical_model_from_fft',
+           'filters_to_fft_table']
 
 
 def _simplified_wavelength(n_lambda, lambda_0, delta_lambda):
@@ -84,9 +86,6 @@ def filter_to_fft(bp, wavelengths=None, n_terms=10):
     return n_lambda, lambda_0, delta_lambda, tr_max, fft.tolist()
 
 
-# TODO: Option to construct Sine1D compound model instead of empirical?
-#       See implementation in tynt/core.py for model=True. It was not ported
-#       due to https://github.com/bmorris3/tynt/issues/9
 def filter_from_fft(n_lambda, lambda_0, delta_lambda, tr_max, fft_parameters):
     """Reconstruct a filter from given FFT parameters.
     The inputs for this function can be obtained from :func:`filter_to_fft`.
@@ -124,6 +123,59 @@ def filter_from_fft(n_lambda, lambda_0, delta_lambda, tr_max, fft_parameters):
     transmittance = ((ifft.real - ifft.real.min()) * tr_max / ifft.real.ptp())  # noqa
     return SpectralElement(
         Empirical1D, points=wavelength, lookup_table=transmittance)
+
+
+def analytical_model_from_fft(n_lambda, lambda_0, delta_lambda, tr_max,
+                              fft_parameters):
+    """Similar to :func:`filter_from_fft` except that this returns
+    an analytical model.
+
+    .. note::
+
+        This model needs to be sampled using the full range of
+        wavelength. See https://github.com/bmorris3/tynt/issues/9 .
+
+    Returns
+    -------
+    astropy_model : `~astropy.modeling.CompoundModel`
+        A compound model that consists of
+        `~astropy.modeling.functional_models.Sine1D` models.
+
+    """
+    wavelength = _simplified_wavelength(n_lambda, lambda_0, delta_lambda)
+    n_wave = len(wavelength)
+    n_fft_pars = len(fft_parameters)
+
+    m = (np.sum([Sine1D(amplitude=fft_parameters[i].real / n_wave,
+                        frequency=i / n_wave, phase=0.25)
+                 for i in range(n_fft_pars)]) -
+         np.sum([Sine1D(amplitude=fft_parameters[i].imag / n_wave,
+                        frequency=i / n_wave)
+                 for i in range(n_fft_pars)]))
+
+    @custom_model
+    def fft_model(x):
+        """Approximate Fourier reconstruction of an astronomical filter.
+
+        Parameters
+        ----------
+        x : `~astropy.units.quantity.Quantity`
+            Full wavelength range that samples the filter.
+
+        Returns
+        -------
+        transmittance : array-like or `~astropy.units.quantity.Quantity`
+            Transmittance curve. If ``tr_max`` is a Quantity, this will
+            be a Quantity as well.
+
+        """
+        wave_unit = SpectralElement._internal_wave_unit
+        x = validate_quantity(x, wave_unit, equivalencies=u.spectral())
+
+        mo = m((x - wavelength.min()) / (wavelength[1] - wavelength[0]))
+        return (mo - mo.min()) * tr_max / mo.ptp()
+
+    return fft_model()
 
 
 def filters_to_fft_table(filters_mapping, n_terms=10):
