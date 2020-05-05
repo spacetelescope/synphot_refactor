@@ -83,7 +83,12 @@ def filter_to_fft(bp, wavelengths=None, n_terms=10):
     # Take the DFT of the interpolated transmittance curve
     fft = np.fft.fft(tr_interp)[:n_terms]
 
-    return n_lambda, lambda_0, delta_lambda, tr_max, fft.tolist()
+    if isinstance(fft, u.Quantity):
+        fft_parameters = fft.value.tolist()
+    else:  # Older Numpy does not return Quantity
+        fft_parameters = fft.tolist()
+
+    return n_lambda, lambda_0, delta_lambda, tr_max, fft_parameters
 
 
 def filter_from_fft(n_lambda, lambda_0, delta_lambda, tr_max, fft_parameters):
@@ -187,6 +192,8 @@ def filters_to_fft_table(filters_mapping, n_terms=10):
     filters_mapping : dict
         Dictionary mapping human-readable filter name to its
         `~synphot.spectrum.SpectralElement` and wavelengths, if applicable.
+        If the filter object has a valid ``waveset``, just provide `None`
+        for wavelengths; otherwise provide a Quantity array for sampling.
         For example::
 
             {'JOHNSON/V': (<SpectralElement ...>, None),
