@@ -59,7 +59,7 @@ By default, 10 FFT parameters are returned as complex numbers::
      (38.635087381362396-13.02803811279449j)]
 
 .. TODO: Only skipping the fft_pars comparison above because output is very
-   different for Numpy 1.16. Unskip it and replace with +FLOAT_CMP when
+   different for NUMPY_LT_1_17. Unskip it and replace with +FLOAT_CMP when
    Numpy minversion is 1.17.
 
 It is up to you to decide how to store this data, though storing it in a
@@ -70,14 +70,18 @@ will store the results in a table for you::
     >>> from synphot.filter_parameterization import filters_to_fft_table
     >>> mapping = {'HST/ACS/HRC/F555W': (bp, None)}
     >>> filter_pars_table = filters_to_fft_table(mapping)
-    >>> filter_pars_table  # doctest: +FLOAT_CMP +ELLIPSIS
+    >>> filter_pars_table  # doctest: +SKIP
     <Table length=1>
           filter      n_lambda ...                  fft_9
                                ...
-          str17        int32   ...                complex128
+          str17        int...  ...                complex128
     ----------------- -------- ... ---------------------------------------
     HST/ACS/HRC/F555W    10000 ... (38.635087381362396-13.02803811279449j)
     >>> filter_pars_table.write('my_filter_pars.fits')  # doctest: +SKIP
+
+.. TODO: Only skipping the filter_pars_table comparison above because output
+   is slightly different for NUMPY_LT_1_17. Unskip it and replace with
+   +FLOAT_CMP +ELLIPSIS when Numpy minversion is 1.17.
 
 .. _filter_fft_construction:
 
