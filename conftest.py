@@ -1,5 +1,3 @@
-import os
-
 try:
     from pytest_astropy_header.display import (PYTEST_HEADER_MODULES,
                                                TESTED_VERSIONS)
@@ -8,7 +6,7 @@ except ImportError:
     TESTED_VERSIONS = {}
 
 try:
-    from .version import version
+    from synphot import __version__ as version
 except ImportError:
     version = 'unknown'
 
@@ -26,5 +24,4 @@ PYTEST_HEADER_MODULES.pop('Matplotlib')
 PYTEST_HEADER_MODULES.pop('Pandas')
 PYTEST_HEADER_MODULES.pop('h5py')
 
-packagename = os.path.basename(os.path.dirname(__file__))
-TESTED_VERSIONS[packagename] = version
+TESTED_VERSIONS['synphot'] = version
