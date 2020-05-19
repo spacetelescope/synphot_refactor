@@ -419,9 +419,9 @@ class TestNormalize:
             obs = Observation(rn_sp, self.acs, force='extrap')
         ct_rate = obs.countrate(_area)
 
-        # 0.2% agreement with IRAF SYNPHOT COUNTRATE
+        # 0.7% agreement with IRAF SYNPHOT COUNTRATE
         assert_quantity_allclose(
-            ct_rate, ans_countrate * (u.ct / u.s), rtol=2e-3)
+            ct_rate, ans_countrate * (u.ct / u.s), rtol=0.007)
 
     @pytest.mark.parametrize(
         ('sp_type', 'rn_val', 'ans_countrate'),
