@@ -108,18 +108,19 @@ can modify this line in your ``$HOME/.astropy/config/synphot.cfg`` file::
 
     johnson_v_file = /my/other/dir/my_johnson_v.fits
 
-.. testsetup::
+Alternately, you can also take advantage of :ref:`astropy:astropy_config`
+to manage **synphot** data files. This example below overwrites the
+Johnson *V* throughput file setting for the entire Python session
+(this supersedes what is set in ``synphot.cfg`` above)::
 
     >>> from synphot.config import conf
     >>> conf.johnson_v_file = '/my/local/dir/cdbs/comp/nonhst/johnson_v_004_syn.fits'
-
-Alternately, you can also take advantage of :ref:`astropy:astropy_config`
-to manage **synphot** data files. For example, you can also temporarily use a
-different Johnson *V* throughput file::
-
-    >>> from synphot.config import conf
     >>> print(conf.johnson_v_file)
     /my/local/dir/cdbs/comp/nonhst/johnson_v_004_syn.fits
+
+Using the configuration system, you can also temporarily use a different
+Johnson *V* throughput file::
+
     >>> with conf.set_temp('johnson_v_file', '/my/other/dir/my_johnson_v.fits'):
     ...     print(conf.johnson_v_file)
     /my/other/dir/my_johnson_v.fits
