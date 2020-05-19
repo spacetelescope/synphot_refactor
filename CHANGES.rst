@@ -1,6 +1,7 @@
 0.3.1 (unreleased)
 ==================
 
+- Default Vega is now ``alpha_lyr_stis_010.fits``. [#266]
 
 0.3.0 (2020-03-17)
 ==================
