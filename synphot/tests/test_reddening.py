@@ -14,6 +14,7 @@ import pytest
 from astropy import units as u
 from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.units import add_enabled_equivalencies
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
@@ -40,11 +41,12 @@ class TestExtinction:
 
     def test_redlaw_call(self):
         w = self.redlaw.waveset[48:53]
-        np.testing.assert_allclose(
-            w.to(u.micron ** -1, u.spectral()).value,
-            [5.41599989, 5.3204999, 5.2249999, 5.12949991, 5.03399992])
-        np.testing.assert_allclose(
-            self.redlaw(w).value,
+        with add_enabled_equivalencies(u.spectral()):
+            assert_quantity_allclose(
+                w, [5.41599989, 5.3204999, 5.2249999, 5.12949991,
+                    5.03399992] * (u.micron ** -1))
+        assert_quantity_allclose(
+            self.redlaw(w),
             [7.90572977, 8.01734924, 8.17892265, 8.40150452, 8.69231796])
 
     def test_extcurve_call(self):
