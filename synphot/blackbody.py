@@ -75,7 +75,7 @@ class BlackBody1D(Fittable1DModel):
         with quantity_support():
             plt.figure()
             plt.semilogx(wav, flux)
-            plt.axvline(bb.lambda_max.to(u.AA).value, ls='--')
+            plt.axvline(bb.lambda_max.to_value(u.AA), ls='--')
             plt.show()
 
     """  # noqa

@@ -59,7 +59,7 @@ class BlackBody1D(Fittable1DModel):
     def lambda_max(self):
         """Peak wavelength in Angstrom when the curve is expressed as
         power density."""
-        return ((const.b_wien.value / self.temperature) * u.m).to(u.AA).value
+        return ((const.b_wien.value / self.temperature) * u.m).to_value(u.AA)
 
     def bounding_box(self, factor=10.0):
         """Tuple defining the default ``bounding_box`` limits,
@@ -562,7 +562,7 @@ class GaussianFlux1D(Gaussian1D):
                 total_flux = total_flux.to(tf_unit)
             else:
                 total_flux = total_flux * tf_unit
-            self.amplitude = (total_flux / (gaussian_amp_to_totflux * u.AA)).to(units.PHOTLAM, u.spectral_density(self.mean.value * u.AA)).value  # noqa
+            self.amplitude = (total_flux / (gaussian_amp_to_totflux * u.AA)).to_value(units.PHOTLAM, u.spectral_density(self.mean.value * u.AA))  # noqa
             total_flux = total_flux.value
 
         self.meta['expr'] = 'em({0:g}, {1:g}, {2:g}, {3})'.format(
@@ -716,7 +716,7 @@ class PowerLawFlux1D(_models.PowerLaw1D):
                 '{0} not supported.'.format(amplitude.unit))
 
         if isinstance(x_0, u.Quantity):
-            x_0 = x_0.to(u.AA, u.spectral()).value
+            x_0 = x_0.to_value(u.AA, u.spectral())
 
         super(PowerLawFlux1D, self).__init__(
             amplitude=amplitude.value, x_0=x_0, alpha=alpha, **kwargs)
