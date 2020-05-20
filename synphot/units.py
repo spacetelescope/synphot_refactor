@@ -187,8 +187,9 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
         OBMAG and count, otherwise it is not needed.
 
     vegaspec : `~synphot.spectrum.SourceSpectrum`
-        Vega spectrum from :func:`~synphot.spectrum.SourceSpectrum.from_vega`.
-        This is *only* used for conversions involving VEGAMAG.
+        Vega spectrum that *must* be provided for conversions involving
+        VEGAMAG, otherwise it is not needed. For instance, it can be
+        obtained from :func:`~synphot.spectrum.SourceSpectrum.from_vega`.
 
     Returns
     -------
