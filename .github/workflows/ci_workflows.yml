@@ -72,7 +72,7 @@ jobs:
         python -m pip install --upgrade pip setuptools pytest-cov codecov
         python -m pip install -e .[test,all]
     - name: Test with coverage
-      run: pytest --cov --cov-report html --open-files --remote-data
+      run: pytest --cov=./ --cov-report=xml --open-files --remote-data
     - name: Coverage report
       uses: codecov/codecov-action@f532c3a  # v1.0.7
       with:
