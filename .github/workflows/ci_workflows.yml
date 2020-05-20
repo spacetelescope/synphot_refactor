@@ -14,6 +14,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+    - name: Fetch tags
+      run: git fetch --prune --unshallow --tags
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -38,6 +40,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+    - name: Fetch tags
+      run: git fetch --prune --unshallow --tags
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -48,8 +52,7 @@ jobs:
         python -m pip install --upgrade pip setuptools
         python -m pip install -e .[test]
     - name: Test without optional deps
-      run: |
-        pytest --open-files
+      run: pytest --open-files
 
   coverage_tests:
     runs-on: ubuntu-latest
@@ -57,6 +60,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+    - name: Fetch tags
+      run: git fetch --prune --unshallow --tags
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -67,8 +72,7 @@ jobs:
         python -m pip install --upgrade pip setuptools pytest-cov codecov
         python -m pip install -e .[test,all]
     - name: Test with coverage
-      run: |
-        pytest --cov --cov-report html --open-files --remote-data
+      run: pytest --cov --cov-report html --open-files --remote-data
     - name: Coverage report
       uses: codecov/codecov-action@f532c3a  # v1.0.7
       with:
@@ -80,6 +84,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+    - name: Fetch tags
+      run: git fetch --prune --unshallow --tags
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -92,8 +98,7 @@ jobs:
         python -m pip install git+https://github.com/astropy/specutils.git@master#egg=specutils
         python -m pip install -e .[test]
     - name: Test with dev deps
-      run: |
-        pytest --open-files
+      run: pytest --open-files
 
   old_deps_tests:
     runs-on: ubuntu-16.04
@@ -101,6 +106,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+    - name: Fetch tags
+      run: git fetch --prune --unshallow --tags
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -114,8 +121,7 @@ jobs:
         python -m pip install astropy==3.2.2
         python -m pip install -e .[test]
     - name: Test with old deps
-      run: |
-        pytest --open-files
+      run: pytest --open-files
 
   other_oses:
     runs-on: ${{ matrix.os }}
@@ -126,6 +132,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+    - name: Fetch tags
+      run: git fetch --prune --unshallow --tags
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -135,8 +143,7 @@ jobs:
         python -m pip install --upgrade pip setuptools
         python -m pip install -e .[test,all]
     - name: Run tests
-      run: |
-        pytest --open-files
+      run: pytest --open-files
 
   link_check:
     runs-on: ubuntu-latest
