@@ -13,9 +13,8 @@ synphot
     :target: http://synphot.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://dev.azure.com/spacetelescope/synphot_refactor/_apis/build/status/spacetelescope.synphot_refactor?branchName=master
-    :target: https://dev.azure.com/spacetelescope/synphot_refactor/_build/latest?definitionId=2&branchName=master
-    :alt: Azure CI Status
+.. image:: https://github.com/spacetelescope/synphot_refactor/workflows/.github/workflows/ci_workflows.yml/badge.svg
+    :alt: Github Actions CI Status
 
 .. image:: https://codecov.io/gh/spacetelescope/synphot_refactor/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/spacetelescope/synphot_refactor
