@@ -13,7 +13,7 @@ synphot
     :target: http://synphot.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://github.com/spacetelescope/synphot_refactor/workflows/.github/workflows/ci_workflows.yml/badge.svg
+.. image:: https://github.com/spacetelescope/synphot_refactor/workflows/CI/badge.svg
     :alt: Github Actions CI Status
 
 .. image:: https://codecov.io/gh/spacetelescope/synphot_refactor/branch/master/graph/badge.svg
