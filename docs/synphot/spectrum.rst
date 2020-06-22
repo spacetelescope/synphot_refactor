@@ -431,8 +431,8 @@ wavelength of 1 micron and an index of -2:
     sp = SourceSpectrum(PowerLawFlux1D, amplitude=1, x_0=1*u.micron, alpha=2)
     wave = range(100, 100000, 50) * u.AA
     sp.plot(wavelengths=wave, xlog=True, ylog=True, bottom=0.1, top=1000)
-    plt.axvline(sp.model.x_0, color='k', ls='--')  # Ref wave
-    plt.axhline(sp.model.amplitude, color='k', ls='--')  # Ref flux
+    plt.axvline(sp.model.x_0.value, color='k', ls='--')  # Ref wave
+    plt.axhline(sp.model.amplitude.value, color='k', ls='--')  # Ref flux
 
 
 .. _synphot-source-specutils:
