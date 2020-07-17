@@ -1,4 +1,4 @@
-0.3.1 (unreleased)
+1.0.0 (unreleased)
 ==================
 
 - Default Vega is now ``alpha_lyr_stis_010.fits``. [#266]
