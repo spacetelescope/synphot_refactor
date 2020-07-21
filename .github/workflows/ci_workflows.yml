@@ -155,9 +155,13 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
+    # Some stuff needs pinning because of out-of-scope warnings when checking links
     - name: Install and build
       run: |
-        python -m pip install --upgrade pip setuptools sphinx-astropy
+        python -m pip install --upgrade pip setuptools
+        python -m pip install 'sphinx<3.1'
+        python -m pip install 'numpydoc<1.1.0'
+        python -m pip install sphinx-astropy
         python -m pip install -e .
     - name: Docs link check
       run: |
