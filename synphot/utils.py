@@ -290,7 +290,7 @@ def download_data(path_root, verbose=True, dry_run=False):
 
     """
     from .config import conf  # Avoid potential circular import
-    BASE_HOST = 'http://ssb.stsci.edu/cdbs/'
+    BASE_HOST = 'https://ssb.stsci.edu/trds/'
 
     if path_root is not None:
         if not os.path.exists(path_root):

@@ -76,15 +76,15 @@ recommended for non-internal STScI users to download the necessary data files to
 a local directory so you can avoid connecting directly to STScI HTTP service,
 which is slower and might not be available all the time. To download the files
 via HTTP, create a local directory where you plan to store the data files
-(e.g., ``/my/local/dir/cdbs``) and run the following:
+(e.g., ``/my/local/dir/trds``) and run the following:
 
     >>> from synphot.utils import download_data
-    >>> file_list = download_data('/my/local/dir/cdbs')  # doctest: +SKIP
+    >>> file_list = download_data('/my/local/dir/trds')  # doctest: +SKIP
 
 Then copy `synphot.cfg <https://github.com/spacetelescope/synphot_refactor/blob/master/synphot/synphot.cfg>`_
 to your ``$HOME/.astropy/config/`` directory, if it is not there already.
 Uncomment and replace every instance of
-``/grp/hst/cdbs`` with ``/my/local/dir/cdbs`` so that ``synphot`` knows where to
+``/grp/hst/cdbs`` with ``/my/local/dir/trds`` so that ``synphot`` knows where to
 look for these files.
 
 On the contrary, if you wish to rely solely on Astropy caching mechanism,
@@ -114,9 +114,9 @@ Johnson *V* throughput file setting for the entire Python session
 (this supersedes what is set in ``synphot.cfg`` above)::
 
     >>> from synphot.config import conf
-    >>> conf.johnson_v_file = '/my/local/dir/cdbs/comp/nonhst/johnson_v_004_syn.fits'
+    >>> conf.johnson_v_file = '/my/local/dir/trds/comp/nonhst/johnson_v_004_syn.fits'
     >>> print(conf.johnson_v_file)
-    /my/local/dir/cdbs/comp/nonhst/johnson_v_004_syn.fits
+    /my/local/dir/trds/comp/nonhst/johnson_v_004_syn.fits
 
 Using the configuration system, you can also temporarily use a different
 Johnson *V* throughput file::
@@ -125,7 +125,7 @@ Johnson *V* throughput file::
     ...     print(conf.johnson_v_file)
     /my/other/dir/my_johnson_v.fits
     >>> print(conf.johnson_v_file)
-    /my/local/dir/cdbs/comp/nonhst/johnson_v_004_syn.fits
+    /my/local/dir/trds/comp/nonhst/johnson_v_004_syn.fits
 
 .. testsetup::
 
