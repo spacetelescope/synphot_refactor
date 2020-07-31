@@ -1,7 +1,8 @@
-1.0.0 (unreleased)
+1.0.0 (2020-07-31)
 ==================
 
 - Default Vega is now ``alpha_lyr_stis_010.fits``. [#266]
+- CDBS is now TRDS. [#278]
 
 0.3.0 (2020-03-17)
 ==================
