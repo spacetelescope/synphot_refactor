@@ -14,6 +14,7 @@ synphot
     :alt: Documentation Status
 
 .. image:: https://github.com/spacetelescope/synphot_refactor/workflows/CI/badge.svg
+    :target: https://github.com/spacetelescope/synphot_refactor/actions?query=workflow%3ACI
     :alt: Github Actions CI Status
 
 .. image:: https://codecov.io/gh/spacetelescope/synphot_refactor/branch/master/graph/badge.svg
