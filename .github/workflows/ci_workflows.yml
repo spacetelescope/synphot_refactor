@@ -9,126 +9,11 @@ on:
     - cron: '0 6 * * 1'
 
 jobs:
-  pep_and_audit:
-    runs-on: ubuntu-16.04
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Fetch tags
-      run: git fetch --prune --unshallow --tags
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-    - name: Lint with flake8
-      run: |
-        python -m pip install --upgrade pip flake8
-        flake8 synphot --count
-    # Make sure that packaging will work
-    - name: pep517 build
-      run: |
-        python -m pip install --upgrade setuptools pep517 twine
-        python -m pep517.build --source .
-        twine check dist/*
-    - name: Security audit
-      run: |
-        python -m pip install --upgrade bandit
-        bandit -r . -c .bandit.yaml
-
-  initial_tests:
-    runs-on: ubuntu-16.04
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Fetch tags
-      run: git fetch --prune --unshallow --tags
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.7'
-    - name: Install and build
-      run: |
-        sudo apt-get install libxml2-utils
-        python -m pip install --upgrade pip setuptools
-        python -m pip install -e .[test]
-    - name: Test without optional deps
-      run: pytest --open-files
-
-  coverage_tests:
-    runs-on: ubuntu-latest
-    needs: [pep_and_audit, initial_tests]
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Fetch tags
-      run: git fetch --prune --unshallow --tags
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-    - name: Install and build
-      run: |
-        sudo apt-get install libxml2-utils
-        python -m pip install --upgrade pip setuptools pytest-cov codecov
-        python -m pip install -e .[test,all]
-    - name: Test with coverage
-      run: pytest --cov=./ --cov-report=xml --open-files --remote-data
-    - name: Coverage report
-      uses: codecov/codecov-action@f532c3a  # v1.0.7
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-
-  dev_deps_tests:
-    runs-on: ubuntu-latest
-    needs: [pep_and_audit, initial_tests]
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Fetch tags
-      run: git fetch --prune --unshallow --tags
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-    - name: Install and build
-      run: |
-        sudo apt-get install libxml2-utils
-        python -m pip install --upgrade pip setuptools
-        python -m pip install git+https://github.com/astropy/astropy.git@master#egg=astropy
-        python -m pip install git+https://github.com/astropy/specutils.git@master#egg=specutils
-        python -m pip install -e .[test]
-    - name: Test with dev deps
-      run: pytest --open-files
-
-  old_deps_tests:
-    runs-on: ubuntu-16.04
-    needs: [pep_and_audit, initial_tests]
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Fetch tags
-      run: git fetch --prune --unshallow --tags
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.6'
-    - name: Install and build
-      run: |
-        sudo apt-get install libxml2-utils
-        python -m pip install --upgrade pip setuptools
-        python -m pip install numpy==1.16.6
-        python -m pip install scipy==1.1.0
-        python -m pip install astropy==3.2.2
-        python -m pip install -e .[test]
-    - name: Test with old deps
-      run: pytest --open-files
-
   other_oses:
     runs-on: ${{ matrix.os }}
-    needs: [pep_and_audit, initial_tests]
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -141,26 +26,7 @@ jobs:
     - name: Install and build
       run: |
         python -m pip install --upgrade pip setuptools
+        python -m pip install astropy==4.1rc2
         python -m pip install -e .[test,all]
     - name: Run tests
-      run: pytest --open-files
-
-  link_check:
-    runs-on: ubuntu-latest
-    needs: [pep_and_audit, initial_tests]
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-    - name: Install and build
-      run: |
-        python -m pip install --upgrade pip setuptools sphinx-astropy
-        python -m pip install -e .
-    - name: Docs link check
-      run: |
-        cd docs
-        make linkcheck
-      shell: bash
+      run: pytest --open-files --remote-data
