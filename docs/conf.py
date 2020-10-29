@@ -65,6 +65,8 @@ release = get_distribution(project).version
 # The short X.Y version.
 version = '.'.join(release.split('.')[:2])
 
+# A list of ignored prefixes for module index sorting.
+modindex_common_prefix = ['synphot.']
 
 # -- Options for HTML output --------------------------------------------------
 
