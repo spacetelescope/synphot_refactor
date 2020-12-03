@@ -2,7 +2,7 @@ synphot
 =======
 
 .. image:: https://img.shields.io/badge/ascl-1811.001-blue.svg?colorB=262255
-    :target: http://ascl.net/1811.001
+    :target: https://ascl.net/1811.001
     :alt: ascl:1811.001
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3673988.svg
@@ -10,7 +10,7 @@ synphot
    :alt: zenodo.3673988
 
 .. image:: https://readthedocs.org/projects/synphot/badge/?version=latest
-    :target: http://synphot.readthedocs.io/en/latest/?badge=latest
+    :target: https://synphot.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
 .. image:: https://github.com/spacetelescope/synphot_refactor/workflows/CI/badge.svg
