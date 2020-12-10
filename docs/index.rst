@@ -24,7 +24,7 @@ allows you to:
   type of sources through multiple bandpasses.
 
 This package covers the general functionalities not related to any particular
-observatory. If you use HST (and soon JWST), you might also be interested in
+observatory. If you use HST, you might also be interested in
 **stsynphot** (https://github.com/spacetelescope/stsynphot_refactor), which
 covers synthetic photometry for the telescope(s).
 
