@@ -50,9 +50,9 @@ jobs:
     # Make sure that packaging will work
     - name: pep517 build
       run: |
-        python -m pip install --upgrade setuptools build twine
+        python -m pip install --upgrade setuptools build twine>=3.3
         python -m build --sdist .
-        twine check dist/*
+        twine check --strict dist/*
     - name: Security audit
       run: |
         python -m pip install --upgrade bandit
