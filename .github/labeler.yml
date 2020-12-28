@@ -1,0 +1,61 @@
+docs:
+  - .github/**/*.md
+  - .readthedocs.yml
+  - docs/*
+  - docs/_static/*
+  - docs/_templates/*
+  - licenses/*
+  - synphot/docstrings.py
+  - '*.md'
+  - any: ['*.rst', '!CHANGES.rst']
+
+testing:
+  - .bandit.yaml
+  - .github/**/*.yml
+  - conftest.py
+  - synphot/tests/**/*
+
+installation:
+  - MANIFEST.in
+  - pyproject.toml
+  - setup.*
+
+Upstream changes:
+  - synphot/compat.py
+
+binning:
+  - synphot/binning.py
+
+C-extension:
+  - synphot/docstrings.py
+  - synphot/setup_package.py
+  - synphot/src/*
+
+config:
+  - synphot/config.py
+  - synphot/synphot.cfg
+
+models:
+  - synphot/blackbody.py
+  - synphot/models.py
+
+observation:
+  - synphot/observation.py
+
+reddening:
+  - synphot/reddening.py
+
+specio:
+  - synphot/specio.py
+
+spectrum:
+  - synphot/spectrum.py
+
+thermal:
+  - synphot/thermal.py
+
+units:
+  - synphot/units.py
+
+utils:
+  - synphot/utils.py

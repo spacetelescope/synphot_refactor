@@ -14,13 +14,30 @@ name: "CodeQL"
 on:
   push:
     branches: [ master ]
-  pull_request:
+  pull_request_target:
     # The branches below must be a subset of the branches above
     branches: [ master ]
 
 jobs:
+  cancel_ci:
+    name: Failure means CI cancelled on purpose
+    runs-on: ubuntu-latest
+    steps:
+    - name: Failure means CI is skipped on purpose
+      uses: pllim/action-skip-ci@main
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # This should only run if we did not skip CI
+    - name: Cancel Previous Runs
+      uses: styfle/cancel-workflow-action@0.6.0
+      with:
+        access_token: ${{ secrets.GITHUB_TOKEN }}
+
+  # The rest only run if above are done
+
   analyze:
     name: Analyze
+    needs: cancel_ci
     runs-on: ubuntu-latest
 
     strategy:

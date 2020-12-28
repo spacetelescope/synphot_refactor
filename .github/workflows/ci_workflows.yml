@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-  pull_request:
+  pull_request_target:
   schedule:
     # Weekly Monday 6AM build
     # * is a special character in YAML so you have to quote this string
@@ -10,9 +10,14 @@ on:
 
 jobs:
   cancel_ci:
-    name: Cancel CI
+    name: Mandatory checks before CI
     runs-on: ubuntu-latest
     steps:
+    # Base branch check should run whether we skip CI or not
+    - name: Check base branch
+      uses: pllim/action-check_pr_basebranch@main
+      with:
+        BASEBRANCH_NAME: master
     - name: Failure means CI is skipped on purpose
       uses: pllim/action-skip-ci@main
       with:
