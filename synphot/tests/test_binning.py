@@ -3,7 +3,6 @@
 
 # STDLIB
 import os
-import warnings
 
 # THIRD PARTY
 import numpy as np
@@ -12,7 +11,6 @@ import pytest
 # ASTROPY
 from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
-from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from .. import binning, exceptions, specio
@@ -187,60 +185,68 @@ class TestBinRange:
                 binning.pixel_range(self.bins, waverange[::-1]))
 
 
-def test_calcbinflux():
+class TestCalcbinflux:
     """Test both C-ext and Python versions of calcbinflux().
 
     This is a simplified version of
     :func:`synphot.observation.Observation.binspec`.
 
     """
-    # Get bandpass data for interpolation.
-    hdr, wave, thru = specio.read_fits_spec(
-        get_pkg_data_filename(os.path.join('data', 'hst_acs_hrc_f555w.fits')),
-        flux_col='THROUGHPUT', flux_unit=u.dimensionless_unscaled)
+    def setup_class(self):
+        # Get bandpass data for interpolation.
+        hdr, wave, thru = specio.read_fits_spec(
+            get_pkg_data_filename(
+                os.path.join('data', 'hst_acs_hrc_f555w.fits')),
+            flux_col='THROUGHPUT', flux_unit=u.dimensionless_unscaled)
 
-    # Binned data.
-    bins = generate_wavelengths(
-        minwave=6000, maxwave=6010, delta=1.0, log=False)[0]
-    edges = binning.calculate_bin_edges(bins)
+        # Binned data.
+        bins = generate_wavelengths(
+            minwave=6000, maxwave=6010, delta=1.0, log=False)[0]
+        edges = binning.calculate_bin_edges(bins)
 
-    # Merge bin edges and centers in with the natural waveset.
-    spwave = merge_wavelengths(
-        merge_wavelengths(wave.value, edges.value), bins.value)
+        # Merge bin edges and centers in with the natural waveset.
+        spwave = merge_wavelengths(
+            merge_wavelengths(wave.value, edges.value), bins.value)
 
-    # Compute indices associated to each endpoint.
-    indices = np.searchsorted(spwave, edges.value)
-    i_beg = indices[:-1]
-    i_end = indices[1:]
+        # Compute indices associated to each endpoint.
+        indices = np.searchsorted(spwave, edges.value)
+        i_beg = indices[:-1]
+        i_end = indices[1:]
 
-    # Prepare integration variables.
-    # In old test, this was bandpass * 1 FLAM, which is just bandpass value.
-    flux = np.interp(spwave, wave.value, thru.value)
-    avflux = (flux[1:] + flux[:-1]) * 0.5
-    deltaw = spwave[1:] - spwave[:-1]
+        # Prepare integration variables.
+        # In old test, this was bandpass * 1 FLAM, which is just bandpass
+        # value.
+        flux = np.interp(spwave, wave.value, thru.value)
+        avflux = (flux[1:] + flux[:-1]) * 0.5
+        deltaw = spwave[1:] - spwave[:-1]
 
-    # PYTHON: Sum over each bin.
-    binflux_py, intwave_py = binning._slow_calcbinflux(
-        bins.size, i_beg, i_end, avflux, deltaw)
+        self.size = bins.size
+        self.i_beg = i_beg
+        self.i_end = i_end
+        self.avflux = avflux
+        self.deltaw = deltaw
 
-    # C-EXT: Sum over each bin.
-    try:
+        # PYTHON: Sum over each bin.
+        self.binflux_py, self.intwave_py = binning._slow_calcbinflux(
+            self.size, self.i_beg, self.i_end, self.avflux, self.deltaw)
+
+    def test_c_ext(self):
+        # C-EXT: Sum over each bin.
         from .. import synphot_utils
-    except ImportError:
-        warnings.warn('synphot_utils import failed, C-ext test is skipped.',
-                      AstropyUserWarning)
-    else:
+
         binflux_c, intwave_c = synphot_utils.calcbinflux(
-            bins.size, i_beg, i_end, avflux, deltaw)
+            self.size, self.i_beg, self.i_end, self.avflux, self.deltaw)
 
         # Compare between Python and C-ext
-        np.testing.assert_allclose(binflux_py, binflux_c)
-        np.testing.assert_allclose(intwave_py, intwave_c)
+        np.testing.assert_allclose(self.binflux_py, binflux_c)
+        np.testing.assert_allclose(self.intwave_py, intwave_c)
 
-    # Compare with expected values.
-    # Flux values are inherited from old test, compare at 0.01% relative diff.
-    flux_ans = np.array(
-        [0.12265425, 0.12226972, 0.12184207, 0.12141429, 0.12098646, 0.1205586,
-         0.1201307, 0.11970269, 0.11927488, 0.11884699])
-    np.testing.assert_allclose(binflux_py, flux_ans, rtol=1e-4)
-    np.testing.assert_array_equal(intwave_py, np.ones(bins.size))
+    def test_py_old(self):
+        # Compare with expected values.
+        # Flux values are inherited from old test, compare at 0.01% relative
+        # diff.
+        flux_ans = np.array(
+            [0.12265425, 0.12226972, 0.12184207, 0.12141429, 0.12098646,
+             0.1205586, 0.1201307, 0.11970269, 0.11927488, 0.11884699])
+        np.testing.assert_allclose(self.binflux_py, flux_ans, rtol=1e-4)
+        np.testing.assert_array_equal(self.intwave_py, np.ones(self.size))
