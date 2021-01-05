@@ -26,6 +26,7 @@ jobs:
     - name: Failure means CI is skipped on purpose
       uses: pllim/action-skip-ci@main
       with:
+        SKIP_DIRECTIVES: '[skip ci],[ci skip],[skip codeql],[codeql skip]'
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     # This should only run if we did not skip CI
     - name: Cancel Previous Runs
