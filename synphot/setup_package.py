@@ -110,8 +110,8 @@ def get_extensions():
         numpy.get_include(),
         os.path.join(LOCALROOT, "include")])
     cfg['sources'] = [
-        str(os.path.join(LOCALROOT, 'src', 'synphot_utils.c')),
-        str(os.path.join(LOCALROOT, 'src', 'docstrings.c'))]
+        os.path.join(LOCALROOT, 'src', 'synphot_utils.c'),
+        os.path.join(LOCALROOT, 'src', 'docstrings.c')]
     cfg = dict((str(key), val) for key, val in cfg.items())
 
-    return [Extension(str('synphot.synphot_utils'), **cfg)]
+    return [Extension('synphot.synphot_utils', **cfg)]
