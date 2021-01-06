@@ -5,7 +5,7 @@ include CITATION.md
 
 include setup.cfg
 include pyproject.toml
-include synphot/include/.gitignore
+recursive-include synphot/include *.h
 
 recursive-include synphot *.c
 recursive-include docs *
