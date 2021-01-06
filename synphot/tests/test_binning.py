@@ -13,8 +13,8 @@ from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from .. import binning, exceptions, specio
-from ..utils import merge_wavelengths, generate_wavelengths
+from synphot import binning, exceptions, specio
+from synphot.utils import merge_wavelengths, generate_wavelengths
 
 
 @pytest.mark.parametrize(
@@ -232,7 +232,7 @@ class TestCalcbinflux:
 
     def test_c_ext(self):
         # C-EXT: Sum over each bin.
-        from .. import synphot_utils
+        from synphot import synphot_utils
 
         binflux_c, intwave_c = synphot_utils.calcbinflux(
             self.size, self.i_beg, self.i_end, self.avflux, self.deltaw)
