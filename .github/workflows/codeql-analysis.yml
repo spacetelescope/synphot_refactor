@@ -20,7 +20,7 @@ on:
 
 jobs:
   cancel_ci:
-    name: Failure means CI cancelled on purpose
+    name: Mandatory checks before CI
     runs-on: ubuntu-latest
     outputs:
       run_next: ${{ steps.skip_ci_step.outputs.run_next }}
