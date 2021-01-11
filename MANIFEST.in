@@ -5,8 +5,8 @@ include CITATION.md
 
 include setup.cfg
 include pyproject.toml
-recursive-include synphot/include *.h
 
+recursive-include synphot/include *.h
 recursive-include synphot *.c
 recursive-include docs *
 recursive-include licenses *

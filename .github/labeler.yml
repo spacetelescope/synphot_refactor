@@ -5,7 +5,6 @@ docs:
   - docs/_static/*
   - docs/_templates/*
   - licenses/*
-  - synphot/docstrings.py
   - '*.md'
   - any: ['*.rst', '!CHANGES.rst']
 
@@ -27,9 +26,8 @@ binning:
   - synphot/binning.py
 
 C-extension:
-  - synphot/docstrings.py
-  - synphot/setup_package.py
   - synphot/src/*
+  - synphot/include/*
 
 config:
   - synphot/config.py

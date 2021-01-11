@@ -5,8 +5,6 @@ import os
 import sys
 from setuptools import setup, Extension
 
-LOCALROOT = 'synphot'
-
 
 def get_extensions():
     from collections import defaultdict
@@ -15,9 +13,9 @@ def get_extensions():
     cfg = defaultdict(list)
     cfg['include_dirs'].extend([
         numpy.get_include(),
-        os.path.join(LOCALROOT, "include")])
+        os.path.join('synphot', 'include')])
     cfg['sources'] = [
-        os.path.join(LOCALROOT, 'src', 'synphot_utils.c')]
+        os.path.join('synphot', 'src', 'synphot_utils.c')]
     cfg = dict((str(key), val) for key, val in cfg.items())
 
     return [Extension('synphot.synphot_utils', **cfg)]

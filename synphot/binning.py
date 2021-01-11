@@ -20,7 +20,7 @@ def _slow_calcbinflux(len_binwave, i_beg, i_end, avflux, deltaw):
     This is only used if ``synphot.synphot_utils`` C-extension
     import fails.
 
-    See docstrings.py
+    See ``include/synphot_utils.h``.
 
     """
     binflux = np.empty(shape=(len_binwave, ), dtype=np.float64)
