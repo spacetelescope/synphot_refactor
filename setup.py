@@ -10,11 +10,7 @@ LOCALROOT = 'synphot'
 
 def get_extensions():
     from collections import defaultdict
-    try:
-        import numpy
-    except ImportError as e:
-        print(e, file=sys.stdout)
-        return []
+    import numpy
 
     cfg = defaultdict(list)
     cfg['include_dirs'].extend([
