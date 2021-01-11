@@ -4,8 +4,7 @@
 
 #include "Python.h"
 #include <numpy/arrayobject.h>
-
-#include "docstrings.h"
+#include "synphot_utils.h"
 
 
 static PyObject * py_calcbinflux(PyObject *self, PyObject *args) {

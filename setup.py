@@ -1,18 +1,25 @@
 #!/usr/bin/env python
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+import os
 import sys
-from setuptools import setup
+from setuptools import setup, Extension
 
-try:
-    from extension_helpers import get_extensions
-except ModuleNotFoundError:
-    print("""
-extension-helpers is not detected, please install with:
 
-    pip install -e .
-""")
-    sys.exit(1)
+def get_extensions():
+    from collections import defaultdict
+    import numpy
+
+    cfg = defaultdict(list)
+    cfg['include_dirs'].extend([
+        numpy.get_include(),
+        os.path.join('synphot', 'include')])
+    cfg['sources'] = [
+        os.path.join('synphot', 'src', 'synphot_utils.c')]
+    cfg = dict((str(key), val) for key, val in cfg.items())
+
+    return [Extension('synphot.synphot_utils', **cfg)]
+
 
 TEST_HELP = """
 Note: running tests is no longer done using 'python setup.py test'. Instead
