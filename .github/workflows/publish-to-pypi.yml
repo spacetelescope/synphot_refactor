@@ -1,26 +1,80 @@
-name: Publish to PyPI
+name: Release
 
 on:
-  release:
-    types: [released]
+  push:
+# FOR DEBUGGING ONLY -- UBCOMMENT BEFORE PROD
+#    tags:
+#    - '*'
 
 jobs:
-  build:
-      name: Publish release to PyPI
+  build_wheels:
+    name: Wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    if: github.repository == 'spacetelescope/synphot_refactor'
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, windows-latest, macos-latest]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v2
+      name: Install Python
+      with:
+        python-version: '3.8'
+    - name: Install dependencies
+      run: python -m pip install "cibuildwheel==1.7.4" "twine>=3.3"
+    - name: Build wheels
+      run: python -m cibuildwheel --output-dir wheelhouse
       env:
-        PYPI_USERNAME_STSCI_MAINTAINER: ${{ secrets.PYPI_USERNAME_STSCI_MAINTAINER }}
-        PYPI_PASSWORD_STSCI_MAINTAINER: ${{ secrets.PYPI_PASSWORD_STSCI_MAINTAINER }}
-        PYPI_USERNAME_OVERRIDE: ${{ secrets.PYPI_USERNAME_OVERRIDE }}
-        PYPI_PASSWORD_OVERRIDE: ${{ secrets.PYPI_PASSWORD_OVERRIDE }}
-        PYPI_TEST: ${{ secrets.PYPI_TEST }}
-        INDEX_URL_OVERRIDE: ${{ secrets.INDEX_URL_OVERRIDE }}
-      runs-on: ubuntu-latest
-      steps:
+        CIBW_BUILD: 'cp36-* cp37-* cp38-* cp39-*'
+        CIBW_TEST_REQUIRES: 'pytest pytest-astropy'
+        CIBW_TEST_COMMAND: 'python -c "import synphot; synphot.test()"'
+    - name: Check wheels
+      run: python -m twine check --strict wheelhouse/*
+    # Upload artifacts because gh-action-pypi-publish Docker is only on Linux
+    - name: Upload wheels
+      uses: actions/upload-artifact@v2
+      with:
+        name: additional-pylons
+        path: ./wheelhouse/*.whl
 
-          # Check out the commit containing this workflow file.
-          - name: checkout repo
-            uses: actions/checkout@v2
-         
-          - name: custom action
-            uses: spacetelescope/action-publish_to_pypi@master
-            id: custom_action_0
+  build_dist:
+    name: Source distribution
+    runs-on: ubuntu-latest
+    needs: build_wheels
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: python -m pip install build "twine>=3.3"
+    - name: Build package
+      run: python -m build --sdist .
+    - name: Check dist
+      run: python -m twine check --strict dist/*
+    - name: Test package
+      run: |
+        cd ..
+        python -m venv testenv
+        testenv/bin/pip install -U pip
+        testenv/bin/pip install pytest pytest-astropy
+        testenv/bin/pip install synphot_refactor/dist/*.tar.gz
+        testenv/bin/python -c "import synphot; synphot.test()"
+    - name: Download wheels
+      uses: actions/download-artifact@v2
+      with:
+        name: additional-pylons
+        path: dist
+    # FOR DEBUGGING ONLY: repository_url (TestPyPI) and verbose;
+    # Use appropriate token if debugging with TestPyPI
+    - name: Publish package to PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.TESTPYPI_TOKEN }}
+        repository_url: https://test.pypi.org/legacy/
+        verbose: true

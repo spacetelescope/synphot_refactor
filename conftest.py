@@ -21,8 +21,8 @@ enable_deprecations_as_exceptions()
 PYTEST_HEADER_MODULES['astropy'] = 'astropy'
 PYTEST_HEADER_MODULES['specutils'] = 'specutils'
 PYTEST_HEADER_MODULES['dust-extinction'] = 'dust_extinction'
-PYTEST_HEADER_MODULES.pop('Matplotlib')
-PYTEST_HEADER_MODULES.pop('Pandas')
-PYTEST_HEADER_MODULES.pop('h5py')
+PYTEST_HEADER_MODULES.pop('Matplotlib', None)
+PYTEST_HEADER_MODULES.pop('Pandas', None)
+PYTEST_HEADER_MODULES.pop('h5py', None)
 
 TESTED_VERSIONS['synphot'] = version
