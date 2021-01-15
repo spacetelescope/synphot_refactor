@@ -1,6 +1,9 @@
 1.1.0 (unreleased)
 ==================
 
+- ``synphot.synphot_utils`` C-extension is no longer optional. Your
+  installation will fail if it cannot build. [#297]
+
 1.0.1 (2020-08-03)
 ==================
 
