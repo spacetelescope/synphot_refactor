@@ -1,10 +1,8 @@
 name: Release
 
 on:
-  push:
-# FOR DEBUGGING ONLY -- UBCOMMENT BEFORE PROD
-#    tags:
-#    - '*'
+  release:
+    types: [released]
 
 jobs:
   build_wheels:
@@ -40,7 +38,7 @@ jobs:
         path: ./wheelhouse/*.whl
 
   build_dist:
-    name: Source distribution
+    name: Source dist and publish
     runs-on: ubuntu-latest
     needs: build_wheels
     steps:
@@ -75,6 +73,6 @@ jobs:
       uses: pypa/gh-action-pypi-publish@master
       with:
         user: __token__
-        password: ${{ secrets.TESTPYPI_TOKEN }}
-        repository_url: https://test.pypi.org/legacy/
-        verbose: true
+        password: ${{ secrets.PYPI_TOKEN }}
+        #repository_url: https://test.pypi.org/legacy/
+        #verbose: true
