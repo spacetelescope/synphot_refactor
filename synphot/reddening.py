@@ -295,8 +295,8 @@ def etau_madau(wave, z, **kwargs):
 
     ll = 912.0
     c = np.array([3.6e-3, 1.7e-3, 1.2e-3, 9.3e-4])
-    el = np.array([1216, 1026, 973, 950], dtype=np.float)  # noqa
-    tau = np.zeros_like(wave, dtype=np.float)
+    el = np.array([1216, 1026, 973, 950], dtype=float)  # noqa
+    tau = np.zeros_like(wave, dtype=float)
     xe = 1.0 + z
 
     # Lyman series

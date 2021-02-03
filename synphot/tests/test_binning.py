@@ -19,7 +19,7 @@ from ..utils import merge_wavelengths, generate_wavelengths
 
 @pytest.mark.parametrize(
     ('in_arr', 'out_arr'),
-    [(np.arange(10, 20, dtype=np.float), np.arange(9.5, 20)),
+    [(np.arange(10, 20, dtype=float), np.arange(9.5, 20)),
      (2 ** np.arange(1, 10), [1, 3, 6, 12, 24, 48, 96, 192, 384, 640])])
 def test_calculate_bin_edges(in_arr, out_arr):
     """Test bin edge calculations for even and uneven bins."""
