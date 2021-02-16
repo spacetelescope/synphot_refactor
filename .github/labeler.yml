@@ -12,6 +12,7 @@ testing:
   - .bandit.yaml
   - .github/**/*.yml
   - conftest.py
+  - tox.ini
   - synphot/tests/**/*
 
 installation:
