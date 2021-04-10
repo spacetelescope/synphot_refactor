@@ -4,6 +4,8 @@
 - ``synphot.synphot_utils`` C-extension is no longer optional. Your
   installation will fail if it cannot build. [#297]
 
+- ``~/.astropy/config/synphot.cfg`` is no longer updated on import. [#307]
+
 1.0.1 (2020-08-03)
 ==================
 
