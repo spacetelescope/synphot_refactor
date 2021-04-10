@@ -81,10 +81,17 @@ via HTTP, create a local directory where you plan to store the data files
     >>> from synphot.utils import download_data
     >>> file_list = download_data('/my/local/dir/trds')  # doctest: +SKIP
 
-Then copy `synphot.cfg <https://github.com/spacetelescope/synphot_refactor/blob/master/synphot/synphot.cfg>`_
-to your ``$HOME/.astropy/config/`` directory, if it is not there already.
-Uncomment and replace every instance of
-``/grp/hst/cdbs`` with ``/my/local/dir/trds`` so that ``synphot`` knows where to
+With ``astropy`` 4.1 or later, you can generate a
+``$HOME/.astropy/config/synphot.cfg`` file like this (otherwise, you can
+manually create one from :ref:`synphot_config_file`):
+
+.. doctest-requires:: astropy>=4.1
+
+    >>> from astropy.config import generate_config
+    >>> generate_config(pkgname='synphot')
+
+Then, you can modify it to your needs; Uncomment and replace every instance of
+file prefix with ``/my/local/dir/trds`` so that ``synphot`` knows where to
 look for these files.
 
 On the contrary, if you wish to rely solely on Astropy caching mechanism,
@@ -273,6 +280,7 @@ Using **synphot**
    :maxdepth: 1
 
    synphot/overview
+   synphot/config
    synphot/from_pysyn_iraf
    synphot/bandpass
    synphot/spectrum

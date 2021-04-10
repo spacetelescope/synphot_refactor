@@ -32,7 +32,7 @@ C-extension:
 
 config:
   - synphot/config.py
-  - synphot/synphot.cfg
+  - docs/synphot/config.rst
 
 models:
   - synphot/blackbody.py
