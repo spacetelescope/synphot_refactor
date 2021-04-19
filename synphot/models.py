@@ -22,7 +22,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from . import units
-from .compat import ASTROPY_LT_4_0
+from .compat import ASTROPY_LT_4_0, ASTROPY_LT_4_3
 from .exceptions import SynphotError
 from .utils import merge_wavelengths
 
@@ -289,7 +289,9 @@ class ConstFlux1D(_models.Const1D):
     def integrate(self, x):
         # TODO: Remove unit hardcoding when we use model with units natively.
         # TODO: We do not handle wav_unit as wave number nor energy for now.
-        if 'wav' in self._flux_unit.physical_type:
+        if ((ASTROPY_LT_4_3 and 'wav' in self._flux_unit.physical_type) or
+            (not ASTROPY_LT_4_3 and
+             any(['wav' in t for t in self._flux_unit.physical_type]))):
             wav_unit = u.AA
         else:
             wav_unit = u.Hz
