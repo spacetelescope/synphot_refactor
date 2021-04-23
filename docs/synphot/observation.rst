@@ -39,7 +39,7 @@ below::
     ...     os.path.join('data', 'hst_acs_hrc_f555w.fits'),
     ...     package='synphot.tests')
     >>> bp = SpectralElement.from_file(filename)
-    >>> binset = np.arange(1000, 11001, dtype=np.float)
+    >>> binset = np.arange(1000, 11001, dtype=float)
     >>> obs = Observation(sp, bp, binset=binset)
 
 It has these main general components:
