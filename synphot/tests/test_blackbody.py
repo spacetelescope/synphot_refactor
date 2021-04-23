@@ -4,8 +4,8 @@ import numpy as np
 from astropy import constants as const
 from astropy import units as u
 
-from ..blackbody import blackbody_nu
-from ..units import FNU
+from synphot.blackbody import blackbody_nu
+from synphot.units import FNU
 
 
 # This test was removed from astropy in

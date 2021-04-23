@@ -18,7 +18,7 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
-from .. import exceptions, specio, units
+from synphot import exceptions, specio, units
 
 
 @pytest.mark.remote_data
@@ -28,7 +28,7 @@ def test_read_remote_spec():
     .. note:: This is just I/O test. No check on data quality.
 
     """
-    from .. import config
+    from synphot import config
 
     hdr, wave, flux = specio.read_remote_spec(
         config.conf.vega_file, cache=False, show_progress=False)
@@ -41,7 +41,7 @@ def test_read_remote_spec():
 def test_read_ascii_spec():
     """Test read local ASCII spectrum."""
     specfile = get_pkg_data_filename(
-        os.path.join('data', 'qso_template_001.dat'))
+        os.path.join('data', 'qso_template_001.dat'), package='synphot.tests')
     hdr, wave, flux = specio.read_spec(specfile)
 
     assert_quantity_allclose(wave[::500], [800, 2050, 3300, 4550, 5800] * u.AA)

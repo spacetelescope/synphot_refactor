@@ -15,7 +15,7 @@ import pytest
 from astropy import units as u
 
 # LOCAL
-from .. import exceptions, units
+from synphot import exceptions, units
 
 # Wavelength conversions
 _wave_angstrom = [0.1, 5000.0, 10000.0] * u.AA
