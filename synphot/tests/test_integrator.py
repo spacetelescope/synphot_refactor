@@ -23,9 +23,9 @@ from astropy.tests.helper import assert_quantity_allclose
 from numpy.testing import assert_allclose
 
 # LOCAL
-from .. import models, units
-from ..exceptions import SynphotError
-from ..spectrum import SourceSpectrum, SpectralElement
+from synphot import models, units
+from synphot.exceptions import SynphotError
+from synphot.spectrum import SourceSpectrum, SpectralElement
 
 
 class TestSourceConstFlux1D:

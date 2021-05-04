@@ -19,19 +19,20 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
-from .. import exceptions, units
-from ..compat import HAS_DUST_EXTINCTION  # noqa
-from ..models import ConstFlux1D, Empirical1D
-from ..observation import Observation
-from ..reddening import ReddeningLaw, etau_madau
-from ..spectrum import SourceSpectrum, SpectralElement
+from synphot import exceptions, units
+from synphot.compat import HAS_DUST_EXTINCTION  # noqa
+from synphot.models import ConstFlux1D, Empirical1D
+from synphot.observation import Observation
+from synphot.reddening import ReddeningLaw, etau_madau
+from synphot.spectrum import SourceSpectrum, SpectralElement
 
 
 class TestExtinction:
     """Test ReddeningLaw and ExtinctionCurve classes (most methods)."""
     def setup_class(self):
         rfile = get_pkg_data_filename(
-            os.path.join('data', 'milkyway_diffuse_001.fits'))
+            os.path.join('data', 'milkyway_diffuse_001.fits'),
+            package='synphot.tests')
         self.redlaw = ReddeningLaw.from_file(rfile)
         self.extcurve = self.redlaw.extinction_curve(0.3 * u.mag)
 
@@ -90,9 +91,11 @@ class TestExtinction:
         https://github.com/spacetelescope/synphot_refactor/issues/129
         """
         bp = SpectralElement.from_file(get_pkg_data_filename(
-            os.path.join('data', 'hst_acs_hrc_f850lp.fits')))
+            os.path.join('data', 'hst_acs_hrc_f850lp.fits'),
+            package='synphot.tests'))
         qso = SourceSpectrum.from_file(get_pkg_data_filename(
-            os.path.join('data', 'qso_template_001.dat')))
+            os.path.join('data', 'qso_template_001.dat'),
+            package='synphot.tests'))
         extcurve = self.redlaw.extinction_curve(1.0 * u.mag)
         spext = qso * extcurve
         with pytest.warns(AstropyUserWarning):

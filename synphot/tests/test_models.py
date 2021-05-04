@@ -25,9 +25,9 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
-from .. import specio, units
-from ..models import (BlackBody1D, ConstFlux1D, Empirical1D, PowerLawFlux1D,
-                      get_metadata)
+from synphot import specio, units
+from synphot.models import (BlackBody1D, ConstFlux1D, Empirical1D,
+                            PowerLawFlux1D, get_metadata)
 
 
 def setup_module(module):
@@ -123,7 +123,8 @@ class TestEmpirical1D:
     """Test Empirical1D model."""
     def setup_class(self):
         filename = get_pkg_data_filename(
-            os.path.join('data', 'hst_acs_hrc_f555w_x_grw70d5824.fits'))
+            os.path.join('data', 'hst_acs_hrc_f555w_x_grw70d5824.fits'),
+            package='synphot.tests')
         hdr, x, f = specio.read_spec(filename)
         y = units.convert_flux(x, f, units.PHOTLAM)
         self.flux_flam = f.value
