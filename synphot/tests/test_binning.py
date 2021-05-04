@@ -13,8 +13,8 @@ from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from synphot import binning, exceptions, specio
-from synphot.utils import merge_wavelengths, generate_wavelengths
+from .. import binning, exceptions, specio
+from ..utils import merge_wavelengths, generate_wavelengths
 
 
 @pytest.mark.parametrize(
@@ -196,8 +196,7 @@ class TestCalcbinflux:
         # Get bandpass data for interpolation.
         hdr, wave, thru = specio.read_fits_spec(
             get_pkg_data_filename(
-                os.path.join('data', 'hst_acs_hrc_f555w.fits'),
-                package='synphot.tests'),
+                os.path.join('data', 'hst_acs_hrc_f555w.fits')),
             flux_col='THROUGHPUT', flux_unit=u.dimensionless_unscaled)
 
         # Binned data.
@@ -233,7 +232,7 @@ class TestCalcbinflux:
 
     def test_c_ext(self):
         # C-EXT: Sum over each bin.
-        from synphot import synphot_utils
+        from .. import synphot_utils
 
         binflux_c, intwave_c = synphot_utils.calcbinflux(
             self.size, self.i_beg, self.i_end, self.avflux, self.deltaw)

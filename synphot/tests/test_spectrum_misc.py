@@ -18,11 +18,11 @@ from astropy.modeling.models import Const1D, RedshiftScaleFactor
 from astropy.tests.helper import assert_quantity_allclose
 
 # LOCAL
-from synphot.tests.test_units import _wave, _flux_jy, _flux_photlam
-from synphot import exceptions, units
-from synphot.compat import ASTROPY_LT_4_0
-from synphot.models import Box1D, Empirical1D, GaussianFlux1D, get_waveset
-from synphot.spectrum import SourceSpectrum, SpectralElement
+from .test_units import _wave, _flux_jy, _flux_photlam
+from .. import exceptions, units
+from ..compat import ASTROPY_LT_4_0
+from ..models import Box1D, Empirical1D, GaussianFlux1D, get_waveset
+from ..spectrum import SourceSpectrum, SpectralElement
 
 
 def setup_module(module):

@@ -13,8 +13,8 @@ from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
 
 # LOCAL
-from synphot import exceptions
-from synphot.thermal import ThermalSpectralElement
+from .. import exceptions
+from ..thermal import ThermalSpectralElement
 
 
 def setup_module(module):
@@ -39,8 +39,7 @@ class TestThermalSpectralElement:
     """Test ``ThermalSpectralElement``."""
     def setup_class(self):
         thfile = get_pkg_data_filename(
-            os.path.join('data', 'wfc3_ir_g141_src_003_th.fits'),
-            package='synphot.tests')
+            os.path.join('data', 'wfc3_ir_g141_src_003_th.fits'))
         self.th = ThermalSpectralElement.from_file(thfile)
 
     def test_taper(self):
@@ -67,7 +66,6 @@ class TestThermalSpectralElement:
 
         # Missing DEFT keyword
         thfile = get_pkg_data_filename(
-            os.path.join('data', 'hst_acs_hrc_f555w.fits'),
-            package='synphot.tests')
+            os.path.join('data', 'hst_acs_hrc_f555w.fits'))
         with pytest.raises(exceptions.SynphotError):
             ThermalSpectralElement.from_file(thfile, flux_col='THROUGHPUT')

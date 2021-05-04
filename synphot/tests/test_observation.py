@@ -18,24 +18,19 @@ from astropy.utils.exceptions import (AstropyDeprecationWarning,
                                       AstropyUserWarning)
 
 # LOCAL
-from synphot.tests.test_units import _area
-from synphot import exceptions, units
-from synphot.compat import HAS_SPECUTILS  # noqa
-from synphot.models import (
-    BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, GaussianFlux1D
-)
-from synphot.observation import Observation
-from synphot.spectrum import SourceSpectrum, SpectralElement
+from .test_units import _area
+from .. import exceptions, units
+from ..compat import HAS_SPECUTILS  # noqa
+from ..models import (BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D,
+                      GaussianFlux1D)
+from ..observation import Observation
+from ..spectrum import SourceSpectrum, SpectralElement
 
 # Global test data files
 _specfile = get_pkg_data_filename(
-    os.path.join('data', 'grw_70d5824_stisnic_005.fits'),
-    package='synphot.tests'
-)
+    os.path.join('data', 'grw_70d5824_stisnic_005.fits'))
 _bandfile = get_pkg_data_filename(
-    os.path.join('data', 'hst_acs_hrc_f555w.fits'),
-    package='synphot.tests'
-)
+    os.path.join('data', 'hst_acs_hrc_f555w.fits'))
 
 
 class TestObservation:
@@ -417,11 +412,8 @@ class TestCountRateNegFlux:
     """Test countrate with files containing negative flux/throughput values."""
     def setup_class(self):
         self.bp = SpectralElement.from_file(get_pkg_data_filename(
-            os.path.join('data', 'cos_fuv_g130m_c1309_psa.fits'),
-            package='synphot.tests'))
-        self.spfile = get_pkg_data_filename(
-            os.path.join('data', 'us7.txt'), package='synphot.tests'
-        )
+            os.path.join('data', 'cos_fuv_g130m_c1309_psa.fits')))
+        self.spfile = get_pkg_data_filename(os.path.join('data', 'us7.txt'))
 
     @pytest.mark.parametrize(
         ('keep_neg', 'ans'),
@@ -447,14 +439,11 @@ def test_countrate_neg_leak():
     """
     # This bug only manifests itself in very specific cases.
     bp = SpectralElement.from_file(get_pkg_data_filename(
-        os.path.join('data', 'stis_fuv_f25ndq2_mjd58300_0822774.fits'),
-        package='synphot.tests'))
+        os.path.join('data', 'stis_fuv_f25ndq2_mjd58300_0822774.fits')))
     sp = SourceSpectrum.from_file(get_pkg_data_filename(
-        os.path.join('data', 'k93_4500_0_5_rn_box.fits'),
-        package='synphot.tests'))
+        os.path.join('data', 'k93_4500_0_5_rn_box.fits')))
     binset = np.fromfile(get_pkg_data_filename(
-        os.path.join('data', 'stis_fuv_f25ndq2_binset.bin'),
-        package='synphot.tests'))
+        os.path.join('data', 'stis_fuv_f25ndq2_binset.bin')))
     obs = Observation(sp, bp, binset=binset)
     area = 45238.93416  # HST cm^2
     wrange = [1109.22, 12000.0]  # Angstrom

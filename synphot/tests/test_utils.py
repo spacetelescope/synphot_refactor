@@ -12,7 +12,7 @@ import pytest
 from astropy import units as u
 
 # LOCAL
-from synphot import exceptions, utils, units
+from .. import exceptions, utils, units
 
 
 @pytest.mark.parametrize(
@@ -131,7 +131,7 @@ def test_download_bad_root(tmpdir):
 
 def test_download_data(tmpdir):
     """Test data download helper in dry run mode."""
-    from synphot.config import conf
+    from ..config import conf
 
     # Use case where user downloads all data into new dir.
     cdbs_root = os.path.join(tmpdir.strpath, 'cdbs')
