@@ -16,11 +16,11 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
-from .test_units import _area, _wave, _flux_photlam
-from .. import exceptions, units
-from ..compat import HAS_SPECUTILS  # noqa
-from ..models import Box1D, Empirical1D, GaussianAbsorption1D
-from ..spectrum import SpectralElement
+from synphot.tests.test_units import _area, _wave, _flux_photlam
+from synphot import exceptions, units
+from synphot.compat import HAS_SPECUTILS  # noqa
+from synphot.models import Box1D, Empirical1D, GaussianAbsorption1D
+from synphot.spectrum import SpectralElement
 
 
 @pytest.mark.remote_data
@@ -52,7 +52,8 @@ class TestEmpiricalBandpassFromFile:
     """This is the most common model used in ASTROLIB PYSYNPHOT."""
     def setup_class(self):
         bandfile = get_pkg_data_filename(
-            os.path.join('data', 'hst_acs_hrc_f555w.fits'))
+            os.path.join('data', 'hst_acs_hrc_f555w.fits'),
+            package='synphot.tests')
         self.bp = SpectralElement.from_file(bandfile)
 
     def test_invalid_flux_unit(self):

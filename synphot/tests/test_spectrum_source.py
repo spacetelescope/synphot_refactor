@@ -21,15 +21,17 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
-from .test_units import _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
-from .. import exceptions, units
-from ..compat import ASTROPY_LT_4_0
-from ..compat import HAS_SPECUTILS  # noqa
-from ..models import (
+from synphot.tests.test_units import (
+    _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
+)
+from synphot import exceptions, units
+from synphot.compat import ASTROPY_LT_4_0
+from synphot.compat import HAS_SPECUTILS  # noqa
+from synphot.models import (
     BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, Gaussian1D,
     GaussianFlux1D, Lorentz1D, RickerWavelet1D, PowerLawFlux1D)
-from ..observation import Observation
-from ..spectrum import SourceSpectrum, SpectralElement
+from synphot.observation import Observation
+from synphot.spectrum import SourceSpectrum, SpectralElement
 
 # GLOBAL VARIABLES
 _vspec = None  # Loaded in test_load_vspec()
@@ -92,7 +94,8 @@ class TestEmpiricalSourceFromFile:
     """This is the most common model used in ASTROLIB PYSYNPHOT."""
     def setup_class(self):
         specfile = get_pkg_data_filename(
-            os.path.join('data', 'hst_acs_hrc_f555w_x_grw70d5824.fits'))
+            os.path.join('data', 'hst_acs_hrc_f555w_x_grw70d5824.fits'),
+            package='synphot.tests')
         self.sp = SourceSpectrum.from_file(specfile)
 
     def test_invalid_flux_unit(self):
@@ -394,7 +397,8 @@ class TestNormalize:
 
         # ACS bandpass: band(acs,hrc,f555w)
         bandfile = get_pkg_data_filename(
-            os.path.join('data', 'hst_acs_hrc_f555w.fits'))
+            os.path.join('data', 'hst_acs_hrc_f555w.fits'),
+            package='synphot.tests')
         self.acs = SpectralElement.from_file(bandfile)
 
         # Box bandpass: box(5500,1)
