@@ -12,7 +12,7 @@ import pytest
 # ASTROPY
 from astropy import units as u
 from astropy.modeling.models import Const1D
-from astropy.tests.helper import catch_warnings, assert_quantity_allclose
+from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import (AstropyDeprecationWarning,
                                       AstropyUserWarning)
@@ -254,10 +254,10 @@ class TestObsPar:
 
     @pytest.mark.parametrize('binned', [True, False])
     def test_efflam(self, binned):
-        with catch_warnings(AstropyDeprecationWarning) as w:
+        with pytest.warns(AstropyDeprecationWarning,
+                          match='Usage of EFFLPHOT is deprecated') as w:
             x = self.obs.effective_wavelength(mode='efflphot', binned=binned)
-            assert len(w) == 1
-            assert str(w[0].message) == 'Usage of EFFLPHOT is deprecated.'
+        assert len(w) == 1
 
         np.testing.assert_allclose(x.value, 5344.312, rtol=1e-4)
 
