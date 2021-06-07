@@ -105,7 +105,10 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Install Linux libs
       if: startsWith(matrix.os, 'ubuntu')
-      run: sudo apt-get install libxml2-utils
+      run: |
+        sudo add-apt-repository --remove ppa:ondrej/ppa
+        sudo apt update
+        sudo apt-get install libxml2-utils
     - name: Install Python dependencies
       run: python -m pip install --upgrade pip tox
     - name: Run tests
