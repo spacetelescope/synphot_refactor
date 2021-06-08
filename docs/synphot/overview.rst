@@ -392,12 +392,17 @@ throughput (for bandpass). The extension header must contain the following
 keywords (unless you overwrite them with non-default values in
 :func:`~synphot.specio.read_fits_spec`):
 
-* ``TUNIT1`` set to :ref:`supported wavelength unit name <synphot_units>`.
-* ``TUNIT2`` set to :ref:`supported flux unit name <synphot_units>`
-  (source spectrum only).
 * ``TTYPE1`` set to "WAVELENGTH".
 * ``TTYPE2`` set to "FLUX" (for source spectrum) or "THROUGHPUT"
   (for bandpass).
+
+While these were required in ASTROLIB PYSYNPHOT, they are optional here in that
+default units would be applied, where applicable, if they are missing from
+the header. Regardless, setting them is highly recommended:
+
+* ``TUNIT1`` set to :ref:`supported wavelength unit name <synphot_units>`.
+* ``TUNIT2`` set to :ref:`supported flux unit name <synphot_units>`
+  (source spectrum only).
 
 For writing out FITS table, many options can be set to non-default as
 acceptable by :func:`~synphot.specio.write_fits_spec`.
