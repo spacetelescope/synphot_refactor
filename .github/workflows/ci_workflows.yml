@@ -37,49 +37,17 @@ jobs:
       matrix:
         include:
 
-          - name: Code style checks
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: codestyle
-
-          - name: PEP 517 build
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: twine
-
-          - name: Security audit
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: bandit
-
-          - name: Link check
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: linkcheck
-
           - name: Test without optional deps
             os: ubuntu-latest
             python: 3.8
             toxenv: py38-test
             toxposargs: --open-files
 
-          - name: Coverage test with remote data
+          - name: Test with remote data
             os: ubuntu-latest
             python: 3.9
-            toxenv: py39-test-alldeps-cov
+            toxenv: py39-test-alldeps
             toxposargs: --open-files --remote-data
-
-          - name: Test with dev dependencies
-            os: ubuntu-latest
-            python: 3.9
-            toxenv: py39-test-devdeps
-            toxposargs: --open-files
-
-          - name: Test with old dependencies
-            os: ubuntu-16.04
-            python: 3.7
-            toxenv: py37-test-oldestdeps
-            toxposargs: --open-files
 
           - name: Test in OSX
             os: macos-latest
