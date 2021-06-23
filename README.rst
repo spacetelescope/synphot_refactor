@@ -5,9 +5,9 @@ synphot
     :target: https://ascl.net/1811.001
     :alt: ascl:1811.001
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3673988.svg
-   :target: https://doi.org/10.5281/zenodo.3673988
-   :alt: zenodo.3673988
+.. image:: https://zenodo.org/badge/10061216.svg
+   :target: https://zenodo.org/badge/latestdoi/10061216
+   :alt: DOI: 10.5281/zenodo.5020322
 
 .. image:: https://readthedocs.org/projects/synphot/badge/?version=latest
     :target: https://synphot.readthedocs.io/en/latest/?badge=latest
