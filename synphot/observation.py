@@ -558,7 +558,7 @@ class Observation(BaseSourceSpectrum):
             Wavelength range only partially overlaps with observation.
 
         synphot.exceptions.SynphotError
-            Calculation failed.
+            Calculation failed, including but not limited to NaNs in flux.
 
         """
         # Sample the observation
