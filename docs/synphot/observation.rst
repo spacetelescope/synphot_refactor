@@ -107,6 +107,8 @@ one wavelength bin corresponds to one detector pixel::
     >>> obs.countrate(area)  # doctest: +FLOAT_CMP
     <Quantity 137190.19332899 ct / s>
 
+.. note:: If flux values contain NaNs, ``countrate()`` will raise ``SynphotError``.
+
 An observation can be converted to a **regular source spectrum** containing
 only the wavelength set and sampled flux (binned by default) by using its
 :meth:`~synphot.observation.Observation.as_spectrum` method.
