@@ -22,7 +22,7 @@ else:
 __all__ = ['ASTROPY_LT_5_0', 'ASTROPY_LT_4_3', 'ASTROPY_LT_4_1',
            'ASTROPY_LT_4_0', 'HAS_SPECUTILS', 'HAS_DUST_EXTINCTION']
 
-ASTROPY_LT_5_0 = not minversion(astropy, '4.99')  # astropy<5 but includes 5.0.dev
+ASTROPY_LT_5_0 = not minversion(astropy, '4.99')  # astropy<5 but includes 5.0.dev  # noqa
 ASTROPY_LT_4_3 = not minversion(astropy, '4.3')
 ASTROPY_LT_4_1 = not minversion(astropy, '4.1')
 ASTROPY_LT_4_0 = not minversion(astropy, '4.0')
