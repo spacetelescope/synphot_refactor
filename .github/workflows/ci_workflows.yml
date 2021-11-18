@@ -9,53 +9,16 @@ on:
     - cron: '0 6 * * 1'
 
 jobs:
-  initial_check:
-    name: Mandatory checks before CI
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check base branch
-      uses: actions/github-script@v3
-      if: github.event_name == 'pull_request'
-      with:
-        script: |
-          const allowed_basebranch = 'master';
-          const pr = context.payload.pull_request;
-          if (pr.base.ref !== allowed_basebranch) {
-            core.setFailed(`PR opened against ${pr.base.ref}, not ${allowed_basebranch}`);
-          } else {
-            core.info(`PR opened correctly against ${allowed_basebranch}`);
-          }
 
   # The rest only run if above are done
 
   tests:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
-    needs: initial_check
     strategy:
       fail-fast: true
       matrix:
         include:
-
-          - name: Code style checks
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: codestyle
-
-          - name: PEP 517 build
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: twine
-
-          - name: Security audit
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: bandit
-
-          - name: Link check
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: linkcheck
 
           - name: Test without optional deps
             os: ubuntu-latest
@@ -68,18 +31,6 @@ jobs:
             python: 3.9
             toxenv: py39-test-alldeps-cov
             toxposargs: --open-files --remote-data
-
-          - name: Test with dev dependencies
-            os: ubuntu-latest
-            python: 3.9
-            toxenv: py39-test-devdeps
-            toxposargs: --open-files
-
-          - name: Test with old dependencies
-            os: ubuntu-18.04
-            python: 3.7
-            toxenv: py37-test-oldestdeps
-            toxposargs: --open-files
 
           - name: Test in OSX
             os: macos-latest
@@ -104,7 +55,9 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
     - name: Install Python dependencies
-      run: python -m pip install --upgrade pip tox
+      run: |
+        python -m pip install --upgrade pip tox
+        python -m pip install "astropy[test]==5.0rc2"
     - name: Run tests
       run: tox -e ${{ matrix.toxenv }} -- ${{ matrix.toxposargs }}
     - name: Upload coverage to codecov
