@@ -1,4 +1,4 @@
-1.2.0 (unreleased)
+1.1.1 (2021-11-17)
 ==================
 
 - Compatibility with ``astropy`` 5.0. [#321]
