@@ -57,7 +57,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip tox
-        python -m pip install "astropy[test]==5.0rc2"
+        python -m pip install "astropy==5.0rc2"
     - name: Run tests
       run: tox -e ${{ matrix.toxenv }} -- ${{ matrix.toxposargs }}
     - name: Upload coverage to codecov
