@@ -1,6 +1,7 @@
 name: Release
 
 on:
+  pull_request:
   release:
     types: [released]
 
@@ -11,27 +12,29 @@ jobs:
     if: github.repository == 'spacetelescope/synphot_refactor'
     strategy:
       matrix:
-        os: [ubuntu-18.04, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
     - uses: actions/setup-python@v2
-      name: Install Python
-      with:
-        python-version: '3.8'
     - name: Install dependencies
-      run: python -m pip install "cibuildwheel==1.7.4" "twine>=3.3"
+      run: |
+        python -m pip install pip "twine>=3.3" -U
+        python -m pip install "cibuildwheel==2.2.2"
+    # TODO: Enable py310-* when scipy allows
     - name: Build wheels
       run: python -m cibuildwheel --output-dir wheelhouse
       env:
         CIBW_BUILD: 'cp36-* cp37-* cp38-* cp39-*'
+        CIBW_SKIP: '*-musllinux_*'
         CIBW_TEST_REQUIRES: 'pytest pytest-astropy'
         CIBW_TEST_COMMAND: 'python -c "import synphot; synphot.test()"'
     - name: Check wheels
       run: python -m twine check --strict wheelhouse/*
     # Upload artifacts because gh-action-pypi-publish Docker is only on Linux
     - name: Upload wheels
+      if: github.event_name == 'release'
       uses: actions/upload-artifact@v2
       with:
         name: additional-pylons
@@ -49,7 +52,7 @@ jobs:
       with:
         python-version: 3.8
     - name: Install dependencies
-      run: python -m pip install build "twine>=3.3"
+      run: python -m pip install pip build "twine>=3.3" -U
     - name: Build package
       run: python -m build --sdist .
     - name: Check dist
@@ -63,6 +66,7 @@ jobs:
         testenv/bin/pip install synphot_refactor/dist/*.tar.gz
         testenv/bin/python -c "import synphot; synphot.test()"
     - name: Download wheels
+      if: github.event_name == 'release'
       uses: actions/download-artifact@v2
       with:
         name: additional-pylons
@@ -70,6 +74,7 @@ jobs:
     # FOR DEBUGGING ONLY: repository_url (TestPyPI) and verbose;
     # Use appropriate token if debugging with TestPyPI
     - name: Publish package to PyPI
+      if: github.event_name == 'release'
       uses: pypa/gh-action-pypi-publish@master
       with:
         user: __token__
