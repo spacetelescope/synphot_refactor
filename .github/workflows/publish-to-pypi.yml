@@ -25,7 +25,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install pip "twine>=3.3" -U
-        python -m pip install "cibuildwheel==2.2.2"
+        python -m pip install "cibuildwheel==2.5.0"
     # TODO: Enable py310-* when scipy allows
     - name: Build wheels
       run: python -m cibuildwheel --output-dir wheelhouse
