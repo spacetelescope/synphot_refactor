@@ -5,6 +5,10 @@ on:
   release:
     types: [released]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build_wheels:
     name: Wheels on ${{ matrix.os }}
@@ -14,10 +18,10 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v3
     - name: Install dependencies
       run: |
         python -m pip install pip "twine>=3.3" -U
@@ -26,7 +30,7 @@ jobs:
     - name: Build wheels
       run: python -m cibuildwheel --output-dir wheelhouse
       env:
-        CIBW_BUILD: 'cp36-* cp37-* cp38-* cp39-*'
+        CIBW_BUILD: 'cp38-* cp39-* cp310-*'
         CIBW_SKIP: '*-musllinux_*'
         CIBW_TEST_REQUIRES: 'pytest pytest-astropy'
         CIBW_TEST_COMMAND: 'python -c "import synphot; synphot.test()"'
@@ -35,7 +39,7 @@ jobs:
     # Upload artifacts because gh-action-pypi-publish Docker is only on Linux
     - name: Upload wheels
       if: github.event_name == 'release'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: additional-pylons
         path: ./wheelhouse/*.whl
@@ -45,10 +49,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_wheels
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v3
       with:
         python-version: 3.8
     - name: Install dependencies
@@ -67,7 +71,7 @@ jobs:
         testenv/bin/python -c "import synphot; synphot.test()"
     - name: Download wheels
       if: github.event_name == 'release'
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: additional-pylons
         path: dist
@@ -75,7 +79,7 @@ jobs:
     # Use appropriate token if debugging with TestPyPI
     - name: Publish package to PyPI
       if: github.event_name == 'release'
-      uses: pypa/gh-action-pypi-publish@master
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
         password: ${{ secrets.PYPI_TOKEN }}
