@@ -87,15 +87,15 @@ jobs:
 
           - name: Test in OSX
             os: macos-latest
-            python: 3.9
-            toxenv: py39-test-alldeps
+            python: '3.10'
+            toxenv: py310-test-alldeps
             toxposargs: --open-files
 
           # NOTE: If TRDS cannot take the hit, disable --remote-data
           - name: Test in Windows with remote data
             os: windows-latest
-            python: '3.10'
-            toxenv: py310-test-alldeps
+            python: 3.9
+            toxenv: py39-test-alldeps
             toxposargs: --open-files --remote-data
 
     steps:
