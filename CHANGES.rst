@@ -1,6 +1,9 @@
 1.2.0 (unreleased)
 ==================
 
+- Dropped support for Python 3.6 and 3.7. Minimum supported Python
+  version is now 3.8. [#330]
+
 1.1.1 (2021-11-18)
 ==================
 
