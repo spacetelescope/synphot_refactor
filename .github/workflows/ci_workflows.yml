@@ -40,13 +40,13 @@ jobs:
           - name: Coverage test with remote data
             os: ubuntu-latest
             python: '3.10'
-            toxenv: py39-test-alldeps-cov
+            toxenv: py310-test-alldeps-cov
             toxposargs: --open-files --remote-data
 
           - name: Test in OSX
             os: macos-latest
             python: 3.8
-            toxenv: py39-test-alldeps
+            toxenv: py38-test-alldeps
             toxposargs: --open-files
 
           # NOTE: If TRDS cannot take the hit, disable --remote-data
