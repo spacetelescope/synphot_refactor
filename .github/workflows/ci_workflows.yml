@@ -8,13 +8,17 @@ on:
     # * is a special character in YAML so you have to quote this string
     - cron: '0 6 * * 1'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   initial_check:
     name: Mandatory checks before CI
     runs-on: ubuntu-latest
     steps:
     - name: Check base branch
-      uses: actions/github-script@v3
+      uses: actions/github-script@v6
       if: github.event_name == 'pull_request'
       with:
         script: |
@@ -71,20 +75,20 @@ jobs:
 
           - name: Test with dev dependencies
             os: ubuntu-latest
-            python: 3.9
-            toxenv: py39-test-devdeps
+            python: '3.10'
+            toxenv: py310-test-devdeps
             toxposargs: --open-files
 
           - name: Test with old dependencies
             os: ubuntu-18.04
-            python: 3.7
-            toxenv: py37-test-oldestdeps
+            python: 3.8
+            toxenv: py38-test-oldestdeps
             toxposargs: --open-files
 
           - name: Test in OSX
             os: macos-latest
-            python: 3.9
-            toxenv: py39-test-alldeps
+            python: '3.10'
+            toxenv: py310-test-alldeps
             toxposargs: --open-files
 
           # NOTE: If TRDS cannot take the hit, disable --remote-data
@@ -96,11 +100,11 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python }}
     - name: Install Python dependencies
@@ -109,6 +113,6 @@ jobs:
       run: tox -e ${{ matrix.toxenv }} -- ${{ matrix.toxposargs }}
     - name: Upload coverage to codecov
       if: ${{ contains(matrix.toxenv,'-cov') }}
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
