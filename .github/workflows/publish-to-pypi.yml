@@ -32,6 +32,7 @@ jobs:
       env:
         CIBW_BUILD: 'cp38-* cp39-* cp310-*'
         CIBW_SKIP: '*-musllinux_*'
+        CIBW_ARCHS_WINDOWS: 'AMD64'
         CIBW_TEST_REQUIRES: 'pytest pytest-astropy'
         CIBW_TEST_COMMAND: 'python -c "import synphot; synphot.test()"'
     - name: Check wheels
