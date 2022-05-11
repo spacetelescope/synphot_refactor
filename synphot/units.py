@@ -49,10 +49,10 @@ FLAM = u.def_unit(
 FNU = u.def_unit(
     'fnu', u.erg / (u.cm**2 * u.s * u.Hz),
     format={'generic': 'FNU', 'console': 'FNU'})
-OBMAG = u.def_unit(
-    'obmag', u.mag, format={'generic': 'OBMAG', 'console': 'OBMAG'})
-VEGAMAG = u.def_unit(
-    'vegamag', u.mag, format={'generic': 'VEGAMAG', 'console': 'VEGAMAG'})
+_u_ob = u.def_unit('OB')
+OBMAG = u.mag(_u_ob)
+_u_vega = u.def_unit('VEGA')
+VEGAMAG = u.mag(_u_vega)
 
 # Register with astropy units
 u.add_enabled_units([PHOTLAM, PHOTNU, FLAM, FNU, OBMAG, VEGAMAG])
@@ -348,6 +348,10 @@ def validate_unit(input_unit):
             output_unit = u.STmag
         elif input_unit_lowcase in ('abmag', 'mag(ab)'):
             output_unit = u.ABmag
+        elif input_unit_lowcase in ('obmag', 'mag(ob)'):
+            output_unit = OBMAG
+        elif input_unit_lowcase in ('vegamag', 'mag(vega)'):
+            output_unit = VEGAMAG
 
         else:
             try:  # astropy.units is case-sensitive
