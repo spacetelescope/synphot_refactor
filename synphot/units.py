@@ -1,9 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module handles photometry units that are not in `astropy.units`."""
 
-# THIRD-PARTY
-import numpy as np
-
 # ASTROPY
 from astropy import constants as const
 from astropy import units as u
@@ -109,20 +106,12 @@ def spectral_density_vega(wav, vegaflux):
         PHOTLAM, equivalencies=u.spectral_density(wav)).value
 
     def converter(x):
-        """Set nan/inf to -99 mag."""
-        val = -2.5 * np.log10(x / vega_photlam)
-        result = np.zeros(val.shape, dtype=np.float64) - 99
-        mask = np.isfinite(val)
-        if result.ndim > 0:
-            result[mask] = val[mask]
-        elif mask:
-            result = np.asarray(val)
-        return result
+        return x / vega_photlam
 
     def iconverter(x):
-        return vega_photlam * 10**(-0.4 * x)
+        return x * vega_photlam
 
-    return [(PHOTLAM, VEGAMAG, converter, iconverter)]
+    return [(PHOTLAM, VEGAMAG.physical_unit, converter, iconverter)]
 
 
 def spectral_density_count(wav, area):
@@ -156,14 +145,8 @@ def spectral_density_count(wav, area):
     def iconverter_count(x):
         return x / factor
 
-    def converter_obmag(x):
-        return -2.5 * np.log10(x * factor)
-
-    def iconverter_obmag(x):
-        return 10**(-0.4 * x) / factor
-
     return [(PHOTLAM, u.count, converter_count, iconverter_count),
-            (PHOTLAM, OBMAG, converter_obmag, iconverter_obmag)]
+            (PHOTLAM, OBMAG.physical_unit, converter_count, iconverter_count)]
 
 
 def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):

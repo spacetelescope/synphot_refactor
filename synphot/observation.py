@@ -458,7 +458,7 @@ class Observation(BaseSourceSpectrum):
         if flux_unit == u.count or flux_unit_name == units.OBMAG.to_string():
             val = self.countrate(area, binned=False, wavelengths=wavelengths)
 
-            if flux_unit.decompose() == u.mag:
+            if flux_unit == units.OBMAG:
                 eff_stim = (-2.5 * np.log10(val.value)) * flux_unit
             else:
                 eff_stim = val
