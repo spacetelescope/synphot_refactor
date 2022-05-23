@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Test units.py module.
 
-.. note:: VEGAMAG conversion is tested in test_spectrum.py.
+.. note:: VEGAMAG conversion is tested in test_spectrum_source.py.
 
 .. note:: spectral_density_integrated is tested in astropy>=4.1.
 
@@ -13,6 +13,7 @@ import pytest
 
 # ASTROPY
 from astropy import units as u
+from astropy.tests.helper import assert_quantity_allclose
 
 # LOCAL
 from synphot import exceptions, units
@@ -176,3 +177,18 @@ def test_flux_conversion_exceptions():
         units.convert_flux(_wave, _flux_photlam, u.count, area=None)
     with pytest.raises(exceptions.SynphotError):
         units.convert_flux(_wave, _flux_obmag, units.PHOTLAM, area=None)
+
+
+def test_vegamag_obmag_calculations():
+    assert_quantity_allclose(
+        5 * units.VEGAMAG - 2.5 * units.VEGAMAG, u.Magnitude(2.5))
+    assert_quantity_allclose(
+        (5 * units.VEGAMAG - 2.5 * units.VEGAMAG).to(u.one), 0.1)
+
+    # Should not be interchangeable with astropy mag unit or with another
+    # custom mag unit, but error is only raised if .to(u.one) is called.
+    msg = 'subtract magnitudes so the unit got lost'
+    with pytest.raises(u.UnitConversionError, match=msg):
+        (5 * units.VEGAMAG - 2.5 * u.STmag).to(u.one)
+    with pytest.raises(u.UnitConversionError, match=msg):
+        5 * units.VEGAMAG - 2.5 * units.OBMAG.to(u.one)

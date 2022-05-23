@@ -48,7 +48,7 @@ for flux conversion)::
     <Quantity [6.62607015e-24, 6.62607015e-23] FNU>
     >>> area = 45238.93416 * units.AREA  # HST
     >>> sp(wave, flux_unit=units.OBMAG, area=area)  # doctest: +FLOAT_CMP
-    <Quantity [-21.52438718,-21.52438718] OBMAG>
+    <Magnitude [-21.52438718,-21.52438718] mag(OB)>
 
 .. _synphot_reddening:
 

@@ -1,9 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """This module handles photometry units that are not in `astropy.units`."""
 
-# THIRD-PARTY
-import numpy as np
-
 # ASTROPY
 from astropy import constants as const
 from astropy import units as u
@@ -49,10 +46,10 @@ FLAM = u.def_unit(
 FNU = u.def_unit(
     'fnu', u.erg / (u.cm**2 * u.s * u.Hz),
     format={'generic': 'FNU', 'console': 'FNU'})
-OBMAG = u.def_unit(
-    'obmag', u.mag, format={'generic': 'OBMAG', 'console': 'OBMAG'})
-VEGAMAG = u.def_unit(
-    'vegamag', u.mag, format={'generic': 'VEGAMAG', 'console': 'VEGAMAG'})
+_u_ob = u.def_unit('OB')
+OBMAG = u.mag(_u_ob)
+_u_vega = u.def_unit('VEGA')
+VEGAMAG = u.mag(_u_vega)
 
 # Register with astropy units
 u.add_enabled_units([PHOTLAM, PHOTNU, FLAM, FNU, OBMAG, VEGAMAG])
@@ -109,20 +106,12 @@ def spectral_density_vega(wav, vegaflux):
         PHOTLAM, equivalencies=u.spectral_density(wav)).value
 
     def converter(x):
-        """Set nan/inf to -99 mag."""
-        val = -2.5 * np.log10(x / vega_photlam)
-        result = np.zeros(val.shape, dtype=np.float64) - 99
-        mask = np.isfinite(val)
-        if result.ndim > 0:
-            result[mask] = val[mask]
-        elif mask:
-            result = np.asarray(val)
-        return result
+        return x / vega_photlam
 
     def iconverter(x):
-        return vega_photlam * 10**(-0.4 * x)
+        return x * vega_photlam
 
-    return [(PHOTLAM, VEGAMAG, converter, iconverter)]
+    return [(PHOTLAM, VEGAMAG.physical_unit, converter, iconverter)]
 
 
 def spectral_density_count(wav, area):
@@ -156,14 +145,8 @@ def spectral_density_count(wav, area):
     def iconverter_count(x):
         return x / factor
 
-    def converter_obmag(x):
-        return -2.5 * np.log10(x * factor)
-
-    def iconverter_obmag(x):
-        return 10**(-0.4 * x) / factor
-
     return [(PHOTLAM, u.count, converter_count, iconverter_count),
-            (PHOTLAM, OBMAG, converter_obmag, iconverter_obmag)]
+            (PHOTLAM, OBMAG.physical_unit, converter_count, iconverter_count)]
 
 
 def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
@@ -348,6 +331,10 @@ def validate_unit(input_unit):
             output_unit = u.STmag
         elif input_unit_lowcase in ('abmag', 'mag(ab)'):
             output_unit = u.ABmag
+        elif input_unit_lowcase in ('obmag', 'mag(ob)'):
+            output_unit = OBMAG
+        elif input_unit_lowcase in ('vegamag', 'mag(vega)'):
+            output_unit = VEGAMAG
 
         else:
             try:  # astropy.units is case-sensitive
