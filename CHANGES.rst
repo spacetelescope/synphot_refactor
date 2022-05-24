@@ -1,6 +1,9 @@
 1.2.0 (unreleased)
 ==================
 
+- New ``filter_parameterization`` subpackage to handle filter parameterization,
+  adapted from ``tynt`` package written by Brett Morris. [#257]
+
 - Dropped support for Python 3.6 and 3.7. Minimum supported Python
   version is now 3.8. [#330]
 

@@ -287,6 +287,7 @@ Using **synphot**
    synphot/observation
    synphot/formulae
    synphot/units
+   synphot/filter_par
    synphot/tutorials
 
 .. _synphot_history:
@@ -324,6 +325,8 @@ Also imports this C-extension to local namespace:
    :no-inheritance-diagram:
 
 .. automodapi:: synphot.exceptions
+
+.. automodapi:: synphot.filter_parameterization
 
 .. automodapi:: synphot.models
 
