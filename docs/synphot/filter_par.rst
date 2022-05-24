@@ -8,10 +8,10 @@ Parameterized Filters
     The algorithm for parameterized filters here was originally developed by
     Brett Morris for the `tynt <https://github.com/bmorris3/tynt/>`_ package.
 
-Some filters could be approximated using Fast Fourier Transform (FFT).
+Filter responses can be approximated using Fast Fourier Transform (FFT).
 If a filter is approximated this way, one only needs to store its FFT
-parameters instead of all the sampled data points. This would reduce the
-storage size and increase performance, at the cost of reduced accuracy.
+parameters instead of all the sampled data points. This reduces the
+storage size and increases performance, at the cost of reduced accuracy.
 If you decide to use the parameterization functions provided here,
 it is up to you to decide whether the results are good enough for your
 use cases or not.
