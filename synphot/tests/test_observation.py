@@ -454,7 +454,7 @@ def test_countrate_neg_leak():
         package='synphot.tests'))
     binset = np.fromfile(get_pkg_data_filename(
         os.path.join('data', 'stis_fuv_f25ndq2_binset.bin'),
-        package='synphot.tests'))
+        package='synphot.tests'), dtype='<f8')
     obs = Observation(sp, bp, binset=binset)
     area = 45238.93416  # HST cm^2
     wrange = [1109.22, 12000.0]  # Angstrom
