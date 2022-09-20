@@ -7,7 +7,6 @@ import warnings
 from copy import deepcopy
 from functools import partial
 
-import astropy.modeling.functional_models
 # THIRD-PARTY
 import numpy as np
 

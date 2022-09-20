@@ -14,7 +14,6 @@ import numpy as np
 # ASTROPY
 from astropy import log
 from astropy import units as u
-from astropy.units import Unit
 from astropy.utils.exceptions import (AstropyUserWarning,
                                       AstropyDeprecationWarning)
 
