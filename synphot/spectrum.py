@@ -45,7 +45,7 @@ class BaseSpectrum:
     Parameters
     ----------
     modelclass : cls
-        Model class from `astropy.modeling.models`.
+        Model class from `astropy.modeling`.
 
     clean_meta : bool
         Scrub "expr" and "header" entries from input metadata before merging.
@@ -447,7 +447,7 @@ class BaseSpectrum:
             integration is requested but no possible, trapezoid integration
             is done anyway.
 
-        flux_unit : str, `~astropy.units.core.Unit`, or `None`
+        flux_unit : str, `~astropy.units.Unit`, or `None`
             **This option is only available for source spectrum.**
             For trapezoid integration, flux is converted to this unit for
             sampling before integration. For analytical integration, while
@@ -863,7 +863,7 @@ class BaseSpectrum:
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
 
-        flux_unit : str, `~astropy.units.core.Unit`, or `None`
+        flux_unit : str, `~astropy.units.Unit`, or `None`
             This option is not applicable to unitless spectrum like bandpass.
             Flux is converted to this unit before written out.
             If not given, internal unit is used.
@@ -928,7 +928,7 @@ class BaseSourceSpectrum(BaseSpectrum):
             Wavelength values for sampling. If not a Quantity,
             assumed to be in Angstrom.
 
-        flux_unit : str, `~astropy.units.core.Unit`, or `None`
+        flux_unit : str, `~astropy.units.Unit`, or `None`
             Flux is converted to this unit.
             If not given, internal unit is used.
 
@@ -1271,7 +1271,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
 
-        flux_unit : str, `~astropy.units.core.Unit`, or `None`
+        flux_unit : str, `~astropy.units.Unit`, or `None`
             Flux is converted to this unit for plotting.
             If not given, internal unit is used.
 
@@ -1305,7 +1305,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, ``self.waveset`` is used.
 
-        flux_unit : str, `~astropy.units.core.Unit`, or `None`
+        flux_unit : str, `~astropy.units.Unit`, or `None`
             Flux is converted to this unit before written out.
             If not given, internal unit is used.
 
@@ -1485,7 +1485,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         wavelengths : array-like, `~astropy.units.quantity.Quantity`, or `None`
             Wavelength values for integration.
             If not a Quantity, assumed to be in Angstrom.
-            If `None`, `waveset` is used.
+            If `None`, ``waveset`` is used.
 
         threshold : float
             If less than this fraction of flux or throughput falls
@@ -1799,7 +1799,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         Parameters
         ----------
         kwargs : dict
-            See :meth:`integrate`.
+            See :meth:`~synphot.spectrum.BaseSpectrum.integrate`.
 
         Returns
         -------

@@ -113,12 +113,12 @@ def read_ascii_spec(filename, wave_unit=u.AA, flux_unit=units.FLAM, **kwargs):
     filename : str or file pointer
         Spectrum file name or pointer.
 
-    wave_unit, flux_unit : str or `~astropy.units.core.Unit`
+    wave_unit, flux_unit : str or `~astropy.units.Unit`
         Wavelength and flux units, which default to Angstrom and FLAM,
         respectively.
 
     kwargs : dict
-        Keywords accepted by :func:`astropy.io.ascii.ui.read`.
+        Keywords accepted by :func:`astropy.io.ascii.read`.
 
     Returns
     -------
@@ -164,7 +164,7 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
     wave_col, flux_col : str
         Wavelength and flux column names (case-insensitive).
 
-    wave_unit, flux_unit : str or `~astropy.units.core.Unit`
+    wave_unit, flux_unit : str or `~astropy.units.Unit`
         Wavelength and flux units, which default to Angstrom and FLAM,
         respectively. These are *only* used if ``TUNIT1`` and ``TUNIT2``
         keywords are not present in table (not primary) header.
@@ -264,7 +264,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={},
     wave_col, flux_col : str
         Wavelength and flux column names (case-insensitive).
 
-    wave_unit, flux_unit : str or `~astropy.units.core.Unit`
+    wave_unit, flux_unit : str or `~astropy.units.Unit`
         Wavelength and flux units, which default to Angstrom and FLAM,
         respectively. These are *only* used if wavelengths and fluxes
         are not in astropy quantities.
