@@ -53,11 +53,7 @@ packages:
 
 You can install **synphot** using one of the following ways:
 
-* From `AstroConda <https://astroconda.readthedocs.io/en/latest/>`_::
-
-    conda install synphot -c http://ssb.stsci.edu/astroconda
-
-* From ``conda-forge`` channel::
+* From the ``conda-forge`` channel::
 
     conda install synphot -c conda-forge
 
