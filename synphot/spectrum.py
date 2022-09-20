@@ -1799,7 +1799,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         Parameters
         ----------
         kwargs : dict
-            See :meth:``integrate``.
+            See :meth:`~synphot.spectrum.BaseSpectrum.integrate`.
 
         Returns
         -------
