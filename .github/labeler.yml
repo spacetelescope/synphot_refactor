@@ -1,6 +1,6 @@
 docs:
   - .github/**/*.md
-  - .readthedocs.yml
+  - .readthedocs.yaml
   - docs/*
   - docs/_static/*
   - docs/_templates/*
