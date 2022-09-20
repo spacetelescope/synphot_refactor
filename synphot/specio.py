@@ -118,7 +118,7 @@ def read_ascii_spec(filename, wave_unit=u.AA, flux_unit=units.FLAM, **kwargs):
         respectively.
 
     kwargs : dict
-        Keywords accepted by :func:`astropy.io.ascii.ui.read`.
+        Keywords accepted by :func:`astropy.io.ascii.read`.
 
     Returns
     -------

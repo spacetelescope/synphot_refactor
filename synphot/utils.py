@@ -165,7 +165,7 @@ def generate_wavelengths(minwave=500, maxwave=26000, num=10000, delta=None,
         If `True`, the wavelength values are evenly spaced in log scale.
         Otherwise, spacing is linear.
 
-    wave_unit : str or `~astropy.units.core.Unit`
+    wave_unit : str or `~astropy.units.Unit`
         Wavelength unit. Default is Angstrom.
 
     Returns
