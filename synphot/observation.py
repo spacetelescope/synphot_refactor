@@ -14,6 +14,7 @@ import numpy as np
 # ASTROPY
 from astropy import log
 from astropy import units as u
+from astropy.units import Unit
 from astropy.utils.exceptions import (AstropyUserWarning,
                                       AstropyDeprecationWarning)
 
@@ -254,7 +255,7 @@ class Observation(BaseSourceSpectrum):
             If not a Quantity, assumed to be in Angstrom.
             If `None`, `binset` is used.
 
-        flux_unit : str or `~astropy.units.core.Unit` or `None`
+        flux_unit : str or `~astropy.units.Unit` or `None`
             Flux is converted to this unit.
             If not given, internal unit is used.
 
@@ -426,7 +427,7 @@ class Observation(BaseSourceSpectrum):
 
         Parameters
         ----------
-        flux_unit : str or `~astropy.units.core.Unit` or `None`
+        flux_unit : str or `~astropy.units.Unit` or `None`
             The unit of effective stimulus.
             COUNT gives result in count/s (see :meth:`countrate` for more
             options).
@@ -638,7 +639,7 @@ class Observation(BaseSourceSpectrum):
             If `None`, ``self.waveset`` or `binset` is used, depending
             on ``binned``.
 
-        flux_unit : str or `~astropy.units.core.Unit` or `None`
+        flux_unit : str or `~astropy.units.Unit` or `None`
             Flux is converted to this unit for plotting.
             If not given, internal unit is used.
 

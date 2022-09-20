@@ -141,3 +141,6 @@ linkcheck_anchors = False
 
 # Enable nitpicky mode - which ensures that all references in the docs resolve.
 nitpicky = True
+nitpick_ignore = [
+    ('py:class', 'synphot.models.BaseGaussian1D'),
+]

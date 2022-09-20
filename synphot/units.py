@@ -161,7 +161,7 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
     fluxes : array-like or `~astropy.units.quantity.Quantity`
         Flux values. If not a Quantity, assumed to be in PHOTLAM.
 
-    out_flux_unit : str or `~astropy.units.core.Unit`
+    out_flux_unit : str or `~astropy.units.Unit`
         Output flux unit.
 
     area : float or `~astropy.units.quantity.Quantity`
@@ -181,7 +181,7 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
 
     Raises
     ------
-    astropy.units.core.UnitsError
+    astropy.units.UnitsError
         Conversion failed.
 
     synphot.exceptions.SynphotError
@@ -298,12 +298,12 @@ def validate_unit(input_unit):
 
     Parameters
     ----------
-    input_unit : str or `~astropy.units.core.Unit`
+    input_unit : str or `~astropy.units.Unit`
         Unit to validate.
 
     Returns
     -------
-    output_unit : `~astropy.units.core.Unit`
+    output_unit : `~astropy.units.Unit`
         Validated unit.
 
     Raises
@@ -348,7 +348,7 @@ def validate_unit(input_unit):
     else:
         raise exceptions.SynphotError(
             '{0} must be a recognized string or '
-            'astropy.units.core.Unit'.format(input_unit))
+            'astropy.units.Unit'.format(input_unit))
 
     return output_unit
 
@@ -379,7 +379,7 @@ def validate_quantity(input_value, output_unit, equivalencies=[]):
         Quantity to validate. If not a Quantity, assumed to be
         already in output unit.
 
-    output_unit : str or `~astropy.units.core.Unit`
+    output_unit : str or `~astropy.units.Unit`
         Output quantity unit.
 
     equivalencies : list of equivalence pairs, optional
