@@ -7,6 +7,9 @@
 - Dropped support for Python 3.6 and 3.7. Minimum supported Python
   version is now 3.8. [#330]
 
+- Bumped minimum supported versions for ``numpy`` to 1.18,
+  ``astropy`` to 4.3, and ``scipy`` to 1.3. [#341]
+
 - OBMAG and VEGAMAG are no longer interchangeable. [#331]
 
 1.1.1 (2021-11-18)

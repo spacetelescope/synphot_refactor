@@ -1,30 +1,26 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Module to handle backward-compatibility."""
+import importlib
 
 import astropy
-import numpy
 from astropy.utils.introspection import minversion
 
-try:
-    import specutils  # noqa
-except ImportError:
-    HAS_SPECUTILS = False
-else:
-    HAS_SPECUTILS = True
+_optional_deps = ['specutils', 'dust_extinction']
+_deps = {k.upper(): k for k in _optional_deps}
 
-try:
-    import dust_extinction  # noqa
-except ImportError:
-    HAS_DUST_EXTINCTION = False
-else:
-    HAS_DUST_EXTINCTION = True
+ASTROPY_LT_5_0 = not minversion(astropy, '5.0')
 
-__all__ = ['ASTROPY_LT_5_0', 'ASTROPY_LT_4_3', 'ASTROPY_LT_4_1',
-           'ASTROPY_LT_4_0', 'NUMPY_LT_1_17', 'HAS_SPECUTILS',
-           'HAS_DUST_EXTINCTION']
+__all__ = ['ASTROPY_LT_5_0'] + [f"HAS_{pkg}" for pkg in _deps]
 
-ASTROPY_LT_5_0 = not minversion(astropy, '4.99')  # astropy<5 but includes 5.0.dev  # noqa
-ASTROPY_LT_4_3 = not minversion(astropy, '4.3')
-ASTROPY_LT_4_1 = not minversion(astropy, '4.1')
-ASTROPY_LT_4_0 = not minversion(astropy, '4.0')
-NUMPY_LT_1_17 = not minversion(numpy, '1.17')
+
+def __getattr__(name):
+    if name in __all__:
+        module_name = name[4:]
+
+        try:
+            importlib.import_module(_deps[module_name])
+        except (ImportError, ModuleNotFoundError):
+            return False
+        return True
+
+    raise AttributeError(f"Module {__name__!r} has no attribute {name!r}.")

@@ -14,20 +14,15 @@ import numpy as np
 from astropy import log
 from astropy import units as u
 from astropy.modeling import Model
+from astropy.modeling.core import CompoundModel
 from astropy.modeling.models import RedshiftScaleFactor, Scale
 from astropy.utils.exceptions import AstropyUserWarning
 from astropy.utils import metadata
 
 # LOCAL
 from . import exceptions, specio, units, utils
-from .compat import ASTROPY_LT_4_0
 from .config import Conf, conf
 from .models import ConstFlux1D, Empirical1D, get_waveset, get_metadata
-
-if ASTROPY_LT_4_0:
-    from astropy.modeling.core import _CompoundModel as CompoundModel
-else:
-    from astropy.modeling.core import CompoundModel
 
 __all__ = ['BaseSpectrum', 'BaseSourceSpectrum', 'SourceSpectrum',
            'BaseUnitlessSpectrum', 'SpectralElement']

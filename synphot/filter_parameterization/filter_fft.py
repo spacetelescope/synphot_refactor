@@ -5,7 +5,6 @@ from astropy import units as u
 from astropy.modeling.models import custom_model, Sine1D
 from astropy.table import Table
 
-from synphot.compat import NUMPY_LT_1_17
 from synphot.models import Empirical1D
 from synphot.spectrum import SpectralElement
 from synphot.units import validate_quantity
@@ -218,13 +217,8 @@ def filters_to_fft_table(filters_mapping, n_terms=10):
     for key, (bp, wavelengths) in filters_mapping.items():
         n_lambda, lambda_0, delta_lambda, tr_max, fft_pars = filter_to_fft(
             bp, wavelengths=wavelengths, n_terms=n_terms)
-        if not NUMPY_LT_1_17:
-            rows.append(tuple(
-                [key, n_lambda, lambda_0, delta_lambda, tr_max] + fft_pars))
-        else:  # Numpy 1.16 cannot handle unit here
-            rows.append(tuple(
-                [key, n_lambda, lambda_0.value, delta_lambda.value,
-                 tr_max.value] + fft_pars))
+        rows.append(tuple(
+            [key, n_lambda, lambda_0, delta_lambda, tr_max] + fft_pars))
 
     fft_table = Table(rows=rows, names=colnames)
     fft_table['lambda_0'].unit = wave_unit

@@ -6,8 +6,7 @@ from astropy import constants as const
 from astropy import units as u
 
 # LOCAL
-from . import exceptions
-from .compat import ASTROPY_LT_4_1
+from synphot import exceptions
 
 __all__ = ['H', 'C', 'HC', 'SR_PER_ARCSEC2', 'AREA', 'THROUGHPUT', 'PHOTLAM',
            'PHOTNU', 'FLAM', 'FNU', 'OBMAG', 'VEGAMAG',
@@ -58,31 +57,6 @@ u.add_enabled_units([PHOTLAM, PHOTNU, FLAM, FNU, OBMAG, VEGAMAG])
 # --------------- #
 # Flux conversion #
 # --------------- #
-
-
-# ASTROPY_LT_4_1: Remove this and just use spectral_density() when astropy
-#                 minversion is 4.1.
-def spectral_density_integrated(wav):
-    """Flux equivalencies for integrated flux.
-
-    .. note::
-
-        For ``astropy>=4.1``, just use
-        :func:`~astropy.units.equivalencies.spectral_density`.
-
-    """
-    la_f_la = u.erg / u.cm ** 2 / u.s
-    la_phot_f_la = u.photon / (u.cm ** 2 * u.s)
-
-    def converter_phot_f_la_to_f_la(x):
-        return HC * x / wav.to_value(u.AA, u.spectral())
-
-    def iconverter_phot_f_la_to_f_la(x):
-        return x * wav.to_value(u.AA, u.spectral()) / HC
-
-    return [(la_phot_f_la, la_f_la,
-             converter_phot_f_la_to_f_la, iconverter_phot_f_la_to_f_la)]
-
 
 def spectral_density_vega(wav, vegaflux):
     """Flux equivalencies between PHOTLAM and VEGAMAG.
@@ -206,11 +180,7 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
     if not isinstance(wavelengths, u.Quantity):
         wavelengths = wavelengths * u.AA
 
-    if ASTROPY_LT_4_1:
-        eqv = (u.spectral_density(wavelengths) +
-               spectral_density_integrated(wavelengths))
-    else:
-        eqv = u.spectral_density(wavelengths)
+    eqv = u.spectral_density(wavelengths)
 
     # Use built-in astropy equivalencies
     try:

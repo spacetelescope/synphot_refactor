@@ -25,8 +25,7 @@ from synphot.tests.test_units import (
     _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
 )
 from synphot import exceptions, units
-from synphot.compat import ASTROPY_LT_4_0
-from synphot.compat import HAS_SPECUTILS  # noqa
+from synphot.compat import HAS_SPECUTILS
 from synphot.models import (
     BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, Gaussian1D,
     GaussianFlux1D, Lorentz1D, RickerWavelet1D, PowerLawFlux1D)
@@ -48,17 +47,11 @@ def setup_module(module):
 
 def teardown_module(module):
     import astropy.constants as const
+    from astropy.constants import si, astropyconst40
 
-    if ASTROPY_LT_4_0:
-        from astropy.constants import si, astropyconst20
-        const.sigma_sb = si.sigma_sb = astropyconst20.sigma_sb
-        const.h = si.h = astropyconst20.h
-        const.k_B = si.k_B = astropyconst20.k_B
-    else:
-        from astropy.constants import si, astropyconst40
-        const.sigma_sb = si.sigma_sb = astropyconst40.sigma_sb
-        const.h = si.h = astropyconst40.h
-        const.k_B = si.k_B = astropyconst40.k_B
+    const.sigma_sb = si.sigma_sb = astropyconst40.sigma_sb
+    const.h = si.h = astropyconst40.h
+    const.k_B = si.k_B = astropyconst40.k_B
 
 
 @pytest.mark.remote_data
@@ -548,10 +541,7 @@ class TestRedShift:
         assert self.sp_z0.z_type == self.sp.z_type == 'wavelength_only'
 
         assert isinstance(self.sp_z0.model, Gaussian1D)
-        if ASTROPY_LT_4_0:
-            assert isinstance(self.sp.model, modeling.core._CompoundModel)
-        else:
-            assert isinstance(self.sp.model, modeling.core.CompoundModel)
+        assert isinstance(self.sp.model, modeling.core.CompoundModel)
 
     def test_composite_redshift(self):
         sp2 = self.sp_z0 + self.sp  # centers: 5000, 11500
@@ -573,7 +563,7 @@ class TestRedShift:
         assert_quantity_allclose(sp.integrate(), self.sp_z0.integrate())
 
 
-@pytest.mark.skipif('not HAS_SPECUTILS')
+@pytest.mark.skipif(not HAS_SPECUTILS, reason='specutils is not installed')
 class TestSpecutilsBridgeSource:
     def test_from_spectrum1d_Empirical1D_source(self):
         import specutils
