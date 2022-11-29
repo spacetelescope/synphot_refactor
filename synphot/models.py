@@ -15,23 +15,17 @@ from astropy import constants as const
 from astropy import units as u
 from astropy.modeling import Fittable1DModel, Model, Parameter
 from astropy.modeling import models as _models
-from astropy.modeling.models import Tabular1D
+from astropy.modeling.models import (RickerWavelet1D as _RickerWavelet1D,
+                                     Tabular1D)
 from astropy.stats.funcs import gaussian_fwhm_to_sigma, gaussian_sigma_to_fwhm
 from astropy.utils import metadata
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from . import units
-from .compat import ASTROPY_LT_4_0, ASTROPY_LT_4_3, ASTROPY_LT_5_0
+from .compat import ASTROPY_LT_5_0
 from .exceptions import SynphotError
 from .utils import merge_wavelengths
-
-if ASTROPY_LT_4_0:
-    from astropy.modeling.core import _CompoundModel as CompoundModel
-    from astropy.modeling.models import MexicanHat1D as _RickerWavelet1D
-else:
-    from astropy.modeling.core import CompoundModel
-    from astropy.modeling.models import RickerWavelet1D as _RickerWavelet1D
 
 __all__ = ['BlackBody1D', 'BlackBodyNorm1D', 'Box1D', 'ConstFlux1D',
            'Empirical1D', 'Gaussian1D', 'GaussianAbsorption1D',
@@ -292,9 +286,7 @@ class ConstFlux1D(_models.Const1D):
     def integrate(self, x):
         # TODO: Remove unit hardcoding when we use model with units natively.
         # TODO: We do not handle wav_unit as wave number nor energy for now.
-        if ((ASTROPY_LT_4_3 and 'wav' in self._flux_unit.physical_type) or
-            (not ASTROPY_LT_4_3 and
-             any(['wav' in t for t in self._flux_unit.physical_type]))):
+        if any(['wav' in t for t in self._flux_unit.physical_type]):
             wav_unit = u.AA
         else:
             wav_unit = u.Hz
@@ -822,61 +814,6 @@ def _model_tree_evaluate_sampleset(root):
     return w
 
 
-def _model_tree_evaluate_sampleset_compat(model):
-    """_model_tree_evaluate_sampleset for astropy<4"""
-
-    def _get_sampleset_compat(model):
-        # Return sampleset of a model or `None` if undefined.
-        # Model could be a real model or evaluated sampleset.
-        if isinstance(model, Model):
-            if hasattr(model, 'sampleset'):
-                w = model.sampleset()
-            else:
-                w = None
-        else:
-            w = model  # Already a sampleset
-        return w
-
-    def _merge_sampleset_compat(model1, model2):
-        # Simple merge of samplesets.
-        w1 = _get_sampleset_compat(model1)
-        w2 = _get_sampleset_compat(model2)
-        return merge_wavelengths(w1, w2)
-
-    def _shift_wavelengths_compat(model1, model2):
-        # One of the models is either ``RedshiftScaleFactor`` or ``Scale``.
-        # Possible combos::
-        #    RedshiftScaleFactor | Model
-        #    Scale | Model
-        #    Model | Scale
-        if isinstance(model1, _models.RedshiftScaleFactor):
-            val = _get_sampleset_compat(model2)
-            if val is None:
-                w = val
-            else:
-                w = model1.inverse(val)
-        elif isinstance(model1, _models.Scale):
-            w = _get_sampleset_compat(model2)
-        else:
-            w = _get_sampleset_compat(model1)
-        return w
-
-    WAVESET_OPERATORS = {
-        '+': _merge_sampleset_compat,
-        '-': _merge_sampleset_compat,
-        '*': _merge_sampleset_compat,
-        '/': _merge_sampleset_compat,
-        '**': _merge_sampleset_compat,
-        '|': _shift_wavelengths_compat,
-        '&': _merge_sampleset_compat}
-
-    if isinstance(model, CompoundModel):
-        waveset = model._tree.evaluate(WAVESET_OPERATORS, getter=None)
-    else:
-        waveset = _get_sampleset_compat(model)
-    return waveset
-
-
 def get_waveset(model):
     """Get optimal wavelengths for sampling a given model.
 
@@ -899,12 +836,7 @@ def get_waveset(model):
     if not isinstance(model, Model):
         raise SynphotError('{0} is not a model.'.format(model))
 
-    if ASTROPY_LT_4_0:
-        waveset = _model_tree_evaluate_sampleset_compat(model)
-    else:
-        waveset = _model_tree_evaluate_sampleset(model)
-
-    return waveset
+    return _model_tree_evaluate_sampleset(model)
 
 
 # Functions below are for meta magic.
@@ -925,34 +857,6 @@ def _model_tree_evaluate_metadata(root):
     m1 = _model_tree_evaluate_metadata(root.left)
     m2 = _model_tree_evaluate_metadata(root.right)
     return metadata.merge(m1, m2, metadata_conflicts='silent')
-
-
-def _model_tree_evaluate_metadata_compat(model):
-    """_model_tree_evaluate_sampleset for astropy<4"""
-    from collections import defaultdict
-
-    def _get_meta_compat(model):
-        # Return metadata of a model.
-        # Model could be a real model or evaluated metadata.
-        if isinstance(model, Model):
-            w = model.meta
-        else:
-            w = model  # Already metadata
-        return w
-
-    def _merge_meta_compat(model1, model2):
-        # Simple merge of samplesets.
-        m1 = _get_meta_compat(model1)
-        m2 = _get_meta_compat(model2)
-        return metadata.merge(m1, m2, metadata_conflicts='silent')
-
-    if isinstance(model, CompoundModel):
-        meta = model._tree.evaluate(
-            defaultdict(lambda: _merge_meta_compat), getter=None)
-    else:
-        meta = deepcopy(model.meta)
-
-    return meta
 
 
 def get_metadata(model):
@@ -977,12 +881,9 @@ def get_metadata(model):
     if not isinstance(model, Model):
         raise SynphotError('{0} is not a model.'.format(model))
 
-    if ASTROPY_LT_4_0:
-        meta = _model_tree_evaluate_metadata_compat(model)
-    else:
-        # Deep copy to make sure modiyfing returned metadata
-        # does not modify input model metadata, especially
-        # if input model is not a compound model.
-        meta = deepcopy(_model_tree_evaluate_metadata(model))
+    # Deep copy to make sure modiyfing returned metadata
+    # does not modify input model metadata, especially
+    # if input model is not a compound model.
+    meta = deepcopy(_model_tree_evaluate_metadata(model))
 
     return meta

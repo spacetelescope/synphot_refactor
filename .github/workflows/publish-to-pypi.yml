@@ -21,16 +21,18 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - uses: actions/setup-python@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
     - name: Install dependencies
       run: |
         python -m pip install pip "twine>=3.3" -U
-        python -m pip install "cibuildwheel==2.5.0"
+        python -m pip install "cibuildwheel==2.11.2"
     # TODO: Enable py310-* when scipy allows
     - name: Build wheels
       run: python -m cibuildwheel --output-dir wheelhouse
       env:
-        CIBW_BUILD: 'cp38-* cp39-* cp310-*'
+        CIBW_BUILD: 'cp38-* cp39-* cp310-* cp311-*'
         CIBW_SKIP: '*-musllinux_*'
         CIBW_ARCHS_LINUX: 'x86_64'
         CIBW_ARCHS_WINDOWS: 'AMD64'
@@ -54,9 +56,9 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - uses: actions/setup-python@v3
+    - uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: '3.10'
     - name: Install dependencies
       run: python -m pip install pip build "twine>=3.3" -U
     - name: Build package
