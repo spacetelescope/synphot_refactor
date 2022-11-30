@@ -152,6 +152,21 @@ class TestWaveset:
         np.testing.assert_array_equal(bp2.waveset.value, w_true)
         np.testing.assert_array_equal(bp3.waveset.value, w_true)
 
+    def test_box1d_coarse_step(self):
+        bp = SpectralElement(Box1D, x_0=2000, width=1, step=0.1)
+        w = bp.waveset.value
+        w_true = bp.model.sampleset()
+
+        np.testing.assert_array_equal(w, w_true)
+        np.testing.assert_allclose(
+            w[([0, 1, -2, -1], )], bp.model.sampleset(minimal=True))
+
+        # Make sure scale does not change waveset
+        bp2 = bp * 2
+        bp3 = 0.5 * bp
+        np.testing.assert_array_equal(bp2.waveset.value, w_true)
+        np.testing.assert_array_equal(bp3.waveset.value, w_true)
+
     def test_composite_none(self):
         bp1 = SpectralElement(Box1D, amplitude=1, x_0=5000, width=10)
         bp2 = SpectralElement(Const1D, amplitude=2)

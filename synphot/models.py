@@ -185,7 +185,18 @@ class Box1D(_models.Box1D):
     """Same as `astropy.modeling.functional_models.Box1D`, except with
     ``sampleset`` defined.
 
+    Parameters
+    ----------
+    step : float
+        Distance of first and last points w.r.t. bounding box. In default units
+        (nominally Angstrom). Defaults to 0.01
+
     """
+    def __init__(self, step=0.01, *args, **kwargs):
+
+        super(Box1D, self).__init__(*args, **kwargs)
+        self.step = float(step)
+
     @staticmethod
     def _calc_sampleset(w1, w2, step, minimal):
         """Calculate sampleset for each model."""
@@ -196,19 +207,23 @@ class Box1D(_models.Box1D):
 
         return arr
 
-    def sampleset(self, step=0.01, minimal=False):
+    def sampleset(self, step=None, minimal=False):
         """Return ``x`` array that samples the feature.
 
         Parameters
         ----------
-        step : float
-            Distance of first and last points w.r.t. bounding box.
+        step : float, optional
+            Distance of first and last points w.r.t. bounding box. If None,
+            set to attribute ``step``.
 
         minimal : bool
             Only return the minimal points needed to define the box;
             i.e., box edges and a point outside on each side.
 
         """
+        if step is None:
+            step = self.step
+
         if ASTROPY_LT_5_0:
             w1, w2 = self.bounding_box
         else:
