@@ -192,10 +192,14 @@ class Box1D(_models.Box1D):
         (nominally Angstrom). Defaults to 0.01
 
     """
-    def __init__(self, step=0.01, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+
+        if "step" in kwargs:
+            self.step = kwargs.pop("step")
+        else:
+            self.step = 0.01
 
         super(Box1D, self).__init__(*args, **kwargs)
-        self.step = float(step)
 
     @staticmethod
     def _calc_sampleset(w1, w2, step, minimal):
