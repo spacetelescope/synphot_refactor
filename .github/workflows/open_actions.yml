@@ -8,6 +8,9 @@ on:
     types:
     - opened
 
+permissions:
+  contents: read
+
 jobs:
   triage:
     runs-on: ubuntu-latest
