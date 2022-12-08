@@ -2,8 +2,6 @@ name: rc-testing
 
 on:
   workflow_dispatch:
-  # REMOVE ME
-  pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
