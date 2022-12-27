@@ -16,8 +16,7 @@ from astropy.utils.data import get_readable_fileobj
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
-from . import exceptions, units
-from synphot import __version__
+from synphot import __version__, exceptions, units
 
 __all__ = ['read_remote_spec', 'read_spec', 'read_ascii_spec',
            'read_fits_spec', 'write_fits_spec']

@@ -22,10 +22,10 @@ from astropy.utils import metadata
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
-from . import units
-from .compat import ASTROPY_LT_5_0
-from .exceptions import SynphotError
-from .utils import merge_wavelengths
+from synphot import units
+from synphot.compat import ASTROPY_LT_5_0
+from synphot.exceptions import SynphotError
+from synphot.utils import merge_wavelengths
 
 __all__ = ['BlackBody1D', 'BlackBodyNorm1D', 'Box1D', 'ConstFlux1D',
            'Empirical1D', 'Gaussian1D', 'GaussianAbsorption1D',

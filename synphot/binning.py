@@ -8,7 +8,7 @@ import numpy as np
 from astropy import units as u
 
 # LOCAL
-from . import exceptions
+from synphot import exceptions
 
 __all__ = ['calculate_bin_edges', 'calculate_bin_widths',
            'calculate_bin_centers', 'wave_range', 'pixel_range']
@@ -41,7 +41,7 @@ def _slow_calcbinflux(len_binwave, i_beg, i_end, avflux, deltaw):
 # Try to import the C version of calcbinflux, otherwise fall back
 # to the Python implementation above.
 try:
-    from . import synphot_utils
+    from synphot import synphot_utils
 except ImportError:
     calcbinflux = _slow_calcbinflux
 else:

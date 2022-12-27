@@ -22,7 +22,7 @@ from astropy.modeling.core import Fittable1DModel
 from astropy.modeling.parameters import Parameter
 from astropy.utils.exceptions import AstropyUserWarning
 
-from .units import FNU, FLAM
+from synphot.units import FNU, FLAM
 
 __all__ = ['BlackBody1D', 'blackbody_nu', 'blackbody_lambda']
 

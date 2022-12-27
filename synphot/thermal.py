@@ -6,9 +6,9 @@ from astropy import units as u
 from astropy.io import fits
 
 # LOCAL
-from . import exceptions, specio, units
-from .models import BlackBody1D, Empirical1D
-from .spectrum import BaseUnitlessSpectrum, SourceSpectrum
+from synphot import exceptions, specio, units
+from synphot.models import BlackBody1D, Empirical1D
+from synphot.spectrum import BaseUnitlessSpectrum, SourceSpectrum
 
 __all__ = ['ThermalSpectralElement']
 

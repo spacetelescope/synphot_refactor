@@ -106,7 +106,7 @@ def spectral_density_count(wav, area):
         List of equivalencies.
 
     """
-    from .binning import calculate_bin_widths, calculate_bin_edges
+    from synphot.binning import calculate_bin_widths, calculate_bin_edges
 
     wav = wav.to(u.AA, equivalencies=u.spectral())
     area = area.to(AREA)
@@ -221,7 +221,7 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
 
     # VEGAMAG
     if VEGAMAG.to_string() in flux_unit_names:
-        from .spectrum import SourceSpectrum
+        from synphot.spectrum import SourceSpectrum
 
         if not isinstance(vegaspec, SourceSpectrum):
             raise exceptions.SynphotError('Vega spectrum is missing.')
