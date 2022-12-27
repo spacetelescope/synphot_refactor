@@ -20,7 +20,8 @@ from astropy.utils.exceptions import (AstropyUserWarning,
 # LOCAL
 from synphot import binning, exceptions, units, utils
 from synphot.models import Empirical1D
-from synphot.spectrum import BaseSourceSpectrum, SourceSpectrum, SpectralElement
+from synphot.spectrum import (BaseSourceSpectrum, SourceSpectrum,
+                              SpectralElement)
 
 __all__ = ['Observation']
 
