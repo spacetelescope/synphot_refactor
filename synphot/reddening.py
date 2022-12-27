@@ -9,11 +9,11 @@ import numpy as np
 from astropy import units as u
 
 # LOCAL
-from . import exceptions, specio, units
-from .compat import HAS_DUST_EXTINCTION
-from .config import Conf
-from .models import Empirical1D
-from .spectrum import BaseUnitlessSpectrum
+from synphot import exceptions, specio, units
+from synphot.compat import HAS_DUST_EXTINCTION
+from synphot.config import Conf
+from synphot.models import Empirical1D
+from synphot.spectrum import BaseUnitlessSpectrum
 
 __all__ = ['ExtinctionModel1D', 'ReddeningLaw', 'ExtinctionCurve',
            'etau_madau']

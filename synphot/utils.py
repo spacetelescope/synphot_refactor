@@ -14,7 +14,7 @@ from astropy.config import ConfigItem
 from astropy.utils.data import download_file
 
 # LOCAL
-from . import exceptions, units
+from synphot import exceptions, units
 
 __all__ = ['overlap_status', 'validate_totalflux', 'validate_wavelengths',
            'generate_wavelengths', 'merge_wavelengths', 'download_data']
@@ -289,7 +289,7 @@ def download_data(path_root, verbose=True, dry_run=False):
         A list of downloaded files.
 
     """
-    from .config import conf  # Avoid potential circular import
+    from synphot.config import conf  # Avoid potential circular import
     BASE_HOST = 'https://ssb.stsci.edu/trds/'
 
     if path_root is not None:

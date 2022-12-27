@@ -83,7 +83,7 @@ jobs:
             toxposargs: --open-files
 
           - name: Test with old dependencies
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             python: 3.8
             toxenv: py38-test-oldestdeps
             toxposargs: --open-files

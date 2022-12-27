@@ -20,9 +20,9 @@ from astropy.utils.exceptions import AstropyUserWarning
 from astropy.utils import metadata
 
 # LOCAL
-from . import exceptions, specio, units, utils
-from .config import Conf, conf
-from .models import ConstFlux1D, Empirical1D, get_waveset, get_metadata
+from synphot import exceptions, specio, units, utils
+from synphot.config import Conf, conf
+from synphot.models import ConstFlux1D, Empirical1D, get_waveset, get_metadata
 
 __all__ = ['BaseSpectrum', 'BaseSourceSpectrum', 'SourceSpectrum',
            'BaseUnitlessSpectrum', 'SpectralElement']
@@ -874,7 +874,7 @@ class BaseSpectrum:
             ``specutils`` is not installed.
 
         """
-        from .compat import HAS_SPECUTILS
+        from synphot.compat import HAS_SPECUTILS
 
         if not HAS_SPECUTILS:  # pragma: no cover
             raise ImportError('specutils must be installed to use this method')
