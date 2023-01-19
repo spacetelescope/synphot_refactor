@@ -152,6 +152,19 @@ class TestWaveset:
         np.testing.assert_array_equal(bp2.waveset.value, w_true)
         np.testing.assert_array_equal(bp3.waveset.value, w_true)
 
+    def test_box1d_set_step(self):
+        # first test that setting step to default value produces the same
+        # waveset as it did before step was a valid input
+        bp1 = SpectralElement(Box1D, x_0=2000, width=1)
+        assert bp1.waveset.shape == (103,)
+
+        bp2 = SpectralElement(Box1D, x_0=2000, width=1, step=0.01)
+        np.testing.assert_array_equal(bp1.waveset.value, bp2.waveset.value)
+
+        # next test that setting a coarser step produces a smaller waveset
+        bp3 = SpectralElement(Box1D, x_0=2000, width=1, step=0.2)
+        assert bp3.waveset.size < bp1.waveset.size
+
     def test_composite_none(self):
         bp1 = SpectralElement(Box1D, amplitude=1, x_0=5000, width=10)
         bp2 = SpectralElement(Const1D, amplitude=2)

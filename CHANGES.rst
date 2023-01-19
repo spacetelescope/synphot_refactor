@@ -12,6 +12,10 @@
 
 - OBMAG and VEGAMAG are no longer interchangeable. [#331]
 
+- ``Box1D`` model now takes optional ``step`` input to allow user control
+  over the generated sampleset. Default behavior maintains backwards 
+  compatibility. [#342]
+
 1.1.1 (2021-11-18)
 ==================
 
