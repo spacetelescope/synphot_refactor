@@ -26,6 +26,9 @@ from synphot.units import FNU, FLAM
 
 __all__ = ['BlackBody1D', 'blackbody_nu', 'blackbody_lambda']
 
+# ASTROPY_LT_5_3
+__doctest_requires__ = {"BlackBody1D": ["astropy<5.3"]}
+
 with warnings.catch_warnings():
     warnings.simplefilter('ignore', RuntimeWarning)
     _has_buggy_expm1 = np.isnan(np.expm1(1000)) or np.isnan(np.expm1(1e10))
