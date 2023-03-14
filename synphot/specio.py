@@ -177,39 +177,40 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
         Wavelength and flux of the spectrum.
 
     """
-    fs = fits.open(filename)
-    header = dict(fs[str('PRIMARY')].header)
-    wave_dat = fs[ext].data.field(wave_col).copy()
-    flux_dat = fs[ext].data.field(flux_col).copy()
-    fits_wave_unit = fs[ext].header.get('TUNIT1')
-    fits_flux_unit = fs[ext].header.get('TUNIT2')
+    try:
+        fs = fits.open(filename)
+        header = dict(fs[str('PRIMARY')].header)
+        wave_dat = fs[ext].data.field(wave_col).copy()
+        flux_dat = fs[ext].data.field(flux_col).copy()
+        fits_wave_unit = fs[ext].header.get('TUNIT1')
+        fits_flux_unit = fs[ext].header.get('TUNIT2')
 
-    if fits_wave_unit is not None:
-        try:
-            wave_unit = units.validate_unit(fits_wave_unit)
-        except (exceptions.SynphotError, ValueError) as e:  # pragma: no cover
-            warnings.warn(
-                '{0} from FITS header is not valid wavelength unit, using '
-                '{1}: {2}'.format(fits_wave_unit, wave_unit, e),
-                AstropyUserWarning)
+        if fits_wave_unit is not None:
+            try:
+                wave_unit = units.validate_unit(fits_wave_unit)
+            except (exceptions.SynphotError, ValueError) as e:  # pragma: no cover  # noqa: E501
+                warnings.warn(
+                    '{0} from FITS header is not valid wavelength unit, using '
+                    '{1}: {2}'.format(fits_wave_unit, wave_unit, e),
+                    AstropyUserWarning)
 
-    if fits_flux_unit is not None:
-        try:
-            flux_unit = units.validate_unit(fits_flux_unit)
-        except (exceptions.SynphotError, ValueError) as e:  # pragma: no cover
-            warnings.warn(
-                '{0} from FITS header is not valid flux unit, using '
-                '{1}: {2}'.format(fits_flux_unit, flux_unit, e),
-                AstropyUserWarning)
+        if fits_flux_unit is not None:
+            try:
+                flux_unit = units.validate_unit(fits_flux_unit)
+            except (exceptions.SynphotError, ValueError) as e:  # pragma: no cover  # noqa: E501
+                warnings.warn(
+                    '{0} from FITS header is not valid flux unit, using '
+                    '{1}: {2}'.format(fits_flux_unit, flux_unit, e),
+                    AstropyUserWarning)
 
-    wave_unit = units.validate_unit(wave_unit)
-    flux_unit = units.validate_unit(flux_unit)
+        wave_unit = units.validate_unit(wave_unit)
+        flux_unit = units.validate_unit(flux_unit)
 
-    wavelengths = wave_dat * wave_unit
-    fluxes = flux_dat * flux_unit
-
-    if isinstance(filename, str):
-        fs.close()
+        wavelengths = wave_dat * wave_unit
+        fluxes = flux_dat * flux_unit
+    finally:
+        if isinstance(filename, str):
+            fs.close()
 
     return header, wavelengths, fluxes
 
