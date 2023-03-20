@@ -27,15 +27,15 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install pip "twine>=3.3" -U
-        python -m pip install "cibuildwheel==2.11.2"
-    # TODO: Enable py310-* when scipy allows
     - name: Build wheels
-      run: python -m cibuildwheel --output-dir wheelhouse
+      uses: pypa/cibuildwheel@v2.12.1
       env:
         CIBW_BUILD: 'cp38-* cp39-* cp310-* cp311-*'
         CIBW_SKIP: '*-musllinux_*'
         CIBW_ARCHS_LINUX: 'x86_64'
         CIBW_ARCHS_WINDOWS: 'AMD64'
+        CIBW_ARCHS_MACOS: 'arm64'
+        CIBW_TEST_SKIP: '*-macosx_arm64'
         CIBW_TEST_REQUIRES: 'pytest pytest-astropy'
         CIBW_TEST_COMMAND: 'python -c "import synphot; synphot.test()"'
     - name: Check wheels
