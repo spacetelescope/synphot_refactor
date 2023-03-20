@@ -1,8 +1,14 @@
-1.2.0 (unreleased)
+1.2.0 (2023-03-20)
 ==================
 
 - New ``filter_parameterization`` subpackage to handle filter parameterization,
   adapted from ``tynt`` package written by Brett Morris. [#257]
+
+- OBMAG and VEGAMAG are no longer interchangeable. [#331]
+
+- ``Box1D`` model now takes optional ``step`` input to allow user control
+  over the generated sampleset. Default behavior maintains backwards 
+  compatibility. [#342]
 
 - Dropped support for Python 3.6 and 3.7. Minimum supported Python
   version is now 3.8. [#330]
@@ -10,11 +16,7 @@
 - Bumped minimum supported versions for ``numpy`` to 1.18,
   ``astropy`` to 4.3, and ``scipy`` to 1.3. [#341]
 
-- OBMAG and VEGAMAG are no longer interchangeable. [#331]
-
-- ``Box1D`` model now takes optional ``step`` input to allow user control
-  over the generated sampleset. Default behavior maintains backwards 
-  compatibility. [#342]
+- Added wheel for OSX ARM64 architecture. [#352]
 
 1.1.1 (2021-11-18)
 ==================
