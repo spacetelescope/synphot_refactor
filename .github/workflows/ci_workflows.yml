@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 jobs:
-  initial_check:
+  validate:
     name: Mandatory checks before CI
     runs-on: ubuntu-latest
     steps:
@@ -35,84 +35,38 @@ jobs:
 
   # The rest only run if above are done
 
+  check:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    needs: [ validate ]
+    with:
+      envs: |
+        - linux: check-style
+        - linux: check-security
+        - linux: check-docs
+        - linux: build-dist
+
   tests:
-    name: ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
-    needs: initial_check
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-
-          - name: Code style checks
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: codestyle
-
-          - name: PEP 517 build
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: twine
-
-          - name: Security audit
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: bandit
-
-          - name: Link check
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: linkcheck
-
-          - name: Test without optional deps
-            os: ubuntu-latest
-            python: 3.9
-            toxenv: py39-test
-
-          - name: Coverage test with remote data
-            os: ubuntu-latest
-            python: '3.10'
-            toxenv: py310-test-alldeps-cov
-            toxposargs: --remote-data
-
-          - name: Test with dev dependencies
-            os: ubuntu-latest
-            python: '3.11'
-            toxenv: py311-test-devdeps
-
-          - name: Test with old dependencies
-            os: ubuntu-20.04
-            python: 3.8
-            toxenv: py38-test-oldestdeps
-
-          - name: Test in OSX
-            os: macos-latest
-            python: '3.10'
-            toxenv: py310-test-alldeps
-
-          # NOTE: If TRDS cannot take the hit, disable --remote-data
-          - name: Test in Windows with remote data
-            os: windows-latest
-            python: 3.9
-            toxenv: py39-test-alldeps
-            toxposargs: --remote-data
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip tox
-    - name: Run tests
-      run: tox -e ${{ matrix.toxenv }} -- ${{ matrix.toxposargs }}
-    - name: Upload coverage to codecov
-      if: ${{ contains(matrix.toxenv,'-cov') }}
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    needs: [ validate ]
+    with:
+      envs: |
+        - linux: test-oldestdeps-xdist-cov
+          python-version: 3.8
+        - linux: test-xdist
+          python-version: 3.8
+        - linux: test-xdist
+          python-version: 3.9
+        # NOTE: If TRDS cannot take the hit, disable --remote-data
+        - windows: test-alldeps-xdist
+          python-version: 3.9
+          posargs: --remote-data
+        - linux: test-xdist
+          python-version: 3.10
+        - linux: test-xdist
+          python-version: 3.11
+        - macos: test-xdist
+          python-version: 3.11
+        - linux: test-devdeps-xdist
+        - linux: test-alldeps-xdist-cov
+          posargs: --remote-data
+          coverage: codecov
