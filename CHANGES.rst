@@ -1,4 +1,4 @@
-1.3.0 (unreleased)
+1.2.1 (2023-06-01)
 ==================
 
 - Compatibility with ``numpy`` 1.25. [#356]
