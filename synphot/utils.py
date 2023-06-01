@@ -122,8 +122,8 @@ def validate_wavelengths(wavelengths):
 
     # Check for monotonicity
     sorted_wave = np.sort(wave)
-    if not np.alltrue(sorted_wave == wave):
-        if np.alltrue(sorted_wave[::-1] == wave):
+    if not np.all(sorted_wave == wave):
+        if np.all(sorted_wave[::-1] == wave):
             pass  # Monotonic descending is allowed
         else:
             raise exceptions.UnsortedWavelength(
