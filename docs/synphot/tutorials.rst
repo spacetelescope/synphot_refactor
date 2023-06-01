@@ -121,10 +121,10 @@ model from the
     >>> extcurve = redlaw.extinction_curve(ebv, wavelengths=wav)
     >>> bb = SourceSpectrum(BlackBodyNorm1D, temperature=5000 * u.K)
     >>> bb.integrate()  # doctest: +FLOAT_CMP
-    <Quantity 9.31004974 ph / (cm2 s)>
+    <Quantity 9.31004028 ph / (s cm2)>
     >>> sp = bb * extcurve
     >>> sp.integrate()  # doctest: +FLOAT_CMP
-    <Quantity 8.27106961 ph / (cm2 s)>
+    <Quantity 8.27106961 ph / (s cm2)>
 
 
 .. _tutorial_fit_ew:

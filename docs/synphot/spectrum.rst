@@ -199,16 +199,16 @@ By default, trapezoid integration is done in internal units::
     >>> sp = SourceSpectrum(GaussianFlux1D, mean=6000*u.AA, fwhm=10*u.AA,
     ...                     total_flux=1*(u.erg/(u.cm**2 * u.s)))
     >>> sp.integrate()  # doctest: +FLOAT_CMP
-    <Quantity 3.02046758e+11 ph / (cm2 s)>
+    <Quantity 3.02046758e+11 ph / (s cm2)>
     >>> with conf.set_temp('default_integrator', 'analytical'):
     ...     print(f'{repr(sp.integrate())}')  # doctest: +FLOAT_CMP
-    <Quantity 3.02046994e+11 ph / (cm2 s)>
+    <Quantity 3.02046994e+11 ph / (s cm2)>
     >>> sp.integrate(integration_type='analytical')  # doctest: +FLOAT_CMP
-    <Quantity 3.02046994e+11 ph / (cm2 s)>
+    <Quantity 3.02046994e+11 ph / (s cm2)>
     >>> sp.integrate(flux_unit=units.FLAM)  # doctest: +FLOAT_CMP
-    <Quantity 0.99999972 erg / (cm2 s)>
+    <Quantity 0.99999972 erg / (s cm2)>
     >>> sp.integrate(flux_unit=units.FLAM, integration_type='analytical')  # doctest: +FLOAT_CMP
-    <Quantity 1. erg / (cm2 s)>
+    <Quantity 1. erg / (s cm2)>
 
 
 .. _synphot-empirical-source:

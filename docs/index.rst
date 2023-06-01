@@ -249,7 +249,7 @@ integrate it::
 
     >>> sp_rn = sp.normalize(1 * u.Jy, band=bp)
     >>> sp_rn.integrate()  # doctest: +FLOAT_CMP
-    <Quantity 12540.4613615 ph / (cm2 s)>
+    <Quantity 12540.4613615 ph / (s cm2)>
 
 Create an observation by passing the redshifted and normalized source spectrum
 through the box bandpass::
