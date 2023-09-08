@@ -42,7 +42,7 @@ reported) or contact `STScI Help Desk <https://hsthelp.stsci.edu>`_.
 Installation and Setup
 ======================
 
-**synphot** works for Python 3.8 or later only. It requires the following
+**synphot** works for Python 3.9 or later only. It requires the following
 packages:
 
 * numpy
@@ -77,11 +77,9 @@ via HTTP, create a local directory where you plan to store the data files
     >>> from synphot.utils import download_data
     >>> file_list = download_data('/my/local/dir/trds')  # doctest: +SKIP
 
-With ``astropy`` 4.1 or later, you can generate a
+With ``astropy``, you can generate a
 ``$HOME/.astropy/config/synphot.cfg`` file like this (otherwise, you can
 manually create one from :ref:`synphot_config_file`):
-
-.. doctest-requires:: astropy>=4.1
 
     >>> from astropy.config import generate_config
     >>> generate_config(pkgname='synphot')
