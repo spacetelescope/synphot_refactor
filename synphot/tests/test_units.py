@@ -3,8 +3,6 @@
 
 .. note:: VEGAMAG conversion is tested in test_spectrum_source.py.
 
-.. note:: spectral_density_integrated is tested in astropy>=4.1.
-
 """
 
 # THIRD-PARTY
