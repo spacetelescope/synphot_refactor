@@ -94,7 +94,7 @@ jobs:
           - name: Test in Windows with remote data
             os: windows-latest
             python: '3.11'
-            toxenv: py39-test-alldeps
+            toxenv: py311-test-alldeps
             toxposargs: --remote-data
 
     steps:
