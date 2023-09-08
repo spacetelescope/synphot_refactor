@@ -9,6 +9,7 @@ from copy import deepcopy
 
 # THIRD-PARTY
 import numpy as np
+from scipy.integrate import trapezoid
 
 # ASTROPY
 from astropy import log
@@ -498,7 +499,7 @@ class BaseSpectrum:
 
         if integration_type == 'trapezoid':
             y = abs(self(x, **kwargs))  # Unsigned area
-            result = abs(np.trapz(y, x=x))
+            result = abs(trapezoid(y, x=x))
 
         elif integration_type == 'analytical':
             result = self.model.integrate(x)
@@ -553,8 +554,8 @@ class BaseSpectrum:
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        num = np.trapz(y * x, x=x)
-        den = np.trapz(y, x=x)
+        num = trapezoid(y * x, x=x)
+        den = trapezoid(y, x=x)
 
         if den == 0:  # pragma: no cover
             avg_wave = 0.0
@@ -581,8 +582,8 @@ class BaseSpectrum:
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        num = np.trapz(y * np.log(x) / x, x=x)
-        den = np.trapz(y / x, x=x)
+        num = trapezoid(y * np.log(x) / x, x=x)
+        den = trapezoid(y / x, x=x)
 
         if num == 0 or den == 0:  # pragma: no cover
             bar_lam = 0.0
@@ -609,8 +610,8 @@ class BaseSpectrum:
         """
         x = self._validate_wavelengths(wavelengths).value
         y = self(x).value
-        num = np.trapz(y * x, x=x)
-        den = np.trapz(y / x, x=x)
+        num = trapezoid(y * x, x=x)
+        den = trapezoid(y / x, x=x)
 
         if den == 0:  # pragma: no cover
             pivwv = 0.0
@@ -1593,7 +1594,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         x = self._validate_wavelengths(wavelengths).to(u.AA)
 
         y = self(x) * x
-        int_val = abs(np.trapz(y, x=x))
+        int_val = abs(trapezoid(y, x=x))
         uresp = units.HC / (a.cgs * int_val)
 
         return (uresp / u.s).to(units.FLAM)
@@ -1642,8 +1643,8 @@ class SpectralElement(BaseUnitlessSpectrum):
             thru = y[mask]
 
         a = self.avgwave(wavelengths=wavelengths)
-        num = np.trapz((wave - a) ** 2 * thru, x=wave)
-        den = np.trapz(thru, x=wave)
+        num = trapezoid((wave - a) ** 2 * thru, x=wave)
+        den = trapezoid(thru, x=wave)
 
         if den == 0:  # pragma: no cover
             rms_width = 0.0 * a.unit
@@ -1703,8 +1704,8 @@ class SpectralElement(BaseUnitlessSpectrum):
         if a == 0:
             bandw = 0.0 * a.unit
         else:
-            num = np.trapz(thru * np.log(wave / a) ** 2 / wave, x=wave)
-            den = np.trapz(thru / wave, x=wave)
+            num = trapezoid(thru * np.log(wave / a) ** 2 / wave, x=wave)
+            den = trapezoid(thru / wave, x=wave)
 
             if den == 0:  # pragma: no cover
                 bandw = 0.0 * a.unit
@@ -1849,7 +1850,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         """
         x = self._validate_wavelengths(wavelengths)
         y = self(x)
-        return abs(np.trapz(y / x, x=x))
+        return abs(trapezoid(y / x, x=x))
 
     def emflx(self, area, wavelengths=None):
         """Calculate

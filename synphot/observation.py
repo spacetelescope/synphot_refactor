@@ -10,6 +10,7 @@ import warnings
 
 # THIRD-PARTY
 import numpy as np
+from scipy.integrate import trapezoid
 
 # ASTROPY
 from astropy import log
@@ -409,8 +410,8 @@ class Observation(BaseSourceSpectrum):
             x = self._validate_wavelengths(wavelengths).value
             y = units.convert_flux(x, self(x), flux_unit).value
 
-        num = np.trapz(y * x ** 2, x=x)
-        den = np.trapz(y * x, x=x)
+        num = trapezoid(y * x ** 2, x=x)
+        den = trapezoid(y * x, x=x)
 
         if den == 0.0:  # pragma: no cover
             eff_lam = 0.0
@@ -488,8 +489,8 @@ class Observation(BaseSourceSpectrum):
         influx = units.convert_flux(inwave, self(inwave), units.FLAM).value
 
         # Integrate
-        num = abs(np.trapz(inwave * influx, x=inwave))
-        den = abs(np.trapz(x_band * y_band, x=x_band))
+        num = abs(trapezoid(inwave * influx, x=inwave))
+        den = abs(trapezoid(x_band * y_band, x=x_band))
         utils.validate_totalflux(num)
         utils.validate_totalflux(den)
         val = (num / den) * units.FLAM

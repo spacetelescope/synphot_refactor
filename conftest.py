@@ -10,6 +10,12 @@ try:
 except ImportError:
     version = 'unknown'
 
+from astropy.utils import minversion
+NUMPY_LT_2_0 = not minversion("numpy", "2.0.dev")
+if not NUMPY_LT_2_0:
+    import numpy as np
+    np.set_printoptions(legacy="1.25")
+
 # Uncomment and customize the following lines to add/remove entries
 # from the list of packages for which version numbers are displayed
 # when running the tests.

@@ -21,6 +21,7 @@ from astropy import units as u
 from astropy.modeling.models import Const1D
 from astropy.tests.helper import assert_quantity_allclose
 from numpy.testing import assert_allclose
+from scipy.integrate import trapezoid
 
 # LOCAL
 from synphot import models, units
@@ -180,14 +181,14 @@ def test_bandpass_Trapezoid1D():
     assert_quantity_allclose(bp.integrate(integration_type='analytical'), ans)
 
 
-def test_trapz_box1d():
+def test_trapezoid_box1d():
     """Test the underlying trapezoid integration."""
     m = models.Box1D(amplitude=1, x_0=5000, width=10)
 
     # Ascending.
     x = m.sampleset()
-    assert_allclose(np.trapz(m(x), x=x), 10)
+    assert_allclose(trapezoid(m(x), x=x), 10)
 
     # Descending.
     x2 = x[::-1]
-    assert_allclose(abs(np.trapz(m(x2), x=x2)), 10)
+    assert_allclose(abs(trapezoid(m(x2), x=x2)), 10)
