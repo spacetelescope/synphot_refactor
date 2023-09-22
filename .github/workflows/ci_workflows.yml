@@ -77,8 +77,8 @@ jobs:
 
           - name: Test with dev dependencies
             os: ubuntu-latest
-            python: '3.11'
-            toxenv: py311-test-devdeps
+            python: '3.12-dev'
+            toxenv: py312-test-devdeps
 
           - name: Test with old dependencies
             os: ubuntu-20.04
@@ -99,7 +99,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up Python
