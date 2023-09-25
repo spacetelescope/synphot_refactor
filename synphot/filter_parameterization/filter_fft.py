@@ -125,7 +125,7 @@ def filter_from_fft(n_lambda, lambda_0, delta_lambda, tr_max, fft_parameters):
     wavelength = _simplified_wavelength(n_lambda, lambda_0, delta_lambda)
     n_wave = len(wavelength)
     ifft = np.fft.ifft(fft_parameters, n=n_wave)
-    transmittance = ((ifft.real - ifft.real.min()) * tr_max / ifft.real.ptp())  # noqa
+    transmittance = ((ifft.real - ifft.real.min()) * tr_max / np.ptp(ifft.real))  # noqa
     return SpectralElement(
         Empirical1D, points=wavelength, lookup_table=transmittance)
 
@@ -178,7 +178,7 @@ def analytical_model_from_fft(n_lambda, lambda_0, delta_lambda, tr_max,
         x = validate_quantity(x, wave_unit, equivalencies=u.spectral())
 
         mo = m((x - wavelength.min()) / (wavelength[1] - wavelength[0]))
-        return (mo - mo.min()) * tr_max / mo.ptp()
+        return (mo - mo.min()) * tr_max / np.ptp(mo)
 
     return fft_model()
 
