@@ -77,7 +77,7 @@ jobs:
 
           - name: Test with dev dependencies
             os: ubuntu-latest
-            python: '3.12-dev'
+            python: '3.12'
             toxenv: py312-test-devdeps
 
           - name: Test with old dependencies
