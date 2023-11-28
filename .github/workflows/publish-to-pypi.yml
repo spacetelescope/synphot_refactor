@@ -53,6 +53,11 @@ jobs:
     name: Source dist and publish
     runs-on: ubuntu-latest
     needs: build_wheels
+    environment:
+      name: pypi
+      url: https://pypi.org/p/synphot
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
     steps:
     - uses: actions/checkout@v4
       with:
@@ -80,13 +85,6 @@ jobs:
       with:
         name: additional-pylons
         path: dist
-    # FOR DEBUGGING ONLY: repository_url (TestPyPI) and verbose;
-    # Use appropriate token if debugging with TestPyPI
     - name: Publish package to PyPI
       if: github.event_name == 'release'
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_TOKEN }}
-        #repository_url: https://test.pypi.org/legacy/
-        #verbose: true
