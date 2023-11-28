@@ -1,10 +1,12 @@
-1.3.0 (unreleased)
+1.3.0 (2023-11-28)
 ==================
 
 - Compatibility with ``numpy`` 2.0. [#363]
 
 - Bumped minimum supported versions for Python to 3.9,
   ``numpy`` to 1.20, ``astropy`` to 5.0, and ``scipy`` to 1.6. [#363]
+
+- Wheels for Python 3.12.
 
 1.2.1 (2023-06-01)
 ==================
