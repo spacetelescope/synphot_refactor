@@ -4,6 +4,12 @@ on:
   workflow_dispatch:
   release:
     types: [released]
+  pull_request:
+    # We also want this workflow triggered if the 'Build wheels'
+    # label is added or present when PR is updated
+    types:
+      - synchronize
+      - labeled
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,7 +19,7 @@ jobs:
   build_wheels:
     name: Wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    if: github.repository == 'spacetelescope/synphot_refactor'
+    if: (github.repository == 'spacetelescope/synphot_refactor' && ( github.event_name == 'release' || github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'Build wheels')))
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
