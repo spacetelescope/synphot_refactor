@@ -54,14 +54,9 @@ jobs:
         path: ./wheelhouse/*.whl
 
   build_dist:
-    name: Source dist and publish
+    name: Source dist
     runs-on: ubuntu-latest
-    needs: build_wheels
-    environment:
-      name: release
-      url: https://pypi.org/p/synphot
-    permissions:
-      id-token: write  # IMPORTANT: mandatory for trusted publishing
+    if: (github.repository == 'spacetelescope/synphot_refactor' && ( github.event_name == 'release' || github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'Build wheels')))
     steps:
     - uses: actions/checkout@v4
       with:
@@ -83,6 +78,39 @@ jobs:
         testenv/bin/pip install pytest pytest-astropy
         testenv/bin/pip install synphot_refactor/dist/*.tar.gz
         testenv/bin/python -c "import synphot; synphot.test()"
+    - name: Upload dist
+      uses: actions/upload-artifact@v4
+      with:
+        name: additional-pylons-dist
+        path: ./dist/*.tar.gz
+
+  # DO NOT MERGE
+  download_only:
+    name: See if download works
+    needs: [build_wheels, build_dist]
+    if: github.repository == 'spacetelescope/synphot_refactor' && github.event_name != 'release' && contains(github.event.pull_request.labels.*.name, 'Build wheels'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download wheels
+      uses: actions/download-artifact@v4
+      with:
+        path: dist
+        pattern: additional-pylons-*
+        merge-multiple: true
+    - name: Pylons inspection
+      run: ls dist/*
+
+  publish:
+    name: Publish to PyPI
+    needs: [build_wheels, build_dist]
+    if: github.repository == 'spacetelescope/synphot_refactor' && github.event_name == 'release'
+    runs-on: ubuntu-latest
+    environment:
+      name: release
+      url: https://pypi.org/p/synphot
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+    steps:
     - name: Download wheels
       uses: actions/download-artifact@v4
       with:
@@ -90,5 +118,4 @@ jobs:
         pattern: additional-pylons-*
         merge-multiple: true
     - name: Publish package to PyPI
-      if: github.event_name == 'release'
       uses: pypa/gh-action-pypi-publish@release/v1
