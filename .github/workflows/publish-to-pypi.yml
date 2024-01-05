@@ -88,7 +88,7 @@ jobs:
   download_only:
     name: See if download works
     needs: [build_wheels, build_dist]
-    if: github.repository == 'spacetelescope/synphot_refactor' && github.event_name != 'release' && contains(github.event.pull_request.labels.*.name, 'Build wheels'
+    if: github.repository == 'spacetelescope/synphot_refactor' && github.event_name != 'release' && contains(github.event.pull_request.labels.*.name, 'Build wheels')
     runs-on: ubuntu-latest
     steps:
     - name: Download wheels
