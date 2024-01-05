@@ -48,7 +48,6 @@ jobs:
       run: python -m twine check --strict wheelhouse/*
     # Upload artifacts because gh-action-pypi-publish Docker is only on Linux
     - name: Upload wheels
-      if: github.event_name == 'release'
       uses: actions/upload-artifact@v4
       with:
         name: additional-pylons-${{ matrix.os }}
@@ -85,7 +84,6 @@ jobs:
         testenv/bin/pip install synphot_refactor/dist/*.tar.gz
         testenv/bin/python -c "import synphot; synphot.test()"
     - name: Download wheels
-      if: github.event_name == 'release'
       uses: actions/download-artifact@v4
       with:
         path: dist
