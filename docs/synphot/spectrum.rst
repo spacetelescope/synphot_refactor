@@ -87,7 +87,7 @@ de-reddens the spectrum), and then multiply it to the source::
 +--------+---------------------------+            |
 |mwrv21  |Milky Way CCM, R(V)=2.1    |            |
 +--------+---------------------------+            |
-|mwrv4   |Milky Way CCM, R(V)=4.0    |            |
+|mwrv40  |Milky Way CCM, R(V)=4.0    |            |
 +--------+---------------------------+------------+
 |lmc30dor|LMC Supershell, R(V)=2.76  ||mc_ext_ref||
 +--------+---------------------------+            |
