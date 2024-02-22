@@ -1,60 +1,92 @@
 docs:
-  - .github/**/*.md
-  - .readthedocs.yaml
-  - docs/*
-  - docs/_static/*
-  - docs/_templates/*
-  - licenses/*
-  - '*.md'
-  - any: ['*.rst', '!CHANGES.rst']
+- changed-files:
+  - any-glob-to-any-file:
+    - .github/**/*.md
+    - .readthedocs.yaml
+    - docs/*
+    - docs/_static/*
+    - docs/_templates/*
+    - licenses/*
+    - '*.md'
+  - all-globs-to-any-file:
+    - '*.rst'
+    - '!CHANGES.rst'
 
 testing:
-  - .bandit.yaml
-  - .github/**/*.yml
-  - conftest.py
-  - tox.ini
-  - synphot/tests/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - .bandit.yaml
+    - .github/**/*.yml
+    - conftest.py
+    - tox.ini
+    - synphot/tests/**/*
 
 installation:
-  - MANIFEST.in
-  - pyproject.toml
-  - setup.*
+- changed-files:
+  - any-glob-to-any-file:
+    - MANIFEST.in
+    - pyproject.toml
+    - setup.*
 
 Upstream changes:
-  - synphot/compat.py
+- changed-files:
+  - any-glob-to-any-file:
+    - synphot/compat.py
 
 binning:
-  - synphot/binning.py
+- changed-files:
+  - any-glob-to-any-file:
+    - synphot/binning.py
 
 C-extension:
-  - synphot/src/*
-  - synphot/include/*
+- changed-files:
+  - any-glob-to-any-file:
+    - synphot/src/*
+    - synphot/include/*
 
 config:
-  - synphot/config.py
-  - docs/synphot/config.rst
+- changed-files:
+  - any-glob-to-any-file:
+    - synphot/config.py
+    - docs/synphot/config.rst
 
 models:
-  - synphot/blackbody.py
-  - synphot/models.py
+- changed-files:
+  - any-glob-to-any-file:
+    - synphot/blackbody.py
+    - synphot/models.py
 
 observation:
-  - synphot/observation.py
+- changed-files:
+  - any-glob-to-any-file:
+    - synphot/observation.py
 
 reddening:
-  - synphot/reddening.py
+- changed-files:
+  - any-glob-to-any-file:
+    - synphot/reddening.py
 
 specio:
-  - synphot/specio.py
+- changed-files:
+  - any-glob-to-any-file:
+    - synphot/specio.py
 
 spectrum:
-  - synphot/spectrum.py
+- changed-files:
+  - any-glob-to-any-file:
+    - synphot/spectrum.py
 
 thermal:
-  - synphot/thermal.py
+- changed-files:
+  - any-glob-to-any-file:
+    - synphot/thermal.py
 
 units:
-  - synphot/units.py
+- changed-files:
+  - any-glob-to-any-file:
+    - synphot/units.py
 
 utils:
-  - synphot/utils.py
+- changed-files:
+  - any-glob-to-any-file:
+    - synphot/utils.py
