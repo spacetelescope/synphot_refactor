@@ -18,7 +18,7 @@ jobs:
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
     - name: 'Reviewer Checklist'
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       if: github.event_name == 'pull_request_target'
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -39,7 +39,7 @@ jobs:
             - [ ] Is a milestone set? Milestone must be set but we cannot check for it on Actions; do not let the green checkmark fool you.`
           })
     - name: 'Comment Draft PR'
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       if: github.event.pull_request.draft == true
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
