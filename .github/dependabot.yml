@@ -15,4 +15,4 @@ updates:
     target-branch: "master"
     schedule:
       interval: "monthly"
-
+    open-pull-requests-limit: 10
