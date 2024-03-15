@@ -396,9 +396,7 @@ keywords (unless you overwrite them with non-default values in
 * ``TTYPE2`` set to "FLUX" (for source spectrum) or "THROUGHPUT"
   (for bandpass).
 
-While these were required in ASTROLIB PYSYNPHOT, they are optional here in that
-default units would be applied, where applicable, if they are missing from
-the header. Regardless, setting them is highly recommended:
+These were required in ASTROLIB PYSYNPHOT, as well as this package:
 
 * ``TUNIT1`` set to :ref:`supported wavelength unit name <synphot_units>`.
 * ``TUNIT2`` set to :ref:`supported flux unit name <synphot_units>`
