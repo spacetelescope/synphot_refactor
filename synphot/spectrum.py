@@ -1944,7 +1944,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         if is_fits("", filename, None):
             if 'flux_col' not in kwargs:
                 kwargs['flux_col'] = 'THROUGHPUT'
-        elif 'flux_unit' not in kwargs:
+        elif 'flux_unit' not in kwargs:  # pragma: no cover
             kwargs['flux_unit'] = cls._internal_flux_unit
 
         header, wavelengths, throughput = specio.read_spec(filename, **kwargs)
@@ -2012,7 +2012,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         if is_fits("", filename, None):
             if 'flux_col' not in kwargs:
                 kwargs['flux_col'] = 'THROUGHPUT'
-        elif 'flux_unit' not in kwargs:
+        elif 'flux_unit' not in kwargs:  # pragma: no cover
             kwargs['flux_unit'] = cls._internal_flux_unit
 
         header, wavelengths, throughput = specio.read_remote_spec(

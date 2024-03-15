@@ -2,11 +2,6 @@
 """Test spectrum.py module and related functionalities that are not covered
 by ``test_spectrum_source.py`` nor ``test_spectrum_bandpass.py``."""
 
-# STDLIB
-import os
-import shutil
-import tempfile
-
 # THIRD-PARTY
 import numpy as np
 import pytest
@@ -390,7 +385,6 @@ class TestMathOperators:
 class TestWriteSpec:
     """Test spectrum to_fits() method."""
     def setup_class(self):
-        self.outdir = tempfile.mkdtemp()
         self.sp = SourceSpectrum(
             Empirical1D, points=_wave, lookup_table=_flux_photlam,
             meta={'expr': 'Test source'})
@@ -404,8 +398,8 @@ class TestWriteSpec:
          (True, {'foo': 'foo'}),
          (False, None),
          (False, {'foo': 'foo'})])
-    def test_write(self, is_sp, ext_hdr):
-        outfile = os.path.join(self.outdir, 'outspec.fits')
+    def test_write(self, tmp_path, is_sp, ext_hdr):
+        outfile = str(tmp_path / 'outspec.fits')
 
         if is_sp:
             sp1 = self.sp
@@ -426,6 +420,3 @@ class TestWriteSpec:
         assert 'expr' in hdr
         if ext_hdr is not None:
             assert 'foo' in hdr
-
-    def teardown_class(self):
-        shutil.rmtree(self.outdir)
