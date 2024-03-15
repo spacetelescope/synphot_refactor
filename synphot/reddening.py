@@ -7,6 +7,7 @@ import numbers
 # THIRD-PARTY
 import numpy as np
 from astropy import units as u
+from astropy.io.fits.connect import is_fits
 
 # LOCAL
 from synphot import exceptions, specio, units
@@ -137,8 +138,8 @@ class ReddeningLaw(BaseUnitlessSpectrum):
     def from_file(cls, filename, **kwargs):
         """Create a reddening law from file.
 
-        If filename has 'fits' or 'fit' suffix, it is read as FITS.
-        Otherwise, it is read as ASCII.
+        If filename is recognized by ``astropy.io.fits`` as FITS,
+        it is read as such. Otherwise, it is read as ASCII.
 
         Parameters
         ----------
@@ -156,12 +157,11 @@ class ReddeningLaw(BaseUnitlessSpectrum):
             Empirical reddening law.
 
         """
-        if 'flux_unit' not in kwargs:
+        if is_fits("", filename, None):
+            if 'flux_col' not in kwargs:
+                kwargs['flux_col'] = 'Av/E(B-V)'
+        elif 'flux_unit' not in kwargs:
             kwargs['flux_unit'] = cls._internal_flux_unit
-
-        if ((filename.endswith('fits') or filename.endswith('fit')) and
-                'flux_col' not in kwargs):
-            kwargs['flux_col'] = 'Av/E(B-V)'
 
         header, wavelengths, rvs = specio.read_spec(filename, **kwargs)
 
@@ -217,12 +217,11 @@ class ReddeningLaw(BaseUnitlessSpectrum):
 
         filename = cfgitem()
 
-        if 'flux_unit' not in kwargs:
+        if is_fits("", filename, None):
+            if 'flux_col' not in kwargs:
+                kwargs['flux_col'] = 'Av/E(B-V)'
+        elif 'flux_unit' not in kwargs:
             kwargs['flux_unit'] = cls._internal_flux_unit
-
-        if ((filename.endswith('fits') or filename.endswith('fit')) and
-                'flux_col' not in kwargs):
-            kwargs['flux_col'] = 'Av/E(B-V)'
 
         header, wavelengths, rvs = specio.read_remote_spec(filename, **kwargs)
         header['filename'] = filename

@@ -14,6 +14,7 @@ from scipy.integrate import trapezoid
 # ASTROPY
 from astropy import log
 from astropy import units as u
+from astropy.io.fits.connect import is_fits
 from astropy.modeling import Model
 from astropy.modeling.core import CompoundModel
 from astropy.modeling.models import RedshiftScaleFactor, Scale
@@ -1921,8 +1922,8 @@ class SpectralElement(BaseUnitlessSpectrum):
     def from_file(cls, filename, **kwargs):
         """Creates a bandpass from file.
 
-        If filename has 'fits' or 'fit' suffix, it is read as FITS.
-        Otherwise, it is read as ASCII.
+        If filename is recognized by ``astropy.io.fits`` as FITS,
+        it is read as such. Otherwise, it is read as ASCII.
 
         Parameters
         ----------
@@ -1940,12 +1941,11 @@ class SpectralElement(BaseUnitlessSpectrum):
             Empirical bandpass.
 
         """
-        if 'flux_unit' not in kwargs:
+        if is_fits("", filename, None):
+            if 'flux_col' not in kwargs:
+                kwargs['flux_col'] = 'THROUGHPUT'
+        elif 'flux_unit' not in kwargs:
             kwargs['flux_unit'] = cls._internal_flux_unit
-
-        if ((filename.endswith('fits') or filename.endswith('fit')) and
-                'flux_col' not in kwargs):
-            kwargs['flux_col'] = 'THROUGHPUT'
 
         header, wavelengths, throughput = specio.read_spec(filename, **kwargs)
         return cls(Empirical1D, points=wavelengths, lookup_table=throughput,
@@ -2009,12 +2009,11 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         filename = cfgitem()
 
-        if 'flux_unit' not in kwargs:
+        if is_fits("", filename, None):
+            if 'flux_col' not in kwargs:
+                kwargs['flux_col'] = 'THROUGHPUT'
+        elif 'flux_unit' not in kwargs:
             kwargs['flux_unit'] = cls._internal_flux_unit
-
-        if ((filename.endswith('fits') or filename.endswith('fit')) and
-                'flux_col' not in kwargs):
-            kwargs['flux_col'] = 'THROUGHPUT'
 
         header, wavelengths, throughput = specio.read_remote_spec(
             filename, **kwargs)

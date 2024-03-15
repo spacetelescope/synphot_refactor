@@ -198,7 +198,7 @@ class TestCalcbinflux:
             get_pkg_data_filename(
                 os.path.join('data', 'hst_acs_hrc_f555w.fits'),
                 package='synphot.tests'),
-            flux_col='THROUGHPUT', flux_unit=u.dimensionless_unscaled)
+            flux_col='THROUGHPUT')
 
         # Binned data.
         bins = generate_wavelengths(

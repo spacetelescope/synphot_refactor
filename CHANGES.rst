@@ -1,5 +1,15 @@
-1.3.1 (unreleased)
+1.4.0 (unreleased)
 ==================
+
+- ``read_fits_spec()`` now uses ``astropy.table.QTable.read`` for parsing to
+  ensure that the correct ``TUNITn`` is read. As a result, ``wave_unit`` and
+  ``flux_unit`` keywords are deprecated and no longer used in that function.
+  Additionally, if any ``TUNITn`` in the table is invalid, regardless whether
+  the column is used or not, an exception will now be raised. The inputs
+  for ``wave_col`` and ``flux_col`` are now case-sensitive. [#384]
+
+- ``read_spec()`` now detects whether given filename is FITS more consistently
+  w.r.t. ``astropy``. [#384]
 
 1.3.0 (2023-11-28)
 ==================

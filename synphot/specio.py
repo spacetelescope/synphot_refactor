@@ -12,7 +12,10 @@ import numpy as np
 from astropy import log
 from astropy import units as u
 from astropy.io import ascii, fits
+from astropy.io.fits.connect import is_fits
+from astropy.table import QTable
 from astropy.utils.data import get_readable_fileobj
+from astropy.utils.decorators import deprecated_renamed_argument
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
@@ -88,7 +91,7 @@ def read_spec(filename, fname='', **kwargs):
     elif not fname:  # pragma: no cover
         raise exceptions.SynphotError('Cannot determine filename.')
 
-    if fname.endswith('fits') or fname.endswith('fit'):
+    if is_fits("", fname, None):
         read_func = read_fits_spec
     else:
         read_func = read_ascii_spec
@@ -143,12 +146,15 @@ def read_ascii_spec(filename, wave_unit=u.AA, flux_unit=units.FLAM, **kwargs):
     return header, wavelengths, fluxes
 
 
+@deprecated_renamed_argument(
+    ["wave_unit", "flux_unit"], [None, None], ["1.4", "1.4"],
+    alternative='TUNITn as per FITS standards')
 def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
                    wave_unit=u.AA, flux_unit=units.FLAM):
     """Read FITS spectrum.
 
-    Wavelength and flux units are extracted from ``TUNIT1`` and ``TUNIT2``
-    keywords, respectively, from data table (not primary) header.
+    Wavelength and flux units are extracted from respective ``TUNITn``
+    keywords, from data table (not primary) header.
     If these keywords are not present, units are taken from
     ``wave_unit`` and ``flux_unit`` instead.
 
@@ -161,12 +167,14 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
         FITS extension with table data. Default is 1.
 
     wave_col, flux_col : str
-        Wavelength and flux column names (case-insensitive).
+        Wavelength and flux column names (case-sensitive).
 
     wave_unit, flux_unit : str or `~astropy.units.Unit`
-        Wavelength and flux units, which default to Angstrom and FLAM,
-        respectively. These are *only* used if ``TUNIT1`` and ``TUNIT2``
-        keywords are not present in table (not primary) header.
+        Wavelength and flux units. These are *no longer used*.
+        Define your units in the respective ``TUNITn``
+        keywords in table (not primary) header.
+
+        .. deprecated:: 1.4
 
     Returns
     -------
@@ -179,35 +187,23 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
     """
     try:
         fs = fits.open(filename)
-        header = dict(fs[str('PRIMARY')].header)
-        wave_dat = fs[ext].data.field(wave_col).copy()
-        flux_dat = fs[ext].data.field(flux_col).copy()
-        fits_wave_unit = fs[ext].header.get('TUNIT1')
-        fits_flux_unit = fs[ext].header.get('TUNIT2')
+        subhdu = fs[ext]
 
-        if fits_wave_unit is not None:
-            try:
-                wave_unit = units.validate_unit(fits_wave_unit)
-            except (exceptions.SynphotError, ValueError) as e:  # pragma: no cover  # noqa: E501
-                warnings.warn(
-                    '{0} from FITS header is not valid wavelength unit, using '
-                    '{1}: {2}'.format(fits_wave_unit, wave_unit, e),
-                    AstropyUserWarning)
+        # Need to fix table units
+        for key in subhdu.header["TUNIT*"]:
+            val = subhdu.header[key]
+            if not val:
+                continue
+            newval = units.validate_unit(val)
+            subhdu.header[key] = newval.to_string("fits")
 
-        if fits_flux_unit is not None:
-            try:
-                flux_unit = units.validate_unit(fits_flux_unit)
-            except (exceptions.SynphotError, ValueError) as e:  # pragma: no cover  # noqa: E501
-                warnings.warn(
-                    '{0} from FITS header is not valid flux unit, using '
-                    '{1}: {2}'.format(fits_flux_unit, flux_unit, e),
-                    AstropyUserWarning)
+        t = QTable.read(subhdu)
+        header = dict(fs["PRIMARY"].header)
+        t_col_wave = t[wave_col]
+        wavelengths = t_col_wave.value * (t_col_wave.unit or u.dimensionless_unscaled)  # noqa: E501
+        t_col_flux = t[flux_col]
+        fluxes = t_col_flux.value * (t_col_flux.unit or u.dimensionless_unscaled)  # noqa: E501
 
-        wave_unit = units.validate_unit(wave_unit)
-        flux_unit = units.validate_unit(flux_unit)
-
-        wavelengths = wave_dat * wave_unit
-        fluxes = flux_dat * flux_unit
     finally:
         if isinstance(filename, str):
             fs.close()
