@@ -36,7 +36,6 @@ jobs:
             - [ ] Is rebase and/or squash necessary? If so, please provide the author with appropriate instructions.
             - [ ] Did the CI pass? If no, are the failures related?
             - [ ] Is a change log needed?
-            - [ ] Is a milestone set? Milestone must be set but we cannot check for it on Actions; do not let the green checkmark fool you.`
           })
     - name: 'Comment Draft PR'
       uses: actions/github-script@v7
@@ -50,7 +49,7 @@ jobs:
             repo: context.repo.repo,
             body: '👋 Thank you for your draft pull request! Do you know that you can use `[ci skip]` or `[skip ci]` in your commit messages to skip running continuous integration tests until you are ready?'
           })
-    - name: Special comment
-      uses: pllim/action-special_pr_comment@main
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #- name: Special comment
+    #  uses: pllim/action-special_pr_comment@main
+    #  with:
+    #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
