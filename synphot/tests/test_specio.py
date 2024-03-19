@@ -158,18 +158,24 @@ def test_read_nonstandard_fits_cols_01(tmp_path):
     trace = np.array([0, 0.5, 1, 0.9, 0])
     coldefs = fits.ColDefs([
         fits.Column(name="X", format="I", array=pix),
-        fits.Column(name="WAVELENGTH", format="E",
+        fits.Column(name="Wavelength", format="E",
                     unit=wav.unit.to_string(format="fits"), array=wav.value),
-        fits.Column(name="TRACE", format="E", array=trace)])
+        fits.Column(name="Trace", format="E", array=trace)])
     hdulist = fits.HDUList([
         fits.PrimaryHDU(),
         fits.BinTableHDU.from_columns(coldefs)])
     outfile = str(tmp_path / "jwst_niriss_soss_trace.fits")
     hdulist.writeto(outfile, overwrite=True)
 
-    tr = SpectralElement.from_file(outfile, flux_col="TRACE")
-    assert_quantity_allclose(tr.waveset, wav)
-    assert_quantity_allclose(tr(wav), trace, atol=1e-7)
+    # Make sure column names are still case insensitive.
+    for (wave_col, flux_col) in (
+            ("Wavelength", "Trace"),
+            ("WAVELENGTH", "TRACE"),
+            ("wavelength", "trace")):
+        tr = SpectralElement.from_file(
+            outfile, wave_col=wave_col, flux_col=flux_col)
+        assert_quantity_allclose(tr.waveset, wav)
+        assert_quantity_allclose(tr(wav), trace, atol=1e-7)
 
 
 def test_read_nonstandard_fits_cols_02(tmp_path):

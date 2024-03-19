@@ -167,7 +167,7 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
         FITS extension with table data. Default is 1.
 
     wave_col, flux_col : str
-        Wavelength and flux column names (case-sensitive).
+        Wavelength and flux column names (case-insensitive).
 
     wave_unit, flux_unit : str or `~astropy.units.Unit`
         Wavelength and flux units. These are *no longer used*.
@@ -185,6 +185,9 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
         Wavelength and flux of the spectrum.
 
     """
+    wave_col = wave_col.lower()
+    flux_col = flux_col.lower()
+
     try:
         fs = fits.open(filename)
         subhdu = fs[ext]
@@ -199,9 +202,12 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
 
         t = QTable.read(subhdu)
         header = dict(fs["PRIMARY"].header)
-        t_col_wave = t[wave_col]
+
+        # https://github.com/astropy/astropy/issues/16221
+        lower_colnames = [c.lower() for c in t.colnames]
+        t_col_wave = t.columns[lower_colnames.index(wave_col)]
+        t_col_flux = t.columns[lower_colnames.index(flux_col)]
         wavelengths = t_col_wave.value * (t_col_wave.unit or u.dimensionless_unscaled)  # noqa: E501
-        t_col_flux = t[flux_col]
         fluxes = t_col_flux.value * (t_col_flux.unit or u.dimensionless_unscaled)  # noqa: E501
 
     finally:
