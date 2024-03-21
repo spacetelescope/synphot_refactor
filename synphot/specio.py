@@ -198,17 +198,28 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
             if not val:
                 continue
             newval = units.validate_unit(val)
-            subhdu.header[key] = newval.to_string("fits")
+            subhdu.header[key] = newval.to_string()  # Must be generic to handle mag  # noqa: E501
 
-        t = QTable.read(subhdu)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=u.UnitsWarning,
+                                    message=".* did not parse as fits unit")
+            t = QTable.read(subhdu)
         header = dict(fs["PRIMARY"].header)
 
         # https://github.com/astropy/astropy/issues/16221
         lower_colnames = [c.lower() for c in t.colnames]
         t_col_wave = t.columns[lower_colnames.index(wave_col)]
+        if t_col_wave.unit:
+            t_col_wave_unit = units.validate_unit(t_col_wave.unit.to_string())
+        else:
+            t_col_wave_unit = u.dimensionless_unscaled
         t_col_flux = t.columns[lower_colnames.index(flux_col)]
-        wavelengths = t_col_wave.value * (t_col_wave.unit or u.dimensionless_unscaled)  # noqa: E501
-        fluxes = t_col_flux.value * (t_col_flux.unit or u.dimensionless_unscaled)  # noqa: E501
+        if t_col_flux.unit:
+            t_col_flux_unit = units.validate_unit(t_col_flux.unit.to_string())
+        else:
+            t_col_flux_unit = u.dimensionless_unscaled
+        wavelengths = t_col_wave.value * t_col_wave_unit
+        fluxes = t_col_flux.value * t_col_flux_unit
 
     finally:
         if isinstance(filename, str):
