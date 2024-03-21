@@ -291,7 +291,7 @@ def validate_unit(input_unit):
         elif input_unit_lowcase == 'inversemicrons':
             output_unit = u.micron ** -1
         elif input_unit_lowcase in ('transmission', 'extinction',
-                                    'emissivity'):
+                                    'emissivity', 'throughput'):
             output_unit = THROUGHPUT
         elif input_unit_lowcase == 'jy':
             output_unit = u.Jy
