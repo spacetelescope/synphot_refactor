@@ -3,8 +3,6 @@
 
 # STDLIB
 import os
-import shutil
-import tempfile
 
 # THIRD-PARTY
 import numpy as np
@@ -156,32 +154,26 @@ def test_redlaw_from_model_exception():
         ReddeningLaw.from_extinction_model('foo')
 
 
-class TestWriteReddeningLaw:
+@pytest.mark.parametrize('ext_hdr', [None, {'foo': 'foo'}])
+def test_write_reddening_law(tmp_path, ext_hdr):
     """Test ReddeningLaw ``to_fits()`` method."""
-    def setup_class(self):
-        self.outdir = tempfile.mkdtemp()
-        self.x = np.linspace(1000, 5000, 5)
-        self.y = np.linspace(1, 5, 5) * 0.1
-        self.redlaw = ReddeningLaw(
-            Empirical1D, points=self.x, lookup_table=self.y)
+    x = np.linspace(1000, 5000, 5)
+    y = np.linspace(1, 5, 5) * 0.1
+    redlaw = ReddeningLaw(
+        Empirical1D, points=x, lookup_table=y, meta={"expr": "ebv(test)"})
 
-    @pytest.mark.parametrize('ext_hdr', [None, {'foo': 'foo'}])
-    def test_write(self, ext_hdr):
-        outfile = os.path.join(self.outdir, 'outredlaw.fits')
+    outfile = str(tmp_path / 'outredlaw.fits')
 
-        if ext_hdr is None:
-            self.redlaw.to_fits(outfile, overwrite=True)
-        else:
-            self.redlaw.to_fits(outfile, overwrite=True, ext_header=ext_hdr)
+    if ext_hdr is None:
+        redlaw.to_fits(outfile, overwrite=True)
+    else:
+        redlaw.to_fits(outfile, overwrite=True, ext_header=ext_hdr)
 
-        # Read it back in and check
-        redlaw2 = ReddeningLaw.from_file(outfile)
-        np.testing.assert_allclose(redlaw2.waveset.value, self.x)
-        np.testing.assert_allclose(redlaw2(self.x).value, self.y)
+    # Read it back in and check
+    redlaw2 = ReddeningLaw.from_file(outfile)
+    np.testing.assert_allclose(redlaw2.waveset.value, x)
+    np.testing.assert_allclose(redlaw2(x).value, y)
 
-        if ext_hdr is not None:
-            hdr = fits.getheader(outfile, 1)
-            assert 'foo' in hdr
-
-    def teardown_class(self):
-        shutil.rmtree(self.outdir)
+    if ext_hdr is not None:
+        hdr = fits.getheader(outfile, 1)
+        assert 'foo' in hdr

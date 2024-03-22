@@ -4,6 +4,7 @@
 # ASTROPY
 from astropy import units as u
 from astropy.io import fits
+from astropy.io.fits.connect import is_fits
 
 # LOCAL
 from synphot import exceptions, specio, units
@@ -124,7 +125,7 @@ class ThermalSpectralElement(BaseUnitlessSpectrum):
             Invalid inputs.
 
         """
-        if not (filename.endswith('fits') or filename.endswith('fit')):
+        if not is_fits("", filename, None):
             raise exceptions.SynphotError('Only FITS format is supported.')
 
         # Extra info from table header
@@ -137,9 +138,6 @@ class ThermalSpectralElement(BaseUnitlessSpectrum):
                 'Missing {0} keyword.'.format(temperature_key))
 
         beam_fill_factor = tab_hdr.get('BEAMFILL', 1)
-
-        if 'flux_unit' not in kwargs:
-            kwargs['flux_unit'] = cls._internal_flux_unit
 
         if 'flux_col' not in kwargs:
             kwargs['flux_col'] = 'EMISSIVITY'

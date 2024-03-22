@@ -291,10 +291,22 @@ def validate_unit(input_unit):
         elif input_unit_lowcase == 'inversemicrons':
             output_unit = u.micron ** -1
         elif input_unit_lowcase in ('transmission', 'extinction',
-                                    'emissivity'):
+                                    'emissivity', 'throughput'):
             output_unit = THROUGHPUT
         elif input_unit_lowcase == 'jy':
             output_unit = u.Jy
+        elif input_unit_lowcase == "flam":
+            output_unit = FLAM
+        elif input_unit_lowcase == "fnu":
+            output_unit = FNU
+        elif input_unit_lowcase == "photlam":
+            output_unit = PHOTLAM
+        elif input_unit_lowcase == "photnu":
+            output_unit = PHOTNU
+        elif input_unit_lowcase == "none":
+            output_unit = u.dimensionless_unscaled
+        elif input_unit_lowcase == "sec":
+            output_unit = u.s
 
         # Work around mag unit limitations
         elif input_unit_lowcase in ('stmag', 'mag(st)'):

@@ -3,8 +3,6 @@
 
 # STDLIB
 import os
-import shutil
-import tempfile
 
 # THIRD-PARTY
 import numpy as np
@@ -15,10 +13,12 @@ from astropy import units as u
 from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
-from astropy.utils.exceptions import AstropyUserWarning
+from astropy.utils.exceptions import (
+    AstropyUserWarning, AstropyDeprecationWarning)
 
 # LOCAL
 from synphot import exceptions, specio, units
+from synphot.spectrum import SpectralElement
 
 
 @pytest.mark.remote_data
@@ -55,7 +55,6 @@ class TestReadWriteFITS:
     """Test read/write FITS spectrum."""
     def setup_class(self):
         self.epsilon = 0.00031
-        self.outdir = tempfile.mkdtemp()
         self.wave = np.array([1000.0, 2000.0, 2000.0 + self.epsilon, 3000.0,
                               4000.0, 5000.0], dtype=np.float64) * u.AA
         self.flux = np.array([0.1, 100.2, 10.0, 0.0, 6.5, 1.2],
@@ -63,9 +62,9 @@ class TestReadWriteFITS:
         self.prihdr = {'PEDIGREE': 'DUMMY'}
         self.scihdr = {'SPEC_SRC': 'RANDOM'}
 
-    def test_array_data(self):
+    def test_array_data(self, tmp_path):
         """Data as Numpy array."""
-        outfile = os.path.join(self.outdir, 'outspec1.fits')
+        outfile = str(tmp_path / 'outspec1.fits')
 
         # Write it out
         with pytest.warns(AstropyUserWarning, match=r'rows are thrown out'):
@@ -76,7 +75,8 @@ class TestReadWriteFITS:
                 wave_unit=self.wave.unit, flux_unit=self.flux.unit)
 
         # Read it back in and check values (flux_unit should be ignored)
-        hdr, wave, flux = specio.read_spec(outfile, flux_unit='foo')
+        with pytest.warns(AstropyDeprecationWarning, match=r"\"flux_unit\" was deprecated"):  # noqa: E501
+            hdr, wave, flux = specio.read_spec(outfile, flux_unit='foo')
 
         # Compare data
         np.testing.assert_allclose(
@@ -95,9 +95,9 @@ class TestReadWriteFITS:
         assert sci_hdr['SPEC_SRC'] == 'RANDOM'
         assert sci_hdr['TFORM2'].lower() == 'e'
 
-    def test_quantity_data(self):
+    def test_quantity_data(self, tmp_path):
         """Data as Quantity."""
-        outfile = os.path.join(self.outdir, 'outspec2.fits')
+        outfile = str(tmp_path / 'outspec2.fits')
 
         # Write it out (flux_unit should be ignored)
         specio.write_fits_spec(
@@ -105,7 +105,8 @@ class TestReadWriteFITS:
             ext_header=self.scihdr, precision='double', flux_unit='foo')
 
         # Read it back in and check values (flux_unit should be ignored)
-        hdr, wave, flux = specio.read_spec(outfile, flux_unit='foo')
+        with pytest.warns(AstropyDeprecationWarning, match=r"\"flux_unit\" was deprecated"):  # noqa: E501
+            hdr, wave, flux = specio.read_spec(outfile, flux_unit='foo')
 
         # Compare data (trim_zero=True, pad_zero_ends=True)
         np.testing.assert_allclose(
@@ -125,9 +126,9 @@ class TestReadWriteFITS:
         assert sci_hdr['SPEC_SRC'] == 'RANDOM'
         assert sci_hdr['TFORM2'].lower() == 'd'
 
-    def test_exceptions(self):
+    def test_exceptions(self, tmp_path):
         """Test for appropriate exceptions."""
-        outfile = os.path.join(self.outdir, 'outspec3.fits')
+        outfile = str(tmp_path / 'outspec3.fits')
 
         # Shape mismatch
         with pytest.raises(exceptions.SynphotError):
@@ -149,5 +150,61 @@ class TestReadWriteFITS:
             specio.write_fits_spec(
                 outfile, self.wave, np.arange(6), overwrite=True)
 
-    def teardown_class(self):
-        shutil.rmtree(self.outdir)
+
+def test_read_nonstandard_fits_cols_01(tmp_path):
+    """See https://github.com/spacetelescope/synphot_refactor/issues/372"""
+    pix = np.arange(5, dtype=int) + 1
+    wav = (pix * 0.1) * u.micron
+    trace = np.array([0, 0.5, 1, 0.9, 0])
+    coldefs = fits.ColDefs([
+        fits.Column(name="X", format="I", array=pix),
+        fits.Column(name="Wavelength", format="E",
+                    unit=wav.unit.to_string(format="fits"), array=wav.value),
+        fits.Column(name="Trace", format="E", array=trace)])
+    hdulist = fits.HDUList([
+        fits.PrimaryHDU(),
+        fits.BinTableHDU.from_columns(coldefs)])
+    outfile = str(tmp_path / "jwst_niriss_soss_trace.fits")
+    hdulist.writeto(outfile, overwrite=True)
+
+    # Make sure column names are still case insensitive.
+    for (wave_col, flux_col) in (
+            ("Wavelength", "Trace"),
+            ("WAVELENGTH", "TRACE"),
+            ("wavelength", "trace")):
+        tr = SpectralElement.from_file(
+            outfile, wave_col=wave_col, flux_col=flux_col)
+        assert_quantity_allclose(tr.waveset, wav)
+        assert_quantity_allclose(tr(wav), trace, atol=1e-7)
+
+
+def test_read_nonstandard_fits_cols_02(tmp_path):
+    """See https://github.com/spacetelescope/synphot_refactor/issues/372"""
+
+    wav = (np.arange(5) + 1) * u.nm
+    flux_unit_str = "ph/s/m2/micron/arcsec2"  # Invalid but should not matter.
+    flux = np.ones(5)
+    thru = np.array([0, 0.5, 1, 0.9, 0])
+    coldefs = fits.ColDefs([
+        fits.Column(name="lam", format="E",
+                    unit=wav.unit.to_string(format="fits"), array=wav.value),
+        fits.Column(name="flux", format="E",
+                    unit=flux_unit_str, array=flux),
+        fits.Column(name="dflux1", format="E",
+                    unit=flux_unit_str, array=flux),
+        fits.Column(name="dflux2", format="E",
+                    unit=flux_unit_str, array=flux),
+        fits.Column(name="trans", format="E", unit="1", array=thru)])
+    hdulist = fits.HDUList([
+        fits.PrimaryHDU(),
+        fits.BinTableHDU.from_columns(coldefs)])
+    outfile = str(tmp_path / "skytable.fits")
+    hdulist.writeto(outfile, overwrite=True)
+
+    with pytest.warns(u.UnitsWarning, match="'ph/s/m2/micron/arcsec2'"):  # noqa: E501
+        header, wavelengths, transmission = specio.read_spec(
+            outfile, wave_col="lam", flux_col="trans")
+
+    assert header["SIMPLE"]
+    assert_quantity_allclose(wavelengths, wav)
+    assert_quantity_allclose(transmission, thru)

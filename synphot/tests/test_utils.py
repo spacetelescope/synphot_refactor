@@ -116,25 +116,25 @@ class TestMergeWave:
         np.testing.assert_array_equal(wave, self.wave)
 
 
-def test_download_bad_root(tmpdir):
+def test_download_bad_root(tmp_path):
     """Test data download helper when input dir is invalid."""
-    ptr = tmpdir.join('bad_cdbs')
-    ptr.write('content')
+    ptr = tmp_path / 'bad_cdbs'
+    ptr.write_text("something")
     cdbs_root = str(ptr)
 
-    with pytest.raises(OSError):
+    with pytest.raises(OSError, match=".* must be a directory"):
         utils.download_data(cdbs_root, verbose=False)
 
     with pytest.raises(FileNotFoundError):
         utils.download_data('', verbose=False)
 
 
-def test_download_data(tmpdir):
+def test_download_data(tmp_path):
     """Test data download helper in dry run mode."""
     from synphot.config import conf
 
     # Use case where user downloads all data into new dir.
-    cdbs_root = os.path.join(tmpdir.strpath, 'cdbs')
+    cdbs_root = str(tmp_path / 'cdbs')
     file_list_1 = utils.download_data(cdbs_root, verbose=False, dry_run=True)
     filename = file_list_1[0]
     assert len(file_list_1) == 21
