@@ -66,13 +66,13 @@ jobs:
 
           - name: Test without optional deps
             os: ubuntu-latest
-            python: 3.9
-            toxenv: py39-test
+            python: '3.10'
+            toxenv: py310-test
 
           - name: Coverage test with remote data
             os: ubuntu-latest
-            python: '3.10'
-            toxenv: py310-test-alldeps-cov
+            python: '3.11'
+            toxenv: py311-test-alldeps-cov
             toxposargs: --remote-data
 
           - name: Test with dev dependencies
@@ -82,13 +82,13 @@ jobs:
 
           - name: Test with old dependencies
             os: ubuntu-20.04
-            python: 3.9
-            toxenv: py39-test-oldestdeps
+            python: '3.10'
+            toxenv: py310-test-oldestdeps
 
           - name: Test in OSX
             os: macos-latest
-            python: '3.10'
-            toxenv: py310-test-alldeps
+            python: '3.12'
+            toxenv: py312-test-alldeps
 
           # NOTE: If TRDS cannot take the hit, disable --remote-data
           - name: Test in Windows with remote data

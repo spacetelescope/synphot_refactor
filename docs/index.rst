@@ -42,7 +42,7 @@ reported) or contact `STScI Help Desk <https://hsthelp.stsci.edu>`_.
 Installation and Setup
 ======================
 
-**synphot** works for Python 3.9 or later only. It requires the following
+**synphot** works for Python 3.10 or later only. It requires the following
 packages:
 
 * numpy

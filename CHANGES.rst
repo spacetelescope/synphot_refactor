@@ -10,6 +10,12 @@
 - ``read_spec()`` now detects whether given filename is FITS more consistently
   w.r.t. ``astropy``. [#384]
 
+- Compatibility with ``numpy`` 2.0 and ``astropy`` 6.1 by building C-extension
+  against ``numpy`` 2.x ABI. [#381]
+
+- Bumped minimum supported versions for Python to 3.10,
+  ``numpy`` to 1.23, ``astropy`` to 6.0, and ``scipy`` to 1.9. [#381]
+
 1.3.0 (2023-11-28)
 ==================
 

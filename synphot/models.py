@@ -23,7 +23,6 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from synphot import units
-from synphot.compat import ASTROPY_LT_5_0
 from synphot.exceptions import SynphotError
 from synphot.utils import merge_wavelengths
 
@@ -228,10 +227,7 @@ class Box1D(_models.Box1D):
         if step is None:
             step = self.step
 
-        if ASTROPY_LT_5_0:
-            w1, w2 = self.bounding_box
-        else:
-            w1, w2 = tuple(self.bounding_box.bounding_box())
+        w1, w2 = tuple(self.bounding_box.bounding_box())
 
         if self._n_models == 1:
             w = self._calc_sampleset(w1, w2, step, minimal)
@@ -763,10 +759,7 @@ class Trapezoid1D(_models.Trapezoid1D):
     """
     def sampleset(self):
         """Return ``x`` array that samples the feature."""
-        if ASTROPY_LT_5_0:
-            x1, x4 = self.bounding_box
-        else:
-            x1, x4 = tuple(self.bounding_box.bounding_box())
+        x1, x4 = tuple(self.bounding_box.bounding_box())
         dw = self.width * 0.5
         x2 = self.x_0 - dw
         x3 = self.x_0 + dw
