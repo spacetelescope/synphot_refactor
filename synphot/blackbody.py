@@ -56,7 +56,7 @@ class BlackBody1D(Fittable1DModel):
     >>> from synphot.blackbody import BlackBody1D
     >>> bb = BlackBody1D()
     >>> bb(6000 * u.AA)  # doctest: +FLOAT_CMP
-    <Quantity 1.3585381201978953e-15 erg / (cm2 Hz s)>
+    <Quantity 1.35853828e-15 erg / (Hz s cm2)>
 
     .. plot::
         :include-source:
