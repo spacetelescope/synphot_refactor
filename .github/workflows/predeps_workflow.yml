@@ -32,8 +32,8 @@ jobs:
 
           - name: RC test on Windows
             os: windows-latest
-            python: 3.9
-            toxenv: py39-test-predeps
+            python: '3.12'
+            toxenv: py312-test-predeps
 
     steps:
     - name: Checkout code

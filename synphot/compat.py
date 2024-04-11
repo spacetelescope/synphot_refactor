@@ -2,15 +2,10 @@
 """Module to handle backward-compatibility."""
 import importlib
 
-import astropy
-from astropy.utils.introspection import minversion
-
 _optional_deps = ['specutils', 'dust_extinction']
 _deps = {k.upper(): k for k in _optional_deps}
 
-ASTROPY_LT_5_0 = not minversion(astropy, '5.0')
-
-__all__ = ['ASTROPY_LT_5_0'] + [f"HAS_{pkg}" for pkg in _deps]
+__all__ = [f"HAS_{pkg}" for pkg in _deps]
 
 
 def __getattr__(name):
