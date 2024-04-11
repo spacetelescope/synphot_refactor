@@ -1,4 +1,4 @@
-1.4.0 (unreleased)
+1.4.0 (2024-04-11)
 ==================
 
 - ``read_fits_spec()`` now uses ``astropy.table.QTable.read`` for parsing to
