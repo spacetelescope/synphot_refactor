@@ -35,7 +35,7 @@ jobs:
             - [ ] Are docs added/updated as required?
             - [ ] Is rebase and/or squash necessary? If so, please provide the author with appropriate instructions.
             - [ ] Did the CI pass? If no, are the failures related?
-            - [ ] Is a change log needed?
+            - [ ] Is a change log needed?`
           })
     - name: 'Comment Draft PR'
       uses: actions/github-script@v7
