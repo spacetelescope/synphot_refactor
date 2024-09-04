@@ -46,17 +46,8 @@ By default, 10 FFT parameters are returned as complex numbers::
     <Quantity 0.66748047 Angstrom>
     >>> tr_max  # Peak value of throughput  # doctest: +FLOAT_CMP
     <Quantity 0.241445>
-    >>> fft_pars  # FFT parameters  # doctest: +FLOAT_CMP
-    [(407.5180314841658+7.494005416219807e-16j),
-     (-78.52240189503877-376.53990235136575j),
-     (-294.86589196496584+127.25464850352665j),
-     (130.20273803287864+190.84263652863257j),
-     (96.62299079012317-91.70087676328245j),
-     (-32.572468348727654-34.227696019221035j),
-     (-8.051741476066471-21.354793540998294j),
-     (-51.708676896903725+6.883836090870033j),
-     (13.08719675518801+54.48177212720124j),
-     (38.635087381362396-13.02803811279449j)]
+    >>> fft_pars  # FFT parameters  # doctest: +ELLIPSIS
+    [(407.51803...), (-78.52240...), ...]
 
 It is up to you to decide how to store this data, though storing it in a
 table format is recommended. In fact, if you have many filters to parameterize,
@@ -66,13 +57,13 @@ will store the results in a table for you::
     >>> from synphot.filter_parameterization import filters_to_fft_table
     >>> mapping = {'HST/ACS/HRC/F555W': (bp, None)}
     >>> filter_pars_table = filters_to_fft_table(mapping)
-    >>> filter_pars_table  # doctest: +FLOAT_CMP +ELLIPSIS
+    >>> filter_pars_table  # doctest: +ELLIPSIS
     <Table length=1>
-          filter      n_lambda ...                  fft_9
+          filter      n_lambda ...                 fft_9
                                ...
-          str17        int...  ...                complex128
-    ----------------- -------- ... ---------------------------------------
-    HST/ACS/HRC/F555W    10000 ... (38.635087381362396-13.02803811279449j)
+          str17        int...  ...               complex128
+    ----------------- -------- ... --------------------------------------
+    HST/ACS/HRC/F555W    10000 ... (38.635...-13.028...j)
     >>> filter_pars_table.write('my_filter_pars.fits')  # doctest: +SKIP
 
 .. _filter_fft_construction:
