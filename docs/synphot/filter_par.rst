@@ -57,12 +57,12 @@ will store the results in a table for you::
     >>> from synphot.filter_parameterization import filters_to_fft_table
     >>> mapping = {'HST/ACS/HRC/F555W': (bp, None)}
     >>> filter_pars_table = filters_to_fft_table(mapping)
-    >>> filter_pars_table  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    >>> filter_pars_table  # doctest: +ELLIPSIS
     <Table length=1>
-          filter      n_lambda ...                 fft_9
+          filter      n_lambda ...                  fft_9
                                ...
-          str17        int...  ...               complex128
-    ----------------- -------- ... --------------------------------------
+          str17        int...  ...                complex128
+    ----------------- -------- ... ---------------------------------------
     HST/ACS/HRC/F555W    10000 ... (38.635...-13.028...j)
     >>> filter_pars_table.write('my_filter_pars.fits')  # doctest: +SKIP
 
