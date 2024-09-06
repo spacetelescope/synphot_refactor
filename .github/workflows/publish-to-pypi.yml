@@ -1,6 +1,9 @@
 name: Release
 
 on:
+  schedule:
+    # run every day at 5am UTC
+    - cron: '0 5 * * *'
   workflow_dispatch:
   release:
     types: [released]
@@ -11,15 +14,20 @@ on:
       - synchronize
       - labeled
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build_wheels:
+    permissions:
+      contents: none
     name: Wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    if: (github.repository == 'spacetelescope/synphot_refactor' && ( github.event_name == 'release' || github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'Build wheels')))
+    if: (github.repository == 'spacetelescope/synphot_refactor' && ( github.event_name == 'release' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'Build wheels')))
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -48,13 +56,15 @@ jobs:
       run: python -m twine check --strict wheelhouse/*
     # Upload artifacts because gh-action-pypi-publish Docker is only on Linux
     - name: Upload wheels
-      if: github.event_name == 'release'
+      if: (github.event_name == 'release' || github.event_name == 'schedule')
       uses: actions/upload-artifact@v4
       with:
         name: additional-pylons-${{ matrix.os }}
         path: ./wheelhouse/*.whl
 
   build_dist:
+    permissions:
+      contents: none
     name: Source dist
     runs-on: ubuntu-latest
     if: (github.repository == 'spacetelescope/synphot_refactor' && ( github.event_name == 'release' || github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'Build wheels')))
@@ -107,3 +117,16 @@ jobs:
       run: ls dist/*
     - name: Publish package to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
+
+  anaconda:
+    name: Publish nightly wheel to Anaconda
+    needs: [build_wheels]
+    if: github.repository == 'spacetelescope/synphot_refactor' && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: OpenAstronomy/publish-wheels-anaconda@612ea808f79152bd52a019316f684a12bbe8ba33  # main 2024-09-06
+      with:
+        anaconda_user: STScI
+        anaconda_package: synphot
+        anaconda_token: ${{ secrets.anaconda_token }}
+        keep_n_latest: 5
