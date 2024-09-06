@@ -61,11 +61,15 @@ You can install **synphot** using one of the following ways:
 
     pip install synphot
 
+* From nightly wheel uploads (pre-built ``dev`` version)::
+
+    pip install -i https://pypi.anaconda.org/stsci/simple synphot -U --pre
+
 * From source (example shown is for the ``dev`` version)::
 
     git clone https://github.com/spacetelescope/synphot_refactor.git
     cd synphot_refactor
-    pip install -e .
+    pip install .
 
 To use the pre-defined standard star, extinction laws, and bandpasses, it is
 recommended for non-internal STScI users to download the necessary data files to
