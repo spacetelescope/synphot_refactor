@@ -124,6 +124,14 @@ jobs:
     if: github.repository == 'spacetelescope/synphot_refactor' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
+    - name: Download wheels
+      uses: actions/download-artifact@v4
+      with:
+        path: dist
+        pattern: additional-pylons-*
+        merge-multiple: true
+    - name: Pylons inspection
+      run: ls dist/*
     - uses: OpenAstronomy/publish-wheels-anaconda@612ea808f79152bd52a019316f684a12bbe8ba33  # main 2024-09-06
       with:
         anaconda_user: STScI
