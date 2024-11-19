@@ -158,7 +158,7 @@ def test_download_data(tmp_path):
     # Use case where user redefined data file to be non-STScI.
     # While the given file will be used, default Vega is downloaded anyway.
     filename = [fname for fname in file_list_1
-                if fname.endswith('alpha_lyr_stis_010.fits')][0]
+                if fname.endswith('alpha_lyr_stis_011.fits')][0]
     os.remove(filename)
     with conf.set_temp('vega_file', '/custom/host/my_vega.fits'):
         file_list_2 = utils.download_data(
