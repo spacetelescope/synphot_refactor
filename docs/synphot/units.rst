@@ -72,7 +72,7 @@ convert between all the supported flux units, including count/OBMAG (needs an
 extra input specifying telescope collecting area) and VEGAMAG (needs an extra
 input specifying the Vega spectrum to use), by taking account all the
 necessary unit equivalencies. You may also use
-:meth:`~astropy.units.quantity.Quantity.to` directly, as supported by Astropy,
+:meth:`~astropy.units.Quantity.to` directly, as supported by Astropy,
 but you would need to provide the equivalencies on your own.
 
 Somewhat related are ``synphot.units.AREA``, which is a shortcut for the unit
@@ -186,8 +186,8 @@ Wavelength Units
 
 **synphot** supports all wavelength, frequency, and spectroscopic wavenumber
 (inverse wavelength) that are supported by Astropy. Conversion between those
-units can be easily done using :meth:`~astropy.units.quantity.Quantity.to` and
-passing in :func:`~astropy.units.equivalencies.spectral` as equivalency.
+units can be easily done using :meth:`~astropy.units.Quantity.to` and
+passing in :func:`~astropy.units.spectral` as equivalency.
 
 For backward compatibility with ASTROLIB PYSYNPHOT data files, the following
 non-standard wavelength unit *names* (case-insensitive) are also supported:
