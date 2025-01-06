@@ -484,7 +484,7 @@ class BaseSpectrum:
                 raise exceptions.SynphotError(
                     'flux_unit cannot be used with unitless spectrum')
             else:
-                self._validate_flux_unit(flux_unit, wav_only=True)
+                flux_unit = self._validate_flux_unit(flux_unit, wav_only=True)
 
         x = self._validate_wavelengths(wavelengths)
 
