@@ -81,7 +81,7 @@ jobs:
             toxenv: py313-test-devdeps
 
           - name: Test with old dependencies
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             python: '3.10'
             toxenv: py310-test-oldestdeps
 
