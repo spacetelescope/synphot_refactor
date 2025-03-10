@@ -45,11 +45,9 @@ jobs:
       uses: pypa/cibuildwheel@6cccd09a31908ffd175b012fb8bf4e1dbda3bc6c  # v2.23.0
       env:
         CIBW_BUILD: 'cp310-* cp311-* cp312-* cp313-*'
-        CIBW_SKIP: '*-musllinux_*'
-        CIBW_ARCHS_LINUX: 'x86_64'
+        CIBW_ARCHS_LINUX: 'x86_64 aarch64'
         CIBW_ARCHS_WINDOWS: 'AMD64'
-        CIBW_ARCHS_MACOS: 'arm64'
-        CIBW_TEST_SKIP: '*-macosx_arm64'
+        CIBW_ARCHS_MACOS: 'x86_64 arm64'
         CIBW_TEST_REQUIRES: 'pytest pytest-astropy'
         CIBW_TEST_COMMAND: 'pytest --pyargs synphot'
     - name: Check wheels
