@@ -3,6 +3,9 @@
 
 - Compatibility with ``astropy`` 7.1. [#403]
 
+- Removed ``synphot.test()`` test runner.
+  Use ``pytest --pyargs synphot`` instead. [#408]
+
 1.5.0 (2024-11-19)
 ==================
 
