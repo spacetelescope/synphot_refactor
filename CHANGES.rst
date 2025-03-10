@@ -6,6 +6,8 @@
 - Removed ``synphot.test()`` test runner.
   Use ``pytest --pyargs synphot`` instead. [#408]
 
+- Added wheels for OSX x86 architecture. [#409]
+
 1.5.0 (2024-11-19)
 ==================
 
