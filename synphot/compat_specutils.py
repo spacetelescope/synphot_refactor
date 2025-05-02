@@ -9,14 +9,17 @@ This module should no longer be necessary once this package
 requires ``specutils`` 2.0 or later.
 
 """
-import specutils
-from astropy.utils import minversion
+from synphot.compat import HAS_SPECUTILS
 
 __all__ = []
 
-SPECUTILS_LT_2 = not minversion(specutils, "2.0.dev")
+if HAS_SPECUTILS:
+    import specutils
+    from astropy.utils import minversion
 
-if SPECUTILS_LT_2:
-    from specutils import Spectrum1D as Spectrum
-else:
-    from specutils import Spectrum  # noqa: F401
+    SPECUTILS_LT_2 = not minversion(specutils, "2.0.dev")
+
+    if SPECUTILS_LT_2:
+        from specutils import Spectrum1D as Spectrum
+    else:
+        from specutils import Spectrum  # noqa: F401
