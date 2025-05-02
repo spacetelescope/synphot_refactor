@@ -75,7 +75,7 @@ class Observation(BaseSourceSpectrum):
 
     """
     def __init__(self, spec, band, binset=None, force='none'):
-        # Duck-type specutils.Spectrum1D to avoid hard dependency on specutils
+        # Duck-type specutils.Spectrum to avoid hard dependency on specutils
         if hasattr(spec, 'flux') and hasattr(spec, 'spectral_axis'):
             spec = SourceSpectrum.from_spectrum1d(spec)
 

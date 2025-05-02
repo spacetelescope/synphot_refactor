@@ -284,7 +284,7 @@ information on how to use `~specutils.Spectrum1D`.
 The example below writes a :ref:`synphot-box-bandpass` to a
 `~specutils.Spectrum1D` object:
 
-.. doctest-requires:: specutils
+.. doctest-requires:: specutils<2
 
     >>> from astropy import units as u
     >>> from synphot import SpectralElement
@@ -295,7 +295,7 @@ The example below writes a :ref:`synphot-box-bandpass` to a
 Meanwhile, this example reads in a bandpass from a
 `~specutils.Spectrum1D` object:
 
-.. doctest-requires:: specutils
+.. doctest-requires:: specutils<2
 
     >>> from astropy import units as u
     >>> from specutils import Spectrum1D

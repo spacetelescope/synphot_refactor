@@ -447,7 +447,7 @@ information on how to use `~specutils.Spectrum1D`.
 The example below writes a :ref:`synphot-gaussian` to a `~specutils.Spectrum1D`
 object in the flux unit of Jansky:
 
-.. doctest-requires:: specutils
+.. doctest-requires:: specutils<2
 
     >>> from astropy import units as u
     >>> from synphot import SourceSpectrum
@@ -459,7 +459,7 @@ object in the flux unit of Jansky:
 Meanwhile, this example reads in a source from a `~specutils.Spectrum1D`
 object:
 
-.. doctest-requires:: specutils
+.. doctest-requires:: specutils<2
 
     >>> from astropy import units as u
     >>> from specutils import Spectrum1D
