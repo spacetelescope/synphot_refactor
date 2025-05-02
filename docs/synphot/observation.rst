@@ -159,7 +159,7 @@ specutils
 A `specutils.Spectrum1D` object can be passed directly into
 `~synphot.observation.Observation` as a source spectrum. For example:
 
-.. doctest-requires:: specutils
+.. doctest-requires:: specutils<2
 
     >>> from specutils import Spectrum1D
     >>> spec = Spectrum1D(spectral_axis=[499, 500, 600, 601]*u.nm,

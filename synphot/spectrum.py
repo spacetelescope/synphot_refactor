@@ -845,7 +845,7 @@ class BaseSpectrum:
             points = spec.spectral_axis
             lookup_table = spec.flux
 
-        # Spectrum1D is designed to be immutable, so no need to make
+        # Spectrum is designed to be immutable, so no need to make
         # copies of spectral_axis nor flux.
         return cls(Empirical1D, points=points, lookup_table=lookup_table,
                    keep_neg=keep_neg, meta={'header': spec.meta.copy()})
@@ -881,12 +881,11 @@ class BaseSpectrum:
         if not HAS_SPECUTILS:  # pragma: no cover
             raise ImportError('specutils must be installed to use this method')
 
-        import specutils
+        from synphot.compat_specutils import Spectrum
 
         w, y = self._get_arrays(wavelengths, **kwargs)
 
-        return specutils.Spectrum1D(spectral_axis=w, flux=y,
-                                    meta=self.meta.copy())
+        return Spectrum(spectral_axis=w, flux=y, meta=self.meta.copy())
 
 
 class BaseSourceSpectrum(BaseSpectrum):

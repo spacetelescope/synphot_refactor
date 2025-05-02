@@ -3,6 +3,9 @@
 
 - Compatibility with ``astropy`` 7.1. [#403]
 
+- Compatibility with ``specutils`` 2.0 (optional dependency).
+  Bumped minversion of ``specutils`` to 1.10. [#413]
+
 - Removed ``synphot.test()`` test runner.
   Use ``pytest --pyargs synphot`` instead. [#408]
 

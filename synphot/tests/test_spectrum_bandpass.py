@@ -224,11 +224,11 @@ class TestBuildModelsBandpass:
 @pytest.mark.skipif('not HAS_SPECUTILS')
 class TestSpecutilsBridgeBandpass:
     def test_from_spectrum1d_Empirical1D_bandpass(self):
-        import specutils
+        from synphot.compat_specutils import Spectrum
 
         lamb = [1000, 5000, 10000] * u.AA
         thru = [0, 1, -1] * units.THROUGHPUT
-        spec = specutils.Spectrum1D(spectral_axis=lamb, flux=thru)
+        spec = Spectrum(spectral_axis=lamb, flux=thru)
         with pytest.warns(AstropyUserWarning,
                           match=r'contained negative flux or throughput'):
             bp = SpectralElement.from_spectrum1d(spec, keep_neg=False)
@@ -239,12 +239,12 @@ class TestSpecutilsBridgeBandpass:
         assert_quantity_allclose(bp(w), [0, 1, 0])
 
     def test_from_spectrum1d_Empirical1D_bandpass_masked(self):
-        import specutils
+        from synphot.compat_specutils import Spectrum
 
         lamb = [1000, 5000, 10000] * u.AA
         thru = [0, 1, -1] * units.THROUGHPUT
         mask = np.array([False, False, True])
-        spec = specutils.Spectrum1D(spectral_axis=lamb, flux=thru, mask=mask)
+        spec = Spectrum(spectral_axis=lamb, flux=thru, mask=mask)
         bp = SpectralElement.from_spectrum1d(spec, keep_neg=False)
 
         w = bp.waveset

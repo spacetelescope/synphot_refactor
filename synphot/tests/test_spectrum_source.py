@@ -566,11 +566,11 @@ class TestRedShift:
 @pytest.mark.skipif(not HAS_SPECUTILS, reason='specutils is not installed')
 class TestSpecutilsBridgeSource:
     def test_from_spectrum1d_Empirical1D_source(self):
-        import specutils
+        from synphot.compat_specutils import Spectrum
 
         lamb = [1000, 5000, 10000] * u.AA
         flux = [0, -0.5e-17, 5.6e-17] * units.FLAM
-        spec = specutils.Spectrum1D(spectral_axis=lamb, flux=flux)
+        spec = Spectrum(spectral_axis=lamb, flux=flux)
         spec.meta['source'] = [1, 2, 3]
         with pytest.warns(AstropyUserWarning,
                           match=r'contained negative flux or throughput'):
@@ -590,12 +590,12 @@ class TestSpecutilsBridgeSource:
         assert spec.meta['source'] == [1, 99, 3]
 
     def test_from_spectrum1d_Empirical1D_source_masked(self):
-        import specutils
+        from synphot.compat_specutils import Spectrum
 
         lamb = [1000, 5000, 10000] * u.AA
         flux = [0, -0.5e-17, 5.6e-17] * units.FLAM
         mask = np.array([False, True, False])
-        spec = specutils.Spectrum1D(spectral_axis=lamb, flux=flux, mask=mask)
+        spec = Spectrum(spectral_axis=lamb, flux=flux, mask=mask)
         sp = SourceSpectrum.from_spectrum1d(spec, keep_neg=False)
 
         w = sp.waveset
@@ -614,7 +614,7 @@ class TestSpecutilsBridgeSource:
         assert_quantity_allclose(spec.flux, flux)
         assert spec.meta['source'] == 'foo'
 
-        # Ensure redshifting does not change Spectrum1D
+        # Ensure redshifting does not change Spectrum
         sp.z = 0.1
         assert_quantity_allclose(spec.flux, flux)
         with pytest.raises(AssertionError):
