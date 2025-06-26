@@ -1,4 +1,4 @@
-1.6.0 (unreleased)
+1.6.0 (2025-06-26)
 ==================
 
 - Compatibility with ``astropy`` 7.1. [#403]
