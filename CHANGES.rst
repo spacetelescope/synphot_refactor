@@ -1,4 +1,4 @@
-1.6.1 (unreleased)
+1.6.1 (2025-12-10)
 ==================
 
 - Added wheels for Python 3.14. [#426]
