@@ -66,8 +66,8 @@ jobs:
 
           - name: Test without optional deps
             os: ubuntu-latest
-            python: '3.10'
-            toxenv: py310-test
+            python: '3.13'
+            toxenv: py313-test
 
           - name: Coverage test with remote data
             os: ubuntu-latest
@@ -77,8 +77,8 @@ jobs:
 
           - name: Test with dev dependencies
             os: ubuntu-latest
-            python: '3.13'
-            toxenv: py313-test-devdeps
+            python: '3.14'
+            toxenv: py314-test-devdeps
 
           - name: Test with old dependencies
             os: ubuntu-22.04
