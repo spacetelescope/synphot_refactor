@@ -3,7 +3,7 @@ updates:
 
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
-    directory: "/"
+    directory: ".github/workflows"
     target-branch: "master"
     schedule:
       interval: "monthly"
