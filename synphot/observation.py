@@ -647,7 +647,7 @@ class Observation(BaseSourceSpectrum):
             Flux is converted to this unit for plotting.
             If not given, internal unit is used.
 
-        area : float
+        area : float or `~astropy.units.quantity.Quantity`
             See :func:`~synphot.units.convert_flux`.
 
         vegaspec : `~synphot.spectrum.SourceSpectrum`
