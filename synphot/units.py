@@ -144,8 +144,8 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
         OBMAG and count, otherwise it is not needed.
 
     vegaspec : `~synphot.spectrum.SourceSpectrum`
-        If this kwarg ispresent, the given Vega spectrum to use for conversion
-        of VEGAMAG. If not present, it is automatically loaded from
+        Vega spectrum for conversions involving
+        VEGAMAG, otherwise it is automatically loaded from
         :func:`~synphot.spectrum.SourceSpectrum.from_vega`.
 
     Returns
@@ -226,7 +226,7 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
         if vegaspec is None:
             vegaspec = SourceSpectrum.from_vega()
 
-        # Vega data file not found, so `from_vega` returns None
+        # Vega data file not found, so from_vega above returns None
         if not isinstance(vegaspec, SourceSpectrum):
             raise exceptions.SynphotError('Vega spectrum is missing.')
 
