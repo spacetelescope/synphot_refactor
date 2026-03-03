@@ -337,12 +337,14 @@ class TestObsPar:
             self.obs.effstim(flux_unit=units.VEGAMAG, vegaspec=vspec).value,
             ans, rtol=0.001)
 
-    @pytest.mark.parametrize('flux_unit', [u.mag, units.VEGAMAG])
-    def test_effstim_exceptions(self, flux_unit):
-        with pytest.raises(exceptions.SynphotError):
-            self.obs.effstim(flux_unit=flux_unit)
-        with pytest.raises(exceptions.SynphotError):
-            self.obs.effstim(units.VEGAMAG)
+    @pytest.mark.remote_data
+    def test_effstim_vegamag_vegaspec_default(self):
+        ans = 12.737293324241517  # pysynphot 0.9.12.dev5
+        np.testing.assert_allclose(
+            self.obs.effstim(flux_unit=units.VEGAMAG).value,
+            ans,
+            rtol=0.001,
+        )
 
 
 class TestCountRate:

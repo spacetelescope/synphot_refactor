@@ -470,6 +470,9 @@ class Observation(BaseSourceSpectrum):
         # Special handling of VEGAMAG.
         # This is basically effstim(self)/effstim(Vega)
         if flux_unit_name == units.VEGAMAG.to_string():
+            if vegaspec is None:
+                vegaspec = SourceSpectrum.from_vega()
+            # Vega data file missing, so from_vega() returns None.
             if not isinstance(vegaspec, SourceSpectrum):
                 raise exceptions.SynphotError('Vega spectrum is missing.')
             num = self.integrate(wavelengths=wavelengths)
@@ -644,8 +647,12 @@ class Observation(BaseSourceSpectrum):
             Flux is converted to this unit for plotting.
             If not given, internal unit is used.
 
-        area, vegaspec
+        area:
             See :func:`~synphot.units.convert_flux`.
+        vegaspec : `~synphot.spectrum.SourceSpectrum`
+            If this kwarg is present, the given Vega spectrum to use for conversion
+            of VEGAMAG. If not present, it is automatically loaded from
+            :func:`~synphot.spectrum.SourceSpectrum.from_vega`.
 
         kwargs : dict
             See :func:`synphot.spectrum.BaseSpectrum.plot`.
