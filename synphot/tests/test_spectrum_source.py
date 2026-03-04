@@ -21,6 +21,7 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
+from synphot.config import conf
 from synphot.tests.test_units import (
     _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
 )
@@ -31,6 +32,7 @@ from synphot.models import (
     GaussianFlux1D, Lorentz1D, RickerWavelet1D, PowerLawFlux1D)
 from synphot.observation import Observation
 from synphot.spectrum import SourceSpectrum, SpectralElement
+from synphot import spectrum
 
 
 def setup_module(module):
@@ -518,14 +520,23 @@ class TestNormalize:
         with pytest.raises(exceptions.DisjointError):
             self.em.normalize(10, band=bp)
 
-        # Missing Vega spectrum
-        with pytest.raises(exceptions.SynphotError):
-            self.bb.normalize(10 * units.VEGAMAG, band=self.abox)
-
         # Zero flux
         sp = SourceSpectrum(Const1D, amplitude=0)
         with pytest.raises(exceptions.SynphotError):
             sp.normalize(100 * u.ct, band=self.abox, area=_area)
+
+    def test_exception_missing_vegaspec(self):
+        """This is the same logic as "test_exception" but pulled out
+        into a separate test because it needs more setup."""
+        conf_vega_file = conf.vega_file
+        try:
+            conf.vega_file = ""
+            # spectrum.Vega is cached it might have been filled by previous tests
+            spectrum.Vega = None
+            with pytest.raises(exceptions.SynphotError):
+                self.bb.normalize(10 * units.VEGAMAG, band=self.abox)
+        finally:
+            conf.vega_file = conf_vega_file
 
 
 class TestRedShift:

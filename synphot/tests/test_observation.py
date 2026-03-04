@@ -26,6 +26,7 @@ from synphot.models import (
 )
 from synphot.observation import Observation
 from synphot.spectrum import SourceSpectrum, SpectralElement
+from synphot import conf
 
 # Global test data files
 _specfile = get_pkg_data_filename(
@@ -336,6 +337,29 @@ class TestObsPar:
         np.testing.assert_allclose(
             self.obs.effstim(flux_unit=units.VEGAMAG, vegaspec=vspec).value,
             ans, rtol=0.001)
+
+    @pytest.mark.parametrize(
+        "flux_unit,message",
+        [
+            (u.mag, "Flux unit mag is invalid"),
+            (units.VEGAMAG, "Need Vega spectrum for conversion but cannot load"),
+        ],
+    )
+    def test_effstim_exceptions(self, flux_unit, message):
+        """By default, the Vega spectrum is lazily loaded when needed. To test the error
+        when the Vega spectrum cannot be loaded, we temporarily
+        modify the package configuration to point to a non-existent Vega file.
+        """
+        conf_vega_file = conf.vega_file
+        try:
+            conf.vega_file = ""
+            with pytest.raises(
+                exceptions.SynphotError,
+                match=message,
+            ):
+                self.obs.effstim(flux_unit=flux_unit)
+        finally:
+            conf.vega_file = conf_vega_file
 
     @pytest.mark.remote_data
     def test_effstim_vegamag_vegaspec_default(self):

@@ -221,14 +221,10 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
 
     # VEGAMAG
     if VEGAMAG.to_string() in flux_unit_names:
-        from synphot.spectrum import SourceSpectrum
-
         if vegaspec is None:
-            vegaspec = SourceSpectrum.from_vega()
+            from synphot.spectrum import _get_cached_vega
 
-        # Vega data file not found, so from_vega above returns None
-        if not isinstance(vegaspec, SourceSpectrum):
-            raise exceptions.SynphotError('Vega spectrum is missing.')
+            vegaspec = _get_cached_vega()
 
         flux_vega = vegaspec(wavelengths)
 

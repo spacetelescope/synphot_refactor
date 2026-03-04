@@ -21,8 +21,12 @@ from astropy.utils.exceptions import (AstropyUserWarning,
 # LOCAL
 from synphot import binning, exceptions, units, utils
 from synphot.models import Empirical1D
-from synphot.spectrum import (BaseSourceSpectrum, SourceSpectrum,
-                              SpectralElement)
+from synphot.spectrum import (
+    BaseSourceSpectrum,
+    SourceSpectrum,
+    SpectralElement,
+    _get_cached_vega,
+)
 
 __all__ = ['Observation']
 
@@ -471,10 +475,8 @@ class Observation(BaseSourceSpectrum):
         # This is basically effstim(self)/effstim(Vega)
         if flux_unit_name == units.VEGAMAG.to_string():
             if vegaspec is None:
-                vegaspec = SourceSpectrum.from_vega()
-            # Vega data file missing, so from_vega above returns None.
-            if not isinstance(vegaspec, SourceSpectrum):
-                raise exceptions.SynphotError('Vega spectrum is missing.')
+                vegaspec = _get_cached_vega()
+
             num = self.integrate(wavelengths=wavelengths)
             den = (vegaspec * self.bandpass).integrate(
                 integration_type='trapezoid')
