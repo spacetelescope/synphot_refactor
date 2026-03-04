@@ -43,9 +43,10 @@ Vega = (
 
 This is lazily loaded when needed using :func:`SourceSpectrum.from_vega()`.
 There are several mechanisms to use a different spectrum for Vega:
+
 - Set ``synphot.conf.vega_file``
 - Set ``synphot.spectrum.Vega`` before it is used
-- Provide Vega spectrum as argument to conversion functions that require it (e.g., ``units.convert_flux``).
+- Provide Vega spectrum as argument to conversion functions that require it (e.g., :func:`synphot.units.convert_flux`).
 """
 
 
@@ -59,8 +60,7 @@ def _get_cached_vega():
                 f"Need Vega spectrum for conversion but cannot load: {e.args[0]}\n"
             )
             new_message += "Fix loading or provide Vega spectrum as argument."
-            e.args = (new_message,) + e.args[1:]
-            raise exceptions.SynphotError((new_message,) + e.args[1:])
+            raise exceptions.SynphotError((new_message,) + e.args[1:]) from None
     return Vega
 
 
@@ -1103,7 +1103,10 @@ class BaseSourceSpectrum(BaseSpectrum):
 
             # VEGAMAG
             if renorm_unit_name == units.VEGAMAG.to_string():
-                stdspec = _get_cached_vega()
+                if not isinstance(vegaspec, SourceSpectrum):
+                    stdspec = _get_cached_vega()
+                else:
+                    stdspec = vegaspec
 
             # Magnitude flux-density units
             elif renorm_val.unit in (u.STmag, u.ABmag):

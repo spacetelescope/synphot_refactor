@@ -10,6 +10,7 @@ import numpy as np
 import pytest
 
 # ASTROPY
+import astropy
 from astropy import modeling
 from astropy import units as u
 from astropy.io import fits
@@ -60,7 +61,7 @@ def teardown_module(module):
      (_flux_vegamag, units.PHOTLAM, _flux_photlam),
      (_flux_jy, units.VEGAMAG, _flux_vegamag),
      (_flux_vegamag, u.Jy, _flux_jy)])
-def test_flux_conversion_vega(in_q, out_u, ans):
+def test_flux_conversion_vega_buildin(in_q, out_u, ans):
     """Test Vega spectrum object and flux conversion with VEGAMAG.
 
     .. note:: 1% is good enough given Vega gets updated from time to time.
@@ -528,15 +529,11 @@ class TestNormalize:
     def test_exception_missing_vegaspec(self):
         """This is the same logic as "test_exception" but pulled out
         into a separate test because it needs more setup."""
-        conf_vega_file = conf.vega_file
-        try:
-            conf.vega_file = ""
+        with astropy.config.set_temp("vega_file", ""):
             # spectrum.Vega is cached it might have been filled by previous tests
             spectrum.Vega = None
             with pytest.raises(exceptions.SynphotError):
                 self.bb.normalize(10 * units.VEGAMAG, band=self.abox)
-        finally:
-            conf.vega_file = conf_vega_file
 
 
 class TestRedShift:
