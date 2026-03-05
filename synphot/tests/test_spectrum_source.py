@@ -25,7 +25,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 from synphot.tests.test_units import (
     _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
 )
-from synphot import exceptions, units
+from synphot import conf, exceptions, units
 from synphot.compat import HAS_SPECUTILS
 from synphot.models import (
     BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, Gaussian1D,
@@ -528,7 +528,7 @@ class TestNormalize:
     def test_exception_missing_vegaspec(self):
         """This is the same logic as "test_exception" but pulled out
         into a separate test because it needs more setup."""
-        with astropy.config.set_temp("vega_file", ""):
+        with conf.set_temp("vega_file", ""):
             # spectrum.Vega is cached it might have been filled by previous tests
             spectrum.Vega = None
             with pytest.raises(exceptions.SynphotError):

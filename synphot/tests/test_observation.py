@@ -19,15 +19,14 @@ from astropy.utils.exceptions import (AstropyDeprecationWarning,
                                       AstropyUserWarning)
 
 # LOCAL
-from synphot.tests.test_units import _area
-from synphot import exceptions, units
+from synphot import conf, exceptions, spectrum, units
 from synphot.compat import HAS_SPECUTILS  # noqa
 from synphot.models import (
     BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, GaussianFlux1D
 )
 from synphot.observation import Observation
 from synphot.spectrum import SourceSpectrum, SpectralElement
-from synphot import spectrum
+from synphot.tests.test_units import _area
 
 # Global test data files
 _specfile = get_pkg_data_filename(
@@ -351,7 +350,7 @@ class TestObsPar:
         when the Vega spectrum cannot be loaded, we temporarily
         modify the package configuration to point to a non-existent Vega file.
         """
-        with astropy.conf.set_temp("vega_file", ""):
+        with conf.set_temp("vega_file", ""):
             # spectrum.Vega is cached it might have been filled by previous tests
             spectrum.Vega = None
             with pytest.raises(
