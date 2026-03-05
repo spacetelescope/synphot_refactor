@@ -22,7 +22,6 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
-from synphot.config import conf
 from synphot.tests.test_units import (
     _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
 )
