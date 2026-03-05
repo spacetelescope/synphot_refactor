@@ -28,7 +28,6 @@ from synphot.models import (
 from synphot.observation import Observation
 from synphot.spectrum import SourceSpectrum, SpectralElement
 from synphot import spectrum
-from synphot import conf
 
 # Global test data files
 _specfile = get_pkg_data_filename(
