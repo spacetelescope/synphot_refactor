@@ -10,7 +10,6 @@ import numpy as np
 import pytest
 
 # ASTROPY
-import astropy
 from astropy import units as u
 from astropy.modeling.models import Const1D
 from astropy.tests.helper import assert_quantity_allclose

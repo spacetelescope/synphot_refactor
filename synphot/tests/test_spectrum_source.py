@@ -10,7 +10,6 @@ import numpy as np
 import pytest
 
 # ASTROPY
-import astropy
 from astropy import modeling
 from astropy import units as u
 from astropy.io import fits
