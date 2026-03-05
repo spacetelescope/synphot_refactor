@@ -2,7 +2,7 @@
 ==================
 
 - Flux conversions to and from VEGAMAG now use the default Vega spectrum
-  (``synphot.spectrum.Vega``) if no Vega spectrum is given, instead of
+  (``synphot.spectrum.Vega``) if no valid Vega spectrum is given, instead of
   throwing an exception. To that end, a new ``synphot.spectrum.lazy_load_vega()``
   function is also introduced. [#435]
 

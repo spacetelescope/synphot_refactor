@@ -21,11 +21,8 @@ from astropy.utils.exceptions import (AstropyUserWarning,
 # LOCAL
 from synphot import binning, exceptions, units, utils
 from synphot.models import Empirical1D
-from synphot.spectrum import (
-    BaseSourceSpectrum,
-    SourceSpectrum,
-    SpectralElement
-)
+from synphot.spectrum import (BaseSourceSpectrum, SourceSpectrum,
+                              SpectralElement)
 
 __all__ = ['Observation']
 
@@ -473,7 +470,7 @@ class Observation(BaseSourceSpectrum):
         # Special handling of VEGAMAG.
         # This is basically effstim(self)/effstim(Vega)
         if flux_unit_name == units.VEGAMAG.to_string():
-            if vegaspec is None:
+            if not isinstance(vegaspec, SourceSpectrum):
                 from synphot import spectrum
                 spectrum.lazy_load_vega()
                 vegaspec = spectrum.Vega

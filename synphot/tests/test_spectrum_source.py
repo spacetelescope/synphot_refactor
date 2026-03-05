@@ -21,17 +21,16 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
-from synphot.tests.test_units import (
-    _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
-)
-from synphot import conf, exceptions, units
+from synphot import conf, exceptions, spectrum, units
 from synphot.compat import HAS_SPECUTILS
 from synphot.models import (
     BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, Gaussian1D,
     GaussianFlux1D, Lorentz1D, RickerWavelet1D, PowerLawFlux1D)
 from synphot.observation import Observation
 from synphot.spectrum import SourceSpectrum, SpectralElement
-from synphot import spectrum
+from synphot.tests.test_units import (
+    _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
+)
 
 
 def setup_module(module):
