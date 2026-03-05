@@ -45,7 +45,7 @@ Vega = (
 This is lazily loaded when needed using :func:`SourceSpectrum.from_vega()`.
 There are several mechanisms to use a different spectrum for Vega:
 
-- Reset ``synphot.spectrum.Vega`` to `None` and reload using :func:`lazy_load_vega` before it is used
+- Reset ``synphot.spectrum.Vega`` to `None` and reload using :func:`lazy_load_vega` before it is used.
 - Provide Vega spectrum as argument to conversion functions that require it (e.g., :func:`synphot.units.convert_flux`).
 """
 
