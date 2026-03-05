@@ -24,8 +24,7 @@ from synphot.models import Empirical1D
 from synphot.spectrum import (
     BaseSourceSpectrum,
     SourceSpectrum,
-    SpectralElement,
-    _get_cached_vega,
+    SpectralElement
 )
 
 __all__ = ['Observation']
@@ -475,7 +474,9 @@ class Observation(BaseSourceSpectrum):
         # This is basically effstim(self)/effstim(Vega)
         if flux_unit_name == units.VEGAMAG.to_string():
             if vegaspec is None:
-                vegaspec = _get_cached_vega()
+                from synphot import spectrum
+                spectrum.lazy_load_vega()
+                vegaspec = spectrum.Vega
 
             num = self.integrate(wavelengths=wavelengths)
             den = (vegaspec * self.bandpass).integrate(
@@ -649,10 +650,7 @@ class Observation(BaseSourceSpectrum):
             Flux is converted to this unit for plotting.
             If not given, internal unit is used.
 
-        area : float or `~astropy.units.quantity.Quantity`
-            See :func:`~synphot.units.convert_flux`.
-
-        vegaspec : `~synphot.spectrum.SourceSpectrum`
+        area, vegaspec
             See :func:`~synphot.units.convert_flux`.
 
         kwargs : dict

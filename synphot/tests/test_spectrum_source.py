@@ -59,7 +59,7 @@ def teardown_module(module):
      (_flux_vegamag, units.PHOTLAM, _flux_photlam),
      (_flux_jy, units.VEGAMAG, _flux_vegamag),
      (_flux_vegamag, u.Jy, _flux_jy)])
-def test_flux_conversion_vega_buildin(in_q, out_u, ans):
+def test_flux_conversion_vega_builtin(in_q, out_u, ans):
     """Test Vega spectrum object and flux conversion with VEGAMAG.
 
     .. note:: 1% is good enough given Vega gets updated from time to time.
@@ -83,7 +83,7 @@ def test_flux_conversion_vega_buildin(in_q, out_u, ans):
     ],
 )
 def test_flux_conversion_vega_different_spec(in_q, out_u, identical_ans):
-    """test_flux_conversion_vega test with the Vega spectrum in the database.
+    """test_flux_conversion_vega_builtin test with the Vega spectrum in the database.
 
     Here, we check that the conversion gives different answers when using different
     spectra for Vega. To make that really obvious and to avoid the need for remote data,

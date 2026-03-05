@@ -222,9 +222,10 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
     # VEGAMAG
     if VEGAMAG.to_string() in flux_unit_names:
         if vegaspec is None:
-            from synphot.spectrum import _get_cached_vega
+            from synphot import spectrum
 
-            vegaspec = _get_cached_vega()
+            spectrum.lazy_load_vega()
+            vegaspec = spectrum.Vega
 
         flux_vega = vegaspec(wavelengths)
 

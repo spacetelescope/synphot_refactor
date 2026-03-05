@@ -2,7 +2,9 @@
 ==================
 
 - Flux conversions to and from VEGAMAG now use the default Vega spectrum
-  if no Vega spectrum is given. [#435]
+  (``synphot.spectrum.Vega``) if no Vega spectrum is given, instead of
+  throwing an exception. To that end, a new ``synphot.spectrum.lazy_load_vega()``
+  function is also introduced. [#435]
 
 1.6.1 (2025-12-10)
 ==================
@@ -69,7 +71,7 @@
 - OBMAG and VEGAMAG are no longer interchangeable. [#331]
 
 - ``Box1D`` model now takes optional ``step`` input to allow user control
-  over the generated sampleset. Default behavior maintains backwards 
+  over the generated sampleset. Default behavior maintains backwards
   compatibility. [#342]
 
 - Dropped support for Python 3.6 and 3.7. Minimum supported Python
