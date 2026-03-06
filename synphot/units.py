@@ -226,7 +226,7 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
         if not isinstance(vegaspec, SourceSpectrum):
             from synphot import spectrum
 
-            spectrum.lazy_load_vega()
+            spectrum._lazy_load_vega_with_exception()
             vegaspec = spectrum.Vega
 
         flux_vega = vegaspec(wavelengths)

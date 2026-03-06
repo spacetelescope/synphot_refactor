@@ -341,7 +341,7 @@ class TestObsPar:
         "flux_unit,message",
         [
             (u.mag, "Flux unit mag is invalid"),
-            (units.VEGAMAG, "Need Vega spectrum for conversion but cannot load"),
+            (units.VEGAMAG, "Failed to load a built-in Vega spectrum"),
         ],
     )
     def test_effstim_exceptions(self, flux_unit, message):

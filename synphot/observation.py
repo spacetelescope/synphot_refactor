@@ -472,7 +472,7 @@ class Observation(BaseSourceSpectrum):
         if flux_unit_name == units.VEGAMAG.to_string():
             if not isinstance(vegaspec, SourceSpectrum):
                 from synphot import spectrum
-                spectrum.lazy_load_vega()
+                spectrum._lazy_load_vega_with_exception()
                 vegaspec = spectrum.Vega
 
             num = self.integrate(wavelengths=wavelengths)

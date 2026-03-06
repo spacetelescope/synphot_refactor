@@ -70,10 +70,10 @@ def lazy_load_vega(vegafile=None, **kwargs):
     kwargs : dict
         Keywords acceptable by :func:`synphot.specio.read_remote_spec`.
 
-    Raises
-    ------
-    synphot.exceptions.SynphotError
-        Vega failed to load and set to `None` instead.
+    Returns
+    -------
+    err_message : str
+        Error message, if any.
 
     """
     global Vega
@@ -89,11 +89,22 @@ def lazy_load_vega(vegafile=None, **kwargs):
             Vega = SourceSpectrum.from_vega(**kwargs)
         except Exception as e:
             Vega = None
-            new_err_message = (
-                f"Need Vega spectrum for conversion but cannot load: {e.args[0]}\n"
-                "Fix loading or provide Vega spectrum as argument."
-            )
-            raise exceptions.SynphotError((new_err_message, ) + e.args[1:]) from None
+            err_message = repr(e)
+        else:
+            err_message = ""
+
+    return err_message
+
+
+def _lazy_load_vega_with_exception(**kwargs):
+    """Run :func:`lazy_load_vega` but throw exception for internal use."""
+    err_message = lazy_load_vega(**kwargs)
+    if err_message:
+        new_err_message = (
+            f"Failed to load a built-in Vega spectrum: {err_message}\n"
+            "Fix loading in lazy_load_vega() function or provide it directly via vegaspec keyword."
+        )
+        raise exceptions.SynphotError(new_err_message) from None
 
 
 # TODO: Update model logic when astropy.modeling supports Quantity.
@@ -1136,7 +1147,7 @@ class BaseSourceSpectrum(BaseSpectrum):
             # VEGAMAG
             if renorm_unit_name == units.VEGAMAG.to_string():
                 if not isinstance(vegaspec, SourceSpectrum):
-                    lazy_load_vega()
+                    _lazy_load_vega_with_exception()
                     stdspec = Vega
                 else:
                     stdspec = vegaspec
