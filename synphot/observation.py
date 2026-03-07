@@ -471,7 +471,10 @@ class Observation(BaseSourceSpectrum):
         # This is basically effstim(self)/effstim(Vega)
         if flux_unit_name == units.VEGAMAG.to_string():
             if not isinstance(vegaspec, SourceSpectrum):
-                raise exceptions.SynphotError('Vega spectrum is missing.')
+                from synphot import spectrum
+                spectrum._lazy_load_vega_with_exception()
+                vegaspec = spectrum.Vega
+
             num = self.integrate(wavelengths=wavelengths)
             den = (vegaspec * self.bandpass).integrate(
                 integration_type='trapezoid')

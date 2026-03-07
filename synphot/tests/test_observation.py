@@ -18,14 +18,14 @@ from astropy.utils.exceptions import (AstropyDeprecationWarning,
                                       AstropyUserWarning)
 
 # LOCAL
-from synphot.tests.test_units import _area
-from synphot import exceptions, units
+from synphot import conf, exceptions, spectrum, units
 from synphot.compat import HAS_SPECUTILS  # noqa
 from synphot.models import (
     BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, GaussianFlux1D
 )
 from synphot.observation import Observation
 from synphot.spectrum import SourceSpectrum, SpectralElement
+from synphot.tests.test_units import _area
 
 # Global test data files
 _specfile = get_pkg_data_filename(
@@ -337,12 +337,35 @@ class TestObsPar:
             self.obs.effstim(flux_unit=units.VEGAMAG, vegaspec=vspec).value,
             ans, rtol=0.001)
 
-    @pytest.mark.parametrize('flux_unit', [u.mag, units.VEGAMAG])
-    def test_effstim_exceptions(self, flux_unit):
-        with pytest.raises(exceptions.SynphotError):
-            self.obs.effstim(flux_unit=flux_unit)
-        with pytest.raises(exceptions.SynphotError):
-            self.obs.effstim(units.VEGAMAG)
+    @pytest.mark.parametrize(
+        "flux_unit,message",
+        [
+            (u.mag, "Flux unit mag is invalid"),
+            (units.VEGAMAG, "Failed to load a built-in Vega spectrum"),
+        ],
+    )
+    def test_effstim_exceptions(self, flux_unit, message):
+        """By default, the Vega spectrum is lazily loaded when needed. To test the error
+        when the Vega spectrum cannot be loaded, we temporarily
+        modify the package configuration to point to a non-existent Vega file.
+        """
+        with conf.set_temp("vega_file", ""):
+            # spectrum.Vega is cached it might have been filled by previous tests
+            spectrum.Vega = None
+            with pytest.raises(
+                exceptions.SynphotError,
+                match=message,
+            ):
+                self.obs.effstim(flux_unit=flux_unit)
+
+    @pytest.mark.remote_data
+    def test_effstim_vegamag_vegaspec_default(self):
+        ans = 12.737293324241517  # pysynphot 0.9.12.dev5
+        np.testing.assert_allclose(
+            self.obs.effstim(flux_unit=units.VEGAMAG).value,
+            ans,
+            rtol=0.001,
+        )
 
 
 class TestCountRate:

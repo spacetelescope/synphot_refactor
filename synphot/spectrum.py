@@ -26,8 +26,85 @@ from synphot import exceptions, specio, units, utils
 from synphot.config import Conf, conf
 from synphot.models import ConstFlux1D, Empirical1D, get_waveset, get_metadata
 
-__all__ = ['BaseSpectrum', 'BaseSourceSpectrum', 'SourceSpectrum',
-           'BaseUnitlessSpectrum', 'SpectralElement']
+__all__ = [
+    "BaseSpectrum",
+    "BaseSourceSpectrum",
+    "SourceSpectrum",
+    "BaseUnitlessSpectrum",
+    "SpectralElement",
+    "lazy_load_vega",
+    "Vega",
+]
+
+
+Vega = (
+    None  # This is defined at the end of this module to avoid circular import issues.
+)
+"""Default Vega spectrum. Used for conversions to and from VEGAMAG when no Vega spectrum is given.
+
+This is lazily loaded when needed using :func:`SourceSpectrum.from_vega()`.
+There are several mechanisms to use a different spectrum for Vega:
+
+- Reset ``synphot.spectrum.Vega`` to `None` and reload using :func:`lazy_load_vega` before it is used.
+- Provide Vega spectrum as argument to conversion functions that require it (e.g., :func:`synphot.units.convert_flux`).
+"""
+
+
+def lazy_load_vega(vegafile=None, **kwargs):
+    """Convenience function to load a default Vega spectrum that is
+    used throughout ``synphot`` when no specific Vega spectrum is given.
+
+    This function only does lazy loading; i.e., it will simply
+    return any previously loaded Vega, if available. To force a reload,
+    set `synphot.spectrum.Vega` to `None` before running this function.
+
+    `synphot.spectrum.Vega` would be loaded as a
+    `~synphot.spectrum.SourceSpectrum` if successful; otherwise `None`.
+
+    Parameters
+    ----------
+    vegafile : str or `None`, optional
+        Vega spectrum filename.
+        If `None`, use ``synphot.config.conf.vega_file``.
+
+    kwargs : dict
+        Keywords acceptable by :func:`synphot.specio.read_remote_spec`.
+
+    Returns
+    -------
+    err_message : str
+        Error message, if any.
+
+    """
+    global Vega
+
+    if isinstance(Vega, SourceSpectrum):  # no-op
+        return
+
+    if vegafile is None:
+        vegafile = conf.vega_file
+
+    with conf.set_temp("vega_file", vegafile):
+        try:
+            Vega = SourceSpectrum.from_vega(**kwargs)
+        except Exception as e:
+            Vega = None
+            err_message = repr(e)
+        else:
+            err_message = ""
+
+    return err_message
+
+
+def _lazy_load_vega_with_exception(**kwargs):
+    """Run :func:`lazy_load_vega` but throw exception for internal use."""
+    err_message = lazy_load_vega(**kwargs)
+    if err_message:
+        new_err_message = (
+            f"Failed to load a built-in Vega spectrum: {err_message}\n"
+            "Fix loading in lazy_load_vega() function or provide it directly via vegaspec keyword."
+        )
+        raise exceptions.SynphotError(new_err_message) from None
 
 
 # TODO: Update model logic when astropy.modeling supports Quantity.
@@ -1070,9 +1147,10 @@ class BaseSourceSpectrum(BaseSpectrum):
             # VEGAMAG
             if renorm_unit_name == units.VEGAMAG.to_string():
                 if not isinstance(vegaspec, SourceSpectrum):
-                    raise exceptions.SynphotError(
-                        'Vega spectrum is missing.')
-                stdspec = vegaspec
+                    _lazy_load_vega_with_exception()
+                    stdspec = Vega
+                else:
+                    stdspec = vegaspec
 
             # Magnitude flux-density units
             elif renorm_val.unit in (u.STmag, u.ABmag):

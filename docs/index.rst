@@ -337,6 +337,7 @@ Also imports this C-extension to local namespace:
 
 .. automodapi:: synphot.spectrum
    :no-inheritance-diagram:
+   :include-all-objects:
 
 .. automodapi:: synphot.thermal
 

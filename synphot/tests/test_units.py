@@ -166,10 +166,6 @@ def test_flux_conversion_exceptions():
     with pytest.raises(u.UnitsError):
         units.convert_flux(_wave, _flux_photlam, u.AA)
 
-    # Missing Vega spectrum
-    with pytest.raises(exceptions.SynphotError):
-        units.convert_flux(_wave, _flux_fnu, units.VEGAMAG, vegaspec=None)
-
     # Missing area
     with pytest.raises(exceptions.SynphotError):
         units.convert_flux(_wave, _flux_photlam, u.count, area=None)

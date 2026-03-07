@@ -21,19 +21,16 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
-from synphot.tests.test_units import (
-    _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
-)
-from synphot import exceptions, units
+from synphot import conf, exceptions, spectrum, units
 from synphot.compat import HAS_SPECUTILS
 from synphot.models import (
     BlackBodyNorm1D, Box1D, ConstFlux1D, Empirical1D, Gaussian1D,
     GaussianFlux1D, Lorentz1D, RickerWavelet1D, PowerLawFlux1D)
 from synphot.observation import Observation
 from synphot.spectrum import SourceSpectrum, SpectralElement
-
-# GLOBAL VARIABLES
-_vspec = None  # Loaded in test_load_vspec()
+from synphot.tests.test_units import (
+    _area, _wave, _flux_jy, _flux_photlam, _flux_vegamag
+)
 
 
 def setup_module(module):
@@ -55,32 +52,50 @@ def teardown_module(module):
 
 
 @pytest.mark.remote_data
-def test_load_vspec():
-    """Load VEGA spectrum once here to be used later."""
-    global _vspec
-    _vspec = SourceSpectrum.from_vega()
-
-
-@pytest.mark.remote_data
 @pytest.mark.parametrize(
     ('in_q', 'out_u', 'ans'),
     [(_flux_photlam, units.VEGAMAG, _flux_vegamag),
      (_flux_vegamag, units.PHOTLAM, _flux_photlam),
      (_flux_jy, units.VEGAMAG, _flux_vegamag),
      (_flux_vegamag, u.Jy, _flux_jy)])
-def test_flux_conversion_vega(in_q, out_u, ans):
+def test_flux_conversion_vega_builtin(in_q, out_u, ans):
     """Test Vega spectrum object and flux conversion with VEGAMAG.
 
     .. note:: 1% is good enough given Vega gets updated from time to time.
 
     """
-    result = units.convert_flux(_wave, in_q, out_u, vegaspec=_vspec)
+    result = units.convert_flux(_wave, in_q, out_u)
     assert_quantity_allclose(result, ans, rtol=1e-2)
 
     # Scalar
     i = 0
-    result = units.convert_flux(_wave[i], in_q[i], out_u, vegaspec=_vspec)
+    result = units.convert_flux(_wave[i], in_q[i], out_u)
     assert_quantity_allclose(result, ans[i], rtol=1e-2)
+
+
+@pytest.mark.parametrize(
+    ("in_q", "out_u", "identical_ans"),
+    [
+        (_flux_photlam, units.VEGAMAG, False),
+        (_flux_vegamag, units.PHOTLAM, False),
+        (_flux_jy, units.FLAM, True),
+    ],
+)
+def test_flux_conversion_vega_different_spec(in_q, out_u, identical_ans):
+    """test_flux_conversion_vega_builtin test with the Vega spectrum in the database.
+
+    Here, we check that the conversion gives different answers when using different
+    spectra for Vega. To make that really obvious and to avoid the need for remote data,
+    we try two different spectra that have little to do with the real Vega spectrum.
+    """
+    not_vega1 = SourceSpectrum(BlackBodyNorm1D, temperature=2500)
+    not_vega2 = SourceSpectrum(BlackBodyNorm1D, temperature=5500)
+    result1 = units.convert_flux(_wave, in_q, out_u, vegaspec=not_vega1)
+    result2 = units.convert_flux(_wave, in_q, out_u, vegaspec=not_vega2)
+    if identical_ans:
+        assert_quantity_allclose(result1, result2, rtol=1e-2)
+    else:
+        assert not (result1 == result2).all()
 
 
 class TestEmpiricalSourceFromFile:
@@ -461,8 +476,7 @@ class TestNormalize:
          ('em', 27.2856)])
     def test_renorm_vegamag(self, sp_type, ans_countrate):
         sp = self._select_sp(sp_type)
-        rn_sp = sp.normalize(20 * units.VEGAMAG, band=self.abox,
-                             vegaspec=_vspec)
+        rn_sp = sp.normalize(20 * units.VEGAMAG, band=self.abox)
         self._compare_countrate(rn_sp, ans_countrate)
 
     def test_renorm_noband_jy(self):
@@ -504,14 +518,19 @@ class TestNormalize:
         with pytest.raises(exceptions.DisjointError):
             self.em.normalize(10, band=bp)
 
-        # Missing Vega spectrum
-        with pytest.raises(exceptions.SynphotError):
-            self.bb.normalize(10 * units.VEGAMAG, band=self.abox)
-
         # Zero flux
         sp = SourceSpectrum(Const1D, amplitude=0)
         with pytest.raises(exceptions.SynphotError):
             sp.normalize(100 * u.ct, band=self.abox, area=_area)
+
+    def test_exception_missing_vegaspec(self):
+        """This is the same logic as "test_exception" but pulled out
+        into a separate test because it needs more setup."""
+        with conf.set_temp("vega_file", ""):
+            # spectrum.Vega is cached it might have been filled by previous tests
+            spectrum.Vega = None
+            with pytest.raises(exceptions.SynphotError):
+                self.bb.normalize(10 * units.VEGAMAG, band=self.abox)
 
 
 class TestRedShift:
