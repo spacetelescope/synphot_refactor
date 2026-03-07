@@ -1,4 +1,4 @@
-1.7.0 (unreleased)
+1.7.0 (2026-03-06)
 ==================
 
 - Flux conversions to and from VEGAMAG now use the default Vega spectrum
