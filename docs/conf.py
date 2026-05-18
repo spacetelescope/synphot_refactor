@@ -129,7 +129,7 @@ man_pages = [('index', project.lower(), project + u' Documentation',
 # -- Options for intersphinx --------------------------------------------------
 
 intersphinx_mapping.update({
-    'astropy': ('https://docs.astropy.org/en/stable/', None),
+    'astropy': ('https://docs.astropy.org/en/v8.0.x/', None),
     'stsynphot': ('https://stsynphot.readthedocs.io/en/latest/', None),
     'specutils': ('https://specutils.readthedocs.io/en/stable/', None),
     'dust-extinction': ('https://dust-extinction.readthedocs.io/en/stable/', None)})
