@@ -13,16 +13,3 @@ updates:
           - "*"
     cooldown:
       default-days: 7
-
-  # Maintain dependencies for pip
-  - package-ecosystem: "pip"
-    directory: "/"
-    target-branch: "master"
-    schedule:
-      interval: "monthly"
-    groups:
-      actions:
-        patterns:
-          - "*"
-    cooldown:
-      default-days: 7
