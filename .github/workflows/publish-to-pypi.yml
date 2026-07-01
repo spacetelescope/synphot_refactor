@@ -32,17 +32,17 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
       with:
         fetch-depth: 0
-    - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+    - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
       with:
         python-version: '3.x'
     - name: Install dependencies
       run: |
         python -m pip install pip "twine>=3.3" -U
     - name: Build wheels
-      uses: pypa/cibuildwheel@8d2b08b68458a16aeb24b64e68a09ab1c8e82084  # v3.4.1
+      uses: pypa/cibuildwheel@294735312765b09d24a2fbec22660ce817587d55  # v4.1.0
       env:
         CIBW_BUILD: 'cp310-* cp311-* cp312-* cp313-* cp314-*'
         CIBW_ARCHS_LINUX: 'x86_64'
@@ -67,10 +67,10 @@ jobs:
     runs-on: ubuntu-latest
     if: (github.repository == 'spacetelescope/synphot_refactor' && ( github.event_name == 'release' || github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'Build wheels')))
     steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
       with:
         fetch-depth: 0
-    - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+    - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
       with:
         python-version: '3.x'
     - name: Install dependencies
