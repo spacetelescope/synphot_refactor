@@ -12,22 +12,22 @@
     https://github.com/spacetelescope/synphot_refactor/pull/224 .
 
 """
+
 import warnings
 
 import numpy as np
-
 from astropy import constants as const
 from astropy import units as u
 from astropy.modeling.core import Fittable1DModel
 from astropy.modeling.parameters import Parameter
 from astropy.utils.exceptions import AstropyUserWarning
 
-from synphot.units import FNU, FLAM
+from synphot.units import FLAM, FNU
 
-__all__ = ['BlackBody1D', 'blackbody_nu', 'blackbody_lambda']
+__all__ = ["BlackBody1D", "blackbody_lambda", "blackbody_nu"]
 
 with warnings.catch_warnings():
-    warnings.simplefilter('ignore', RuntimeWarning)
+    warnings.simplefilter("ignore", RuntimeWarning)
     _has_buggy_expm1 = np.isnan(np.expm1(1000)) or np.isnan(np.expm1(1e10))
 
 
@@ -78,20 +78,20 @@ class BlackBody1D(Fittable1DModel):
             plt.axvline(bb.lambda_max.to_value(u.AA), ls='--')
             plt.show()
 
-    """  # noqa
+    """
 
     # We parametrize this model with a temperature and a bolometric flux. The
     # bolometric flux is the integral of the model over the spectral axis. This
     # is more useful than simply having an amplitude parameter.
     temperature = Parameter(default=5000, min=0, unit=u.K)
-    bolometric_flux = Parameter(default=1, min=0, unit=u.erg / u.cm ** 2 / u.s)
+    bolometric_flux = Parameter(default=1, min=0, unit=u.erg / u.cm**2 / u.s)
 
     # We allow values without units to be passed when evaluating the model, and
     # in this case the input x values are assumed to be frequencies in Hz.
     _input_units_allow_dimensionless = True
 
     # We enable the spectral equivalency by default for the spectral axis
-    input_units_equivalencies = {'x': u.spectral()}
+    input_units_equivalencies = {"x": u.spectral()}
 
     def evaluate(self, x, temperature, bolometric_flux):
         """Evaluate the model.
@@ -131,14 +131,12 @@ class BlackBody1D(Fittable1DModel):
         # calculate here. We convert to 1/Hz to make sure the units are
         # simplified as much as possible, then we multiply by the bolometric
         # flux to get the normalization right.
-        fnu = ((np.pi * u.sr * blackbody_nu(x, temperature) /
-                const.sigma_sb / temperature ** 4).to(1 / u.Hz) *
-               bolometric_flux)
+        fnu = (np.pi * u.sr * blackbody_nu(x, temperature) / const.sigma_sb / temperature**4).to(1 / u.Hz) * bolometric_flux
 
         # If the bolometric_flux parameter has no unit, we should drop the /Hz
         # and return a unitless value. This occurs for instance during fitting,
         # since we drop the units temporarily.
-        if hasattr(bolometric_flux, 'unit'):
+        if hasattr(bolometric_flux, "unit"):
             return fnu
         else:
             return fnu.value
@@ -148,11 +146,10 @@ class BlackBody1D(Fittable1DModel):
         # The input units are those of the 'x' value, which should always be
         # Hz. Because we do this, and because input_units_allow_dimensionless
         # is set to True, dimensionless values are assumed to be in Hz.
-        return {'x': u.Hz}
+        return {"x": u.Hz}
 
     def _parameter_units_for_data_units(self, inputs_unit, outputs_unit):
-        return {'temperature': u.K,
-                'bolometric_flux': outputs_unit['y'] * u.Hz}
+        return {"temperature": u.K, "bolometric_flux": outputs_unit["y"] * u.Hz}
 
     @property
     def lambda_max(self):
@@ -203,10 +200,9 @@ def blackbody_nu(in_x, temperature):
 
     # Check if input values are physically possible
     if np.any(temp < 0):
-        raise ValueError(f'Temperature should be positive: {temp}')
+        raise ValueError(f"Temperature should be positive: {temp}")
     if not np.all(np.isfinite(freq)) or np.any(freq <= 0):
-        warnings.warn('Input contains invalid wavelength/frequency value(s)',
-                      AstropyUserWarning)
+        warnings.warn("Input contains invalid wavelength/frequency value(s)", AstropyUserWarning)
 
     log_boltz = const.h * freq / (const.k_B * temp)
     boltzm1 = np.expm1(log_boltz)
@@ -225,7 +221,7 @@ def blackbody_nu(in_x, temperature):
                 boltzm1[np.where(~np.isnan(log_boltz) & boltzm1_nans)] = np.inf
 
     # Calculate blackbody flux
-    bb_nu = (2.0 * const.h * freq ** 3 / (const.c ** 2 * boltzm1))
+    bb_nu = 2.0 * const.h * freq**3 / (const.c**2 * boltzm1)
     flux = bb_nu.to(FNU, u.spectral_density(freq))
 
     return flux / u.sr  # Add per steradian to output flux unit
@@ -251,7 +247,7 @@ def blackbody_lambda(in_x, temperature):
         :math:`erg \\; cm^{-2} s^{-1} \\mathring{A}^{-1} sr^{-1}`.
 
     """
-    if getattr(in_x, 'unit', None) is None:
+    if getattr(in_x, "unit", None) is None:
         in_x = u.Quantity(in_x, u.AA)
 
     bb_nu = blackbody_nu(in_x, temperature) * u.sr  # Remove sr for conversion

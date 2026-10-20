@@ -1,0 +1,14 @@
+ci:
+  autofix_prs: false
+  autoupdate_schedule: monthly
+
+repos:
+  # lint and format
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.10
+    hooks:
+      - id: ruff-check
+        args:
+          - --fix
+          - --show-fixes
+      - id: ruff-format

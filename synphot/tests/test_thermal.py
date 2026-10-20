@@ -19,7 +19,7 @@ from synphot.thermal import ThermalSpectralElement
 
 def setup_module(module):
     import astropy.constants as const
-    from astropy.constants import si, astropyconst13
+    from astropy.constants import astropyconst13, si
 
     const.sigma_sb = si.sigma_sb = astropyconst13.sigma_sb
     const.h = si.h = astropyconst13.h
@@ -28,7 +28,7 @@ def setup_module(module):
 
 def teardown_module(module):
     import astropy.constants as const
-    from astropy.constants import si, astropyconst20
+    from astropy.constants import astropyconst20, si
 
     const.sigma_sb = si.sigma_sb = astropyconst20.sigma_sb
     const.h = si.h = astropyconst20.h
@@ -37,10 +37,9 @@ def teardown_module(module):
 
 class TestThermalSpectralElement:
     """Test ``ThermalSpectralElement``."""
+
     def setup_class(self):
-        thfile = get_pkg_data_filename(
-            os.path.join('data', 'wfc3_ir_g141_src_003_th.fits'),
-            package='synphot.tests')
+        thfile = get_pkg_data_filename(os.path.join("data", "wfc3_ir_g141_src_003_th.fits"), package="synphot.tests")
         self.th = ThermalSpectralElement.from_file(thfile)
 
     def test_taper(self):
@@ -53,21 +52,20 @@ class TestThermalSpectralElement:
 
     def test_thermal_source(self):
         sp = self.th.thermal_source()
-        assert sp.meta['temperature'] == self.th.temperature
-        assert sp.meta['beam_fill_factor'] == self.th.beam_fill_factor
+        assert sp.meta["temperature"] == self.th.temperature
+        assert sp.meta["beam_fill_factor"] == self.th.beam_fill_factor
         np.testing.assert_allclose(
             sp([6800, 7800, 8800, 17920, 18920, 19920]).value,
-            [1.246735e-30, 6.63655885e-26, 2.80933935e-22, 2.76427032e-08,
-             1.33011769e-07, 5.40857951e-07], rtol=1e-5)
+            [1.246735e-30, 6.63655885e-26, 2.80933935e-22, 2.76427032e-08, 1.33011769e-07, 5.40857951e-07],
+            rtol=1e-5,
+        )
 
     def test_from_file_exceptions(self):
         # Non-FITS file
         with pytest.raises(exceptions.SynphotError):
-            ThermalSpectralElement.from_file('dummy.txt')
+            ThermalSpectralElement.from_file("dummy.txt")
 
         # Missing DEFT keyword
-        thfile = get_pkg_data_filename(
-            os.path.join('data', 'hst_acs_hrc_f555w.fits'),
-            package='synphot.tests')
+        thfile = get_pkg_data_filename(os.path.join("data", "hst_acs_hrc_f555w.fits"), package="synphot.tests")
         with pytest.raises(exceptions.SynphotError):
-            ThermalSpectralElement.from_file(thfile, flux_col='THROUGHPUT')
+            ThermalSpectralElement.from_file(thfile, flux_col="THROUGHPUT")

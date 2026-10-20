@@ -16,8 +16,14 @@ from astropy.utils.data import download_file
 # LOCAL
 from synphot import exceptions, units
 
-__all__ = ['overlap_status', 'validate_totalflux', 'validate_wavelengths',
-           'generate_wavelengths', 'merge_wavelengths', 'download_data']
+__all__ = [
+    "download_data",
+    "generate_wavelengths",
+    "merge_wavelengths",
+    "overlap_status",
+    "validate_totalflux",
+    "validate_wavelengths",
+]
 
 
 def overlap_status(a, b):
@@ -42,11 +48,11 @@ def overlap_status(a, b):
 
     # Do the comparison
     if a1 >= b1 and a2 <= b2:
-        result = 'full'
+        result = "full"
     elif a2 < b1 or b2 < a1:
-        result = 'none'
+        result = "none"
     else:
-        result = 'partial'
+        result = "partial"
 
     return result
 
@@ -66,11 +72,11 @@ def validate_totalflux(totalflux):
 
     """
     if totalflux <= 0.0:
-        raise exceptions.SynphotError('Integrated flux is <= 0')
+        raise exceptions.SynphotError("Integrated flux is <= 0")
     elif np.isnan(totalflux):
-        raise exceptions.SynphotError('Integrated flux is NaN')
+        raise exceptions.SynphotError("Integrated flux is NaN")
     elif np.isinf(totalflux):
-        raise exceptions.SynphotError('Integrated flux is infinite')
+        raise exceptions.SynphotError("Integrated flux is infinite")
 
 
 def validate_wavelengths(wavelengths):
@@ -117,8 +123,8 @@ def validate_wavelengths(wavelengths):
     # Check for zeroes
     if np.any(wave <= 0):
         raise exceptions.ZeroWavelength(
-            'Negative or zero wavelength occurs in wavelength array',
-            rows=np.where(wave <= 0)[0])
+            "Negative or zero wavelength occurs in wavelength array", rows=np.where(wave <= 0)[0]
+        )
 
     # Check for monotonicity
     sorted_wave = np.sort(wave)
@@ -126,21 +132,16 @@ def validate_wavelengths(wavelengths):
         if np.all(sorted_wave[::-1] == wave):
             pass  # Monotonic descending is allowed
         else:
-            raise exceptions.UnsortedWavelength(
-                'Wavelength array is not monotonic',
-                rows=np.where(sorted_wave != wave)[0])
+            raise exceptions.UnsortedWavelength("Wavelength array is not monotonic", rows=np.where(sorted_wave != wave)[0])
 
     # Check for duplicate values
     if wave.size > 1:
         dw = sorted_wave[1:] - sorted_wave[:-1]
         if np.any(dw == 0):
-            raise exceptions.DuplicateWavelength(
-                'Wavelength array contains duplicate entries',
-                rows=np.where(dw == 0)[0])
+            raise exceptions.DuplicateWavelength("Wavelength array contains duplicate entries", rows=np.where(dw == 0)[0])
 
 
-def generate_wavelengths(minwave=500, maxwave=26000, num=10000, delta=None,
-                         log=True, wave_unit=u.AA):
+def generate_wavelengths(minwave=500, maxwave=26000, num=10000, delta=None, log=True, wave_unit=u.AA):
     """Generate wavelength array to be used for spectrum sampling.
 
     .. math::
@@ -182,8 +183,7 @@ def generate_wavelengths(minwave=500, maxwave=26000, num=10000, delta=None,
     if delta is not None:
         num = None
 
-    waveset_str = 'Min: {0}, Max: {1}, Num: {2}, Delta: {3}, Log: {4}'.format(
-        minwave, maxwave, num, delta, log)
+    waveset_str = f"Min: {minwave}, Max: {maxwave}, Num: {num}, Delta: {delta}, Log: {log}"
 
     # Log space
     if log:
@@ -246,8 +246,7 @@ def merge_wavelengths(waveset1, waveset2, threshold=1e-12):
 
         # Remove "too close together" duplicates
         if len(i_good[0]) < delta.size:
-            out_wavelengths = np.append(
-                out_wavelengths[i_good], out_wavelengths[-1])
+            out_wavelengths = np.append(out_wavelengths[i_good], out_wavelengths[-1])
 
     return out_wavelengths
 
@@ -290,15 +289,16 @@ def download_data(path_root, verbose=True, dry_run=False):
 
     """
     from synphot.config import conf  # Avoid potential circular import
-    BASE_HOST = 'https://ssb.stsci.edu/trds/'
+
+    BASE_HOST = "https://ssb.stsci.edu/trds/"
 
     if path_root is not None:
         if not os.path.exists(path_root):
             os.makedirs(path_root, exist_ok=True)
             if verbose:  # pragma: no cover
-                print('Created {}'.format(path_root))
+                print(f"Created {path_root}")
         elif not os.path.isdir(path_root):
-            raise OSError('{} must be a directory'.format(path_root))
+            raise OSError(f"{path_root} must be a directory")
 
         if not path_root.endswith(os.sep):
             path_root += os.sep
@@ -307,24 +307,22 @@ def download_data(path_root, verbose=True, dry_run=False):
 
     # See https://github.com/astropy/astropy/issues/8524
     for cfgitem in conf.__class__.__dict__.values():
-        if (not isinstance(cfgitem, ConfigItem) or
-                not cfgitem.name.endswith('file')):
+        if not isinstance(cfgitem, ConfigItem) or not cfgitem.name.endswith("file"):
             continue
 
         url = cfgitem.defaultvalue
 
         if not url.startswith(BASE_HOST):
             if verbose:  # pragma: no cover
-                print('{} is not from {}, skipping download'.format(
-                    url, BASE_HOST))
+                print(f"{url} is not from {BASE_HOST}, skipping download")
             continue
 
         if path_root is not None:
-            dst = url.replace(BASE_HOST, path_root).replace('/', os.sep)
+            dst = url.replace(BASE_HOST, path_root).replace("/", os.sep)
 
             if os.path.exists(dst):
                 if verbose:  # pragma: no cover
-                    print('{} already exists, skipping download'.format(dst))
+                    print(f"{dst} already exists, skipping download")
                 continue
 
             # Create sub-directories, if needed.
@@ -336,8 +334,8 @@ def download_data(path_root, verbose=True, dry_run=False):
                 src = download_file(url, cache=True)
                 if path_root is not None:
                     copyfile(src, dst)
-            except Exception as exc:
-                print('Download failed - {}'.format(str(exc)))
+            except Exception as exc:  # noqa: BLE001
+                print(f"Download failed - {exc!s}")
                 continue
 
         if path_root is None:
@@ -349,6 +347,6 @@ def download_data(path_root, verbose=True, dry_run=False):
             file_list.append(dst)
 
         if verbose:  # pragma: no cover
-            print('{} downloaded to {}'.format(url, file_list[-1]))
+            print(f"{url} downloaded to {file_list[-1]}")
 
     return file_list

@@ -1,8 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """Module to handle backward-compatibility."""
+
 import importlib
 
-_optional_deps = ['specutils', 'dust_extinction']
+_optional_deps = ["specutils", "dust_extinction"]
 _deps = {k.upper(): k for k in _optional_deps}
 
 __all__ = [f"HAS_{pkg}" for pkg in _deps]

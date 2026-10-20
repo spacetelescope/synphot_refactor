@@ -44,12 +44,6 @@ jobs:
       fail-fast: true
       matrix:
         include:
-
-          - name: Code style checks
-            os: ubuntu-latest
-            python: 3.x
-            toxenv: codestyle
-
           - name: PEP 517 build
             os: ubuntu-latest
             python: 3.x

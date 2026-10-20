@@ -11,7 +11,7 @@ from synphot import exceptions, specio, units
 from synphot.models import BlackBody1D, Empirical1D
 from synphot.spectrum import BaseUnitlessSpectrum, SourceSpectrum
 
-__all__ = ['ThermalSpectralElement']
+__all__ = ["ThermalSpectralElement"]
 
 
 class ThermalSpectralElement(BaseUnitlessSpectrum):
@@ -40,8 +40,9 @@ class ThermalSpectralElement(BaseUnitlessSpectrum):
         Defaults to 1.
 
     """
+
     def __init__(self, modelclass, temperature, beam_fill_factor=1, **kwargs):
-        super(ThermalSpectralElement, self).__init__(modelclass, **kwargs)
+        super().__init__(modelclass, **kwargs)
         self.temperature = temperature
         self.beam_fill_factor = beam_fill_factor
 
@@ -63,12 +64,11 @@ class ThermalSpectralElement(BaseUnitlessSpectrum):
     @beam_fill_factor.setter
     def beam_fill_factor(self, what):
         """Set beam filling factor."""
-        self._beam_fill_factor = units.validate_quantity(what, '').value
+        self._beam_fill_factor = units.validate_quantity(what, "").value
 
     def taper(self, **kwargs):
         """Tapering is disabled."""
-        raise NotImplementedError(
-            'Thermal spectral element cannot be tapered.')
+        raise NotImplementedError("Thermal spectral element cannot be tapered.")
 
     def thermal_source(self):
         """Apply emissivity to an existing beam to produce a thermal
@@ -86,15 +86,13 @@ class ThermalSpectralElement(BaseUnitlessSpectrum):
             Thermal source spectrum.
 
         """
-        sp = (SourceSpectrum(BlackBody1D, temperature=self.temperature) *
-              units.SR_PER_ARCSEC2 * self.beam_fill_factor * self)
-        sp.meta['temperature'] = self.temperature
-        sp.meta['beam_fill_factor'] = self.beam_fill_factor
+        sp = SourceSpectrum(BlackBody1D, temperature=self.temperature) * units.SR_PER_ARCSEC2 * self.beam_fill_factor * self
+        sp.meta["temperature"] = self.temperature
+        sp.meta["beam_fill_factor"] = self.beam_fill_factor
         return sp
 
     @classmethod
-    def from_file(cls, filename, temperature_key='DEFT',
-                  beamfill_key='BEAMFILL', **kwargs):
+    def from_file(cls, filename, temperature_key="DEFT", beamfill_key="BEAMFILL", **kwargs):
         """Creates a thermal spectral element from file.
 
         .. note::
@@ -126,23 +124,27 @@ class ThermalSpectralElement(BaseUnitlessSpectrum):
 
         """
         if not is_fits("", filename, None):
-            raise exceptions.SynphotError('Only FITS format is supported.')
+            raise exceptions.SynphotError("Only FITS format is supported.")
 
         # Extra info from table header
-        ext = kwargs.get('ext', 1)
+        ext = kwargs.get("ext", 1)
         tab_hdr = fits.getheader(filename, ext=ext)
 
         temperature = tab_hdr.get(temperature_key)
         if temperature is None:
-            raise exceptions.SynphotError(
-                'Missing {0} keyword.'.format(temperature_key))
+            raise exceptions.SynphotError(f"Missing {temperature_key} keyword.")
 
-        beam_fill_factor = tab_hdr.get('BEAMFILL', 1)
+        beam_fill_factor = tab_hdr.get("BEAMFILL", 1)
 
-        if 'flux_col' not in kwargs:
-            kwargs['flux_col'] = 'EMISSIVITY'
+        if "flux_col" not in kwargs:
+            kwargs["flux_col"] = "EMISSIVITY"
 
         header, wavelengths, em = specio.read_spec(filename, **kwargs)
         return cls(
-            Empirical1D, temperature, beam_fill_factor=beam_fill_factor,
-            points=wavelengths, lookup_table=em, meta={'header': header})
+            Empirical1D,
+            temperature,
+            beam_fill_factor=beam_fill_factor,
+            points=wavelengths,
+            lookup_table=em,
+            meta={"header": header},
+        )
