@@ -13,7 +13,6 @@
 # See sphinx_astropy.conf for which values are set there.
 
 import datetime
-import os
 import sys
 
 from synphot import __version__
