@@ -10,21 +10,19 @@ import warnings
 
 # THIRD-PARTY
 import numpy as np
-from scipy.integrate import trapezoid
 
 # ASTROPY
 from astropy import log
 from astropy import units as u
-from astropy.utils.exceptions import (AstropyUserWarning,
-                                      AstropyDeprecationWarning)
+from astropy.utils.exceptions import AstropyDeprecationWarning, AstropyUserWarning
+from scipy.integrate import trapezoid
 
 # LOCAL
 from synphot import binning, exceptions, units, utils
 from synphot.models import Empirical1D
-from synphot.spectrum import (BaseSourceSpectrum, SourceSpectrum,
-                              SpectralElement)
+from synphot.spectrum import BaseSourceSpectrum, SourceSpectrum, SpectralElement
 
-__all__ = ['Observation']
+__all__ = ["Observation"]
 
 
 class Observation(BaseSourceSpectrum):
@@ -74,67 +72,62 @@ class Observation(BaseSourceSpectrum):
         Missing binned wavelength set.
 
     """
-    def __init__(self, spec, band, binset=None, force='none'):
+
+    def __init__(self, spec, band, binset=None, force="none"):
         # Duck-type specutils.Spectrum to avoid hard dependency on specutils
-        if hasattr(spec, 'flux') and hasattr(spec, 'spectral_axis'):
+        if hasattr(spec, "flux") and hasattr(spec, "spectral_axis"):
             spec = SourceSpectrum.from_spectrum1d(spec)
 
         if not isinstance(spec, SourceSpectrum):
-            raise exceptions.SynphotError('Invalid source spectrum.')
+            raise exceptions.SynphotError("Invalid source spectrum.")
 
         if not isinstance(band, SpectralElement):
-            raise exceptions.SynphotError('Invalid bandpass.')
+            raise exceptions.SynphotError("Invalid bandpass.")
 
         # Inherit input warnings like ASTROLIB PYSYNPHOT
         warn = {}
 
         # Validate overlap
         if force is None:
-            force = 'none'
+            force = "none"
         else:
             force = force.lower()
         stat = band.check_overlap(spec)
 
-        if stat == 'none':
-            raise exceptions.DisjointError(
-                'Source spectrum and bandpass are disjoint.')
+        if stat == "none":
+            raise exceptions.DisjointError("Source spectrum and bandpass are disjoint.")
 
-        elif 'partial' in stat:
-
-            if force == 'none':
+        elif "partial" in stat:
+            if force == "none":
                 raise exceptions.PartialOverlap(
-                    'Source spectrum and bandpass do not fully overlap. '
-                    'You may use force=[extrap|taper] to force this '
-                    'Observation anyway.')
+                    "Source spectrum and bandpass do not fully overlap. "
+                    "You may use force=[extrap|taper] to force this "
+                    "Observation anyway."
+                )
 
-            elif force == 'taper':
+            elif force == "taper":
                 spec = spec.taper()
-                msg = 'Source spectrum is tapered.'
+                msg = "Source spectrum is tapered."
                 warnings.warn(msg, AstropyUserWarning)
-                warn['PartialOverlap'] = msg
+                warn["PartialOverlap"] = msg
 
-            elif force.startswith('extrap'):
+            elif force.startswith("extrap"):
                 if spec.force_extrapolation():
-                    msg = ('Source spectrum will be extrapolated (at constant '
-                           'value for empirical model).')
+                    msg = "Source spectrum will be extrapolated (at constant value for empirical model)."
                 else:
-                    msg = ('Source spectrum will be evaluated outside '
-                           'pre-defined waveset.')
+                    msg = "Source spectrum will be evaluated outside pre-defined waveset."
 
                 warnings.warn(msg, AstropyUserWarning)
-                warn['PartialOverlap'] = msg
+                warn["PartialOverlap"] = msg
 
             else:
-                raise exceptions.SynphotError(
-                    'force={0} is invalid, must be "none", "taper", '
-                    'or "extrap"'.format(force))
+                raise exceptions.SynphotError(f'force={force} is invalid, must be "none", "taper", or "extrap"')
 
-        elif stat != 'full':  # pragma: no cover
-            raise exceptions.SynphotError(
-                'Overlap result of {0} is unexpected'.format(stat))
+        elif stat != "full":  # pragma: no cover
+            raise exceptions.SynphotError(f"Overlap result of {stat} is unexpected")
 
         # Create composite spectrum
-        super(Observation, self).__init__(spec * band, clean_meta=True)
+        super().__init__(spec * band, clean_meta=True)
         self._spec = spec
         self._band = band
         self._force = force
@@ -160,12 +153,11 @@ class Observation(BaseSourceSpectrum):
                 self._binset = self.bandpass.waveset
             elif self.spectrum.waveset is not None:
                 self._binset = self.spectrum.waveset
-                log.info('Bandpass waveset is undefined; '
-                         'Using source spectrum waveset instead.')
+                log.info("Bandpass waveset is undefined; Using source spectrum waveset instead.")
             else:
                 raise exceptions.UndefinedBinset(
-                    'Both source spectrum and bandpass have undefined '
-                    'waveset; Provide binset manually.')
+                    "Both source spectrum and bandpass have undefined waveset; Provide binset manually."
+                )
         else:
             self._binset = self._validate_wavelengths(binset)
 
@@ -177,8 +169,7 @@ class Observation(BaseSourceSpectrum):
         self._bin_edges = binning.calculate_bin_edges(self._binset)
 
         # Merge bin edges and centers in with the natural waveset
-        spwave = utils.merge_wavelengths(
-            self._bin_edges.value, self._binset.value)
+        spwave = utils.merge_wavelengths(self._bin_edges.value, self._binset.value)
         if self.waveset is not None:
             spwave = utils.merge_wavelengths(spwave, self.waveset.value)
 
@@ -196,8 +187,7 @@ class Observation(BaseSourceSpectrum):
         deltaw = spwave[1:] - spwave[:-1]
 
         # Sum over each bin.
-        binflux, intwave = binning.calcbinflux(
-            self._binset.size, i_beg, i_end, avflux, deltaw)
+        binflux, _intwave = binning.calcbinflux(self._binset.size, i_beg, i_end, avflux, deltaw)
 
         self._binflux = binflux * flux.unit
 
@@ -229,13 +219,12 @@ class Observation(BaseSourceSpectrum):
     def __mul__(self, other):
         """Multiply self and other."""
         sp = self.spectrum * other
-        obs = self.__class__(
-            sp, self.bandpass, binset=self.binset, force=self._force)
+        obs = self.__class__(sp, self.bandpass, binset=self.binset, force=self._force)
         return obs
 
     def taper(self, **kwargs):
         """Tapering is disabled."""
-        raise NotImplementedError('Observation cannot be tapered.')
+        raise NotImplementedError("Observation cannot be tapered.")
 
     def _validate_binned_wavelengths(self, wave):
         if wave is None:
@@ -277,8 +266,7 @@ class Observation(BaseSourceSpectrum):
         x = self._validate_binned_wavelengths(wavelengths)
         i = np.searchsorted(self.binset, x)
         if not np.allclose(self.binset[i].value, x.value):
-            raise exceptions.InterpolationNotAllowed(
-                'Some or all wavelength values are not in binset.')
+            raise exceptions.InterpolationNotAllowed("Some or all wavelength values are not in binset.")
         y = self.binflux[i]
 
         if flux_unit is None:
@@ -288,12 +276,10 @@ class Observation(BaseSourceSpectrum):
 
         return flux
 
-    def _get_binned_arrays(self, wavelengths, flux_unit, area=None,
-                           vegaspec=None):
+    def _get_binned_arrays(self, wavelengths, flux_unit, area=None, vegaspec=None):
         """Get binned observation in user units."""
         x = self._validate_binned_wavelengths(wavelengths)
-        y = self.sample_binned(wavelengths=x, flux_unit=flux_unit, area=area,
-                               vegaspec=vegaspec)
+        y = self.sample_binned(wavelengths=x, flux_unit=flux_unit, area=area, vegaspec=vegaspec)
 
         if isinstance(wavelengths, u.Quantity):
             w = x.to(wavelengths.unit, u.spectral())
@@ -330,11 +316,9 @@ class Observation(BaseSourceSpectrum):
         if not isinstance(cenwave, u.Quantity):
             cenwave = cenwave * self._internal_wave_unit
 
-        bin_wave = units.validate_quantity(
-            self.binset, cenwave.unit, equivalencies=u.spectral())
+        bin_wave = units.validate_quantity(self.binset, cenwave.unit, equivalencies=u.spectral())
 
-        return binning.wave_range(
-            bin_wave.value, cenwave.value, npix, **kwargs) * cenwave.unit
+        return binning.wave_range(bin_wave.value, cenwave.value, npix, **kwargs) * cenwave.unit
 
     def binned_pixelrange(self, waverange, **kwargs):
         """Calculate the number of pixels within the given wavelength
@@ -355,12 +339,10 @@ class Observation(BaseSourceSpectrum):
             Number of pixels.
 
         """
-        x = units.validate_quantity(
-            waverange, self._internal_wave_unit, equivalencies=u.spectral())
+        x = units.validate_quantity(waverange, self._internal_wave_unit, equivalencies=u.spectral())
         return binning.pixel_range(self.binset.value, x.value, **kwargs)
 
-    def effective_wavelength(self, binned=True, wavelengths=None,
-                             mode='efflerg'):
+    def effective_wavelength(self, binned=True, wavelengths=None, mode="efflerg"):
         """Calculate :ref:`effective wavelength <synphot-formula-effwave>`.
 
         Parameters
@@ -393,15 +375,13 @@ class Observation(BaseSourceSpectrum):
 
         """
         mode = mode.lower()
-        if mode == 'efflerg':
+        if mode == "efflerg":
             flux_unit = units.FLAM
-        elif mode == 'efflphot':
-            warnings.warn(
-                'Usage of EFFLPHOT is deprecated.', AstropyDeprecationWarning)
+        elif mode == "efflphot":
+            warnings.warn("Usage of EFFLPHOT is deprecated.", AstropyDeprecationWarning)
             flux_unit = units.PHOTLAM
         else:
-            raise exceptions.SynphotError(
-                'mode must be "efflerg" or "efflphot"')
+            raise exceptions.SynphotError('mode must be "efflerg" or "efflphot"')
 
         if binned:
             x = self._validate_binned_wavelengths(wavelengths).value
@@ -410,7 +390,7 @@ class Observation(BaseSourceSpectrum):
             x = self._validate_wavelengths(wavelengths).value
             y = units.convert_flux(x, self(x), flux_unit).value
 
-        num = trapezoid(y * x ** 2, x=x)
+        num = trapezoid(y * x**2, x=x)
         den = trapezoid(y * x, x=x)
 
         if den == 0.0:  # pragma: no cover
@@ -421,8 +401,7 @@ class Observation(BaseSourceSpectrum):
         return eff_lam * self._internal_wave_unit
 
     # https://github.com/spacetelescope/synphot_refactor/issues/159
-    def effstim(self, flux_unit=None, wavelengths=None, area=None,
-                vegaspec=None):
+    def effstim(self, flux_unit=None, wavelengths=None, area=None, vegaspec=None):
         """Calculate :ref:`effective stimulus <synphot-formula-effstim>`
         for given flux unit.
 
@@ -472,16 +451,15 @@ class Observation(BaseSourceSpectrum):
         if flux_unit_name == units.VEGAMAG.to_string():
             if not isinstance(vegaspec, SourceSpectrum):
                 from synphot import spectrum
+
                 spectrum._lazy_load_vega_with_exception()
                 vegaspec = spectrum.Vega
 
             num = self.integrate(wavelengths=wavelengths)
-            den = (vegaspec * self.bandpass).integrate(
-                integration_type='trapezoid')
+            den = (vegaspec * self.bandpass).integrate(integration_type="trapezoid")
             utils.validate_totalflux(num)
             utils.validate_totalflux(den)
-            return (2.5 * (math.log10(den.value) -
-                           math.log10(num.value))) * units.VEGAMAG
+            return (2.5 * (math.log10(den.value) - math.log10(num.value))) * units.VEGAMAG
 
         # Sample the bandpass
         x_band = self.bandpass._validate_wavelengths(wavelengths).value
@@ -500,24 +478,20 @@ class Observation(BaseSourceSpectrum):
 
         # Integration should always be done in FLAM and then
         # converted to desired units as follows.
-        if flux_unit.physical_type == 'spectral flux density wav':
+        if flux_unit.physical_type == "spectral flux density wav":
             if flux_unit == u.STmag:
                 eff_stim = val.to(flux_unit)
             else:  # FLAM
                 eff_stim = val
-        elif flux_unit.physical_type in (
-                'spectral flux density', 'photon flux density',
-                'photon flux density wav'):
+        elif flux_unit.physical_type in ("spectral flux density", "photon flux density", "photon flux density wav"):
             w_pivot = self.bandpass.pivot()
             eff_stim = units.convert_flux(w_pivot, val, flux_unit)
         else:
-            raise exceptions.SynphotError(
-                'Flux unit {0} is invalid'.format(flux_unit))
+            raise exceptions.SynphotError(f"Flux unit {flux_unit} is invalid")
 
         return eff_stim
 
-    def countrate(self, area, binned=True, wavelengths=None, waverange=None,
-                  force=False):
+    def countrate(self, area, binned=True, wavelengths=None, waverange=None, force=False):
         """Calculate :ref:`effective stimulus <synphot-formula-effstim>`
         in count/s.
 
@@ -569,12 +543,10 @@ class Observation(BaseSourceSpectrum):
         # Sample the observation
         if binned:
             x = self._validate_binned_wavelengths(wavelengths).value
-            y = self.sample_binned(wavelengths=x, flux_unit=u.count,
-                                   area=area).value
+            y = self.sample_binned(wavelengths=x, flux_unit=u.count, area=area).value
         else:
             x = self._validate_wavelengths(wavelengths).value
-            y = units.convert_flux(x, self(x), u.count,
-                                   area=area).value
+            y = units.convert_flux(x, self(x), u.count, area=area).value
 
         # Use entire wavelength range
         if waverange is None:
@@ -582,31 +554,29 @@ class Observation(BaseSourceSpectrum):
 
         # Use given wavelength range
         else:
-            w = units.validate_quantity(waverange, self._internal_wave_unit,
-                                        equivalencies=u.spectral()).value
+            w = units.validate_quantity(waverange, self._internal_wave_unit, equivalencies=u.spectral()).value
             stat = utils.overlap_status(w, x)
             w1 = w.min()
             w2 = w.max()
 
-            if stat == 'none':
-                raise exceptions.DisjointError(
-                    'Observation and wavelength range are disjoint.')
-            elif 'partial' in stat:
+            if stat == "none":
+                raise exceptions.DisjointError("Observation and wavelength range are disjoint.")
+            elif "partial" in stat:
                 if force:
                     warnings.warn(
-                        'Count rate calculated only for wavelengths in the '
-                        'overlap between observation and given range.',
-                        AstropyUserWarning)
+                        "Count rate calculated only for wavelengths in the overlap between observation and given range.",
+                        AstropyUserWarning,
+                    )
                     w1 = max(w1, x.min())
                     w2 = min(w2, x.max())
                 else:
                     raise exceptions.PartialOverlap(
-                        'Observation and wavelength range do not fully '
-                        'overlap. You may use force=True to force this '
-                        'calculation anyway.')
-            elif stat != 'full':  # pragma: no cover
-                raise exceptions.SynphotError(
-                    'Overlap result of {0} is unexpected'.format(stat))
+                        "Observation and wavelength range do not fully "
+                        "overlap. You may use force=True to force this "
+                        "calculation anyway."
+                    )
+            elif stat != "full":  # pragma: no cover
+                raise exceptions.SynphotError(f"Overlap result of {stat} is unexpected")
 
             if binned:
                 if wavelengths is None:
@@ -617,7 +587,7 @@ class Observation(BaseSourceSpectrum):
                 i2 = np.searchsorted(bin_edges, w2)
                 influx = y[i1:i2]
             else:
-                mask = ((x >= w1) & (x <= w2))
+                mask = (x >= w1) & (x <= w2)
                 influx = y[mask]
 
         val = math.fsum(influx)
@@ -625,8 +595,7 @@ class Observation(BaseSourceSpectrum):
 
         return val * (u.count / u.s)
 
-    def plot(self, binned=True, wavelengths=None, flux_unit=None, area=None,
-             vegaspec=None, **kwargs):  # pragma: no cover
+    def plot(self, binned=True, wavelengths=None, flux_unit=None, area=None, vegaspec=None, **kwargs):  # pragma: no cover
         """Plot the observation.
 
         .. note:: Uses ``matplotlib``.
@@ -660,11 +629,9 @@ class Observation(BaseSourceSpectrum):
 
         """
         if binned:
-            w, y = self._get_binned_arrays(wavelengths, flux_unit, area=area,
-                                           vegaspec=vegaspec)
+            w, y = self._get_binned_arrays(wavelengths, flux_unit, area=area, vegaspec=vegaspec)
         else:
-            w, y = self._get_arrays(wavelengths, flux_unit=flux_unit,
-                                    area=area, vegaspec=vegaspec)
+            w, y = self._get_arrays(wavelengths, flux_unit=flux_unit, area=area, vegaspec=vegaspec)
         self._do_plot(w, y, **kwargs)
 
     def as_spectrum(self, binned=True, wavelengths=None):
@@ -697,12 +664,9 @@ class Observation(BaseSourceSpectrum):
 
         """
         if binned:
-            w, y = self._get_binned_arrays(
-                wavelengths, self._internal_flux_unit)
+            w, y = self._get_binned_arrays(wavelengths, self._internal_flux_unit)
         else:
-            w, y = self._get_arrays(
-                wavelengths, flux_unit=self._internal_flux_unit)
+            w, y = self._get_arrays(wavelengths, flux_unit=self._internal_flux_unit)
 
-        header = {'observation': str(self), 'binned': binned}
-        return SourceSpectrum(Empirical1D, points=w, lookup_table=y,
-                              meta={'header': header})
+        header = {"observation": str(self), "binned": binned}
+        return SourceSpectrum(Empirical1D, points=w, lookup_table=y, meta={"header": header})

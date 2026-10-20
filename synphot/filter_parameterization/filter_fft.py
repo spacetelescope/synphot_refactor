@@ -2,15 +2,19 @@
 
 import numpy as np
 from astropy import units as u
-from astropy.modeling.models import custom_model, Sine1D
+from astropy.modeling.models import Sine1D, custom_model
 from astropy.table import Table
 
 from synphot.models import Empirical1D
 from synphot.spectrum import SpectralElement
 from synphot.units import validate_quantity
 
-__all__ = ['filter_to_fft', 'filter_from_fft', 'analytical_model_from_fft',
-           'filters_to_fft_table']
+__all__ = [
+    "analytical_model_from_fft",
+    "filter_from_fft",
+    "filter_to_fft",
+    "filters_to_fft_table",
+]
 
 
 def _simplified_wavelength(n_lambda, lambda_0, delta_lambda):
@@ -18,14 +22,11 @@ def _simplified_wavelength(n_lambda, lambda_0, delta_lambda):
     # synphot internal wavelength unit.
     wave_unit = SpectralElement._internal_wave_unit
 
-    lambda_0 = validate_quantity(
-        lambda_0, wave_unit, equivalencies=u.spectral())
-    delta_lambda = validate_quantity(
-        delta_lambda, wave_unit, equivalencies=u.spectral())
+    lambda_0 = validate_quantity(lambda_0, wave_unit, equivalencies=u.spectral())
+    delta_lambda = validate_quantity(delta_lambda, wave_unit, equivalencies=u.spectral())
     lambda_max = (n_lambda + 1) * delta_lambda + lambda_0
 
-    return np.arange(lambda_0.value, lambda_max.value,
-                     delta_lambda.value) * wave_unit
+    return np.arange(lambda_0.value, lambda_max.value, delta_lambda.value) * wave_unit
 
 
 def filter_to_fft(bp, wavelengths=None, n_terms=10):
@@ -72,8 +73,7 @@ def filter_to_fft(bp, wavelengths=None, n_terms=10):
     n_lambda = len(wl)
 
     # Create a simplified wavelength grid
-    simplified_wavelength = _simplified_wavelength(
-        n_lambda, lambda_0, delta_lambda)
+    simplified_wavelength = _simplified_wavelength(n_lambda, lambda_0, delta_lambda)
 
     tr_max = tr.max()
 
@@ -125,13 +125,11 @@ def filter_from_fft(n_lambda, lambda_0, delta_lambda, tr_max, fft_parameters):
     wavelength = _simplified_wavelength(n_lambda, lambda_0, delta_lambda)
     n_wave = len(wavelength)
     ifft = np.fft.ifft(fft_parameters, n=n_wave)
-    transmittance = ((ifft.real - ifft.real.min()) * tr_max / np.ptp(ifft.real))  # noqa
-    return SpectralElement(
-        Empirical1D, points=wavelength, lookup_table=transmittance)
+    transmittance = (ifft.real - ifft.real.min()) * tr_max / np.ptp(ifft.real)
+    return SpectralElement(Empirical1D, points=wavelength, lookup_table=transmittance)
 
 
-def analytical_model_from_fft(n_lambda, lambda_0, delta_lambda, tr_max,
-                              fft_parameters):
+def analytical_model_from_fft(n_lambda, lambda_0, delta_lambda, tr_max, fft_parameters):
     """Similar to :func:`filter_from_fft` except that this returns
     an analytical model.
 
@@ -151,12 +149,9 @@ def analytical_model_from_fft(n_lambda, lambda_0, delta_lambda, tr_max,
     n_wave = len(wavelength)
     n_fft_pars = len(fft_parameters)
 
-    m = (np.sum([Sine1D(amplitude=fft_parameters[i].real / n_wave,
-                        frequency=i / n_wave, phase=0.25)
-                 for i in range(n_fft_pars)]) -
-         np.sum([Sine1D(amplitude=fft_parameters[i].imag / n_wave,
-                        frequency=i / n_wave)
-                 for i in range(n_fft_pars)]))
+    m = np.sum(
+        [Sine1D(amplitude=fft_parameters[i].real / n_wave, frequency=i / n_wave, phase=0.25) for i in range(n_fft_pars)]
+    ) - np.sum([Sine1D(amplitude=fft_parameters[i].imag / n_wave, frequency=i / n_wave) for i in range(n_fft_pars)])
 
     @custom_model
     def fft_model(x):
@@ -208,20 +203,17 @@ def filters_to_fft_table(filters_mapping, n_terms=10):
         Table storing FFT parameterization for the given filters.
         Use its ``write`` method to save it to file.
 
-    """  # noqa
+    """
     wave_unit = SpectralElement._internal_wave_unit
-    colnames = ['filter', 'n_lambda', 'lambda_0', 'delta_lambda',
-                'tr_max'] + [f'fft_{i}' for i in range(n_terms)]
+    colnames = ["filter", "n_lambda", "lambda_0", "delta_lambda", "tr_max"] + [f"fft_{i}" for i in range(n_terms)]
     rows = []
 
     for key, (bp, wavelengths) in filters_mapping.items():
-        n_lambda, lambda_0, delta_lambda, tr_max, fft_pars = filter_to_fft(
-            bp, wavelengths=wavelengths, n_terms=n_terms)
-        rows.append(tuple(
-            [key, n_lambda, lambda_0, delta_lambda, tr_max] + fft_pars))
+        n_lambda, lambda_0, delta_lambda, tr_max, fft_pars = filter_to_fft(bp, wavelengths=wavelengths, n_terms=n_terms)
+        rows.append(tuple([key, n_lambda, lambda_0, delta_lambda, tr_max] + fft_pars))
 
     fft_table = Table(rows=rows, names=colnames)
-    fft_table['lambda_0'].unit = wave_unit
-    fft_table['delta_lambda'].unit = wave_unit
+    fft_table["lambda_0"].unit = wave_unit
+    fft_table["delta_lambda"].unit = wave_unit
 
     return fft_table

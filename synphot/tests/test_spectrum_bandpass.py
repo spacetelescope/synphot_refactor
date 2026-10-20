@@ -15,20 +15,33 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
-# LOCAL
-from synphot.tests.test_units import _area, _wave, _flux_photlam
 from synphot import exceptions, units
 from synphot.compat import HAS_SPECUTILS  # noqa
 from synphot.models import Box1D, Empirical1D, GaussianAbsorption1D
 from synphot.spectrum import SpectralElement
 
+# LOCAL
+from synphot.tests.test_units import _area, _flux_photlam, _wave
+
 
 @pytest.mark.remote_data
 @pytest.mark.parametrize(
-    'filtername',
-    ['bessel_j', 'bessel_h', 'bessel_k', 'cousins_r', 'cousins_i',
-     'johnson_u', 'johnson_b', 'johnson_v', 'johnson_r', 'johnson_i',
-     'johnson_j', 'johnson_k'])
+    "filtername",
+    [
+        "bessel_j",
+        "bessel_h",
+        "bessel_k",
+        "cousins_r",
+        "cousins_i",
+        "johnson_u",
+        "johnson_b",
+        "johnson_v",
+        "johnson_r",
+        "johnson_i",
+        "johnson_j",
+        "johnson_k",
+    ],
+)
 def test_filter(filtername):
     """Test loading pre-defined bandpass.
 
@@ -39,35 +52,31 @@ def test_filter(filtername):
     """
     bp = SpectralElement.from_filter(filtername)
     assert isinstance(bp.model, Empirical1D)
-    assert filtername in bp.meta['expr']
+    assert filtername in bp.meta["expr"]
 
 
 def test_filter_exception():
     """Test SpectralElement from_filter() exception."""
     with pytest.raises(exceptions.SynphotError):
-        SpectralElement.from_filter('foo')
+        SpectralElement.from_filter("foo")
 
 
 class TestEmpiricalBandpassFromFile:
     """This is the most common model used in ASTROLIB PYSYNPHOT."""
+
     def setup_class(self):
-        bandfile = get_pkg_data_filename(
-            os.path.join('data', 'hst_acs_hrc_f555w.fits'),
-            package='synphot.tests')
+        bandfile = get_pkg_data_filename(os.path.join("data", "hst_acs_hrc_f555w.fits"), package="synphot.tests")
         self.bp = SpectralElement.from_file(bandfile)
 
     def test_invalid_flux_unit(self):
         with pytest.raises(u.UnitsError):
-            SpectralElement(Empirical1D, points=_wave,
-                            lookup_table=_flux_photlam)
+            SpectralElement(Empirical1D, points=_wave, lookup_table=_flux_photlam)
 
     def test_call(self):
         w = self.bp.model.points[0][5000:5004]
         y = self.bp(w)
-        np.testing.assert_allclose(
-            w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
-        np.testing.assert_allclose(
-            y.value, [0.0920415, 0.09125588, 0.09047068, 0.08968487])
+        np.testing.assert_allclose(w, [6045.1640625, 6045.83203125, 6046.49951172, 6047.16748047])
+        np.testing.assert_allclose(y.value, [0.0920415, 0.09125588, 0.09047068, 0.08968487])
 
     def test_integrate(self):
         # Whole range (same as EQUVW)
@@ -111,7 +120,7 @@ class TestEmpiricalBandpassFromFile:
         with pytest.raises(exceptions.SynphotError):
             self.bp.rmswidth(threshold=[0.01, 0.02])
         with pytest.raises(exceptions.SynphotError):
-            self.bp.rmswidth(threshold='foo')
+            self.bp.rmswidth(threshold="foo")
 
     def test_fwhm(self):
         """This also calls PHOTBW."""
@@ -131,7 +140,7 @@ class TestEmpiricalBandpassFromFile:
         with pytest.raises(exceptions.SynphotError):
             self.bp.fwhm(threshold=[0.01, 0.02])
         with pytest.raises(exceptions.SynphotError):
-            self.bp.fwhm(threshold='foo')
+            self.bp.fwhm(threshold="foo")
 
     def test_tlambda(self):
         f = self.bp.tlambda()
@@ -168,6 +177,7 @@ class TestEmpiricalBandpassFromFile:
 
 class TestBoxBandpass:
     """Test bandpass with Box1D model."""
+
     def setup_class(self):
         self.bp = SpectralElement(Box1D, amplitude=1, x_0=5000, width=100)
 
@@ -177,16 +187,14 @@ class TestBoxBandpass:
         np.testing.assert_array_equal(y.value, [0, 0, 1])
 
     def test_conversion(self):
-        bp2 = SpectralElement(
-            Box1D, amplitude=1, x_0=500 * u.nm, width=10 * u.nm)
+        bp2 = SpectralElement(Box1D, amplitude=1, x_0=500 * u.nm, width=10 * u.nm)
         y = bp2([4000, 4949.95, 5000])
         np.testing.assert_array_equal(y.value, [0, 0, 1])
 
     def test_fwhm(self):
         # You would think FWHM of a box is the width but
         # not according to IRAF SYNPHOT.
-        assert_quantity_allclose(self.bp.fwhm(), 67.977 * u.AA,
-                                 rtol=1e-3)  # 0.1%
+        assert_quantity_allclose(self.bp.fwhm(), 67.977 * u.AA, rtol=1e-3)  # 0.1%
 
     def test_taper(self):
         bp2 = self.bp.taper(np.arange(499, 501.01, 0.01) * u.nm)
@@ -196,32 +204,28 @@ class TestBoxBandpass:
     def test_integrate(self):
         ans = 100 * u.AA
         assert_quantity_allclose(self.bp.integrate(), ans)
-        assert_quantity_allclose(
-            self.bp.integrate(integration_type='analytical'), ans)
+        assert_quantity_allclose(self.bp.integrate(integration_type="analytical"), ans)
 
-        with pytest.raises(exceptions.SynphotError,
-                           match='flux_unit cannot be used'):
-            self.bp.integrate(integration_type='analytical', flux_unit='flam')
+        with pytest.raises(exceptions.SynphotError, match="flux_unit cannot be used"):
+            self.bp.integrate(integration_type="analytical", flux_unit="flam")
 
     def test_multi_n_models(self):
         """This is not allowed."""
         with pytest.raises(exceptions.SynphotError):
-            SpectralElement(
-                Box1D, amplitude=[1, 1], x_0=[5000, 6000],
-                width=[100, 1], n_models=2)
+            SpectralElement(Box1D, amplitude=[1, 1], x_0=[5000, 6000], width=[100, 1], n_models=2)
 
 
 class TestBuildModelsBandpass:
     """Test compatiblity with other models not tested above."""
+
     def test_GaussianAbsorption1D(self):
         """This should be unitless, not a source spectrum."""
-        bp = SpectralElement(
-            GaussianAbsorption1D, amplitude=0.8, mean=5500, stddev=50)
+        bp = SpectralElement(GaussianAbsorption1D, amplitude=0.8, mean=5500, stddev=50)
         y = bp([5300, 5500, 5700])
         assert_quantity_allclose(y, [0.99973163, 0.2, 0.99973163])
 
 
-@pytest.mark.skipif('not HAS_SPECUTILS')
+@pytest.mark.skipif("not HAS_SPECUTILS")
 class TestSpecutilsBridgeBandpass:
     def test_from_spectrum1d_Empirical1D_bandpass(self):
         from specutils import Spectrum
@@ -229,8 +233,7 @@ class TestSpecutilsBridgeBandpass:
         lamb = [1000, 5000, 10000] * u.AA
         thru = [0, 1, -1] * units.THROUGHPUT
         spec = Spectrum(spectral_axis=lamb, flux=thru)
-        with pytest.warns(AstropyUserWarning,
-                          match=r'contained negative flux or throughput'):
+        with pytest.warns(AstropyUserWarning, match=r"contained negative flux or throughput"):
             bp = SpectralElement.from_spectrum1d(spec, keep_neg=False)
 
         w = bp.waveset
@@ -267,7 +270,7 @@ class TestSpecutilsBridgeBandpass:
 
         with pytest.raises(exceptions.SynphotError) as e:
             spec = bp.to_spectrum1d()
-        assert 'Provide wavelengths for sampling' in str(e.value)
+        assert "Provide wavelengths for sampling" in str(e.value)
 
         w = [100, 500, 1000] * u.nm
         spec = bp.to_spectrum1d(wavelengths=w)
@@ -278,8 +281,7 @@ class TestSpecutilsBridgeBandpass:
     def test_to_spectrum1d_compound_bandpass(self):
         from specutils.analysis import line_flux
 
-        box = SpectralElement(
-            Box1D, amplitude=0.5, x_0=5000 * u.AA, width=1 * u.AA)
+        box = SpectralElement(Box1D, amplitude=0.5, x_0=5000 * u.AA, width=1 * u.AA)
         bp = box * box
         spec = bp.to_spectrum1d()
 

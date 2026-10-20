@@ -14,11 +14,13 @@ quote-style = "double"
 indent-style = "space"
 
 [lint]
-# Ignoring these for now ???
-# I100: import statements are in the wrong order
-# I201: Missing newline before sections or imports
-# W504: line break after binary operator
-ignore = []
+# Ignoring these for now:
+# B006: Do not use mutable data structures for argument defaults
+# RUF012: Mutable default value for class attribute
+ignore = [
+    "B006",
+    "RUF012",
+]
 
 [lint.isort]
 known-first-party = ["synphot"]

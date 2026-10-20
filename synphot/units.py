@@ -8,17 +8,33 @@ from astropy import units as u
 # LOCAL
 from synphot import exceptions
 
-__all__ = ['H', 'C', 'HC', 'SR_PER_ARCSEC2', 'AREA', 'THROUGHPUT', 'PHOTLAM',
-           'PHOTNU', 'FLAM', 'FNU', 'OBMAG', 'VEGAMAG',
-           'spectral_density_vega', 'spectral_density_count', 'convert_flux',
-           'validate_unit', 'validate_wave_unit', 'validate_quantity']
+__all__ = [
+    "AREA",
+    "FLAM",
+    "FNU",
+    "HC",
+    "OBMAG",
+    "PHOTLAM",
+    "PHOTNU",
+    "SR_PER_ARCSEC2",
+    "THROUGHPUT",
+    "VEGAMAG",
+    "C",
+    "H",
+    "convert_flux",
+    "spectral_density_count",
+    "spectral_density_vega",
+    "validate_quantity",
+    "validate_unit",
+    "validate_wave_unit",
+]
 
 # ----------------- #
 # General constants #
 # ----------------- #
 
 H = const.h.cgs  # Planck's constant in erg * sec
-C = const.c.to('AA/s')  # Speed of light in Angstrom/sec
+C = const.c.to("AA/s")  # Speed of light in Angstrom/sec
 HC = H * C
 SR_PER_ARCSEC2 = u.rad.to(u.arcsec) ** -2  # steradian per arcsec^2
 
@@ -33,21 +49,13 @@ AREA = u.cm * u.cm
 THROUGHPUT = u.dimensionless_unscaled
 
 # synphot flux units
-PHOTLAM = u.def_unit(
-    'photlam', u.photon / (u.cm**2 * u.s * u.AA),
-    format={'generic': 'PHOTLAM', 'console': 'PHOTLAM'})
-PHOTNU = u.def_unit(
-    'photnu', u.photon / (u.cm**2 * u.s * u.Hz),
-    format={'generic': 'PHOTNU', 'console': 'PHOTNU'})
-FLAM = u.def_unit(
-    'flam', u.erg / (u.cm**2 * u.s * u.AA),
-    format={'generic': 'FLAM', 'console': 'FLAM'})
-FNU = u.def_unit(
-    'fnu', u.erg / (u.cm**2 * u.s * u.Hz),
-    format={'generic': 'FNU', 'console': 'FNU'})
-_u_ob = u.def_unit('OB')
+PHOTLAM = u.def_unit("photlam", u.photon / (u.cm**2 * u.s * u.AA), format={"generic": "PHOTLAM", "console": "PHOTLAM"})
+PHOTNU = u.def_unit("photnu", u.photon / (u.cm**2 * u.s * u.Hz), format={"generic": "PHOTNU", "console": "PHOTNU"})
+FLAM = u.def_unit("flam", u.erg / (u.cm**2 * u.s * u.AA), format={"generic": "FLAM", "console": "FLAM"})
+FNU = u.def_unit("fnu", u.erg / (u.cm**2 * u.s * u.Hz), format={"generic": "FNU", "console": "FNU"})
+_u_ob = u.def_unit("OB")
 OBMAG = u.mag(_u_ob)
-_u_vega = u.def_unit('VEGA')
+_u_vega = u.def_unit("VEGA")
 VEGAMAG = u.mag(_u_vega)
 
 # Register with astropy units
@@ -57,6 +65,7 @@ u.add_enabled_units([PHOTLAM, PHOTNU, FLAM, FNU, OBMAG, VEGAMAG])
 # --------------- #
 # Flux conversion #
 # --------------- #
+
 
 def spectral_density_vega(wav, vegaflux):
     """Flux equivalencies between PHOTLAM and VEGAMAG.
@@ -76,8 +85,7 @@ def spectral_density_vega(wav, vegaflux):
         List of equivalencies.
 
     """
-    vega_photlam = vegaflux.to(
-        PHOTLAM, equivalencies=u.spectral_density(wav)).value
+    vega_photlam = vegaflux.to(PHOTLAM, equivalencies=u.spectral_density(wav)).value
 
     def converter(x):
         return x / vega_photlam
@@ -106,7 +114,7 @@ def spectral_density_count(wav, area):
         List of equivalencies.
 
     """
-    from synphot.binning import calculate_bin_widths, calculate_bin_edges
+    from synphot.binning import calculate_bin_edges, calculate_bin_widths
 
     wav = wav.to(u.AA, equivalencies=u.spectral())
     area = area.to(AREA)
@@ -119,8 +127,10 @@ def spectral_density_count(wav, area):
     def iconverter_count(x):
         return x / factor
 
-    return [(PHOTLAM, u.count, converter_count, iconverter_count),
-            (PHOTLAM, OBMAG.physical_unit, converter_count, iconverter_count)]
+    return [
+        (PHOTLAM, u.count, converter_count, iconverter_count),
+        (PHOTLAM, OBMAG.physical_unit, converter_count, iconverter_count),
+    ]
 
 
 def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
@@ -191,33 +201,28 @@ def convert_flux(wavelengths, fluxes, out_flux_unit, **kwargs):
         # Convert input unit to PHOTLAM
         if fluxes.unit == PHOTLAM:
             flux_photlam = fluxes
-        elif in_flux_type != 'unknown':
+        elif in_flux_type != "unknown":
             flux_photlam = fluxes.to(PHOTLAM, eqv)
         else:
-            flux_photlam = _convert_flux(
-                wavelengths, fluxes, PHOTLAM, **kwargs)
+            flux_photlam = _convert_flux(wavelengths, fluxes, PHOTLAM, **kwargs)
 
         # Convert PHOTLAM to output unit
         if out_flux_unit == PHOTLAM:
             out_flux = flux_photlam
-        elif out_flux_type != 'unknown':
+        elif out_flux_type != "unknown":
             out_flux = flux_photlam.to(out_flux_unit, eqv)
         else:
-            out_flux = _convert_flux(
-                wavelengths, flux_photlam, out_flux_unit, **kwargs)
+            out_flux = _convert_flux(wavelengths, flux_photlam, out_flux_unit, **kwargs)
 
     return out_flux
 
 
-def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
-                  vegaspec=None):
+def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None, vegaspec=None):
     """Flux conversion for PHOTLAM <-> X."""
     flux_unit_names = (fluxes.unit.to_string(), out_flux_unit.to_string())
 
     if PHOTLAM.to_string() not in flux_unit_names:
-        raise exceptions.SynphotError(
-            'PHOTLAM must be one of the conversion units but get '
-            '{0}.'.format(flux_unit_names))
+        raise exceptions.SynphotError(f"PHOTLAM must be one of the conversion units but get {flux_unit_names}.")
 
     # VEGAMAG
     if VEGAMAG.to_string() in flux_unit_names:
@@ -231,26 +236,19 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
 
         flux_vega = vegaspec(wavelengths)
 
-        out_flux = fluxes.to(
-            out_flux_unit,
-            equivalencies=spectral_density_vega(wavelengths, flux_vega))
+        out_flux = fluxes.to(out_flux_unit, equivalencies=spectral_density_vega(wavelengths, flux_vega))
 
     # OBMAG or count
-    elif (u.count in (fluxes.unit, out_flux_unit) or
-          OBMAG.to_string() in flux_unit_names):
+    elif u.count in (fluxes.unit, out_flux_unit) or OBMAG.to_string() in flux_unit_names:
         if area is None:
-            raise exceptions.SynphotError(
-                'Area is compulsory for conversion involving count or OBMAG.')
+            raise exceptions.SynphotError("Area is compulsory for conversion involving count or OBMAG.")
         elif not isinstance(area, u.Quantity):
             area = area * AREA
 
-        out_flux = fluxes.to(
-            out_flux_unit,
-            equivalencies=spectral_density_count(wavelengths, area))
+        out_flux = fluxes.to(out_flux_unit, equivalencies=spectral_density_count(wavelengths, area))
 
     else:
-        raise u.UnitsError('{0} and {1} are not convertible'.format(
-            fluxes.unit, out_flux_unit))
+        raise u.UnitsError(f"{fluxes.unit} and {out_flux_unit} are not convertible")
 
     return out_flux
 
@@ -258,6 +256,7 @@ def _convert_flux(wavelengths, fluxes, out_flux_unit, area=None,
 # ----------------- #
 # Utility functions #
 # ----------------- #
+
 
 def validate_unit(input_unit):
     """Validate unit.
@@ -289,14 +288,13 @@ def validate_unit(input_unit):
         input_unit_lowcase = input_unit.lower()
 
         # Backward-compatibility
-        if input_unit_lowcase == 'angstroms':
+        if input_unit_lowcase == "angstroms":
             output_unit = u.AA
-        elif input_unit_lowcase == 'inversemicrons':
-            output_unit = u.micron ** -1
-        elif input_unit_lowcase in ('transmission', 'extinction',
-                                    'emissivity', 'throughput'):
+        elif input_unit_lowcase == "inversemicrons":
+            output_unit = u.micron**-1
+        elif input_unit_lowcase in ("transmission", "extinction", "emissivity", "throughput"):
             output_unit = THROUGHPUT
-        elif input_unit_lowcase == 'jy':
+        elif input_unit_lowcase == "jy":
             output_unit = u.Jy
         elif input_unit_lowcase == "flam":
             output_unit = FLAM
@@ -312,13 +310,13 @@ def validate_unit(input_unit):
             output_unit = u.s
 
         # Work around mag unit limitations
-        elif input_unit_lowcase in ('stmag', 'mag(st)'):
+        elif input_unit_lowcase in ("stmag", "mag(st)"):
             output_unit = u.STmag
-        elif input_unit_lowcase in ('abmag', 'mag(ab)'):
+        elif input_unit_lowcase in ("abmag", "mag(ab)"):
             output_unit = u.ABmag
-        elif input_unit_lowcase in ('obmag', 'mag(ob)'):
+        elif input_unit_lowcase in ("obmag", "mag(ob)"):
             output_unit = OBMAG
-        elif input_unit_lowcase in ('vegamag', 'mag(vega)'):
+        elif input_unit_lowcase in ("vegamag", "mag(vega)"):
             output_unit = VEGAMAG
 
         else:
@@ -331,9 +329,7 @@ def validate_unit(input_unit):
         output_unit = input_unit
 
     else:
-        raise exceptions.SynphotError(
-            '{0} must be a recognized string or '
-            'astropy.units.Unit'.format(input_unit))
+        raise exceptions.SynphotError(f"{input_unit} must be a recognized string or astropy.units.Unit")
 
     return output_unit
 
@@ -343,10 +339,8 @@ def validate_wave_unit(wave_unit):
     output_unit = validate_unit(wave_unit)
     unit_type = output_unit.physical_type
 
-    if unit_type not in ('length', 'wavenumber', 'frequency'):
-        raise exceptions.SynphotError(
-            'wavelength physical type is not length, wave number, or '
-            'frequency: {0}'.format(unit_type))
+    if unit_type not in ("length", "wavenumber", "frequency"):
+        raise exceptions.SynphotError(f"wavelength physical type is not length, wave number, or frequency: {unit_type}")
 
     return output_unit
 

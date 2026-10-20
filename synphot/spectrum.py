@@ -9,7 +9,6 @@ from copy import deepcopy
 
 # THIRD-PARTY
 import numpy as np
-from scipy.integrate import trapezoid
 
 # ASTROPY
 from astropy import log
@@ -18,28 +17,27 @@ from astropy.io.fits.connect import is_fits
 from astropy.modeling import Model
 from astropy.modeling.core import CompoundModel
 from astropy.modeling.models import RedshiftScaleFactor, Scale
-from astropy.utils.exceptions import AstropyUserWarning
 from astropy.utils import metadata
+from astropy.utils.exceptions import AstropyUserWarning
+from scipy.integrate import trapezoid
 
 # LOCAL
 from synphot import exceptions, specio, units, utils
 from synphot.config import Conf, conf
-from synphot.models import ConstFlux1D, Empirical1D, get_waveset, get_metadata
+from synphot.models import ConstFlux1D, Empirical1D, get_metadata, get_waveset
 
 __all__ = [
-    "BaseSpectrum",
     "BaseSourceSpectrum",
-    "SourceSpectrum",
+    "BaseSpectrum",
     "BaseUnitlessSpectrum",
+    "SourceSpectrum",
     "SpectralElement",
-    "lazy_load_vega",
     "Vega",
+    "lazy_load_vega",
 ]
 
 
-Vega = (
-    None  # This is defined at the end of this module to avoid circular import issues.
-)
+Vega = None  # This is defined at the end of this module to avoid circular import issues.
 """Default Vega spectrum. Used for conversions to and from VEGAMAG when no Vega spectrum is given.
 
 This is lazily loaded when needed using :func:`SourceSpectrum.from_vega()`.
@@ -87,7 +85,7 @@ def lazy_load_vega(vegafile=None, **kwargs):
     with conf.set_temp("vega_file", vegafile):
         try:
             Vega = SourceSpectrum.from_vega(**kwargs)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             Vega = None
             err_message = repr(e)
         else:
@@ -143,71 +141,71 @@ class BaseSpectrum:
         Invalid model.
 
     """
+
     _internal_wave_unit = u.AA
     _internal_flux_unit = None
 
     # For handling of units with models.
     _model_param_dict = {
-        'BlackBody1D': {'temperature': u.K},
-        'BlackBodyNorm1D': {'temperature': u.K},
-        'Box1D': {'amplitude': 'flux', 'x_0': 'wave', 'width': 'wave'},
-        'BrokenPowerLaw1D': {
-            'amplitude': 'flux', 'x_break': 'wave',
-            'alpha_1': u.dimensionless_unscaled,
-            'alpha_2': u.dimensionless_unscaled},
-        'Const1D': {'amplitude': 'noconv'},
-        'ConstFlux1D': {'amplitude': 'noconv'},
-        'Empirical1D': {'points': 'wave', 'lookup_table': 'flux'},
-        'ExtinctionModel1D': {'points': 'wave', 'lookup_table': 'flux'},
-        'ExponentialCutoffPowerLaw1D': {
-            'amplitude': 'flux', 'x_0': 'wave', 'x_cutoff': 'wave',
-            'alpha': u.dimensionless_unscaled},
-        'Gaussian1D': {'amplitude': 'flux', 'mean': 'wave', 'stddev': 'wave'},
-        'GaussianAbsorption1D': {
-            'amplitude': 'flux', 'mean': 'wave', 'stddev': 'wave'},
-        'GaussianFlux1D': {'total_flux': 'noconv', 'amplitude': 'flux',
-                           'mean': 'wave', 'stddev': 'wave', 'fwhm': 'wave'},
-        'LogParabola1D': {
-            'amplitude': 'flux', 'x_0': 'wave',
-            'alpha': u.dimensionless_unscaled,
-            'beta': u.dimensionless_unscaled},
-        'Lorentz1D': {'amplitude': 'flux', 'x_0': 'wave', 'fwhm': 'wave'},
-        'RickerWavelet1D': {
-            'amplitude': 'flux', 'x_0': 'wave', 'sigma': 'wave'},
-        'MexicanHat1D': {
-            'amplitude': 'flux', 'x_0': 'wave', 'sigma': 'wave'},
-        'PowerLaw1D': {
-            'amplitude': 'flux', 'x_0': 'wave',
-            'alpha': u.dimensionless_unscaled},
-        'PowerLawFlux1D': {
-            'amplitude': 'noconv', 'x_0': 'noconv',
-            'alpha': u.dimensionless_unscaled},
-        'Trapezoid1D': {
-            'amplitude': 'flux', 'x_0': 'wave', 'width': 'wave',
-            'slope': u.dimensionless_unscaled}}
+        "BlackBody1D": {"temperature": u.K},
+        "BlackBodyNorm1D": {"temperature": u.K},
+        "Box1D": {"amplitude": "flux", "x_0": "wave", "width": "wave"},
+        "BrokenPowerLaw1D": {
+            "amplitude": "flux",
+            "x_break": "wave",
+            "alpha_1": u.dimensionless_unscaled,
+            "alpha_2": u.dimensionless_unscaled,
+        },
+        "Const1D": {"amplitude": "noconv"},
+        "ConstFlux1D": {"amplitude": "noconv"},
+        "Empirical1D": {"points": "wave", "lookup_table": "flux"},
+        "ExtinctionModel1D": {"points": "wave", "lookup_table": "flux"},
+        "ExponentialCutoffPowerLaw1D": {
+            "amplitude": "flux",
+            "x_0": "wave",
+            "x_cutoff": "wave",
+            "alpha": u.dimensionless_unscaled,
+        },
+        "Gaussian1D": {"amplitude": "flux", "mean": "wave", "stddev": "wave"},
+        "GaussianAbsorption1D": {"amplitude": "flux", "mean": "wave", "stddev": "wave"},
+        "GaussianFlux1D": {"total_flux": "noconv", "amplitude": "flux", "mean": "wave", "stddev": "wave", "fwhm": "wave"},
+        "LogParabola1D": {
+            "amplitude": "flux",
+            "x_0": "wave",
+            "alpha": u.dimensionless_unscaled,
+            "beta": u.dimensionless_unscaled,
+        },
+        "Lorentz1D": {"amplitude": "flux", "x_0": "wave", "fwhm": "wave"},
+        "RickerWavelet1D": {"amplitude": "flux", "x_0": "wave", "sigma": "wave"},
+        "MexicanHat1D": {"amplitude": "flux", "x_0": "wave", "sigma": "wave"},
+        "PowerLaw1D": {"amplitude": "flux", "x_0": "wave", "alpha": u.dimensionless_unscaled},
+        "PowerLawFlux1D": {"amplitude": "noconv", "x_0": "noconv", "alpha": u.dimensionless_unscaled},
+        "Trapezoid1D": {"amplitude": "flux", "x_0": "wave", "width": "wave", "slope": u.dimensionless_unscaled},
+    }
 
     # Flux conversion will use these wavelengths.
     _model_fconv_wav = {
-        'Box1D': 'x_0',
-        'BrokenPowerLaw1D': 'x_break',
-        'Empirical1D': 'points',
-        'ExponentialCutoffPowerLaw1D': 'x_0',
-        'Gaussian1D': 'mean',
-        'GaussianAbsorption1D': 'mean',
-        'GaussianFlux1D': 'mean',
-        'LogParabola1D': 'x_0',
-        'Lorentz1D': 'x_0',
-        'RickerWavelet1D': 'x_0',
-        'MexicanHat1D': 'x_0',
-        'PowerLaw1D': 'x_0',
-        'Trapezoid1D': 'x_0'}
+        "Box1D": "x_0",
+        "BrokenPowerLaw1D": "x_break",
+        "Empirical1D": "points",
+        "ExponentialCutoffPowerLaw1D": "x_0",
+        "Gaussian1D": "mean",
+        "GaussianAbsorption1D": "mean",
+        "GaussianFlux1D": "mean",
+        "LogParabola1D": "x_0",
+        "Lorentz1D": "x_0",
+        "RickerWavelet1D": "x_0",
+        "MexicanHat1D": "x_0",
+        "PowerLaw1D": "x_0",
+        "Trapezoid1D": "x_0",
+    }
 
     def __init__(self, modelclass, clean_meta=False, **kwargs):
 
         # Does not handle multiple model sets for now; too complicated.
-        n_models = kwargs.pop('n_models', 1)
+        n_models = kwargs.pop("n_models", 1)
         if n_models != 1:
-            raise exceptions.SynphotError('Model can only have n_models=1')
+            raise exceptions.SynphotError("Model can only have n_models=1")
 
         other_meta = {}
 
@@ -225,14 +223,12 @@ class BaseSpectrum:
             self._model = modelclass.model
 
         elif not issubclass(modelclass, Model):
-            raise exceptions.SynphotError(
-                '{0} is not a valid model class.'.format(modelclass))
+            raise exceptions.SynphotError(f"{modelclass} is not a valid model class.")
 
         else:
             modelname = modelclass.__name__
             if modelname not in self._model_param_dict:
-                raise exceptions.SynphotError(
-                    '{0} is not supported.'.format(modelname))
+                raise exceptions.SynphotError(f"{modelname} is not supported.")
 
             modargs = {}
 
@@ -243,18 +239,18 @@ class BaseSpectrum:
                 pval_wav = self._process_wave_param(kwargs.pop(pname_wav))
                 modargs[pname_wav] = pval_wav
             else:
-                pname_wav = ''
+                pname_wav = ""
                 pval_wav = None
 
             # Process the rest of the parameters.
             for pname, kval in kwargs.items():
                 if pname in self._model_param_dict[modelname]:
                     ptype = self._model_param_dict[modelname][pname]
-                    if ptype == 'wave':
+                    if ptype == "wave":
                         pval = self._process_wave_param(kval)
-                    elif ptype == 'flux':
+                    elif ptype == "flux":
                         pval = self._process_flux_param(kval, pval_wav)
-                    elif ptype == 'noconv':
+                    elif ptype == "noconv":
                         pval = kval
                     else:
                         pval = self._process_generic_param(kval, ptype)
@@ -275,7 +271,7 @@ class BaseSpectrum:
     @staticmethod
     def _get_meta(obj):
         """Extract metadata, if any, from given object."""
-        if hasattr(obj, 'meta'):  # Spectrum or model
+        if hasattr(obj, "meta"):  # Spectrum or model
             meta = deepcopy(obj.meta)
         elif isinstance(obj, dict):  # Metadata
             meta = deepcopy(obj)
@@ -312,14 +308,13 @@ class BaseSpectrum:
         #   header = FITS header metadata
         #   expr = ASTROLIB PYSYNPHOT expression
         if clean:
-            for key in ('header', 'expr'):
+            for key in ("header", "expr"):
                 for d in (left, right):
                     if key in d:
                         del d[key]
 
-        mid = metadata.merge(left, right, metadata_conflicts='silent')
-        result.meta = metadata.merge(result.meta, mid,
-                                     metadata_conflicts='silent')
+        mid = metadata.merge(left, right, metadata_conflicts="silent")
+        result.meta = metadata.merge(result.meta, mid, metadata_conflicts="silent")
 
     @staticmethod
     def _process_generic_param(pval, def_unit, equivalencies=[]):
@@ -332,8 +327,7 @@ class BaseSpectrum:
 
     def _process_wave_param(self, pval):
         """Process individual model parameter representing wavelength."""
-        return self._process_generic_param(
-            pval, self._internal_wave_unit, equivalencies=u.spectral())
+        return self._process_generic_param(pval, self._internal_wave_unit, equivalencies=u.spectral())
 
     def _process_flux_param(self, pval, wave):
         """Process individual model parameter representing flux/throughput.
@@ -352,7 +346,7 @@ class BaseSpectrum:
             Input converted to internal unit.
 
         """
-        raise NotImplementedError('To be implemented by subclasses.')
+        raise NotImplementedError("To be implemented by subclasses.")
 
     @staticmethod
     def _validate_flux_unit(new_unit):
@@ -369,7 +363,7 @@ class BaseSpectrum:
             Output from :func:`~synphot.units.validate_unit`.
 
         """
-        raise NotImplementedError('To be implemented by subclasses.')
+        raise NotImplementedError("To be implemented by subclasses.")
 
     @property
     def model(self):
@@ -378,15 +372,14 @@ class BaseSpectrum:
 
     @property
     def warnings(self):
-        """Dictionary of warning key-value pairs related to spectrum/bandpass.
-        """
-        return self.meta.get('warnings', {})
+        """Dictionary of warning key-value pairs related to spectrum/bandpass."""
+        return self.meta.get("warnings", {})
 
     @warnings.setter
     def warnings(self, val):
-        if 'warnings' not in self.meta:
-            self.meta['warnings'] = {}
-        self.meta['warnings'].update(val)
+        if "warnings" not in self.meta:
+            self.meta["warnings"] = {}
+        self.meta["warnings"].update(val)
 
     @property
     def waveset(self):
@@ -408,15 +401,13 @@ class BaseSpectrum:
 
     def __str__(self):
         """Descriptive information of the spectrum or bandpass."""
-        return '{0}\n{1}'.format(self.__class__.__name__, str(self.model))
+        return f"{self.__class__.__name__}\n{self.model!s}"
 
     def _validate_wavelengths(self, wave):
         """Validate wavelengths for sampling."""
         if wave is None:
             if self.waveset is None:
-                raise exceptions.SynphotError(
-                    'self.waveset is undefined; '
-                    'Provide wavelengths for sampling.')
+                raise exceptions.SynphotError("self.waveset is undefined; Provide wavelengths for sampling.")
             wavelengths = self.waveset
         else:
             w = self._process_wave_param(wave)
@@ -448,33 +439,29 @@ class BaseSpectrum:
 
     def __add__(self, other):  # pragma: no cover
         """Add self and other."""
-        raise NotImplementedError('This operation is not supported.')
+        raise NotImplementedError("This operation is not supported.")
 
     def __sub__(self, other):  # pragma: no cover
         """Subtract other from self."""
-        raise NotImplementedError('This operation is not supported.')
+        raise NotImplementedError("This operation is not supported.")
 
     @staticmethod
     def _validate_other_mul_div(other):
         """Conditions for other to satisfy before mul/div."""
-        if not isinstance(other, (u.Quantity, numbers.Number,
-                                  BaseUnitlessSpectrum, SourceSpectrum)):
-            raise exceptions.IncompatibleSources(
-                'Can only operate on scalar number/Quantity or spectrum')
-        elif (isinstance(other, u.Quantity) and
-              (other.unit.decompose() != u.dimensionless_unscaled or
-               not np.isscalar(other.value) or
-               not isinstance(other.value, numbers.Real))):
-            raise exceptions.IncompatibleSources(
-                'Can only operate on real scalar dimensionless Quantity')
-        elif (isinstance(other, numbers.Number) and
-              not (np.isscalar(other) and isinstance(other, numbers.Real))):
-            raise exceptions.IncompatibleSources(
-                'Can only operate on real scalar number')
+        if not isinstance(other, (u.Quantity, numbers.Number, BaseUnitlessSpectrum, SourceSpectrum)):
+            raise exceptions.IncompatibleSources("Can only operate on scalar number/Quantity or spectrum")
+        elif isinstance(other, u.Quantity) and (
+            other.unit.decompose() != u.dimensionless_unscaled
+            or not np.isscalar(other.value)
+            or not isinstance(other.value, numbers.Real)
+        ):
+            raise exceptions.IncompatibleSources("Can only operate on real scalar dimensionless Quantity")
+        elif isinstance(other, numbers.Number) and not (np.isscalar(other) and isinstance(other, numbers.Real)):
+            raise exceptions.IncompatibleSources("Can only operate on real scalar number")
 
     def __mul__(self, other):  # pragma: no cover
         """Multiply self and other."""
-        raise NotImplementedError('This operation is not supported.')
+        raise NotImplementedError("This operation is not supported.")
 
     def __rmul__(self, other):
         """This is only called if ``other.__mul__`` cannot operate."""
@@ -482,7 +469,7 @@ class BaseSpectrum:
 
     def __truediv__(self, other):  # pragma: no cover
         """Divide self by other."""
-        raise NotImplementedError('This operation is not supported.')
+        raise NotImplementedError("This operation is not supported.")
 
     def __div__(self, other):  # pragma: py2
         """Same as :meth:`__truediv__` for Python 2 compatibility without
@@ -554,12 +541,11 @@ class BaseSpectrum:
         # without converting them to per Angstrom unit first, so
         # less misleading to just disallow that option for now.
         # For analytical integration: Keep the same behavior for consistency.
-        flux_unit = kwargs.get('flux_unit')
+        flux_unit = kwargs.get("flux_unit")
         is_unitless = self._internal_flux_unit == units.THROUGHPUT
         if flux_unit is not None:
             if is_unitless:
-                raise exceptions.SynphotError(
-                    'flux_unit cannot be used with unitless spectrum')
+                raise exceptions.SynphotError("flux_unit cannot be used with unitless spectrum")
             else:
                 flux_unit = self._validate_flux_unit(flux_unit, wav_only=True)
 
@@ -571,20 +557,19 @@ class BaseSpectrum:
         # NOTE: Emitting warning is not done because it overcomplicates
         #       the logic here.
         # Fallback to trapezoid if analytical not possible.
-        if (integration_type == 'analytical' and
-                not hasattr(self.model, 'integrate')):
-            integration_type = 'trapezoid'
+        if integration_type == "analytical" and not hasattr(self.model, "integrate"):
+            integration_type = "trapezoid"
 
-        if integration_type == 'trapezoid':
+        if integration_type == "trapezoid":
             y = abs(self(x, **kwargs))  # Unsigned area
             result = abs(trapezoid(y, x=x))
 
-        elif integration_type == 'analytical':
+        elif integration_type == "analytical":
             result = self.model.integrate(x)
 
             # TODO: Remove unit hardcoding when we use model with units
             #       natively.
-            if not is_unitless and result.unit.physical_type == 'length':
+            if not is_unitless and result.unit.physical_type == "length":
                 result = result * self._internal_flux_unit
 
             # NOTE: flux_unit is flux density, not integrated.
@@ -599,15 +584,13 @@ class BaseSpectrum:
                     to_unit = flux_unit * self._internal_wave_unit
                     result = units.convert_flux(wav, result, to_unit)
         else:
-            raise NotImplementedError(
-                '{} is not a supported integration '
-                'type'.format(integration_type))
+            raise NotImplementedError(f"{integration_type} is not a supported integration type")
 
         # Ensure final unit takes account of integration across wavelength
         # and make it pretty, where applicable.
         if not is_unitless:
             result_unit_str = result.unit.to_string()
-            if 'ph' in result_unit_str or 'PHOTLAM' in result_unit_str:
+            if "ph" in result_unit_str or "PHOTLAM" in result_unit_str:
                 result = result.to(u.photon / (u.cm**2 * u.s))
             else:  # FLAM
                 result = result.to(u.erg / (u.cm**2 * u.s))
@@ -791,9 +774,9 @@ class BaseSpectrum:
         return w, y
 
     @staticmethod
-    def _do_plot(x, y, title='', xlog=False, ylog=False,
-                 left=None, right=None, bottom=None, top=None,
-                 save_as=''):  # pragma: no cover
+    def _do_plot(
+        x, y, title="", xlog=False, ylog=False, left=None, right=None, bottom=None, top=None, save_as=""
+    ):  # pragma: no cover
         """Plot worker.
 
         Parameters
@@ -808,11 +791,10 @@ class BaseSpectrum:
         try:
             import matplotlib.pyplot as plt
         except ImportError:
-            log.error('No matplotlib installation found; plotting disabled '
-                      'as a result.')
+            log.error("No matplotlib installation found; plotting disabled as a result.")
             return
 
-        fig, ax = plt.subplots()
+        _fig, ax = plt.subplots()
         ax.plot(x, y)
 
         # Custom wavelength limits
@@ -828,30 +810,30 @@ class BaseSpectrum:
             ax.set_ylim(top=top)
 
         xu = x.unit
-        if xu.physical_type == 'frequency':
-            ax.set_xlabel('Frequency ({0})'.format(xu))
+        if xu.physical_type == "frequency":
+            ax.set_xlabel(f"Frequency ({xu})")
         else:
-            ax.set_xlabel('Wavelength ({0})'.format(xu))
+            ax.set_xlabel(f"Wavelength ({xu})")
 
         yu = y.unit
         if yu is u.dimensionless_unscaled:
-            ax.set_ylabel('Unitless')
+            ax.set_ylabel("Unitless")
         else:
-            ax.set_ylabel('Flux ({0})'.format(yu))
+            ax.set_ylabel(f"Flux ({yu})")
 
         if title:
             ax.set_title(title)
 
         if xlog:
-            ax.set_xscale('log')
+            ax.set_xscale("log")
         if ylog:
-            ax.set_yscale('log')
+            ax.set_yscale("log")
 
         plt.draw()
 
         if save_as:
             plt.savefig(save_as)
-            log.info('Plot saved as {0}'.format(save_as))
+            log.info(f"Plot saved as {save_as}")
 
     def plot(self, wavelengths=None, **kwargs):  # pragma: no cover
         """Plot the spectrum.
@@ -924,8 +906,9 @@ class BaseSpectrum:
 
         # Spectrum is designed to be immutable, so no need to make
         # copies of spectral_axis nor flux.
-        return cls(Empirical1D, points=points, lookup_table=lookup_table,
-                   keep_neg=keep_neg, meta={'header': spec.meta.copy()})
+        return cls(
+            Empirical1D, points=points, lookup_table=lookup_table, keep_neg=keep_neg, meta={"header": spec.meta.copy()}
+        )
 
     def to_spectrum1d(self, wavelengths=None, **kwargs):
         """Create a `specutils.Spectrum1D` object from spectrum.
@@ -956,7 +939,7 @@ class BaseSpectrum:
         from synphot.compat import HAS_SPECUTILS
 
         if not HAS_SPECUTILS:  # pragma: no cover
-            raise ImportError('specutils must be installed to use this method')
+            raise ImportError("specutils must be installed to use this method")
 
         from specutils import Spectrum
 
@@ -970,25 +953,24 @@ class BaseSourceSpectrum(BaseSpectrum):
     and observation. Do not use directly.
 
     """
+
     _internal_flux_unit = units.PHOTLAM
 
     @staticmethod
     def _validate_flux_unit(new_unit, wav_only=False):
         """Make sure flux unit is valid."""
         new_unit = units.validate_unit(new_unit)
-        acceptable_types = ['spectral flux density wav',
-                            'photon flux density wav']
-        acceptable_names = ['PHOTLAM', 'FLAM']
+        acceptable_types = ["spectral flux density wav", "photon flux density wav"]
+        acceptable_names = ["PHOTLAM", "FLAM"]
 
         if not wav_only:  # Include per Hz units
-            acceptable_types += ['spectral flux density',
-                                 'photon flux density']
-            acceptable_names += ['PHOTNU', 'FNU', 'Jy']
+            acceptable_types += ["spectral flux density", "photon flux density"]
+            acceptable_names += ["PHOTNU", "FNU", "Jy"]
 
         if new_unit.physical_type not in acceptable_types:
             raise exceptions.SynphotError(
-                'Source spectrum cannot operate in {0}. Acceptable units: '
-                '{1}'.format(new_unit, ','.join(acceptable_names)))
+                f"Source spectrum cannot operate in {new_unit}. Acceptable units: {','.join(acceptable_names)}"
+            )
 
         return new_unit
 
@@ -1025,8 +1007,7 @@ class BaseSourceSpectrum(BaseSpectrum):
 
         return sampled_result
 
-    def normalize(self, renorm_val, band=None, wavelengths=None, force=False,
-                  area=None, vegaspec=None):
+    def normalize(self, renorm_val, band=None, wavelengths=None, force=False, area=None, vegaspec=None):
         """Renormalize the spectrum to the given Quantity and band.
 
         .. warning::
@@ -1088,43 +1069,41 @@ class BaseSourceSpectrum(BaseSpectrum):
 
         else:
             if not isinstance(band, SpectralElement):
-                raise exceptions.SynphotError('Invalid bandpass.')
+                raise exceptions.SynphotError("Invalid bandpass.")
 
             stat = band.check_overlap(self, wavelengths=wavelengths)
 
-            if stat == 'none':
-                raise exceptions.DisjointError(
-                    'Spectrum and renormalization band are disjoint.')
+            if stat == "none":
+                raise exceptions.DisjointError("Spectrum and renormalization band are disjoint.")
 
-            elif 'partial' in stat:
-                if stat == 'partial_most':
-                    warn_str = 'At least'
-                elif stat == 'partial_notmost' and force:
-                    warn_str = 'Less than'
+            elif "partial" in stat:
+                if stat == "partial_most":
+                    warn_str = "At least"
+                elif stat == "partial_notmost" and force:
+                    warn_str = "Less than"
                 else:
                     raise exceptions.PartialOverlap(
-                        'Spectrum and renormalization band do not fully '
-                        'overlap. You may use force=True to force the '
-                        'renormalization to proceed.')
+                        "Spectrum and renormalization band do not fully "
+                        "overlap. You may use force=True to force the "
+                        "renormalization to proceed."
+                    )
 
                 warn_str = (
-                    'Spectrum is not defined everywhere in renormalization '
-                    'bandpass. {0} 99% of the band throughput has '
-                    'data. Spectrum will be').format(warn_str)
+                    "Spectrum is not defined everywhere in renormalization "
+                    f"bandpass. {warn_str} 99% of the band throughput has "
+                    "data. Spectrum will be"
+                )
 
                 if self.force_extrapolation():
-                    warn_str = ('{0} extrapolated at constant '
-                                'value.').format(warn_str)
+                    warn_str = f"{warn_str} extrapolated at constant value."
                 else:
-                    warn_str = ('{0} evaluated outside pre-defined '
-                                'waveset.').format(warn_str)
+                    warn_str = f"{warn_str} evaluated outside pre-defined waveset."
 
                 warnings.warn(warn_str, AstropyUserWarning)
-                warndict['PartialRenorm'] = warn_str
+                warndict["PartialRenorm"] = warn_str
 
-            elif stat != 'full':  # pragma: no cover
-                raise exceptions.SynphotError(
-                    'Overlap result of {0} is unexpected.'.format(stat))
+            elif stat != "full":  # pragma: no cover
+                raise exceptions.SynphotError(f"Overlap result of {stat} is unexpected.")
 
             sp = self.__mul__(band)
 
@@ -1134,15 +1113,13 @@ class BaseSourceSpectrum(BaseSpectrum):
         renorm_unit_name = renorm_val.unit.to_string()
         w = sp._validate_wavelengths(wavelengths)
 
-        if (renorm_val.unit == u.count or
-                renorm_unit_name == units.OBMAG.to_string()):
+        if renorm_val.unit == u.count or renorm_unit_name == units.OBMAG.to_string():
             # Special handling for non-density units
             flux_tmp = sp(w, flux_unit=u.count, area=area)
             totalflux = flux_tmp.sum().value
             stdflux = 1.0
         else:
-            totalflux = sp.integrate(wavelengths=wavelengths,
-                                     integration_type='trapezoid')
+            totalflux = sp.integrate(wavelengths=wavelengths, integration_type="trapezoid")
 
             # VEGAMAG
             if renorm_unit_name == units.VEGAMAG.to_string():
@@ -1154,32 +1131,27 @@ class BaseSourceSpectrum(BaseSpectrum):
 
             # Magnitude flux-density units
             elif renorm_val.unit in (u.STmag, u.ABmag):
-                stdspec = SourceSpectrum(
-                    ConstFlux1D, amplitude=(0 * renorm_val.unit))
+                stdspec = SourceSpectrum(ConstFlux1D, amplitude=(0 * renorm_val.unit))
 
             # Linear flux-density units
             else:
-                stdspec = SourceSpectrum(
-                    ConstFlux1D, amplitude=(1 * renorm_val.unit))
+                stdspec = SourceSpectrum(ConstFlux1D, amplitude=(1 * renorm_val.unit))
 
             if band is None:
                 # TODO: Cannot get this to agree with results
                 # from using a very large box bandpass.
                 # stdflux = stdspec.integrate(wavelengths=w).value
-                raise NotImplementedError('Must provide a bandpass')
+                raise NotImplementedError("Must provide a bandpass")
             else:
                 up = stdspec * band
-                stdflux = up.integrate(wavelengths=wavelengths,
-                                       integration_type='trapezoid')
+                stdflux = up.integrate(wavelengths=wavelengths, integration_type="trapezoid")
 
         utils.validate_totalflux(totalflux)
 
         # Renormalize in magnitudes
-        if (renorm_val.unit.decompose() == u.mag or
-                isinstance(renorm_val.unit, u.LogUnit)):
-            const = renorm_val.value + (2.5 *
-                                        np.log10(totalflux / stdflux))
-            newsp = self.__mul__(10**(-0.4 * const))
+        if renorm_val.unit.decompose() == u.mag or isinstance(renorm_val.unit, u.LogUnit):
+            const = renorm_val.value + (2.5 * np.log10(totalflux / stdflux))
+            newsp = self.__mul__(10 ** (-0.4 * const))
         # Renormalize in linear flux units
         else:
             const = renorm_val.value * (stdflux / totalflux)
@@ -1209,18 +1181,18 @@ class SourceSpectrum(BaseSourceSpectrum):
         * ``'conserve_flux'`` also scales the flux to conserve it.
 
     """
-    def __init__(self, modelclass, z=0, z_type='wavelength_only', **kwargs):
-        self._valid_z_types = ('wavelength_only', 'conserve_flux')
+
+    def __init__(self, modelclass, z=0, z_type="wavelength_only", **kwargs):
+        self._valid_z_types = ("wavelength_only", "conserve_flux")
         self.z_type = z_type
         self.z = z
-        super(SourceSpectrum, self).__init__(modelclass, **kwargs)
+        super().__init__(modelclass, **kwargs)
 
     def _process_flux_param(self, pval, wave):
         """Process individual model parameter representing flux."""
         if isinstance(pval, u.Quantity):
             self._validate_flux_unit(pval.unit)
-            outval = units.convert_flux(self._redshift_model(wave), pval,
-                                        self._internal_flux_unit).value
+            outval = units.convert_flux(self._redshift_model(wave), pval, self._internal_flux_unit).value
         else:  # Assume already in internal unit
             outval = pval
         return outval
@@ -1232,7 +1204,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             m = self._model
         else:
             # wavelength
-            if self._internal_wave_unit.physical_type == 'length':
+            if self._internal_wave_unit.physical_type == "length":
                 rs = self._redshift_model.inverse
             # frequency or wavenumber
             # NOTE: This will never execute as long as internal wavelength
@@ -1240,7 +1212,7 @@ class SourceSpectrum(BaseSourceSpectrum):
             else:  # pragma: no cover
                 rs = self._redshift_model
 
-            if self.z_type == 'wavelength_only':
+            if self.z_type == "wavelength_only":
                 m = rs | self._model
             else:  # conserve_flux
                 m = rs | self._model | self._redshift_flux_model
@@ -1256,11 +1228,10 @@ class SourceSpectrum(BaseSourceSpectrum):
     def z(self, what):
         """Change redshift."""
         if not isinstance(what, numbers.Real):
-            raise exceptions.SynphotError(
-                'Redshift must be a real scalar number.')
+            raise exceptions.SynphotError("Redshift must be a real scalar number.")
         self._z = float(what)
         self._redshift_model = RedshiftScaleFactor(self._z)
-        if self.z_type == 'wavelength_only':
+        if self.z_type == "wavelength_only":
             self._redshift_flux_model = None
         else:  # conserve_flux
             self._redshift_flux_model = Scale(1 / (1 + self._z))
@@ -1273,21 +1244,17 @@ class SourceSpectrum(BaseSourceSpectrum):
     @z_type.setter
     def z_type(self, what):
         if what not in self._valid_z_types:
-            raise exceptions.SynphotError(
-                '{0} is not a valid redshift behavior, choose '
-                'from {1}'.format(what, self._valid_z_types))
+            raise exceptions.SynphotError(f"{what} is not a valid redshift behavior, choose from {self._valid_z_types}")
         self._z_type = what
 
     def __str__(self):
         """Descriptive information of the spectrum."""
-        return '{0} at z={1}\n{2}'.format(
-            self.__class__.__name__, self.z, str(self.model))
+        return f"{self.__class__.__name__} at z={self.z}\n{self.model!s}"
 
     def _validate_other_add_sub(self, other):
         """Conditions for other to satisfy before add/sub."""
         if not isinstance(other, self.__class__):
-            raise exceptions.IncompatibleSources(
-                'Can only operate on {0}.'.format(self.__class__.__name__))
+            raise exceptions.IncompatibleSources(f"Can only operate on {self.__class__.__name__}.")
 
     def __add__(self, other):
         """Add ``self`` with ``other``."""
@@ -1312,8 +1279,7 @@ class SourceSpectrum(BaseSourceSpectrum):
         elif isinstance(other, BaseUnitlessSpectrum):
             newcls = self.__class__(self.model * other.model)
         else:  # Source spectrum
-            raise exceptions.IncompatibleSources(
-                'Cannot multiply two source spectra together')
+            raise exceptions.IncompatibleSources("Cannot multiply two source spectra together")
 
         self._merge_meta(self, other, newcls)
         return newcls
@@ -1332,8 +1298,7 @@ class SourceSpectrum(BaseSourceSpectrum):
         self._merge_meta(self, other, newcls)
         return newcls
 
-    def plot(self, wavelengths=None, flux_unit=None, area=None, vegaspec=None,
-             **kwargs):  # pragma: no cover
+    def plot(self, wavelengths=None, flux_unit=None, area=None, vegaspec=None, **kwargs):  # pragma: no cover
         """Plot the spectrum.
 
         .. note:: Uses :mod:`matplotlib`.
@@ -1361,12 +1326,10 @@ class SourceSpectrum(BaseSourceSpectrum):
             Invalid inputs.
 
         """
-        w, y = self._get_arrays(wavelengths, flux_unit=flux_unit, area=area,
-                                vegaspec=vegaspec)
+        w, y = self._get_arrays(wavelengths, flux_unit=flux_unit, area=area, vegaspec=vegaspec)
         self._do_plot(w, y, **kwargs)
 
-    def to_fits(self, filename, wavelengths=None, flux_unit=None, area=None,
-                vegaspec=None, **kwargs):
+    def to_fits(self, filename, wavelengths=None, flux_unit=None, area=None, vegaspec=None, **kwargs):
         """Write the spectrum to a FITS file.
 
         Parameters
@@ -1390,20 +1353,19 @@ class SourceSpectrum(BaseSourceSpectrum):
             Keywords accepted by :func:`~synphot.specio.write_fits_spec`.
 
         """
-        w, y = self._get_arrays(wavelengths, flux_unit=flux_unit, area=area,
-                                vegaspec=vegaspec)
+        w, y = self._get_arrays(wavelengths, flux_unit=flux_unit, area=area, vegaspec=vegaspec)
 
         # There are some standard keywords that should be added
         # to the extension header.
-        bkeys = {'tdisp1': 'G15.7', 'tdisp2': 'G15.7'}
+        bkeys = {"tdisp1": "G15.7", "tdisp2": "G15.7"}
 
-        if 'expr' in self.meta:
-            bkeys['expr'] = (self.meta['expr'], 'synphot expression')
+        if "expr" in self.meta:
+            bkeys["expr"] = (self.meta["expr"], "synphot expression")
 
-        if 'ext_header' in kwargs:
-            kwargs['ext_header'].update(bkeys)
+        if "ext_header" in kwargs:
+            kwargs["ext_header"].update(bkeys)
         else:
-            kwargs['ext_header'] = bkeys
+            kwargs["ext_header"] = bkeys
 
         specio.write_fits_spec(filename, w, y, **kwargs)
 
@@ -1434,8 +1396,7 @@ class SourceSpectrum(BaseSourceSpectrum):
 
         """
         header, wavelengths, fluxes = specio.read_spec(filename, **kwargs)
-        return cls(Empirical1D, points=wavelengths, lookup_table=fluxes,
-                   keep_neg=keep_neg, meta={'header': header})
+        return cls(Empirical1D, points=wavelengths, lookup_table=fluxes, keep_neg=keep_neg, meta={"header": header})
 
     @classmethod
     def from_vega(cls, **kwargs):
@@ -1453,17 +1414,15 @@ class SourceSpectrum(BaseSourceSpectrum):
 
         """
         filename = conf.vega_file
-        header, wavelengths, fluxes = specio.read_remote_spec(
-            filename, **kwargs)
-        header['filename'] = filename
-        meta = {'header': header,
-                'expr': 'Vega from {0}'.format(os.path.basename(filename))}
-        return cls(Empirical1D, points=wavelengths, lookup_table=fluxes,
-                   meta=meta)
+        header, wavelengths, fluxes = specio.read_remote_spec(filename, **kwargs)
+        header["filename"] = filename
+        meta = {"header": header, "expr": f"Vega from {os.path.basename(filename)}"}
+        return cls(Empirical1D, points=wavelengths, lookup_table=fluxes, meta=meta)
 
 
 class BaseUnitlessSpectrum(BaseSpectrum):
     """Base class to handle unitless spectrum like bandpass, reddening, etc."""
+
     _internal_flux_unit = units.THROUGHPUT
 
     def _process_flux_param(self, pval, wave):
@@ -1476,8 +1435,7 @@ class BaseUnitlessSpectrum(BaseSpectrum):
         new_unit = units.validate_unit(new_unit)
 
         if new_unit.decompose() != u.dimensionless_unscaled:
-            raise exceptions.SynphotError(
-                'Unit {0} is not dimensionless'.format(new_unit))
+            raise exceptions.SynphotError(f"Unit {new_unit} is not dimensionless")
 
         return new_unit
 
@@ -1508,8 +1466,7 @@ class BaseUnitlessSpectrum(BaseSpectrum):
         elif isinstance(other, BaseUnitlessSpectrum):
             newcls = self.__class__(self.model / other.model)
         else:  # SourceSpectrum
-            raise exceptions.IncompatibleSources(
-                'Cannot divide by source spectrum')
+            raise exceptions.IncompatibleSources("Cannot divide by source spectrum")
 
         self._merge_meta(self, other, newcls)
         return newcls
@@ -1524,6 +1481,7 @@ class SpectralElement(BaseUnitlessSpectrum):
         See `BaseSpectrum`.
 
     """
+
     def check_overlap(self, other, wavelengths=None, threshold=0.01):
         """Check for wavelength overlap between two spectra.
 
@@ -1585,16 +1543,15 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         """
         if not isinstance(other, BaseSpectrum):
-            raise exceptions.SynphotError(
-                'other must be spectrum or bandpass.')
+            raise exceptions.SynphotError("other must be spectrum or bandpass.")
 
         # Special cases where no sampling wavelengths given and
         # one of the inputs is continuous.
         if wavelengths is None:
             if other.waveset is None:
-                return 'full'
+                return "full"
             if self.waveset is None:
-                return 'partial_notmost'
+                return "partial_notmost"
 
         x1 = self._validate_wavelengths(wavelengths)
         y1 = self(x1)
@@ -1604,23 +1561,22 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         result = utils.overlap_status(a, b)
 
-        if result == 'partial':
+        if result == "partial":
             # If there is no need to extrapolate or taper other
             # (i.e., other is zero at self's wave limits),
             # then we consider it as a full coverage.
             # This logic assumes __call__ never returns mag or count!
-            if ((isinstance(other.model, Empirical1D) and
-                 other.model.is_tapered() or
-                 not isinstance(other.model,
-                                (Empirical1D, CompoundModel))) and
-                    np.allclose(other(x1[::x1.size - 1]).value, 0)):
-                result = 'full'
+            if (
+                isinstance(other.model, Empirical1D)
+                and other.model.is_tapered()
+                or not isinstance(other.model, (Empirical1D, CompoundModel))
+            ) and np.allclose(other(x1[:: x1.size - 1]).value, 0):
+                result = "full"
 
             # Check if the lack of overlap is significant.
             else:
                 # Get all the flux
-                totalflux = self.integrate(wavelengths=wavelengths,
-                                           integration_type='trapezoid')
+                totalflux = self.integrate(wavelengths=wavelengths, integration_type="trapezoid")
                 utils.validate_totalflux(totalflux)
 
                 a_min, a_max = a.min(), a.max()
@@ -1629,18 +1585,14 @@ class SpectralElement(BaseUnitlessSpectrum):
                 # Now get the other two pieces
                 excluded = 0.0 * totalflux.unit
                 if a_min < b_min:
-                    excluded += self.integrate(
-                        wavelengths=u.Quantity([a_min, b_min]),
-                        integration_type='trapezoid')
+                    excluded += self.integrate(wavelengths=u.Quantity([a_min, b_min]), integration_type="trapezoid")
                 if a_max > b_max:
-                    excluded += self.integrate(
-                        wavelengths=u.Quantity([b_max, a_max]),
-                        integration_type='trapezoid')
+                    excluded += self.integrate(wavelengths=u.Quantity([b_max, a_max]), integration_type="trapezoid")
 
                 if excluded / totalflux < threshold:
-                    result = 'partial_most'
+                    result = "partial_most"
                 else:
-                    result = 'partial_notmost'
+                    result = "partial_notmost"
 
         return result
 
@@ -1713,10 +1665,8 @@ class SpectralElement(BaseUnitlessSpectrum):
         else:
             try:
                 mask = y >= threshold
-            except Exception as e:
-                raise exceptions.SynphotError(
-                    '{0} is not a valid threshold: '
-                    '{1}'.format(threshold, str(e)))
+            except Exception as e:  # noqa: BLE001
+                raise exceptions.SynphotError(f"{threshold} is not a valid threshold: {e!s}")
             wave = x[mask]
             thru = y[mask]
 
@@ -1770,10 +1720,8 @@ class SpectralElement(BaseUnitlessSpectrum):
         else:
             try:
                 mask = y >= threshold
-            except Exception as e:
-                raise exceptions.SynphotError(
-                    '{0} is not a valid threshold: '
-                    '{1}'.format(threshold, str(e)))
+            except Exception as e:  # noqa: BLE001
+                raise exceptions.SynphotError(f"{threshold} is not a valid threshold: {e!s}")
             wave = x[mask]
             thru = y[mask]
 
@@ -1899,8 +1847,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             Bandpass rectangular width.
 
         """
-        equvw = self.equivwidth(wavelengths=wavelengths,
-                                integration_type='trapezoid')
+        equvw = self.equivwidth(wavelengths=wavelengths, integration_type="trapezoid")
         tpeak = self.tpeak(wavelengths=wavelengths)
 
         if tpeak.value == 0:  # pragma: no cover
@@ -1951,8 +1898,7 @@ class SpectralElement(BaseUnitlessSpectrum):
             em_flux = 0.0 * units.FLAM
         else:
             uresp = self.unit_response(area, wavelengths=wavelengths)
-            equvw = self.equivwidth(wavelengths=wavelengths,
-                                    integration_type='trapezoid')
+            equvw = self.equivwidth(wavelengths=wavelengths, integration_type="trapezoid")
             em_flux = uresp * equvw / (t_lambda * self._internal_wave_unit)
 
         return em_flux
@@ -1978,20 +1924,20 @@ class SpectralElement(BaseUnitlessSpectrum):
         """
         w, y = self._get_arrays(wavelengths)
 
-        kwargs['flux_col'] = 'THROUGHPUT'
-        kwargs['flux_unit'] = self._internal_flux_unit
+        kwargs["flux_col"] = "THROUGHPUT"
+        kwargs["flux_unit"] = self._internal_flux_unit
 
         # There are some standard keywords that should be added
         # to the extension header.
-        bkeys = {'tdisp1': 'G15.7', 'tdisp2': 'G15.7'}
+        bkeys = {"tdisp1": "G15.7", "tdisp2": "G15.7"}
 
-        if 'expr' in self.meta:
-            bkeys['expr'] = (self.meta['expr'], 'synphot expression')
+        if "expr" in self.meta:
+            bkeys["expr"] = (self.meta["expr"], "synphot expression")
 
-        if 'ext_header' in kwargs:
-            kwargs['ext_header'].update(bkeys)
+        if "ext_header" in kwargs:
+            kwargs["ext_header"].update(bkeys)
         else:
-            kwargs['ext_header'] = bkeys
+            kwargs["ext_header"] = bkeys
 
         specio.write_fits_spec(filename, w, y, **kwargs)
 
@@ -2019,14 +1965,13 @@ class SpectralElement(BaseUnitlessSpectrum):
 
         """
         if is_fits("", filename, None):
-            if 'flux_col' not in kwargs:
-                kwargs['flux_col'] = 'THROUGHPUT'
-        elif 'flux_unit' not in kwargs:  # pragma: no cover
-            kwargs['flux_unit'] = cls._internal_flux_unit
+            if "flux_col" not in kwargs:
+                kwargs["flux_col"] = "THROUGHPUT"
+        elif "flux_unit" not in kwargs:  # pragma: no cover
+            kwargs["flux_unit"] = cls._internal_flux_unit
 
         header, wavelengths, throughput = specio.read_spec(filename, **kwargs)
-        return cls(Empirical1D, points=wavelengths, lookup_table=throughput,
-                   keep_neg=True, meta={'header': header})
+        return cls(Empirical1D, points=wavelengths, lookup_table=throughput, keep_neg=True, meta={"header": header})
 
     @classmethod
     def from_filter(cls, filtername, **kwargs):
@@ -2056,46 +2001,43 @@ class SpectralElement(BaseUnitlessSpectrum):
         filtername = filtername.lower()
 
         # Select filename based on filter name
-        if filtername == 'bessel_j':
+        if filtername == "bessel_j":
             cfgitem = Conf.bessel_j_file
-        elif filtername == 'bessel_h':
+        elif filtername == "bessel_h":
             cfgitem = Conf.bessel_h_file
-        elif filtername == 'bessel_k':
+        elif filtername == "bessel_k":
             cfgitem = Conf.bessel_k_file
-        elif filtername == 'cousins_r':
+        elif filtername == "cousins_r":
             cfgitem = Conf.cousins_r_file
-        elif filtername == 'cousins_i':
+        elif filtername == "cousins_i":
             cfgitem = Conf.cousins_i_file
-        elif filtername == 'johnson_u':
+        elif filtername == "johnson_u":
             cfgitem = Conf.johnson_u_file
-        elif filtername == 'johnson_b':
+        elif filtername == "johnson_b":
             cfgitem = Conf.johnson_b_file
-        elif filtername == 'johnson_v':
+        elif filtername == "johnson_v":
             cfgitem = Conf.johnson_v_file
-        elif filtername == 'johnson_r':
+        elif filtername == "johnson_r":
             cfgitem = Conf.johnson_r_file
-        elif filtername == 'johnson_i':
+        elif filtername == "johnson_i":
             cfgitem = Conf.johnson_i_file
-        elif filtername == 'johnson_j':
+        elif filtername == "johnson_j":
             cfgitem = Conf.johnson_j_file
-        elif filtername == 'johnson_k':
+        elif filtername == "johnson_k":
             cfgitem = Conf.johnson_k_file
         else:
-            raise exceptions.SynphotError(
-                'Filter name {0} is invalid.'.format(filtername))
+            raise exceptions.SynphotError(f"Filter name {filtername} is invalid.")
 
         filename = cfgitem()
 
         if is_fits("", filename, None):
-            if 'flux_col' not in kwargs:
-                kwargs['flux_col'] = 'THROUGHPUT'
-        elif 'flux_unit' not in kwargs:  # pragma: no cover
-            kwargs['flux_unit'] = cls._internal_flux_unit
+            if "flux_col" not in kwargs:
+                kwargs["flux_col"] = "THROUGHPUT"
+        elif "flux_unit" not in kwargs:  # pragma: no cover
+            kwargs["flux_unit"] = cls._internal_flux_unit
 
-        header, wavelengths, throughput = specio.read_remote_spec(
-            filename, **kwargs)
-        header['filename'] = filename
-        header['descrip'] = cfgitem.description
-        meta = {'header': header, 'expr': filtername}
-        return cls(Empirical1D, points=wavelengths, lookup_table=throughput,
-                   meta=meta)
+        header, wavelengths, throughput = specio.read_remote_spec(filename, **kwargs)
+        header["filename"] = filename
+        header["descrip"] = cfgitem.description
+        meta = {"header": header, "expr": filtername}
+        return cls(Empirical1D, points=wavelengths, lookup_table=throughput, meta=meta)

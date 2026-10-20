@@ -21,12 +21,16 @@ from astropy.utils.exceptions import AstropyUserWarning
 # LOCAL
 from synphot import __version__, exceptions, units
 
-__all__ = ['read_remote_spec', 'read_spec', 'read_ascii_spec',
-           'read_fits_spec', 'write_fits_spec']
+__all__ = [
+    "read_ascii_spec",
+    "read_fits_spec",
+    "read_remote_spec",
+    "read_spec",
+    "write_fits_spec",
+]
 
 
-def read_remote_spec(filename, encoding='binary', cache=True,
-                     show_progress=True, **kwargs):
+def read_remote_spec(filename, encoding="binary", cache=True, show_progress=True, **kwargs):
     """Read FITS or ASCII spectrum from a remote location.
 
     Parameters
@@ -50,14 +54,13 @@ def read_remote_spec(filename, encoding='binary', cache=True,
         Wavelength and flux of the spectrum.
 
     """
-    with get_readable_fileobj(filename, encoding=encoding, cache=cache,
-                              show_progress=show_progress) as fd:
+    with get_readable_fileobj(filename, encoding=encoding, cache=cache, show_progress=show_progress) as fd:
         header, wavelengths, fluxes = read_spec(fd, fname=filename, **kwargs)
 
     return header, wavelengths, fluxes
 
 
-def read_spec(filename, fname='', **kwargs):
+def read_spec(filename, fname="", **kwargs):
     """Read FITS or ASCII spectrum.
 
     Parameters
@@ -89,7 +92,7 @@ def read_spec(filename, fname='', **kwargs):
     if isinstance(filename, str):
         fname = filename
     elif not fname:  # pragma: no cover
-        raise exceptions.SynphotError('Cannot determine filename.')
+        raise exceptions.SynphotError("Cannot determine filename.")
 
     if is_fits("", fname, None):
         read_func = read_fits_spec
@@ -147,10 +150,9 @@ def read_ascii_spec(filename, wave_unit=u.AA, flux_unit=units.FLAM, **kwargs):
 
 
 @deprecated_renamed_argument(
-    ["wave_unit", "flux_unit"], [None, None], ["1.4", "1.4"],
-    alternative='TUNITn as per FITS standards')
-def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
-                   wave_unit=u.AA, flux_unit=units.FLAM):
+    ["wave_unit", "flux_unit"], [None, None], ["1.4", "1.4"], alternative="TUNITn as per FITS standards"
+)
+def read_fits_spec(filename, ext=1, wave_col="WAVELENGTH", flux_col="FLUX", wave_unit=u.AA, flux_unit=units.FLAM):
     """Read FITS spectrum.
 
     Wavelength and flux units are extracted from respective ``TUNITn``
@@ -198,11 +200,10 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
             if not val:
                 continue
             newval = units.validate_unit(val)
-            subhdu.header[key] = newval.to_string()  # Must be generic to handle mag  # noqa: E501
+            subhdu.header[key] = newval.to_string()  # Must be generic to handle mag
 
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=u.UnitsWarning,
-                                    message=".* did not parse as fits unit")
+            warnings.filterwarnings("ignore", category=u.UnitsWarning, message=".* did not parse as fits unit")
             t = QTable.read(subhdu)
         header = dict(fs["PRIMARY"].header)
 
@@ -228,11 +229,22 @@ def read_fits_spec(filename, ext=1, wave_col='WAVELENGTH', flux_col='FLUX',
     return header, wavelengths, fluxes
 
 
-def write_fits_spec(filename, wavelengths, fluxes, pri_header={},
-                    ext_header={}, overwrite=False, trim_zero=True,
-                    pad_zero_ends=True, precision=None, epsilon=0.00032,
-                    wave_col='WAVELENGTH', flux_col='FLUX',
-                    wave_unit=u.AA, flux_unit=units.FLAM):
+def write_fits_spec(
+    filename,
+    wavelengths,
+    fluxes,
+    pri_header={},
+    ext_header={},
+    overwrite=False,
+    trim_zero=True,
+    pad_zero_ends=True,
+    precision=None,
+    epsilon=0.00032,
+    wave_col="WAVELENGTH",
+    flux_col="FLUX",
+    wave_unit=u.AA,
+    flux_unit=units.FLAM,
+):
     """Write FITS spectrum.
 
     .. warning::
@@ -305,9 +317,7 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={},
     flux_unit = units.validate_unit(flux_unit).to_string().upper()
 
     if wave_value.shape != flux_value.shape:
-        raise exceptions.SynphotError(
-            'Wavelengths have shape {0} but fluxes have shape {1}'.format(
-                wave_value.shape, flux_value.shape))
+        raise exceptions.SynphotError(f"Wavelengths have shape {wave_value.shape} but fluxes have shape {flux_value.shape}")
 
     # Remove rows with zero flux. Putting this before precision logic to avoid
     # keeping duplicate wavelengths with zero flux.
@@ -318,40 +328,38 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={},
 
         n_thrown = wave_value.size - len(idx[0])
         if n_thrown != 0:
-            log.info('{0} zero-flux rows are thrown out'.format(n_thrown))
+            log.info(f"{n_thrown} zero-flux rows are thrown out")
 
     # Only these Numpy types are supported
     #    'f'   np.float32
     #    'd'   np.float64
-    pcodes = {'d': 'D', 'f': 'E'}  # Numpy to FITS conversion
+    pcodes = {"d": "D", "f": "E"}  # Numpy to FITS conversion
 
     # Use native flux precision
     if precision is None:
         precision = flux_value.dtype.char
         if precision not in pcodes:
-            raise exceptions.SynphotError('flux is not float32 or float64')
+            raise exceptions.SynphotError("flux is not float32 or float64")
 
     # Use user specified precision
     else:
         precision = precision.lower()
-        if precision == 'single':
-            precision = 'f'
-        elif precision == 'double':
-            precision = 'd'
+        if precision == "single":
+            precision = "f"
+        elif precision == "double":
+            precision = "d"
         else:
-            raise exceptions.SynphotError(
-                'precision must be single or double')
+            raise exceptions.SynphotError("precision must be single or double")
 
     # Now check wavelength precision
     wave_precision = wave_value.dtype.char
     if wave_precision not in pcodes:
-        raise exceptions.SynphotError(
-            'wavelength is not float32 or float64')
+        raise exceptions.SynphotError("wavelength is not float32 or float64")
 
     # If wavelength is double-precision but data is written out as
     # single-precision, wavelength values have to be recalculated
     # so that they will still be sorted with no duplicates.
-    if wave_precision == 'd' and precision == 'f':
+    if wave_precision == "d" and precision == "f":
         orig_size = wave_value.size
         idx = np.where(np.abs(wave_value[1:] - wave_value[:-1]) > epsilon)
         wave_value = np.append(wave_value[idx], wave_value[-1])
@@ -359,9 +367,9 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={},
         n_thrown = orig_size - wave_value.size
         if n_thrown != 0:
             warnings.warn(
-                '{0} rows are thrown out in converting wavelengths from '
-                'double- to single-precision'.format(n_thrown),
-                AstropyUserWarning)
+                f"{n_thrown} rows are thrown out in converting wavelengths from double- to single-precision",
+                AstropyUserWarning,
+            )
 
     # Keep one zero at each end
     if pad_zero_ends:
@@ -371,18 +379,16 @@ def write_fits_spec(filename, wavelengths, fluxes, pri_header={},
         flux_value = np.insert(flux_value, [0, flux_value.size], [0.0, 0.0])
 
     # Construct the columns
-    cw = fits.Column(name=wave_col, array=wave_value, unit=wave_unit,
-                     format=pcodes[precision])
-    cf = fits.Column(name=flux_col, array=flux_value, unit=flux_unit,
-                     format=pcodes[precision])
+    cw = fits.Column(name=wave_col, array=wave_value, unit=wave_unit, format=pcodes[precision])
+    cf = fits.Column(name=flux_col, array=flux_value, unit=flux_unit, format=pcodes[precision])
 
     # These are written to the primary header:
     #   1. Filename
     #   2. Origin
     #   3. User dictionary (can overwrite defaults)
     hdr_hdu = fits.PrimaryHDU()
-    hdr_hdu.header['filename'] = (os.path.basename(filename), 'name of file')
-    hdr_hdu.header['origin'] = ('synphot', 'Version {0}'.format(__version__))
+    hdr_hdu.header["filename"] = (os.path.basename(filename), "name of file")
+    hdr_hdu.header["origin"] = ("synphot", f"Version {__version__}")
     for key, val in pri_header.items():
         hdr_hdu.header[key] = val
 

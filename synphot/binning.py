@@ -10,8 +10,13 @@ from astropy import units as u
 # LOCAL
 from synphot import exceptions
 
-__all__ = ['calculate_bin_edges', 'calculate_bin_widths',
-           'calculate_bin_centers', 'wave_range', 'pixel_range']
+__all__ = [
+    "calculate_bin_centers",
+    "calculate_bin_edges",
+    "calculate_bin_widths",
+    "pixel_range",
+    "wave_range",
+]
 
 
 def _slow_calcbinflux(len_binwave, i_beg, i_end, avflux, deltaw):
@@ -23,8 +28,8 @@ def _slow_calcbinflux(len_binwave, i_beg, i_end, avflux, deltaw):
     See ``include/synphot_utils.h``.
 
     """
-    binflux = np.empty(shape=(len_binwave, ), dtype=np.float64)
-    intwave = np.empty(shape=(len_binwave, ), dtype=np.float64)
+    binflux = np.empty(shape=(len_binwave,), dtype=np.float64)
+    intwave = np.empty(shape=(len_binwave,), dtype=np.float64)
 
     # Note that, like all Python striding, the range over which
     # we integrate is [first:last).
@@ -76,11 +81,10 @@ def calculate_bin_edges(centers):
         centers = centers * u.AA
 
     if centers.ndim != 1:
-        raise exceptions.SynphotError('Bin centers must be 1D array.')
+        raise exceptions.SynphotError("Bin centers must be 1D array.")
 
     if centers.size < 2:
-        raise exceptions.SynphotError(
-            'Bin centers must have at least two values.')
+        raise exceptions.SynphotError("Bin centers must have at least two values.")
 
     edges = np.empty(centers.size + 1, dtype=np.float64)
     edges[1:-1] = (centers.value[1:] + centers.value[:-1]) * 0.5
@@ -117,11 +121,10 @@ def calculate_bin_widths(edges):
         edges = edges * u.AA
 
     if edges.ndim != 1:
-        raise exceptions.SynphotError('Bin edges must be 1D array.')
+        raise exceptions.SynphotError("Bin edges must be 1D array.")
 
     if edges.size < 2:
-        raise exceptions.SynphotError(
-            'Bin edges must have at least two values.')
+        raise exceptions.SynphotError("Bin edges must have at least two values.")
 
     return np.abs(edges[1:] - edges[:-1])
 
@@ -151,11 +154,10 @@ def calculate_bin_centers(edges):
         edges = edges * u.AA
 
     if edges.ndim != 1:
-        raise exceptions.SynphotError('Bin edges must be 1D array.')
+        raise exceptions.SynphotError("Bin edges must be 1D array.")
 
     if edges.size < 2:
-        raise exceptions.SynphotError(
-            'Bin edges must have at least two values.')
+        raise exceptions.SynphotError("Bin edges must have at least two values.")
 
     centers = np.empty(edges.size - 1, dtype=np.float64)
     centers[0] = edges.value[:2].mean()
@@ -166,7 +168,7 @@ def calculate_bin_centers(edges):
     return centers * edges.unit
 
 
-def wave_range(bins, cenwave, npix, mode='round'):
+def wave_range(bins, cenwave, npix, mode="round"):
     """Calculate the wavelength range covered by the given number of pixels
     centered on the given central wavelength of the given bins.
 
@@ -221,13 +223,11 @@ def wave_range(bins, cenwave, npix, mode='round'):
     """
     mode = mode.lower()
 
-    if mode not in ('round', 'min', 'max', 'none'):
-        raise exceptions.SynphotError(
-            'mode={0} is invalid, must be "round", "min", "max", '
-            'or "none".'.format(mode))
+    if mode not in ("round", "min", "max", "none"):
+        raise exceptions.SynphotError(f'mode={mode} is invalid, must be "round", "min", "max", or "none".')
 
     if not isinstance(npix, int):
-        raise exceptions.SynphotError('npix={0} is invalid.'.format(npix))
+        raise exceptions.SynphotError(f"npix={npix} is invalid.")
 
     # Bin values must be in ascending order.
     if bins[0] > bins[-1]:
@@ -235,9 +235,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
 
     # Central wavelength must be within given bins.
     if cenwave < bins[0] or cenwave > bins[-1]:
-        raise exceptions.OverlapError(
-            'cenwave={0} is not within binset (min={1}, max={2}).'.format(
-                cenwave, bins[0], bins[-1]))
+        raise exceptions.OverlapError(f"cenwave={cenwave} is not within binset (min={bins[0]}, max={bins[-1]}).")
 
     # Find the index the central wavelength among bins
     diff = cenwave - bins
@@ -257,23 +255,21 @@ def wave_range(bins, cenwave, npix, mode='round'):
 
     # Calculated edges must not exceed bin edges
     if frac_ind1 < -0.5:
-        raise exceptions.OverlapError(
-            'Lower limit of wavelength range is out of bounds.')
+        raise exceptions.OverlapError("Lower limit of wavelength range is out of bounds.")
     if frac_ind2 > (bins.size - 0.5):
-        raise exceptions.OverlapError(
-            'Upper limit of wavelength range is out of bounds.')
+        raise exceptions.OverlapError("Upper limit of wavelength range is out of bounds.")
 
     frac1, int1 = np.modf(frac_ind1)
     frac2, int2 = np.modf(frac_ind2)
     int1 = int(int1)
     int2 = int(int2)
 
-    if mode == 'round':
+    if mode == "round":
         # Lower end of wavelength range
         if frac1 >= 0:
             # end is somewhere greater than binset[0] so we can just
             # interpolate between two neighboring values going with upper edge
-            wave1 = bins[int1:int1 + 2].mean()
+            wave1 = bins[int1 : int1 + 2].mean()
         else:
             # end is below the lowest binset value, but not by enough to
             # trigger an exception
@@ -283,73 +279,65 @@ def wave_range(bins, cenwave, npix, mode='round'):
         if int2 < bins.shape[0] - 1:
             # end is somewhere below binset[-1] so we can just interpolate
             # between two neighboring values, going with the upper edge.
-            wave2 = bins[int2:int2 + 2].mean()
+            wave2 = bins[int2 : int2 + 2].mean()
         else:
             # end is above highest binset value but not by enough to
             # trigger an exception
             wave2 = bins[-1] + (bins[-1] - bins[-2:].mean())
 
-    elif mode == 'min':
+    elif mode == "min":
         # Lower end of wavelength range
         if frac1 <= 0.5 and int1 < bins.shape[0] - 1:
             # not at the lowest possible edge and pixel i included
-            wave1 = bins[int1:int1 + 2].mean()
+            wave1 = bins[int1 : int1 + 2].mean()
         elif frac1 > 0.5 and int1 < bins.shape[0] - 2:
             # not at the lowest possible edge and pixel i not included
-            wave1 = bins[int1 + 1:int1 + 3].mean()
+            wave1 = bins[int1 + 1 : int1 + 3].mean()
         elif frac1 == -0.5:
             # at the lowest possible edge
             wave1 = bins[0] - (bins[0:2].mean() - bins[0])
         else:  # pragma: no cover
-            raise exceptions.SynphotError(
-                'mode={0} gets unexpected frac1={1}, int1={2}'.format(
-                    mode, frac1, int1))
+            raise exceptions.SynphotError(f"mode={mode} gets unexpected frac1={frac1}, int1={int1}")
 
         # Upper end of wavelength range
         if frac2 >= 0.5 and int2 < bins.shape[0] - 1:
             # not out at the end and pixel i included
-            wave2 = bins[int2:int2 + 2].mean()
+            wave2 = bins[int2 : int2 + 2].mean()
         elif frac2 < 0.5 and int2 < bins.shape[0]:
             # not out at end and pixel i not included
-            wave2 = bins[int2 - 1:int2 + 1].mean()
+            wave2 = bins[int2 - 1 : int2 + 1].mean()
         elif frac2 == 0.5 and int2 == bins.shape[0] - 1:
             # at the very end
             wave2 = bins[-1] + (bins[-1] - bins[-2:].mean())
         else:  # pragma: no cover
-            raise exceptions.SynphotError(
-                'mode={0} gets unexpected frac2={1}, int2={2}'.format(
-                    mode, frac2, int2))
+            raise exceptions.SynphotError(f"mode={mode} gets unexpected frac2={frac2}, int2={int2}")
 
-    elif mode == 'max':
+    elif mode == "max":
         # Lower end of wavelength range
         if frac1 < 0.5 and int1 < bins.shape[0]:
             # not at the lowest possible edge and pixel i included
-            wave1 = bins[int1 - 1:int1 + 1].mean()
+            wave1 = bins[int1 - 1 : int1 + 1].mean()
         elif frac1 >= 0.5 and int1 < bins.shape[0] - 1:
             # not at the lowest possible edge and pixel i not included
-            wave1 = bins[int1:int1 + 2].mean()
+            wave1 = bins[int1 : int1 + 2].mean()
         elif frac1 == -0.5:
             # at the lowest possible edge
             wave1 = bins[0] - (bins[0:2].mean() - bins[0])
         else:  # pragma: no cover
-            raise exceptions.SynphotError(
-                'mode={0} gets unexpected frac1={1}, int1={2}'.format(
-                    mode, frac1, int1))
+            raise exceptions.SynphotError(f"mode={mode} gets unexpected frac1={frac1}, int1={int1}")
 
         # Upper end of wavelength range
         if frac2 > 0.5 and int2 < bins.shape[0] - 2:
             # not out at the end and pixel i included
-            wave2 = bins[int2 + 1:int2 + 3].mean()
+            wave2 = bins[int2 + 1 : int2 + 3].mean()
         elif frac2 <= 0.5 and int2 < bins.shape[0] - 1:
             # not out at end and pixel i not included
-            wave2 = bins[int2:int2 + 2].mean()
+            wave2 = bins[int2 : int2 + 2].mean()
         elif frac2 == 0.5 and int2 == bins.shape[0] - 1:
             # at the very end
             wave2 = bins[-1] + (bins[-1] - bins[-2:].mean())
         else:  # pragma: no cover
-            raise exceptions.SynphotError(
-                'mode={0} gets unexpected frac2={1}, int2={2}'.format(
-                    mode, frac2, int2))
+            raise exceptions.SynphotError(f"mode={mode} gets unexpected frac2={frac2}, int2={int2}")
 
     else:  # mode == 'none'
         wave1 = bins[int1] + frac1 * (bins[int1 + 1] - bins[int1])
@@ -358,7 +346,7 @@ def wave_range(bins, cenwave, npix, mode='round'):
     return wave1, wave2
 
 
-def pixel_range(bins, waverange, mode='round'):
+def pixel_range(bins, waverange, mode="round"):
     """Calculate the number of pixels within the given wavelength range
     and the given bins.
 
@@ -408,10 +396,8 @@ def pixel_range(bins, waverange, mode='round'):
     """
     mode = mode.lower()
 
-    if mode not in ('round', 'min', 'max', 'none'):
-        raise exceptions.SynphotError(
-            'mode={0} is invalid, must be "round", "min", "max", '
-            'or "none".'.format(mode))
+    if mode not in ("round", "min", "max", "none"):
+        raise exceptions.SynphotError(f'mode={mode} is invalid, must be "round", "min", "max", or "none".')
 
     if waverange[0] < waverange[-1]:
         wave1 = waverange[0]
@@ -429,23 +415,23 @@ def pixel_range(bins, waverange, mode='round'):
     maxwave = bins[-1] + (bins[-1] - bins[-2:].mean())
     if wave1 < minwave or wave2 > maxwave:
         raise exceptions.OverlapError(
-            'Wavelength range ({0}, {1}) is out of bounds of bins '
-            '(min={2}, max={3}).'.format(wave1, wave2, minwave, maxwave))
+            f"Wavelength range ({wave1}, {wave2}) is out of bounds of bins (min={minwave}, max={maxwave})."
+        )
 
     if wave1 == wave2:
         return 0
 
-    if mode == 'round':
-        ind1 = bins.searchsorted(wave1, side='right')
-        ind2 = bins.searchsorted(wave2, side='right')
+    if mode == "round":
+        ind1 = bins.searchsorted(wave1, side="right")
+        ind2 = bins.searchsorted(wave2, side="right")
     else:
-        ind1 = bins.searchsorted(wave1, side='left')
-        ind2 = bins.searchsorted(wave2, side='left')
+        ind1 = bins.searchsorted(wave1, side="left")
+        ind2 = bins.searchsorted(wave2, side="left")
 
-    if mode == 'round':
+    if mode == "round":
         npix = ind2 - ind1
 
-    elif mode == 'min':
+    elif mode == "min":
         # for ind1, figure out if pixel ind1 is wholly included or not.
         # do this by figuring out where wave1 is between ind1 and ind1-1.
         frac = (bins[ind1] - wave1) / (bins[ind1] - bins[ind1 - 1])
@@ -461,7 +447,7 @@ def pixel_range(bins, waverange, mode='round'):
 
         npix = ind2 - ind1
 
-    elif mode == 'max':
+    elif mode == "max":
         # for ind1, figure out if pixel ind1-1 is partially included or not.
         # do this by figuring out where wave1 is between ind1 and ind1-1.
         frac = (wave1 - bins[ind1 - 1]) / (bins[ind1] - bins[ind1 - 1])

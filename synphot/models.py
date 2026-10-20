@@ -15,8 +15,8 @@ from astropy import constants as const
 from astropy import units as u
 from astropy.modeling import Fittable1DModel, Model, Parameter
 from astropy.modeling import models as _models
-from astropy.modeling.models import (RickerWavelet1D as _RickerWavelet1D,
-                                     Tabular1D)
+from astropy.modeling.models import RickerWavelet1D as _RickerWavelet1D
+from astropy.modeling.models import Tabular1D
 from astropy.stats.funcs import gaussian_fwhm_to_sigma, gaussian_sigma_to_fwhm
 from astropy.utils import metadata
 from astropy.utils.exceptions import AstropyUserWarning
@@ -26,10 +26,23 @@ from synphot import units
 from synphot.exceptions import SynphotError
 from synphot.utils import merge_wavelengths
 
-__all__ = ['BlackBody1D', 'BlackBodyNorm1D', 'Box1D', 'ConstFlux1D',
-           'Empirical1D', 'Gaussian1D', 'GaussianAbsorption1D',
-           'GaussianFlux1D', 'Lorentz1D', 'MexicanHat1D', 'RickerWavelet1D',
-           'PowerLawFlux1D', 'Trapezoid1D', 'get_waveset', 'get_metadata']
+__all__ = [
+    "BlackBody1D",
+    "BlackBodyNorm1D",
+    "Box1D",
+    "ConstFlux1D",
+    "Empirical1D",
+    "Gaussian1D",
+    "GaussianAbsorption1D",
+    "GaussianFlux1D",
+    "Lorentz1D",
+    "MexicanHat1D",
+    "PowerLawFlux1D",
+    "RickerWavelet1D",
+    "Trapezoid1D",
+    "get_metadata",
+    "get_waveset",
+]
 
 
 class BlackBody1D(Fittable1DModel):
@@ -42,11 +55,12 @@ class BlackBody1D(Fittable1DModel):
         Blackbody temperature in Kelvin.
 
     """
+
     temperature = Parameter(default=5000)
 
     def __init__(self, *args, **kwargs):
-        super(BlackBody1D, self).__init__(*args, **kwargs)
-        self.meta['expr'] = 'bb({0})'.format(self.temperature.value)
+        super().__init__(*args, **kwargs)
+        self.meta["expr"] = f"bb({self.temperature.value})"
 
     @property
     def lambda_max(self):
@@ -116,12 +130,11 @@ class BlackBody1D(Fittable1DModel):
         from synphot.blackbody import blackbody_nu
 
         # Silence Numpy
-        old_np_err_cfg = np.seterr(all='ignore')
+        old_np_err_cfg = np.seterr(all="ignore")
 
         wave = np.ascontiguousarray(x) * u.AA
         bbnu_flux = blackbody_nu(wave, temperature)
-        bbflux = (bbnu_flux * u.sr).to(
-            units.PHOTLAM, u.spectral_density(wave)) / u.sr  # PHOTLAM/sr
+        bbflux = (bbnu_flux * u.sr).to(units.PHOTLAM, u.spectral_density(wave)) / u.sr  # PHOTLAM/sr
 
         # Restore Numpy settings
         np.seterr(**old_np_err_cfg)
@@ -132,7 +145,7 @@ class BlackBody1D(Fittable1DModel):
         with u.add_enabled_equivalencies(u.temperature()):
             t = u.Quantity(self.temperature, u.K)
 
-        return (const.sigma_sb * t ** 4 / math.pi)  # per steradian
+        return const.sigma_sb * t**4 / math.pi  # per steradian
 
 
 class BlackBodyNorm1D(BlackBody1D):
@@ -152,8 +165,9 @@ class BlackBodyNorm1D(BlackBody1D):
         Blackbody temperature in Kelvin.
 
     """
+
     def __init__(self, *args, **kwargs):
-        super(BlackBodyNorm1D, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._omega = np.pi * (const.R_sun / const.kpc).value ** 2  # steradian
 
     def evaluate(self, x, temperature):
@@ -173,7 +187,7 @@ class BlackBodyNorm1D(BlackBody1D):
             Blackbody radiation in PHOTLAM.
 
         """
-        bbflux = super(BlackBodyNorm1D, self).evaluate(x, temperature)
+        bbflux = super().evaluate(x, temperature)
         return bbflux * self._omega
 
     def integrate(self, *args):
@@ -191,6 +205,7 @@ class Box1D(_models.Box1D):
         (nominally Angstrom). Defaults to 0.01
 
     """
+
     def __init__(self, *args, **kwargs):
 
         if "step" in kwargs:
@@ -198,7 +213,7 @@ class Box1D(_models.Box1D):
         else:
             self.step = 0.01
 
-        super(Box1D, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @staticmethod
     def _calc_sampleset(w1, w2, step, minimal):
@@ -232,8 +247,7 @@ class Box1D(_models.Box1D):
         if self._n_models == 1:
             w = self._calc_sampleset(w1, w2, step, minimal)
         else:
-            w = list(map(partial(
-                self._calc_sampleset, step=step, minimal=minimal), w1, w2))
+            w = list(map(partial(self._calc_sampleset, step=step, minimal=minimal), w1, w2))
 
         return np.asarray(w)
 
@@ -261,6 +275,7 @@ class ConstFlux1D(_models.Const1D):
         If not Quantity, assume the unit of PHOTLAM.
 
     """
+
     def __init__(self, amplitude, **kwargs):
         if not isinstance(amplitude, u.Quantity):
             amplitude = amplitude * units.PHOTLAM
@@ -269,16 +284,18 @@ class ConstFlux1D(_models.Const1D):
             a = units.convert_flux(1, amplitude, units.FLAM)
         elif amplitude.unit == u.ABmag:
             a = units.convert_flux(1, amplitude, units.FNU)
-        elif (amplitude.unit.physical_type in
-              ('spectral flux density', 'spectral flux density wav',
-               'photon flux density', 'photon flux density wav')):
+        elif amplitude.unit.physical_type in (
+            "spectral flux density",
+            "spectral flux density wav",
+            "photon flux density",
+            "photon flux density wav",
+        ):
             a = amplitude
         else:
-            raise NotImplementedError(
-                '{0} not supported.'.format(amplitude.unit))
+            raise NotImplementedError(f"{amplitude.unit} not supported.")
 
         self._flux_unit = a.unit
-        super(ConstFlux1D, self).__init__(amplitude=a.value, **kwargs)
+        super().__init__(amplitude=a.value, **kwargs)
 
     def evaluate(self, x, *args):
         """One dimensional constant flux model function.
@@ -301,7 +318,7 @@ class ConstFlux1D(_models.Const1D):
     def integrate(self, x):
         # TODO: Remove unit hardcoding when we use model with units natively.
         # TODO: We do not handle wav_unit as wave number nor energy for now.
-        if any(['wav' in t for t in self._flux_unit.physical_type]):
+        if any("wav" in t for t in self._flux_unit.physical_type):
             wav_unit = u.AA
         else:
             wav_unit = u.Hz
@@ -334,40 +351,41 @@ class Empirical1D(Tabular1D):
         behavior.
 
     """
+
     def __init__(self, **kwargs):
 
         # Manually insert user metadata here to accomodate any warning
         # from self._process_neg_flux()
-        meta = kwargs.pop('meta', {})
+        meta = kwargs.pop("meta", {})
         self.meta = meta
-        if 'warnings' not in self.meta:
-            self.meta['warnings'] = {}
+        if "warnings" not in self.meta:
+            self.meta["warnings"] = {}
 
-        x = kwargs['points']
-        y = kwargs['lookup_table']
+        x = kwargs["points"]
+        y = kwargs["lookup_table"]
 
         # Points can only be ascending for interpn()
         if x[-1] < x[0]:
             x = x[::-1]
             y = y[::-1]
-            kwargs['points'] = x
+            kwargs["points"] = x
 
         # Handle negative flux
-        keep_neg = kwargs.pop('keep_neg', False)
+        keep_neg = kwargs.pop("keep_neg", False)
         self._keep_neg = keep_neg
         y = self._process_neg_flux(x, y)
 
-        kwargs['lookup_table'] = y
-        super(Empirical1D, self).__init__(**kwargs)
+        kwargs["lookup_table"] = y
+        super().__init__(**kwargs)
 
         # Set non-default interpolation default values.
         # For tapered model, just fill with zero;
         # Otherwise, extrapolate like ASTROLIB PYSYNPHOT.
-        self.bounds_error = kwargs.get('bounds_error', False)
+        self.bounds_error = kwargs.get("bounds_error", False)
         if self.is_tapered():
-            self.fill_value = kwargs.get('fill_value', 0)
+            self.fill_value = kwargs.get("fill_value", 0)
         else:
-            self.fill_value = kwargs.get('fill_value', np.nan)
+            self.fill_value = kwargs.get("fill_value", np.nan)
 
     def _process_neg_flux(self, x, y):
         """Remove negative flux."""
@@ -394,18 +412,15 @@ class Empirical1D(Tabular1D):
                 y[i] = 0
 
         if old_y is not None:
-            warn_str = ('{0} bin(s) contained negative flux or throughput'
-                        '; it/they will be set to zero.'.format(n_neg))
-            warn_str += '\n  points: {0}\n  lookup_table: {1}'.format(
-                old_x, old_y)  # Extra info
-            self.meta['warnings'].update({'NegativeFlux': warn_str})
+            warn_str = f"{n_neg} bin(s) contained negative flux or throughput; it/they will be set to zero."
+            warn_str += f"\n  points: {old_x}\n  lookup_table: {old_y}"  # Extra info
+            self.meta["warnings"].update({"NegativeFlux": warn_str})
             warnings.warn(warn_str, AstropyUserWarning)
 
         return y
 
     def is_tapered(self):
-        return np.array_equal(
-            self.lookup_table[::self.lookup_table.size - 1], [0, 0])
+        return np.array_equal(self.lookup_table[:: self.lookup_table.size - 1], [0, 0])
 
     def sampleset(self):
         """Return array that samples the feature."""
@@ -425,18 +440,16 @@ class Empirical1D(Tabular1D):
             Flux or throughput in same unit as ``lookup_table``.
 
         """
-        y = super(Empirical1D, self).evaluate(inputs)
+        y = super().evaluate(inputs)
 
         # Assume NaN at both ends need to be extrapolated based on
         # nearest end point.
-        if self.fill_value is np.nan:
+        if np.isnan(self.fill_value):
             # Cannot use sampleset() due to ExtinctionModel1D.
             x = np.squeeze(self.points)
 
             # np.squeeze may throw unit away.
-            if (isinstance(self.points, tuple) and
-                    isinstance(self.points[0], u.Quantity) and
-                    not isinstance(x, u.Quantity)):
+            if isinstance(self.points, tuple) and isinstance(self.points[0], u.Quantity) and not isinstance(x, u.Quantity):
                 x = x * self.points[0].unit
 
             if np.isscalar(y):  # pragma: no cover
@@ -456,6 +469,7 @@ class BaseGaussian1D(_models.Gaussian1D):
     ``sampleset`` defined.
 
     """
+
     _sqrt_2_pi = math.sqrt(2 * math.pi)
 
     def sampleset(self, factor_step=0.1, **kwargs):
@@ -473,8 +487,8 @@ class BaseGaussian1D(_models.Gaussian1D):
             ASTROLIB PYSYNPHOT.
 
         """
-        if 'factor' not in kwargs:
-            kwargs['factor'] = 5.0
+        if "factor" not in kwargs:
+            kwargs["factor"] = 5.0
 
         w1, w2 = self.bounding_box(**kwargs)
         dw = factor_step * self.stddev
@@ -492,6 +506,7 @@ class Gaussian1D(BaseGaussian1D):
     ``sampleset`` defined.
 
     """
+
     def integrate(self, *args):
         # TODO: Remove unit hardcoding when we use model with units natively.
         with u.add_enabled_equivalencies(u.spectral()):
@@ -507,6 +522,7 @@ class GaussianAbsorption1D(BaseGaussian1D):
     except with ``sampleset`` defined.
 
     """
+
     @staticmethod
     def evaluate(x, amplitude, mean, stddev):
         """
@@ -520,8 +536,8 @@ class GaussianAbsorption1D(BaseGaussian1D):
         GaussianAbsorption1D model function derivatives.
         """
         import operator
-        return list(map(
-            operator.neg, Gaussian1D.fit_deriv(x, amplitude, mean, stddev)))
+
+        return list(map(operator.neg, Gaussian1D.fit_deriv(x, amplitude, mean, stddev)))
 
 
 class GaussianFlux1D(Gaussian1D):
@@ -549,11 +565,12 @@ class GaussianFlux1D(Gaussian1D):
         If given, this overrides ``amplitude``.
 
     """
-    def __init__(self, *args, **kwargs):
-        fwhm = kwargs.pop('fwhm', None)
-        total_flux = kwargs.pop('total_flux', None)
 
-        super(GaussianFlux1D, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        fwhm = kwargs.pop("fwhm", None)
+        total_flux = kwargs.pop("total_flux", None)
+
+        super().__init__(*args, **kwargs)
 
         if fwhm is None:
             fwhm = self.stddev * gaussian_sigma_to_fwhm
@@ -563,10 +580,10 @@ class GaussianFlux1D(Gaussian1D):
         gaussian_amp_to_totflux = self._sqrt_2_pi * self.stddev
 
         if total_flux is None:
-            u_str = 'PHOTLAM'
+            u_str = "PHOTLAM"
             total_flux = self.amplitude * gaussian_amp_to_totflux
         else:
-            u_str = 'FLAM'
+            u_str = "FLAM"
             # total_flux is passed in unaltered, any conversion error would
             # happen here.
             tf_unit = u.erg / (u.cm * u.cm * u.s)
@@ -574,15 +591,16 @@ class GaussianFlux1D(Gaussian1D):
                 total_flux = total_flux.to(tf_unit)
             else:
                 total_flux = total_flux * tf_unit
-            self.amplitude = (total_flux / (gaussian_amp_to_totflux * u.AA)).to_value(units.PHOTLAM, u.spectral_density(self.mean.value * u.AA))  # noqa
+            self.amplitude = (total_flux / (gaussian_amp_to_totflux * u.AA)).to_value(
+                units.PHOTLAM, u.spectral_density(self.mean.value * u.AA)
+            )
             total_flux = total_flux.value
 
-        self.meta['expr'] = 'em({0:g}, {1:g}, {2:g}, {3})'.format(
-            self.mean.value, fwhm, total_flux, u_str)
+        self.meta["expr"] = f"em({self.mean.value:g}, {fwhm:g}, {total_flux:g}, {u_str})"
 
     def integrate(self, *args):
         # TODO: Remove unit hardcoding when we use model with units natively.
-        return super(GaussianFlux1D, self).integrate(*args) * units.PHOTLAM
+        return super().integrate(*args) * units.PHOTLAM
 
 
 class Lorentz1D(_models.Lorentz1D):
@@ -590,6 +608,7 @@ class Lorentz1D(_models.Lorentz1D):
     ``sampleset`` defined.
 
     """
+
     def sampleset(self, factor_step=0.05, **kwargs):
         """Return ``x`` array that samples the feature.
 
@@ -631,6 +650,7 @@ class RickerWavelet1D(_RickerWavelet1D):
     with ``sampleset`` defined.
 
     """
+
     def sampleset(self, factor_step=0.1, **kwargs):
         """Return ``x`` array that samples the feature.
 
@@ -668,8 +688,7 @@ class RickerWavelet1D(_RickerWavelet1D):
         x_min = min(x)
         x_max = max(x)
         if x_min >= root_left or x_max <= root_right:
-            raise NotImplementedError(
-                'Partial analytic integration not supported')
+            raise NotImplementedError("Partial analytic integration not supported")
 
         sig2 = sig * sig
 
@@ -681,9 +700,9 @@ class RickerWavelet1D(_RickerWavelet1D):
             return abs(a2 - a1)
 
         # Unsigned area
-        return self.amplitude * (_int_subregion(x_min, root_left) +
-                                 _int_subregion(root_left, root_right) +
-                                 _int_subregion(root_right, x_max))
+        return self.amplitude * (
+            _int_subregion(x_min, root_left) + _int_subregion(root_left, root_right) + _int_subregion(root_right, x_max)
+        )
 
 
 # TODO: Emit proper deprecation warning.
@@ -715,23 +734,25 @@ class PowerLawFlux1D(_models.PowerLaw1D):
         Power law index.
 
     """
+
     def __init__(self, amplitude, x_0, alpha, **kwargs):
         if not isinstance(amplitude, u.Quantity):
             amplitude = amplitude * units.PHOTLAM
 
-        if (amplitude.unit.physical_type in
-                ('spectral flux density', 'spectral flux density wav',
-                 'photon flux density', 'photon flux density wav')):
+        if amplitude.unit.physical_type in (
+            "spectral flux density",
+            "spectral flux density wav",
+            "photon flux density",
+            "photon flux density wav",
+        ):
             self._flux_unit = amplitude.unit
         else:
-            raise NotImplementedError(
-                '{0} not supported.'.format(amplitude.unit))
+            raise NotImplementedError(f"{amplitude.unit} not supported.")
 
         if isinstance(x_0, u.Quantity):
             x_0 = x_0.to_value(u.AA, u.spectral())
 
-        super(PowerLawFlux1D, self).__init__(
-            amplitude=amplitude.value, x_0=x_0, alpha=alpha, **kwargs)
+        super().__init__(amplitude=amplitude.value, x_0=x_0, alpha=alpha, **kwargs)
 
     def evaluate(self, x, *args):
         """Return flux in PHOTLAM. Assume input wavelength is in Angstrom."""
@@ -748,7 +769,7 @@ class PowerLawFlux1D(_models.PowerLaw1D):
             amp = u.Quantity(self.amplitude, self._flux_unit)
 
         fac = 1 - self.alpha
-        denom = x_0 ** -self.alpha * fac
+        denom = x_0**-self.alpha * fac
         return amp * (max(x) ** fac - min(x) ** fac) / denom
 
 
@@ -757,6 +778,7 @@ class Trapezoid1D(_models.Trapezoid1D):
     ``sampleset`` defined.
 
     """
+
     def sampleset(self):
         """Return ``x`` array that samples the feature."""
         x1, x4 = tuple(self.bounding_box.bounding_box())
@@ -782,17 +804,18 @@ class Trapezoid1D(_models.Trapezoid1D):
 
 # Functions below are for sampleset magic.
 
+
 def _get_sampleset(model):
     """Return sampleset of a model or `None` if undefined."""
     w = None
-    if isinstance(model, Model) and hasattr(model, 'sampleset'):
+    if isinstance(model, Model) and hasattr(model, "sampleset"):
         w = model.sampleset()
     return w
 
 
 def _model_tree_evaluate_sampleset(root):
     # Not a CompoundModel, grab sampleset and be done.
-    if not hasattr(root, 'op'):
+    if not hasattr(root, "op"):
         return _get_sampleset(root)
 
     model1 = root.left
@@ -846,12 +869,13 @@ def get_waveset(model):
 
     """
     if not isinstance(model, Model):
-        raise SynphotError('{0} is not a model.'.format(model))
+        raise SynphotError(f"{model} is not a model.")
 
     return _model_tree_evaluate_sampleset(model)
 
 
 # Functions below are for meta magic.
+
 
 def _get_meta(model):
     """Return metadata of a model."""
@@ -863,12 +887,12 @@ def _get_meta(model):
 
 def _model_tree_evaluate_metadata(root):
     # Not a CompoundModel, grab metadata and be done.
-    if not hasattr(root, 'op'):
+    if not hasattr(root, "op"):
         return _get_meta(root)
 
     m1 = _model_tree_evaluate_metadata(root.left)
     m2 = _model_tree_evaluate_metadata(root.right)
-    return metadata.merge(m1, m2, metadata_conflicts='silent')
+    return metadata.merge(m1, m2, metadata_conflicts="silent")
 
 
 def get_metadata(model):
@@ -891,7 +915,7 @@ def get_metadata(model):
 
     """
     if not isinstance(model, Model):
-        raise SynphotError('{0} is not a model.'.format(model))
+        raise SynphotError(f"{model} is not a model.")
 
     # Deep copy to make sure modiyfing returned metadata
     # does not modify input model metadata, especially
