@@ -1,5 +1,9 @@
-1.7.1 (unreleased)
+1.8.0 (2026-10-20)
 ==================
+
+- Dropped support for Python 3.10 and added wheels for Python 3.15.
+  Also bumped minversions of other dependencies: numpy to 2,
+  astropy to 7, scipy to 1.14, and specutils to 2.
 
 1.7.0 (2026-03-06)
 ==================
