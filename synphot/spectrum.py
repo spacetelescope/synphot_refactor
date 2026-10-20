@@ -958,7 +958,7 @@ class BaseSpectrum:
         if not HAS_SPECUTILS:  # pragma: no cover
             raise ImportError('specutils must be installed to use this method')
 
-        from synphot.compat_specutils import Spectrum
+        from specutils import Spectrum
 
         w, y = self._get_arrays(wavelengths, **kwargs)
 

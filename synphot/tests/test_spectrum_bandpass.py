@@ -224,7 +224,7 @@ class TestBuildModelsBandpass:
 @pytest.mark.skipif('not HAS_SPECUTILS')
 class TestSpecutilsBridgeBandpass:
     def test_from_spectrum1d_Empirical1D_bandpass(self):
-        from synphot.compat_specutils import Spectrum
+        from specutils import Spectrum
 
         lamb = [1000, 5000, 10000] * u.AA
         thru = [0, 1, -1] * units.THROUGHPUT
@@ -239,7 +239,7 @@ class TestSpecutilsBridgeBandpass:
         assert_quantity_allclose(bp(w), [0, 1, 0])
 
     def test_from_spectrum1d_Empirical1D_bandpass_masked(self):
-        from synphot.compat_specutils import Spectrum
+        from specutils import Spectrum
 
         lamb = [1000, 5000, 10000] * u.AA
         thru = [0, 1, -1] * units.THROUGHPUT

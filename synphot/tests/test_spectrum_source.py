@@ -585,7 +585,7 @@ class TestRedShift:
 @pytest.mark.skipif(not HAS_SPECUTILS, reason='specutils is not installed')
 class TestSpecutilsBridgeSource:
     def test_from_spectrum1d_Empirical1D_source(self):
-        from synphot.compat_specutils import Spectrum
+        from specutils import Spectrum
 
         lamb = [1000, 5000, 10000] * u.AA
         flux = [0, -0.5e-17, 5.6e-17] * units.FLAM
@@ -609,7 +609,7 @@ class TestSpecutilsBridgeSource:
         assert spec.meta['source'] == [1, 99, 3]
 
     def test_from_spectrum1d_Empirical1D_source_masked(self):
-        from synphot.compat_specutils import Spectrum
+        from specutils import Spectrum
 
         lamb = [1000, 5000, 10000] * u.AA
         flux = [0, -0.5e-17, 5.6e-17] * units.FLAM
