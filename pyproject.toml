@@ -1,5 +1,108 @@
+[project]
+name = "synphot"
+description = "Synthetic photometry"
+readme = {file = "README.rst", content-type = "text/x-rst"}
+requires-python = ">=3.11"
+authors = [{name = "STScI"}]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: C",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Physics"]
+keywords = ["astronomy", "astrophysics", "synthetic", "photometry"]
+dependencies = [
+    "numpy>=2",
+    "astropy>=7",
+    "scipy>=1.12"]
+license = "BSD-3-Clause"
+license-files = ["LICENSE.rst"]
+dynamic = [
+    "version",
+]
+
+[project.urls]
+"Bug Reports" = "https://github.com/spacetelescope/synphot_refactor/issues"
+Source = "https://github.com/spacetelescope/synphot_refactor"
+Help = "https://hsthelp.stsci.edu"
+Documentation = "https://synphot.readthedocs.io"
+
+[project.optional-dependencies]
+all = [
+    "specutils>=2",
+    "dust-extinction"]
+test = [
+    "pytest-astropy-header",
+    "pytest-cov",
+    "pytest-doctestplus",
+    "pytest-remotedata"]
+docs = [
+    "matplotlib",
+    "sphinx-astropy"]
+
 [build-system]
-requires = ["setuptools>=82.0.1",
-            "setuptools_scm",
-            "numpy>=2.0.0"]
+requires = [
+    "setuptools>=82.0.1",
+    "setuptools_scm",
+    "numpy>=2.0.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+zip-safe = false
+include-package-data = false
+
+[tool.setuptools.packages.find]
+include = ["synphot*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+"synphot.tests" = ["data/*"]
+"synphot.filter_parameterization.tests" = ["data/*"]
+
+[tool.setuptools_scm]
+version_file = "synphot/version.py"
+
+[tool.pytest]
+minversion = "9"
+testpaths = ["synphot", "docs"]
+norecursedirs = ["build", "docs/_build", "synphot/src"]
+astropy_header = true
+doctest_plus = "enabled"
+text_file_format = "rst"
+addopts = ["--doctest-rst", "--import-mode=append"]
+xfail_strict = true
+filterwarnings = [
+    "error",
+    "ignore:can't resolve package from __spec__",
+    "ignore:numpy\\.ndarray size changed:RuntimeWarning",
+    "ignore:numpy\\.ufunc size changed:RuntimeWarning",
+    "ignore:distutils Version classes are deprecated:DeprecationWarning",
+    "ignore:Class CCM89 defines class attributes"]
+
+[tool.coverage]
+
+    [tool.coverage.run]
+    source = "synphot"
+    omit = [
+        "synphot/tests/*",
+        "synphot/version*",
+        "*/synphot/tests/*",
+        "*/synphot/version*"]
+
+    [tool.coverage.report]
+    exclude_also = [
+        # Have to re-enable the standard pragma
+        "pragma: no cover",
+        # Don't complain about packages we have installed
+        "except ImportError",
+        # Don't complain if tests don't hit defensive assertion code:
+        "raise AssertionError",
+        "raise NotImplementedError",
+        # Don't complain about script hooks
+        "'def main(.*):'",
+        # Ignore branches that don't pertain to this version of Python
+        "pragma: py{ignore_python_version}",
+        # Don't complain about IPython completion helper
+        "def _ipython_key_completions_"]
