@@ -1,0 +1,24 @@
+exclude = [
+    "docs",
+    ".tox",
+    ".eggs",
+    "build",
+    "__init__.py",
+]
+line-length = 125
+
+target-version = "py311"
+
+[format]
+quote-style = "double"
+indent-style = "space"
+
+[lint]
+# Ignoring these for now ???
+# I100: import statements are in the wrong order
+# I201: Missing newline before sections or imports
+# W504: line break after binary operator
+ignore = []
+
+[lint.isort]
+known-first-party = ["synphot"]
