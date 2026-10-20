@@ -9,8 +9,6 @@ from copy import deepcopy
 
 # THIRD-PARTY
 import numpy as np
-
-# ASTROPY
 from astropy import log
 from astropy import units as u
 from astropy.io.fits.connect import is_fits

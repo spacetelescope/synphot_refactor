@@ -15,12 +15,11 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.exceptions import AstropyUserWarning
 
+# LOCAL
 from synphot import exceptions, units
 from synphot.compat import HAS_SPECUTILS  # noqa
 from synphot.models import Box1D, Empirical1D, GaussianAbsorption1D
 from synphot.spectrum import SpectralElement
-
-# LOCAL
 from synphot.tests.test_units import _area, _flux_photlam, _wave
 
 

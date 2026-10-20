@@ -10,8 +10,6 @@ import warnings
 
 # THIRD-PARTY
 import numpy as np
-
-# ASTROPY
 from astropy import log
 from astropy import units as u
 from astropy.utils.exceptions import AstropyDeprecationWarning, AstropyUserWarning
