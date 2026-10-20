@@ -84,7 +84,6 @@ filterwarnings = [
 [tool.coverage]
 
     [tool.coverage.run]
-    source = "synphot"
     omit = [
         "synphot/tests/*",
         "synphot/version*",
