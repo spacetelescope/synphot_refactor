@@ -194,13 +194,20 @@ def read_fits_spec(filename, ext=1, wave_col="WAVELENGTH", flux_col="FLUX", wave
         fs = fits.open(filename)
         subhdu = fs[ext]
 
-        # Need to fix table units
+        # Need to fix table units. Write them in FITS format where possible, so that
+        # QTable.read parses them on the first try (a failed parse builds a slow
+        # "did you mean" message). Columns keep the units validated here.
+        col_units = {}
         for key in subhdu.header["TUNIT*"]:
             val = subhdu.header[key]
             if not val:
                 continue
             newval = units.validate_unit(val)
-            subhdu.header[key] = newval.to_string()  # Must be generic to handle mag
+            col_units[subhdu.header[f"TTYPE{key[5:]}"].lower()] = newval
+            try:
+                subhdu.header[key] = newval.to_string(format="fits")
+            except ValueError:
+                subhdu.header[key] = newval.to_string()  # Must be generic to handle mag
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=u.UnitsWarning, message=".* did not parse as fits unit")
@@ -210,15 +217,9 @@ def read_fits_spec(filename, ext=1, wave_col="WAVELENGTH", flux_col="FLUX", wave
         # https://github.com/astropy/astropy/issues/16221
         lower_colnames = [c.lower() for c in t.colnames]
         t_col_wave = t.columns[lower_colnames.index(wave_col)]
-        if t_col_wave.unit:
-            t_col_wave_unit = units.validate_unit(t_col_wave.unit.to_string())
-        else:
-            t_col_wave_unit = u.dimensionless_unscaled
+        t_col_wave_unit = col_units.get(wave_col, u.dimensionless_unscaled)
         t_col_flux = t.columns[lower_colnames.index(flux_col)]
-        if t_col_flux.unit:
-            t_col_flux_unit = units.validate_unit(t_col_flux.unit.to_string())
-        else:
-            t_col_flux_unit = u.dimensionless_unscaled
+        t_col_flux_unit = col_units.get(flux_col, u.dimensionless_unscaled)
         wavelengths = t_col_wave.value * t_col_wave_unit
         fluxes = t_col_flux.value * t_col_flux_unit
 

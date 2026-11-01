@@ -174,6 +174,38 @@ def test_read_nonstandard_fits_cols_01(tmp_path):
         assert_quantity_allclose(tr(wav), trace, atol=1e-7)
 
 
+@pytest.mark.parametrize(
+    ("wave_unit_str", "flux_unit_str", "wave_unit", "flux_unit"),
+    [
+        ("ANGSTROM", "FLAM", u.AA, units.FLAM),
+        ("angstroms", "PHOTLAM", u.AA, units.PHOTLAM),
+        ("nm", "STMAG", u.nm, u.STmag),
+        ("ANGSTROM", "VEGAMAG", u.AA, units.VEGAMAG),
+    ],
+)
+def test_read_fits_synphot_units(tmp_path, wave_unit_str, flux_unit_str, wave_unit, flux_unit):
+    """Columns keep the units validated from TUNITn, including synphot names
+    that are not FITS units and magnitudes that FITS cannot represent."""
+    coldefs = fits.ColDefs(
+        [
+            fits.Column(name="WAVELENGTH", format="E", unit=wave_unit_str, array=[1000, 2000, 3000]),
+            fits.Column(name="FLUX", format="E", unit=flux_unit_str, array=[1, 2, 3]),
+            fits.Column(name="FLUX2", format="E", unit=flux_unit_str, array=[4, 5, 6]),
+        ]
+    )
+    hdulist = fits.HDUList([fits.PrimaryHDU(), fits.BinTableHDU.from_columns(coldefs)])
+    outfile = str(tmp_path / "synphot_units.fits")
+    hdulist.writeto(outfile, overwrite=True)
+
+    header, wavelengths, fluxes = specio.read_fits_spec(outfile)
+
+    assert wavelengths.unit == wave_unit
+    assert fluxes.unit == flux_unit
+    assert fluxes.unit.to_string() == flux_unit.to_string()
+    np.testing.assert_array_equal(wavelengths.value, [1000, 2000, 3000])
+    np.testing.assert_array_equal(fluxes.value, [1, 2, 3])
+
+
 def test_read_nonstandard_fits_cols_02(tmp_path):
     """See https://github.com/spacetelescope/synphot_refactor/issues/372"""
 
