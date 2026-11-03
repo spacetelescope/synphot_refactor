@@ -49,6 +49,9 @@ def test_implicit_assumptions():
     ("in_u", "out_u"),
     [
         ("angstroms", u.AA),
+        ("angstrom", u.AA),
+        ("ANGSTROM", u.AA),
+        ("Angstrom", u.AA),
         ("inversemicrons", u.micron**-1),
         ("transmission", units.THROUGHPUT),
         ("TRANSMISSION", units.THROUGHPUT),

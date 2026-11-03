@@ -1,6 +1,10 @@
 1.8.1 (unreleased)
 ==================
 
+- Reading FITS spectra with synphot unit names such as ``ANGSTROM`` and ``FLAM``
+  in ``TUNITn`` (e.g., the CDBS atlas grids) is about 40% faster. Units no
+  longer fail to parse before falling back, and the results are unchanged. [#458]
+
 1.8.0 (2026-10-20)
 ==================
 
