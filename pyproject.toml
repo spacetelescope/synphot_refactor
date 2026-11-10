@@ -50,6 +50,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
+build = "cp312*" # build against Stable ABI3
 test-requires = "pytest pytest-astropy"
 test-command = "pytest --pyargs synphot"
 
