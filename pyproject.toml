@@ -50,7 +50,6 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
-skip = "cp3*t*" # skip free-threaded Python
 test-requires = "pytest pytest-astropy"
 test-command = "pytest --pyargs synphot"
 
