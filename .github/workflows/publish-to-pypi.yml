@@ -105,7 +105,6 @@ jobs:
         merge-multiple: true
     - name: Pylons inspection
       run: ls dist/*
-    # To upload to PyPI without a token, add this workflow file as a Trusted Publisher in the project settings on the PyPI website
     - name: Publish package to PyPI
       uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # v1.14.3
 
