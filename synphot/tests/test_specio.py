@@ -197,7 +197,7 @@ def test_read_fits_synphot_units(tmp_path, wave_unit_str, flux_unit_str, wave_un
     outfile = str(tmp_path / "synphot_units.fits")
     hdulist.writeto(outfile, overwrite=True)
 
-    header, wavelengths, fluxes = specio.read_fits_spec(outfile)
+    _header, wavelengths, fluxes = specio.read_fits_spec(outfile)
 
     assert wavelengths.unit == wave_unit
     assert fluxes.unit == flux_unit
