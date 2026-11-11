@@ -202,9 +202,7 @@ def read_fits_spec(filename, ext=1, wave_col="WAVELENGTH", flux_col="FLUX", wave
             newval = units.validate_unit(val)
             subhdu.header[key] = newval.to_string()  # Must be generic to handle mag
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=u.UnitsWarning, message=".* did not parse as fits unit")
-            t = QTable.read(subhdu)
+        t = QTable.read(subhdu, unit_parse_strict="silent")
         header = dict(fs["PRIMARY"].header)
 
         # https://github.com/astropy/astropy/issues/16221
