@@ -49,6 +49,17 @@ requires = [
     "numpy>=2.0.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.cibuildwheel]
+skip = "cp3*t*" # skip free-threaded Python
+test-requires = "pytest pytest-astropy"
+test-command = "pytest --pyargs synphot"
+
+[tool.cibuildwheel.windows]
+archs = ["amd64"]
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64"]
+
 [tool.setuptools]
 zip-safe = false
 include-package-data = false

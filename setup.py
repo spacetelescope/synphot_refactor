@@ -1,22 +1,17 @@
 #!/usr/bin/env python
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from setuptools import setup
+import os
 
+import numpy as np
+from setuptools import Extension, setup
 
-def get_extensions():
-    import os
-    from collections import defaultdict
+cfg = {
+    "sources": [os.path.join("synphot", "src", "synphot_utils.c")],
+    "include_dirs": [np.get_include(), os.path.join("synphot", "include")],
+    "define_macros": [("NUMPY", "1")],
+    "libraries": [],
+    "extra_compile_args": [],
+}
 
-    import numpy
-    from setuptools import Extension
-
-    cfg = defaultdict(list)
-    cfg["include_dirs"].extend([numpy.get_include(), os.path.join("synphot", "include")])
-    cfg["sources"] = [os.path.join("synphot", "src", "synphot_utils.c")]
-    cfg = {str(key): val for key, val in cfg.items()}
-
-    return [Extension("synphot.synphot_utils", **cfg)]
-
-
-setup(ext_modules=get_extensions())
+setup(ext_modules=[Extension("synphot.synphot_utils", **cfg)])
