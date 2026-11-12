@@ -13,7 +13,7 @@ from astropy import units as u
 from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
-from astropy.utils.exceptions import AstropyDeprecationWarning, AstropyUserWarning
+from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
 from synphot import exceptions, specio, units
@@ -77,9 +77,8 @@ class TestReadWriteFITS:
                 flux_unit=self.flux.unit,
             )
 
-        # Read it back in and check values (flux_unit should be ignored)
-        with pytest.warns(AstropyDeprecationWarning, match=r"\"flux_unit\" was deprecated"):
-            hdr, wave, flux = specio.read_spec(outfile, flux_unit="foo")
+        # Read it back in and check values
+        hdr, wave, flux = specio.read_spec(outfile)
 
         # Compare data
         np.testing.assert_allclose(wave.value, [1000.0, 2000.0 + self.epsilon, 3000.0, 4000.0, 5000.0], rtol=1e-06)
@@ -110,9 +109,8 @@ class TestReadWriteFITS:
             flux_unit="foo",
         )
 
-        # Read it back in and check values (flux_unit should be ignored)
-        with pytest.warns(AstropyDeprecationWarning, match=r"\"flux_unit\" was deprecated"):
-            hdr, wave, flux = specio.read_spec(outfile, flux_unit="foo")
+        # Read it back in and check values
+        hdr, wave, flux = specio.read_spec(outfile)
 
         # Compare data (trim_zero=True, pad_zero_ends=True)
         np.testing.assert_allclose(
@@ -194,8 +192,7 @@ def test_read_nonstandard_fits_cols_02(tmp_path):
     outfile = str(tmp_path / "skytable.fits")
     hdulist.writeto(outfile, overwrite=True)
 
-    with pytest.warns(u.UnitsWarning, match="'ph/s/m2/micron/arcsec2'"):
-        header, wavelengths, transmission = specio.read_spec(outfile, wave_col="lam", flux_col="trans")
+    header, wavelengths, transmission = specio.read_spec(outfile, wave_col="lam", flux_col="trans")
 
     assert header["SIMPLE"]
     assert_quantity_allclose(wavelengths, wav)
