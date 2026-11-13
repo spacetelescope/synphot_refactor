@@ -5,6 +5,7 @@
 #include "Python.h"
 #include <numpy/arrayobject.h>
 #include "synphot_utils.h"
+#include <stdlib.h>
 
 
 static PyObject * py_calcbinflux(PyObject *self, PyObject *args) {
