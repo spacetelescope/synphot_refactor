@@ -19,7 +19,7 @@ cfg = {
 }
 SETUPTOOLS_OPTIONS = {}
 if GIL_ENABLED_PYTHON:
-    cfg["define_macros"].append(("Py_LIMITED_API", "0x030C0000"))  # PY_VERSION_HEX for 3.12
+    cfg["define_macros"].append(("Py_LIMITED_API", "0x030B0000"))  # PY_VERSION_HEX for 3.11
     SETUPTOOLS_OPTIONS["bdist_wheel"] = {"py_limited_api": "cp312"}
 
 setup(ext_modules=[Extension("synphot.synphot_utils", **cfg)], options=SETUPTOOLS_OPTIONS)
