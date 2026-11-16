@@ -145,7 +145,7 @@ def read_ascii_spec(filename, wave_unit=u.AA, flux_unit=units.FLAM, **kwargs):
     return header, wavelengths, fluxes
 
 
-def read_fits_spec(filename, ext=1, wave_col="WAVELENGTH", flux_col="FLUX"):
+def read_fits_spec(filename, ext=1, wave_col="WAVELENGTH", flux_col="FLUX", primary_header=True):
     """Read FITS spectrum.
 
     Wavelength and flux units are extracted from respective ``TUNITn``
@@ -163,10 +163,18 @@ def read_fits_spec(filename, ext=1, wave_col="WAVELENGTH", flux_col="FLUX"):
     wave_col, flux_col : str
         Wavelength and flux column names (case-insensitive).
 
+    primary_header : bool
+        Return primary header. If `False`, the returned
+        ``header`` is empty, which may increase performance
+        if you plan to do a lot of arithmetic with the
+        spectrum you will build from this function, at the
+        cost of losing metadata.
+
     Returns
     -------
     header : dict
-        Primary header only. Extension header is discarded.
+        Primary header only, if ``primary_header=True``.
+        Extension header is discarded.
 
     wavelengths, fluxes : `~astropy.units.quantity.Quantity`
         Wavelength and flux of the spectrum.
@@ -177,7 +185,10 @@ def read_fits_spec(filename, ext=1, wave_col="WAVELENGTH", flux_col="FLUX"):
 
     try:
         fs = fits.open(filename)
-        header = dict(fs["PRIMARY"].header)
+        if primary_header:
+            header = dict(fs["PRIMARY"].header)
+        else:
+            header = {}
         subhdu = fs[ext]
         subhdu_hdr = subhdu.header
         t = subhdu.data
