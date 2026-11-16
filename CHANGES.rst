@@ -1,5 +1,12 @@
-1.8.1 (unreleased)
+1.9.0 (unreleased)
 ==================
+
+- Removed deprecated ``wave_unit`` and ``flux_unit`` optional
+  keywords from ``read_fits_spec()``. Units are obtained from
+  ``TUNITn`` header keywords as per FITS standards. [#465]
+- ``read_fits_spec()`` is now more performant. [#465]
+- Free-threaded Python wheels are now available for supported
+  architectures. [#462, #463]
 
 1.8.0 (2026-10-20)
 ==================

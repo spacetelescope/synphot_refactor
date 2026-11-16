@@ -7,15 +7,11 @@ import warnings
 
 # THIRD-PARTY
 import numpy as np
-
-# ASTROPY
 from astropy import log
 from astropy import units as u
 from astropy.io import ascii, fits
 from astropy.io.fits.connect import is_fits
-from astropy.table import QTable
 from astropy.utils.data import get_readable_fileobj
-from astropy.utils.decorators import deprecated_renamed_argument
 from astropy.utils.exceptions import AstropyUserWarning
 
 # LOCAL
@@ -107,8 +103,8 @@ def read_ascii_spec(filename, wave_unit=u.AA, flux_unit=units.FLAM, **kwargs):
 
     ASCII table must have following columns:
 
-        #. Wavelength data
-        #. Flux data
+    #. Wavelength data
+    #. Flux data
 
     It can have more than 2 columns but the rest is ignored.
     Comments are discarded.
@@ -149,34 +145,23 @@ def read_ascii_spec(filename, wave_unit=u.AA, flux_unit=units.FLAM, **kwargs):
     return header, wavelengths, fluxes
 
 
-@deprecated_renamed_argument(
-    ["wave_unit", "flux_unit"], [None, None], ["1.4", "1.4"], alternative="TUNITn as per FITS standards"
-)
-def read_fits_spec(filename, ext=1, wave_col="WAVELENGTH", flux_col="FLUX", wave_unit=u.AA, flux_unit=units.FLAM):
+def read_fits_spec(filename, ext=1, wave_col="WAVELENGTH", flux_col="FLUX"):
     """Read FITS spectrum.
 
     Wavelength and flux units are extracted from respective ``TUNITn``
     keywords, from data table (not primary) header.
-    If these keywords are not present, units are taken from
-    ``wave_unit`` and ``flux_unit`` instead.
+    If these keywords are not present, exception is raised.
 
     Parameters
     ----------
     filename : str or file pointer
         Spectrum file name or pointer.
 
-    ext: int
+    ext : int
         FITS extension with table data. Default is 1.
 
     wave_col, flux_col : str
         Wavelength and flux column names (case-insensitive).
-
-    wave_unit, flux_unit : str or `~astropy.units.Unit`
-        Wavelength and flux units. These are *no longer used*.
-        Define your units in the respective ``TUNITn``
-        keywords in table (not primary) header.
-
-        .. deprecated:: 1.4
 
     Returns
     -------
@@ -192,33 +177,21 @@ def read_fits_spec(filename, ext=1, wave_col="WAVELENGTH", flux_col="FLUX", wave
 
     try:
         fs = fits.open(filename)
-        subhdu = fs[ext]
-
-        # Need to fix table units
-        for key in subhdu.header["TUNIT*"]:
-            val = subhdu.header[key]
-            if not val:
-                continue
-            newval = units.validate_unit(val)
-            subhdu.header[key] = newval.to_string()  # Must be generic to handle mag
-
-        t = QTable.read(subhdu, unit_parse_strict="silent")
         header = dict(fs["PRIMARY"].header)
+        subhdu = fs[ext]
+        subhdu_hdr = subhdu.header
+        t = subhdu.data
+        lower_colnames = [c.name.lower() for c in subhdu.columns]
 
-        # https://github.com/astropy/astropy/issues/16221
-        lower_colnames = [c.lower() for c in t.colnames]
-        t_col_wave = t.columns[lower_colnames.index(wave_col)]
-        if t_col_wave.unit:
-            t_col_wave_unit = units.validate_unit(t_col_wave.unit.to_string())
-        else:
-            t_col_wave_unit = u.dimensionless_unscaled
-        t_col_flux = t.columns[lower_colnames.index(flux_col)]
-        if t_col_flux.unit:
-            t_col_flux_unit = units.validate_unit(t_col_flux.unit.to_string())
-        else:
-            t_col_flux_unit = u.dimensionless_unscaled
-        wavelengths = t_col_wave.value * t_col_wave_unit
-        fluxes = t_col_flux.value * t_col_flux_unit
+        t_col_wave = t.field(wave_col)
+        i_col_wave = lower_colnames.index(wave_col)
+        t_col_wave_unit = units.validate_unit(subhdu_hdr.get(f"TUNIT{i_col_wave + 1}", ""))
+        wavelengths = t_col_wave << t_col_wave_unit
+
+        t_col_flux = t.field(flux_col)
+        i_col_flux = lower_colnames.index(flux_col)
+        t_col_flux_unit = units.validate_unit(subhdu_hdr.get(f"TUNIT{i_col_flux + 1}", ""))
+        fluxes = t_col_flux << t_col_flux_unit
 
     finally:
         if isinstance(filename, str):

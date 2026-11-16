@@ -288,7 +288,7 @@ def validate_unit(input_unit):
         input_unit_lowcase = input_unit.lower()
 
         # Backward-compatibility
-        if input_unit_lowcase == "angstroms":
+        if input_unit_lowcase in ("angstrom", "angstroms"):
             output_unit = u.AA
         elif input_unit_lowcase == "inversemicrons":
             output_unit = u.micron**-1

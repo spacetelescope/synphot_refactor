@@ -85,10 +85,8 @@ addopts = ["--doctest-rst", "--import-mode=append"]
 xfail_strict = true
 filterwarnings = [
     "error",
-    "ignore:can't resolve package from __spec__",
     "ignore:numpy\\.ndarray size changed:RuntimeWarning",
     "ignore:numpy\\.ufunc size changed:RuntimeWarning",
-    "ignore:distutils Version classes are deprecated:DeprecationWarning",
     "ignore:Class CCM89 defines class attributes"]
 
 [tool.coverage]
