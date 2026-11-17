@@ -1,4 +1,4 @@
-1.9.0 (unreleased)
+1.9.0 (2026-11-17)
 ==================
 
 - Removed deprecated ``wave_unit`` and ``flux_unit`` optional
