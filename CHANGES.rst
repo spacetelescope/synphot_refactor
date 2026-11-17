@@ -5,6 +5,10 @@
   keywords from ``read_fits_spec()``. Units are obtained from
   ``TUNITn`` header keywords as per FITS standards. [#465]
 - ``read_fits_spec()`` is now more performant. [#465]
+- ``read_fits_spec()`` has a new ``primary_header`` keyword
+  option. Set ``primary_header=False`` to not read and return
+  the primary header. This option can be passed in via any
+  ``from_file`` method, when applicable. [#466]
 - Free-threaded and ABI3 Python wheels are now available for supported
   architectures. [#461, #462, #463]
 

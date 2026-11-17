@@ -167,7 +167,9 @@ def test_read_nonstandard_fits_cols_01(tmp_path):
 
     # Make sure column names are still case insensitive.
     for wave_col, flux_col in (("Wavelength", "Trace"), ("WAVELENGTH", "TRACE"), ("wavelength", "trace")):
-        tr = SpectralElement.from_file(outfile, wave_col=wave_col, flux_col=flux_col)
+        tr = SpectralElement.from_file(outfile, wave_col=wave_col, flux_col=flux_col, primary_header=False)
+        # Also test no-header option.
+        assert tr.meta["header"] == {}
         assert_quantity_allclose(tr.waveset, wav)
         assert_quantity_allclose(tr(wav), trace, atol=1e-7)
 
